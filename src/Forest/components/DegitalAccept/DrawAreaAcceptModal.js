@@ -388,8 +388,17 @@ class DrawAreaAcceptModal extends Component {
             } else {
                 coords = thinClassCoords;
             }
+            console.log('thinClassCoords', thinClassCoords);
+
             if (thinAreaNum > 1) {
-                let coordinatesData = handleMULTIPOLYGONLngLatToLatLng(thinClassCoords);
+                let translateCoords = [];
+                thinClassCoords.map((coord) => {
+                    let translateData = JSON.parse(JSON.stringify(coord));
+                    translateData.push(coord[0]);
+                    translateCoords.push(translateData);
+                });
+                console.log('translateCoords', translateCoords);
+                let coordinatesData = handleMULTIPOLYGONLngLatToLatLng(translateCoords);
                 console.log('coordinatesData', coordinatesData);
                 let data = {
                     type: 'MultiPolygon',
@@ -397,8 +406,10 @@ class DrawAreaAcceptModal extends Component {
                 };
                 wkt = wellknown.stringify(data);
                 console.log('wkt', wkt);
+                wkt = wkt.split('), (').join('),(');
+                console.log('wkt', wkt);
                 coords.map((coord, index) => {
-                    console.log('coord', coord);
+                    // console.log('coord', coord);
                     let num = computeSignedArea(coord, 2);
                     actualRegionArea = actualRegionArea + num;
                 });
@@ -420,7 +431,7 @@ class DrawAreaAcceptModal extends Component {
                 // 获取手动框选坐标wkt
                 wkt = wkt + getHandleWktData(coords);
                 wkt = wkt + ')';
-                console.log('coords', coords);
+                // console.log('coords', coords);
 
                 actualRegionArea = computeSignedArea(coords, 2);
             }
