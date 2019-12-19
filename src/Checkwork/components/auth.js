@@ -1,39 +1,7 @@
 import './Checkwork.less';
-import {handlePOLYGONWktData} from '_platform/gisAuth';
 export const fillAreaColor = (index) => {
     let colors = ['#c3c4f5', '#e7c8f5', '#c8f5ce', '#f5b6b8', '#e7c6f5'];
     return colors[index % 5];
-};
-// 点击区域地块处理电子围栏坐标数据
-export const handleAreaLayerData = async (eventKey, getTreearea) => {
-    let handleKey = eventKey.split('-');
-    let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
-    let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
-    try {
-        let rst = await getTreearea({}, { no: no });
-        if (!(rst && rst.content && rst.content instanceof Array && rst.content.length > 0)) {
-            return;
-        }
-        let coords = [];
-        let str = '';
-        let contents = rst.content;
-        let data = contents.find(content => content.Section === section);
-        let wkt = data.coords;
-        if (wkt.indexOf('MULTIPOLYGON') !== -1) {
-            let datas = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf(')))') + 1);
-            let arr = datas.split('),(');
-            arr.map((a, index) => {
-                str = a.slice(a.indexOf('(') + 1, a.length - 1);
-                coords.push(str);
-            });
-        } else if (wkt.indexOf('POLYGON') !== -1) {
-            str = handlePOLYGONWktData(wkt);
-            coords.push(str);
-        }
-        return coords;
-    } catch (e) {
-        console.log('await', e);
-    }
 };
 
 export const handleCoordinates = (str) => {

@@ -280,3 +280,48 @@ export const handleMULTIPOLYGONLngLatToLatLng = (coordinates) => {
         console.log('handlePolygonLatLngs', e);
     }
 };
+
+// 点击区域地块处理细班坐标数据
+export const handleAreaLayerData = async (eventKey, getTreearea) => {
+    let handleKey = eventKey.split('-');
+    let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
+    let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
+    try {
+        let rst = await getTreearea({}, { no: no });
+        if (!(rst && rst.content && rst.content instanceof Array && rst.content.length > 0)) {
+            return;
+        }
+        let coords = [];
+        let str = '';
+        let contents = rst.content;
+        let datas = [];
+        let coordsList = [];
+        contents.map((content) => {
+            if (content.Section && content.Section === section) {
+                datas.push(content);
+            }
+        });
+        // let data = contents.find(content => content.Section === section);
+        // console.log('data', data);
+        datas.map((data) => {
+            let wkt = data.coords;
+            if (wkt.indexOf('MULTIPOLYGON') !== -1) {
+                let datas = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf(')))') + 1);
+                let arr = datas.split('),(');
+                arr.map((a, index) => {
+                    str = a.slice(a.indexOf('(') + 1, a.length - 1);
+                    coords.push(str);
+                });
+            } else if (wkt.indexOf('POLYGON') !== -1) {
+                str = handlePOLYGONWktData(wkt);
+                coords.push(str);
+            }
+            coordsList.push(coords);
+        });
+        console.log('coordsList', coordsList);
+
+        return coordsList;
+    } catch (e) {
+        console.log('handleAreaLayerData', e);
+    }
+};
