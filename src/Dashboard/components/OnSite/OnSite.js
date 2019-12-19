@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-12-19 09:26:40
+ * @Last Modified time: 2019-12-19 14:48:44
  */
 import React, { Component } from 'react';
 import {
@@ -81,10 +81,10 @@ class OnSite extends Component {
         //     label: '树种筛选',
         //     value: 'geojsonFeature_treetype'
         // },
-        {
-            label: '养护任务',
-            value: 'geojsonFeature_curingTask'
-        },
+        // {
+        //     label: '养护任务',
+        //     value: 'geojsonFeature_curingTask'
+        // },
         {
             label: '成活率',
             value: 'geojsonFeature_survivalRate'

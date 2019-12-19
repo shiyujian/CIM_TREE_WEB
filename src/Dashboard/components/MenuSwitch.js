@@ -5,6 +5,9 @@ import L from 'leaflet';
 import {
     getIconType
 } from './auth';
+import {
+    trim
+} from '_platform/auth';
 import irrigationSel from './MenuSwitchImg/irrigation3.gif';
 import irrigation from './MenuSwitchImg/irrigation2.png';
 import distributedSel from './MenuSwitchImg/distributed3.gif';
@@ -278,7 +281,7 @@ export default class MenuSwitch extends Component {
             }
         } else {
             // await switchDashboardCompoment(buttonID);
-            await switchDashboardCompoment('geojsonFeature_treetype');
+            await switchDashboardCompoment('geojsonFeature_curingTask');
             await getMenuTreeVisible(true);
         }
     }
@@ -497,6 +500,7 @@ export default class MenuSwitch extends Component {
 
         let location = {};
         let value = document.getElementById('searchInput').value;
+        value = trim(value);
         console.log('value', value);
         let treeData = await getTreeLocation({sxm: value});
         let treeMess = treeData && treeData.content && treeData.content[0];
@@ -680,15 +684,26 @@ export default class MenuSwitch extends Component {
                         </div>
                     </div>
                 </div>
-                <div className='menuSwitch-searchLayout'>
-                    <img src={searchTopImg} style={{display: 'block'}} />
-                    <Input placeholder='请输入苗木编码'
-                        id='searchInput'
-                        autocomplete='off'
-                        onPressEnter={this.handleSearchTreeLocation.bind(this)}
-                        className='menuSwitch-searchInputLayout' />
-                    <img src={searchRightImg} className='menuSwitch-searchInputRightLayout' />
-                </div>
+                {
+                    dashboardCompomentMenu && dashboardCompomentMenu === 'geojsonFeature_auxiliaryManagement'
+                        ? <div>
+                            <div className='menuSwitch-auxiliaryManagementLayout'>
+                                <span className='menuSwitch-auxiliaryManagementText'>请点击右侧区域地块按钮</span>
+                            </div>
+                        </div> : ''
+                }
+                {
+                    dashboardCompomentMenu !== 'geojsonFeature_treetype'
+                        ? <div className='menuSwitch-searchLayout'>
+                            <img src={searchTopImg} style={{display: 'block'}} />
+                            <Input placeholder='请输入苗木编码'
+                                id='searchInput'
+                                autocomplete='off'
+                                onPressEnter={this.handleSearchTreeLocation.bind(this)}
+                                className='menuSwitch-searchInputLayout' />
+                            <img src={searchRightImg} className='menuSwitch-searchInputRightLayout' />
+                        </div> : ''
+                }
                 <div className='menuSwitch-menuSwitchRightLayout'>
                     <a className={dashboardFocus === 'mapFoucs' ? 'menuSwitch-rightMenuMapFoucsButtonSelLayout' : 'menuSwitch-rightMenuMapFoucsButtonUnSelLayout'}
                         id='mapFoucs'

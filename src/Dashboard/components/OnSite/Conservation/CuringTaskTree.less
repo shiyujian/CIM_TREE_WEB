@@ -1,3 +1,355 @@
+@font-face {
+    font-family: Digital-7;
+    src: url('../digital-7.ttf');
+}
+.CuringTreePage-container{
+    display: flex;
+    position: absolute;
+    // width: calc(~'100% - 44px');
+    left: 44px;
+    top: 610px;
+    width: 664px;
+    height: 265px;
+
+    .CuringTreePage-r-main{
+    flex:1 1 auto;
+    position: relative;
+    overflow: hidden;
+    }
+
+    .CuringTreePage-foldBtn {
+        position: absolute;
+        width: 64px;
+        height: 64px;
+        text-align: center;
+        cursor: pointer;
+        z-index: 500;
+        -webkit-transition: all .3s;
+        -o-transition: all .3s;
+        transition: all .3s;
+        // border:1px solid rgba(97,245,171,1);
+    }
+
+    .CuringTreePage-menuPanel {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 265px;
+        transition: all 0.8s;
+        z-index: 980;
+        // background:rgba(19,34,36,0.8);
+        // background-image: url("./ConservationImg/bottom1.png");
+        // background-repeat: no-repeat;
+  
+        .CuringTreePage-menuBackground {
+            background-image: url("./ConservationImg/bottom1.png");
+            background-repeat: no-repeat;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            bottom: 0;
+            // background: rgba(19,34,36,1);
+            opacity: 0.7;
+        }
+        .CuringTreePage-aside {
+            position: absolute;
+            left: 24px;
+            width: calc(~'100% - 40px');;
+            height: 100%;
+            color: #333;
+            z-index: 999;
+            overflow: auto;
+
+            .CuringTreePage-MenuNameLayout { 
+                display: inline-block;
+                margin-top: 18px;
+                width: 100%;
+            }
+             .CuringTreePage-MenuName {
+                width: 65px;
+                height: 17px;
+                font-size: 16px;
+                font-family: Microsoft YaHei;
+                font-weight: bold;
+                color: #61f5ab;
+                position: absolute;
+                left: 12px;
+                top: 18px;
+            }
+            .CuringTreePage-MenuButton {
+                float: right;
+                cursor: pointer;
+                margin-right: 10px;
+            }
+            .CuringTreePage-asideTree {
+                margin-top: 10px;
+                // margin-left: 10px;
+            }
+            .CuringTreePage-button {
+                display: block;
+                // width: 220px;
+            }
+            .CuringTreePage-button-layout {
+                width:148px;
+                height:71px;
+                // border:1px solid rgba(60,248,247,1);
+                border-radius:2px;
+                background-image: url("./ConservationImg/2levitate.png");
+                display: inline-block;
+            }
+            .CuringTreePage-button-layoutSel {
+                width:148px;
+                height:71px;
+                border:1px solid rgba(60,248,247,1);
+                border-radius:2px;
+                background-image: url("./ConservationImg/2selection.png");
+                display: inline-block;
+            }
+            .CuringTreePage-button-layout-text {
+                width:28px;
+                height:14px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:bold;
+                color:rgba(255,255,255,1);
+                line-height: 60px;
+                margin-left: 10px;
+            }
+        }
+    }
+}
+.CuringTreePage-result-Container{
+    display: flex;
+    position: absolute;
+    left: 612px;
+    top: 610px;
+    width: 280px;
+    height: 265px;
+
+    .CuringTreePage-result-r-main{
+    flex:1 1 auto;
+    position: relative;
+    overflow: hidden;
+    }
+
+    .CuringTreePage-result-foldBtn {
+        position: absolute;
+        width: 64px;
+        height: 64px;
+        text-align: center;
+        cursor: pointer;
+        z-index: 500;
+        -webkit-transition: all .3s;
+        -o-transition: all .3s;
+        transition: all .3s;
+        // border:1px solid rgba(97,245,171,1);
+    }
+
+    .CuringTreePage-result-menuPanel {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 265px;
+        transition: all 0.8s;
+        z-index: 980;
+        // background:rgba(19,34,36,0.8);
+        // background-image: url("./ConservationImg/bottom1.png");
+        // background-repeat: no-repeat;
+  
+        .CuringTreePage-result-menuBackground {
+            background-image: url("./ConservationImg/bottom1.png");
+            background-repeat: no-repeat;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            bottom: 0;
+            // background: rgba(19,34,36,1);
+            opacity: 0.7;
+        }
+        .CuringTreePage-result-aside {
+            position: absolute;
+            left: 24px;
+            width: calc(~'100% - 40px');;
+            height: 100%;
+            color: #333;
+            z-index: 999;
+            overflow: auto;
+
+            .CuringTreePage-result-MenuNameLayout { 
+                display: inline-block;
+                margin-top: 18px;
+                width: 100%;
+            }
+             .CuringTreePage-result-MenuName {
+                width:32px;
+                height:17px;
+                font-size:16px;
+                font-family:Microsoft YaHei;
+                font-weight:bold;
+                color:rgba(255,255,255,1);
+                position: absolute;
+                left: 12px;
+                top: 18px;
+            }
+            .CuringTreePage-result-asideTree {
+                margin-top: 10px;
+                margin-left: 10px;
+            }
+
+            .CuringTreePage-result-resultlayout {
+                width:232px;
+                height:32px;
+                margin-bottom: 5px;
+                // background:rgba(161,182,194,1);
+                // opacity:0.6;
+            }
+            .CuringTreePage-result-resultBackground {
+                width: 100%;
+                height: 32px;
+                background:rgba(161,182,194,1);
+                position: absolute;
+                opacity: 0.26;
+            }
+            .CuringTreePage-result-type {
+                width:100px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:400;
+                color:rgba(97,245,171,1);
+                line-height:40px;
+                vertical-align: middle;
+                float: left;
+                line-height: 32px;
+                margin-left: 15px;
+            }
+            .CuringTreePage-result-num {
+                width:34px;
+                font-size:18px;
+                font-family:Digital-7;
+                font-weight:400;
+                color:rgba(97,245,171,1);
+                line-height:40px;
+                vertical-align: middle;
+                float: right;
+                line-height: 32px;
+                margin-right: 15px;
+            }
+        }
+    }
+}
+.DeviceTree-button {
+    display: inline-block;
+    width: 220px;
+}
+
+.DeviceTree-button-layout {
+    width: 105px;
+    margin-bottom: 10px;
+}
+
+.DeviceTree-mrg10 {
+	white-space: nowrap;
+    width: 220px;
+    margin-bottom: 20px;
+}
+
+.DeviceTree-statis-layout {
+	white-space: nowrap;
+    width: 100%;
+    margin-bottom: 10px;
+    border-bottom:1px dashed #8c8383; 
+    padding-bottom: 10px;
+    width: 220px;
+}
+
+.DeviceTree-menuPanel {
+    position: absolute;
+    left: 330px;
+    top: 40px;
+    height: 80%;
+    width: 260px;
+    transition: all 0.3s;
+    z-index: 980;
+
+    .DeviceTree-aside {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        top: 0;
+        bottom: 0;
+        background-color: rgba(255,255,255, 0.9);
+        color: #333;
+        z-index: 999;
+        overflow-x: hidden;
+        overflow-y: auto;
+
+        .DeviceTree-asideTree {
+            margin-top: 20px;
+            margin-left: 20px;
+        }
+    }
+}
+
+.DeviceTree-data-text {
+    float: right;
+    // margin-right: 23px;
+}
+
+.DeviceTree-menuSwitchDeviceTypeLayout {
+    position: absolute;
+    z-index: 960;
+    top: 350px;
+    right: 40px;
+    width: 122px;
+    height: 315px;
+    display: block;
+    background-image: url('../../RiskImg/background.png');
+}
+.DeviceTree-menuLabel {
+    display: inline-block;
+    position: relative;
+    width: 56px;
+    left: 7px;
+    bottom: 13px;
+}
+.DeviceTree-menuLabel1 {
+    display: inline-block;
+    position: relative;
+    width: 84px;
+    left: 7px;
+    bottom: 13px;
+}
+.DeviceTree-menuSwitchDeviceTypeDataLayout {
+    margin-top: 20px;
+}
+.DeviceTree-rightMenuDeviceTypeImgLayout {
+    margin-left: 14px;
+    margin-top: -31px;
+    height: 20px;
+    width: 20px;
+}
+
+.DeviceTree-rightMenuDeviceTypeSelLayout {
+    margin-bottom: 10px;
+    display: inline-block;
+    background-image: url('../../RiskImg/select.png');
+    background-size: 100% 100%;
+    width: 18px;
+    height: 18px;
+    margin-left: 4px;
+    margin-top: 6px;
+}
+
+.DeviceTree-rightMenuDeviceTypeUnSelLayout {
+    margin-bottom: 10px;
+    display: inline-block;
+    background-image: url('../../RiskImg/unSelect.png');
+    background-size: 100% 100%;
+    width: 18px;
+    height: 18px;
+    margin-left: 4px;
+    margin-top: 6px;
+}
 .CuringTaskTree-button {
     display: inline-block;
     width: 220px;

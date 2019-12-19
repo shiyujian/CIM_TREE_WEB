@@ -14,8 +14,8 @@ import './TreeType.less';
 import decoration from './TreeTypeImg/decoration.png';
 import hide from './TreeTypeImg/hide2.png';
 import display from './TreeTypeImg/display2.png';
-const TreeNode = Tree.TreeNode;
-const Search = Input.Search;
+import searchTopImg from './TreeTypeImg/1.png';
+import searchRightImg from './TreeTypeImg/2.png';
 export default class TreeTypeTree extends Component {
     constructor (props) {
         super(props);
@@ -88,8 +88,6 @@ export default class TreeTypeTree extends Component {
         } catch (e) {
             console.log('获取不分类树种', e);
         }
-        console.log('aaaaaaaaaaaaaaaa', treeTypeTreeData);
-
         this.setState({
             treetypes,
             treeTypeTreeData
@@ -98,6 +96,34 @@ export default class TreeTypeTree extends Component {
 
     componentWillUnmount = async () => {
         await this.removeTileTreeTypeLayerFilter();
+        await this.treeTypeTreeCancelLocation();
+    }
+
+    // 去除树种筛选瓦片图层
+    removeTileTreeTypeLayerFilter = () => {
+        const {
+            map
+        } = this.props;
+        if (this.tileTreeTypeLayerFilter) {
+            map.removeLayer(this.tileTreeTypeLayerFilter);
+            this.tileTreeTypeLayerFilter = null;
+        }
+    }
+
+    // 取消树节点定位
+    treeTypeTreeCancelLocation = async () => {
+        const {
+            map
+        } = this.props;
+        const {
+            treeTypeTreeMarkerLayer
+        } = this.state;
+        if (treeTypeTreeMarkerLayer) {
+            map.removeLayer(treeTypeTreeMarkerLayer);
+        }
+        this.setState({
+            treeTypeTreeMarkerLayer: ''
+        });
     }
 
     /* 树种筛选多选树节点 */
@@ -142,18 +168,7 @@ export default class TreeTypeTree extends Component {
         ).addTo(map);
     }
 
-    // 去除树种筛选瓦片图层
-    removeTileTreeTypeLayerFilter = () => {
-        const {
-            map
-        } = this.props;
-        if (this.tileTreeTypeLayerFilter) {
-            map.removeLayer(this.tileTreeTypeLayerFilter);
-            this.tileTreeTypeLayerFilter = null;
-        }
-    }
-
-    handleSearchTree = async (value) => {
+    handleSearchTree = async (event) => {
         const {
             actions: {
                 getTreeLocation
@@ -163,19 +178,21 @@ export default class TreeTypeTree extends Component {
             treetypes = []
         } = this.state;
         try {
+            let value = document.getElementById('searchInput').value;
             value = trim(value);
+            console.log('value', value);
+
             if (value) {
-                let searchTree = [];
                 let keys = [];
                 treetypes.map((tree) => {
                     let name = tree.properties.name;
                     if (name.indexOf(value) !== -1) {
                         keys.push(tree.key);
-                        searchTree.push(tree);
                     }
                 });
+                console.log('keys', keys);
                 // 如果所搜索的数据非树种名称，则查看是否为顺序码
-                if (searchTree.length === 0 && value) {
+                if (keys.length === 0 && value) {
                     let location = {};
                     let treeData = await getTreeLocation({sxm: value});
                     let treeMess = treeData && treeData.content && treeData.content[0];
@@ -184,32 +201,13 @@ export default class TreeTypeTree extends Component {
                         location.X = treeMess.X;
                         location.Y = treeMess.Y;
                         await this.treeTypeTreeLocation(location);
-                        this.setState({
-                            searchValue: '',
-                            searchTree: []
-                        });
-                    } else {
-                        // 如果根据顺序码查到的数据不存在坐标，则树数据为空，同时没有坐标信息
-                        this.setState({
-                            searchValue: value,
-                            searchTree
-                        });
                     }
                 } else {
-                    // 如果搜索的数据为树种名称，则展示搜索数据
-                    this.setState({
-                        searchValue: value,
-                        searchTree
-                    });
+                    await this.handleTreeTypeCheck(keys);
                 }
             } else {
                 // 如果搜索的信息为空，则取消定位信息，同时展示所有的树种信息
-                // await this.props.cancelLocation();
                 await this.treeTypeTreeCancelLocation();
-                this.setState({
-                    searchValue: '',
-                    searchTree: []
-                });
             }
         } catch (e) {
             console.log('handleSearchTree', e);
@@ -237,22 +235,6 @@ export default class TreeTypeTree extends Component {
         map.panTo([data.Y, data.X]);
         this.setState({
             treeTypeTreeMarkerLayer: marker
-        });
-    }
-
-    // 取消树节点定位
-    treeTypeTreeCancelLocation = async () => {
-        const {
-            map
-        } = this.props;
-        const {
-            treeTypeTreeMarkerLayer
-        } = this.state;
-        if (treeTypeTreeMarkerLayer) {
-            map.removeLayer(treeTypeTreeMarkerLayer);
-        }
-        this.setState({
-            treeTypeTreeMarkerLayer: ''
         });
     }
     /* 菜单展开收起 */
@@ -302,12 +284,9 @@ export default class TreeTypeTree extends Component {
 
     render () {
         let {
-            treetypesTree = [],
             treetypesTreeLoading
         } = this.props;
         const {
-            searchTree,
-            searchValue,
             menuIsExtend,
             menuWidth
         } = this.state;
@@ -373,6 +352,15 @@ export default class TreeTypeTree extends Component {
                             </aside>
                         </div>
                     </div>
+                </div>
+                <div className='TreeTypePage-searchLayout'>
+                    <img src={searchTopImg} style={{display: 'block'}} />
+                    <Input placeholder='请输入树种或苗木编码'
+                        id='searchInput'
+                        autocomplete='off'
+                        onPressEnter={this.handleSearchTree.bind(this)}
+                        className='TreeTypePage-searchInputLayout' />
+                    <img src={searchRightImg} className='TreeTypePage-searchInputRightLayout' />
                 </div>
             </div>
 

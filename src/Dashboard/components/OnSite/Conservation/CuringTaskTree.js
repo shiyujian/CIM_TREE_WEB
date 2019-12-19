@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { Tree, Button, DatePicker, Spin, Checkbox, Row } from 'antd';
+import { Button, DatePicker, Spin, Checkbox, Row } from 'antd';
 import L from 'leaflet';
+import Scrollbar from 'smooth-scrollbar';
 import './CuringTaskTree.less';
 import moment from 'moment';
 import {
@@ -19,7 +20,10 @@ import curingTaskTrimImg from '../../CuringTaskImg/trim.png';
 import curingTaskWateringImg from '../../CuringTaskImg/watering.png';
 import curingTaskWeedImg from '../../CuringTaskImg/weed.png';
 import curingTaskWormImg from '../../CuringTaskImg/worm.png';
-const TreeNode = Tree.TreeNode;
+
+import decoration from './ConservationImg/decoration.png';
+import hide from './ConservationImg/hide2.png';
+import display from './ConservationImg/display2.png';
 const { RangePicker } = DatePicker;
 
 export default class CuringTaskTree extends Component {
@@ -45,7 +49,9 @@ export default class CuringTaskTree extends Component {
             curingTaskPlanLayerList: {},
             curingTaskRealLayerList: {},
             curingTaskMarkerLayerList: {},
-            curingTaskMessList: {} // 养护任务信息List
+            curingTaskMessList: {}, // 养护任务信息List
+            menuIsExtend: true /* 菜单是否展开 */,
+            menuWidth: 560 /* 菜单宽度 */
         };
     }
 
@@ -92,40 +98,6 @@ export default class CuringTaskTree extends Component {
             img: curingTaskOtherImg
         }
     ]
-    loop (p, loopTime) {
-        const that = this;
-        if (loopTime) {
-            loopTime = loopTime + 1;
-        } else {
-            loopTime = 1;
-        }
-        if (loopTime === 1) {
-            if (p) {
-                return (
-                    <TreeNode
-                        selectable={false}
-                        title={p.Name}
-                        key={p.ID}
-                    >
-                        {p.children &&
-                            p.children.map(m => {
-                                return that.loop(m, loopTime);
-                            })}
-                    </TreeNode>
-                );
-            }
-        } else {
-            if (p) {
-                return (
-                    <TreeNode
-                        selectable={false}
-                        title={`${p.CreateTime}-${p.CuringMans}`}
-                        key={p.ID}
-                    />
-                );
-            }
-        }
-    }
 
     componentDidMount = async () => {
         const {
@@ -134,154 +106,16 @@ export default class CuringTaskTree extends Component {
         if (curingTaskTreeDay && curingTaskTreeDay instanceof Array && curingTaskTreeDay.length > 0) {
             await this.handleCuringTaskSearchData(curingTaskTreeDay);
         }
+        let data = Scrollbar.init(document.querySelector('#asideDom'));
     }
 
     componentWillUnmount = async () => {
         await this.handleRemoveAllCuringTaskLayer();
     }
 
-    render () {
-        let {
-            curingTaskTree = [],
-            curingTaskTreeLoading,
-            menuTreeVisible
-        } = this.props;
-        const {
-            timeType,
-            stime,
-            etime,
-            searchData,
-            curingTaskComplete,
-            curingTaskUnComplete
-        } = this.state;
-        let contents = [];
-        if (!etime && !stime && curingTaskUnComplete) {
-            for (let j = 0; j < curingTaskTree.length; j++) {
-                const element = curingTaskTree[j];
-                if (element !== undefined) {
-                    contents.push(element);
-                }
-            }
-        } else {
-            for (let j = 0; j < searchData.length; j++) {
-                const element = searchData[j];
-                if (element !== undefined) {
-                    contents.push(element);
-                }
-            }
-        };
-        return (
-            <div>
-                {
-                    menuTreeVisible
-                        ? (
-                            <div>
-                                <div className='CuringTaskTree-menuPanel'>
-                                    <aside className='CuringTaskTree-aside' draggable='false'>
-                                        <div className='CuringTaskTree-asideTree'>
-                                            <Spin spinning={curingTaskTreeLoading}>
-                                                <div className='CuringTaskTree-button'>
-                                                    <Checkbox className='CuringTaskTree-button-layout'
-                                                        checked={curingTaskUnComplete}
-                                                        onChange={this.handleCuringTaskUnComplete.bind(this)}>
-                                                        未完成
-                                                    </Checkbox>
-                                                    <Checkbox className='CuringTaskTree-button-layout'
-                                                        checked={curingTaskComplete}
-                                                        onChange={this.handleCuringTaskComplete.bind(this)}>
-                                                        已完成
-                                                    </Checkbox>
-                                                </div>
-                                                <div className='CuringTaskTree-button'>
-                                                    <Button className='CuringTaskTree-button-layout' style={{ marginRight: 10 }}
-                                                        type={timeType === 'all' ? 'primary' : 'default'}
-                                                        id='all' onClick={this.handleTimeChange.bind(this)}>
-                                                        全部
-                                                    </Button>
-                                                    <Button className='CuringTaskTree-button-layout' id='today'
-                                                        type={timeType === 'today' ? 'primary' : 'default'}
-                                                        onClick={this.handleTimeChange.bind(this)}>
-                                                        今天
-                                                    </Button>
-                                                </div>
-                                                <div className='CuringTaskTree-button'>
-                                                    <Button className='CuringTaskTree-button-layout' style={{ marginRight: 10 }}
-                                                        type={timeType === 'week' ? 'primary' : 'default'}
-                                                        id='week' onClick={this.handleTimeChange.bind(this)}>
-                                                        一周内
-                                                    </Button>
-                                                    <Button className='CuringTaskTree-button-layout' id='custom'
-                                                        type={timeType === 'custom' ? 'primary' : 'default'}
-                                                        onClick={this.handleTimeChange.bind(this)}>
-                                                        自定义
-                                                    </Button>
-                                                </div>
-                                                {
-                                                    timeType === 'custom'
-                                                        ? <RangePicker
-                                                            style={{ width: 220, marginBottom: 10 }}
-                                                            showTime={{ format: 'YYYY-MM-DD HH:mm:ss' }}
-                                                            format='YYYY-MM-DD HH:mm:ss'
-                                                            placeholder={['Start Time', 'End Time']}
-                                                            onChange={this.handleDateChange.bind(this)}
-                                                        />
-                                                        : ''
-                                                }
-                                                <div className='CuringTaskTree-statis-layout'>
-                                                    <span style={{ verticalAlign: 'middle' }}>类型</span>
-                                                    <span className='CuringTaskTree-data-text'>
-                                                        数量
-                                                    </span>
-                                                </div>
-                                                <div>
-                                                    {
-                                                        contents.map((content) => {
-                                                            return (
-                                                                <Row className='CuringTaskTree-mrg10' key={content.ID}>
-                                                                    <span style={{ verticalAlign: 'middle' }}>{content.Name}</span>
-                                                                    <span className='CuringTaskTree-data-text'>
-                                                                        {content.children.length}
-                                                                    </span>
-                                                                </Row>
-                                                            );
-                                                        })
-                                                    }
-                                                </div>
-                                            </Spin>
-                                        </div>
-                                    </aside>
-                                </div>
-                                <div>
-                                    <div className='CuringTaskTree-menuSwitchCuringTaskTypeLayout'>
-                                        {
-                                            <div>
-                                                <div style={{ display: 'inlineBlock', marginTop: 8 }} />
-                                                {
-                                                    this.curingTaskTypeOptions.map((option) => {
-                                                        return (
-                                                            <div style={{ display: 'inlineBlock', height: 20 }} key={option.id}>
-                                                                <p className='CuringTaskTree-menuLabel1'>{option.label}</p>
-                                                                <img src={option.img}
-                                                                    title={option.label}
-                                                                    className='CuringTaskTree-rightMenuCuringTaskTypeImgLayout' />
-                                                                <a className={this.state[option.id] ? 'CuringTaskTree-rightMenuCuringTaskTypeSelLayout' : 'CuringTaskTree-rightMenuCuringTaskTypeUnSelLayout'}
-                                                                    title={option.label}
-                                                                    key={option.id}
-                                                                    onClick={this.handleCuringTaskTypeButton.bind(this, option)} />
-                                                            </div>
-                                                        );
-                                                    })
-                                                }
-                                            </div>
-
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-                        ) : ''
-                }
-            </div>
-        );
+    /* 菜单展开收起 */
+    _extendAndFold = () => {
+        this.setState({ menuIsExtend: !this.state.menuIsExtend });
     }
 
     // 未整改
@@ -790,5 +624,233 @@ export default class CuringTaskTree extends Component {
         } catch (e) {
             console.log('e', e);
         }
+    }
+    render () {
+        let {
+            curingTaskTree = [],
+            curingTaskTreeLoading,
+            menuTreeVisible
+        } = this.props;
+        const {
+            timeType,
+            stime,
+            etime,
+            searchData,
+            curingTaskComplete,
+            curingTaskUnComplete,
+            menuIsExtend,
+            menuWidth
+        } = this.state;
+        let contents = [];
+        if (!etime && !stime && curingTaskUnComplete) {
+            for (let j = 0; j < curingTaskTree.length; j++) {
+                const element = curingTaskTree[j];
+                if (element !== undefined) {
+                    contents.push(element);
+                }
+            }
+        } else {
+            for (let j = 0; j < searchData.length; j++) {
+                const element = searchData[j];
+                if (element !== undefined) {
+                    contents.push(element);
+                }
+            }
+        };
+        console.log('contents', contents);
+
+        return (
+            <div>
+                {
+                    menuTreeVisible
+                        ? (
+                            <div>
+                                <div className='CuringTreePage-container'>
+                                    <div className='CuringTreePage-r-main'>
+                                        {
+                                            menuIsExtend ? '' : (
+                                                <img src={display}
+                                                    className='CuringTreePage-foldBtn'
+                                                    onClick={this._extendAndFold.bind(this)} />
+                                            )
+                                        }
+                                        <div
+                                            className={`CuringTreePage-menuPanel`}
+                                            style={
+                                                menuIsExtend
+                                                    ? {
+                                                        width: menuWidth,
+                                                        transform: 'translateX(0)'
+                                                    }
+                                                    : {
+                                                        width: menuWidth,
+                                                        transform: `translateX(-${
+                                                            menuWidth
+                                                        }px)`
+                                                    }
+                                            }
+                                        >
+                                            <div className='CuringTreePage-menuBackground' />
+                                            <aside className='CuringTreePage-aside' id='asideDom'>
+                                                <div className='CuringTreePage-MenuNameLayout'>
+                                                    <img src={decoration} />
+                                                    <span className='CuringTreePage-MenuName'>苗木养护</span>
+                                                    <img src={hide}
+                                                        onClick={this._extendAndFold.bind(this)}
+                                                        className='CuringTreePage-MenuButton' />
+                                                </div>
+                                                <div className='CuringTreePage-asideTree'>
+                                                    <div className='CuringTreePage-button'>
+                                                        <a key='未完成'
+                                                            title='未完成'
+                                                            className={curingTaskUnComplete ? 'CuringTreePage-button-layoutSel' : 'CuringTreePage-button-layout'}
+                                                            onClick={this.handleCuringTaskUnComplete.bind(this)}
+                                                            style={{
+                                                                marginRight: 8,
+                                                                marginTop: 8
+                                                            }}
+                                                        >
+                                                            <span className='CuringTreePage-button-layout-text'>未完成</span>
+                                                        </a>
+                                                        <a key='已完成'
+                                                            title='已完成'
+                                                            className={curingTaskComplete ? 'CuringTreePage-button-layoutSel' : 'CuringTreePage-button-layout'}
+                                                            onClick={this.handleCuringTaskComplete.bind(this)}
+                                                            style={{
+                                                                marginRight: 8,
+                                                                marginTop: 8
+                                                            }}
+                                                        >
+                                                            <span className='CuringTreePage-button-layout-text'>已完成</span>
+                                                        </a>
+                                                    </div>
+                                                    <div className='CuringTreePage-button' style={{ marginTop: 8 }}>
+                                                        {
+                                                            this.curingTaskTypeOptions.map((option) => {
+                                                                return (<a key={option.label}
+                                                                    title={option.label}
+                                                                    className={this.state[option.id] ? 'CuringTreePage-button-layoutSel' : 'CuringTreePage-button-layout'}
+                                                                    onClick={this.handleCuringTaskTypeButton.bind(this, option)}
+                                                                    style={{
+                                                                        marginRight: 8,
+                                                                        marginTop: 8
+                                                                    }}
+                                                                >
+                                                                    <span className='CuringTreePage-button-layout-text'>{option.label}</span>
+                                                                </a>);
+                                                            })
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </aside>
+                                        </div>
+                                    </div>
+                                </div>
+                                {/* <div className='CuringTaskTree-menuPanel'>
+                                    <aside className='CuringTaskTree-aside' draggable='false'>
+                                        <div className='CuringTaskTree-asideTree'>
+                                            <Spin spinning={curingTaskTreeLoading}>
+                                                <div className='CuringTaskTree-button'>
+                                                    <Checkbox className='CuringTaskTree-button-layout'
+                                                        checked={curingTaskUnComplete}
+                                                        onChange={this.handleCuringTaskUnComplete.bind(this)}>
+                                                        未完成
+                                                    </Checkbox>
+                                                    <Checkbox className='CuringTaskTree-button-layout'
+                                                        checked={curingTaskComplete}
+                                                        onChange={this.handleCuringTaskComplete.bind(this)}>
+                                                        已完成
+                                                    </Checkbox>
+                                                </div>
+                                                <div className='CuringTaskTree-button'>
+                                                    <Button className='CuringTaskTree-button-layout' style={{ marginRight: 10 }}
+                                                        type={timeType === 'all' ? 'primary' : 'default'}
+                                                        id='all' onClick={this.handleTimeChange.bind(this)}>
+                                                        全部
+                                                    </Button>
+                                                    <Button className='CuringTaskTree-button-layout' id='today'
+                                                        type={timeType === 'today' ? 'primary' : 'default'}
+                                                        onClick={this.handleTimeChange.bind(this)}>
+                                                        今天
+                                                    </Button>
+                                                </div>
+                                                <div className='CuringTaskTree-button'>
+                                                    <Button className='CuringTaskTree-button-layout' style={{ marginRight: 10 }}
+                                                        type={timeType === 'week' ? 'primary' : 'default'}
+                                                        id='week' onClick={this.handleTimeChange.bind(this)}>
+                                                        一周内
+                                                    </Button>
+                                                    <Button className='CuringTaskTree-button-layout' id='custom'
+                                                        type={timeType === 'custom' ? 'primary' : 'default'}
+                                                        onClick={this.handleTimeChange.bind(this)}>
+                                                        自定义
+                                                    </Button>
+                                                </div>
+                                                {
+                                                    timeType === 'custom'
+                                                        ? <RangePicker
+                                                            style={{ width: 220, marginBottom: 10 }}
+                                                            showTime={{ format: 'YYYY-MM-DD HH:mm:ss' }}
+                                                            format='YYYY-MM-DD HH:mm:ss'
+                                                            placeholder={['Start Time', 'End Time']}
+                                                            onChange={this.handleDateChange.bind(this)}
+                                                        />
+                                                        : ''
+                                                }
+                                                <div className='CuringTaskTree-statis-layout'>
+                                                    <span style={{ verticalAlign: 'middle' }}>类型</span>
+                                                    <span className='CuringTaskTree-data-text'>
+                                                        数量
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    {
+                                                        contents.map((content) => {
+                                                            return (
+                                                                <Row className='CuringTaskTree-mrg10' key={content.ID}>
+                                                                    <span style={{ verticalAlign: 'middle' }}>{content.Name}</span>
+                                                                    <span className='CuringTaskTree-data-text'>
+                                                                        {content.children.length}
+                                                                    </span>
+                                                                </Row>
+                                                            );
+                                                        })
+                                                    }
+                                                </div>
+                                            </Spin>
+                                        </div>
+                                    </aside>
+                                </div> */}
+                                <div>
+                                    <div className='CuringTaskTree-menuSwitchCuringTaskTypeLayout'>
+                                        {
+                                            <div>
+                                                <div style={{ display: 'inlineBlock', marginTop: 8 }} />
+                                                {
+                                                    this.curingTaskTypeOptions.map((option) => {
+                                                        return (
+                                                            <div style={{ display: 'inlineBlock', height: 20 }} key={option.id}>
+                                                                <p className='CuringTaskTree-menuLabel1'>{option.label}</p>
+                                                                <img src={option.img}
+                                                                    title={option.label}
+                                                                    className='CuringTaskTree-rightMenuCuringTaskTypeImgLayout' />
+                                                                <a className={this.state[option.id] ? 'CuringTaskTree-rightMenuCuringTaskTypeSelLayout' : 'CuringTaskTree-rightMenuCuringTaskTypeUnSelLayout'}
+                                                                    title={option.label}
+                                                                    key={option.id}
+                                                                    onClick={this.handleCuringTaskTypeButton.bind(this, option)} />
+                                                            </div>
+                                                        );
+                                                    })
+                                                }
+                                            </div>
+
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        ) : ''
+                }
+            </div>
+        );
     }
 }
