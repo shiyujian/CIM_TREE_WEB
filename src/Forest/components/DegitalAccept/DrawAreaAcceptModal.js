@@ -395,7 +395,7 @@ class DrawAreaAcceptModal extends Component {
                     type: 'MultiPolygon',
                     coordinates: coordinatesData
                 };
-                let wkt = wellknown.stringify(data);
+                wkt = wellknown.stringify(data);
                 console.log('wkt', wkt);
                 coords.map((coord, index) => {
                     console.log('coord', coord);
