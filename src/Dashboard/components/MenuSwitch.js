@@ -280,8 +280,8 @@ export default class MenuSwitch extends Component {
                 await getMenuTreeVisible(true);
             }
         } else {
-            // await switchDashboardCompoment(buttonID);
-            await switchDashboardCompoment('geojsonFeature_curingTask');
+            await switchDashboardCompoment(buttonID);
+            // await switchDashboardCompoment('geojsonFeature_curingTask');
             await getMenuTreeVisible(true);
         }
     }

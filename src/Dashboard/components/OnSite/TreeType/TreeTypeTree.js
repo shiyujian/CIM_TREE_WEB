@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Tree, Input, Spin } from 'antd';
 import L from 'leaflet';
+import Scrollbar from 'smooth-scrollbar';
 import {
     getIconType
 } from '../../auth';
@@ -31,7 +32,7 @@ export default class TreeTypeTree extends Component {
             treeType5: true,
             treeTypeTreeMarkerLayer: '', // 树种筛选树节点图层
             menuIsExtend: true /* 菜单是否展开 */,
-            menuWidth: 560 /* 菜单宽度 */
+            menuWidth: 665 /* 菜单宽度 */
         };
         this.tileTreeTypeLayerFilter = null; // 树种筛选图层
     }
@@ -71,6 +72,7 @@ export default class TreeTypeTree extends Component {
         let treetypes = [];
         let treeTypeTreeData = [];
         try {
+            let data = Scrollbar.init(document.querySelector('#asideDom'));
             if (treetypesTree && treetypesTree instanceof Array) {
                 for (let i = 0; i < treetypesTree.length; i++) {
                     let children = treetypesTree[i].children;
@@ -327,10 +329,10 @@ export default class TreeTypeTree extends Component {
                                         <span className='TreeTypePage-MenuName'>树种分布</span>
                                         <img src={hide}
                                             onClick={this._extendAndFold.bind(this)}
-                                            className='TreeTypePage-MenuButton' />
+                                            className='TreeTypePage-MenuHideButton' />
                                     </div>
                                     <div className='TreeTypePage-asideTree'>
-                                        <div className='TreeTypePage-button' style={{ marginTop: 8 }}>
+                                        <div className='TreeTypePage-button'>
                                             {
                                                 this.treeTypeOptions.map((option) => {
                                                     return (<a key={option.label}

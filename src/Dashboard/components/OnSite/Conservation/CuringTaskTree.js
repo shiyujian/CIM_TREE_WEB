@@ -51,7 +51,7 @@ export default class CuringTaskTree extends Component {
             curingTaskMarkerLayerList: {},
             curingTaskMessList: {}, // 养护任务信息List
             menuIsExtend: true /* 菜单是否展开 */,
-            menuWidth: 560 /* 菜单宽度 */
+            menuWidth: 665 /* 菜单宽度 */
         };
     }
 
@@ -697,34 +697,38 @@ export default class CuringTaskTree extends Component {
                                                     <span className='CuringTreePage-MenuName'>苗木养护</span>
                                                     <img src={hide}
                                                         onClick={this._extendAndFold.bind(this)}
-                                                        className='CuringTreePage-MenuButton' />
+                                                        className='CuringTreePage-MenuHideButton' />
                                                 </div>
                                                 <div className='CuringTreePage-asideTree'>
                                                     <div className='CuringTreePage-button'>
                                                         <a key='未完成'
                                                             title='未完成'
-                                                            className={curingTaskUnComplete ? 'CuringTreePage-button-layoutSel' : 'CuringTreePage-button-layout'}
+                                                            className={curingTaskUnComplete ? 'CuringTreePage-button-statusSel' : 'CuringTreePage-button-status'}
                                                             onClick={this.handleCuringTaskUnComplete.bind(this)}
                                                             style={{
-                                                                marginRight: 8,
-                                                                marginTop: 8
+                                                                marginRight: 8
+                                                                // marginTop: 8
                                                             }}
                                                         >
-                                                            <span className='CuringTreePage-button-layout-text'>未完成</span>
+                                                            <span className={curingTaskUnComplete ? 'CuringTreePage-button-status-textSel' : 'CuringTreePage-button-status-text'}>
+                                                                未完成
+                                                            </span>
                                                         </a>
                                                         <a key='已完成'
                                                             title='已完成'
-                                                            className={curingTaskComplete ? 'CuringTreePage-button-layoutSel' : 'CuringTreePage-button-layout'}
+                                                            className={curingTaskComplete ? 'CuringTreePage-button-statusSel' : 'CuringTreePage-button-status'}
                                                             onClick={this.handleCuringTaskComplete.bind(this)}
                                                             style={{
-                                                                marginRight: 8,
-                                                                marginTop: 8
+                                                                marginRight: 8
+                                                                // marginTop: 8
                                                             }}
                                                         >
-                                                            <span className='CuringTreePage-button-layout-text'>已完成</span>
+                                                            <span className={curingTaskComplete ? 'CuringTreePage-button-status-textSel' : 'CuringTreePage-button-status-text'}>
+                                                                已完成
+                                                            </span>
                                                         </a>
                                                     </div>
-                                                    <div className='CuringTreePage-button' style={{ marginTop: 8 }}>
+                                                    <div className='CuringTreePage-button'>
                                                         {
                                                             this.curingTaskTypeOptions.map((option) => {
                                                                 return (<a key={option.label}

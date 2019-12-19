@@ -759,7 +759,7 @@ export default class TreePipePage extends Component {
                                                     <span className='TreePipePage-MenuName'>灌溉管网</span>
                                                     <img src={hide}
                                                         onClick={this._extendAndFold.bind(this)}
-                                                        className='TreePipePage-MenuButton' />
+                                                        className='TreePipePage-MenuHideButton' />
                                                 </div>
                                                 <div className='TreePipePage-asideTree'>
 
@@ -786,7 +786,7 @@ export default class TreePipePage extends Component {
                                                     {
                                                         treePipe
                                                             ? <div>
-                                                                <div className='TreePipePage-button' style={{ marginTop: 8 }}>
+                                                                <div className='TreePipePage-button'>
                                                                     {
                                                                         this.treePipeMaterialOptions.map((option) => {
                                                                             return (<a key={option.label}
@@ -803,7 +803,7 @@ export default class TreePipePage extends Component {
                                                                         })
                                                                     }
                                                                 </div>
-                                                                <div className='TreePipePage-button' style={{ marginTop: 8 }}>
+                                                                <div className='TreePipePage-button'>
                                                                     {
                                                                         this.treePipeRateOptions.map((option) => {
                                                                             return (<a key={option.label}
@@ -824,7 +824,7 @@ export default class TreePipePage extends Component {
                                                     }
                                                     {
                                                         treePipeNode
-                                                            ? <div className='TreePipePage-button' style={{ marginTop: 8 }}>
+                                                            ? <div className='TreePipePage-button'>
                                                                 {
                                                                     this.treePipeNodeTypeOptions.map((option) => {
                                                                         return (<a key={option.label}
@@ -832,7 +832,8 @@ export default class TreePipePage extends Component {
                                                                             className={this.state[option.id] ? 'TreePipePage-button-layoutSel' : 'TreePipePage-button-layout'}
                                                                             onClick={this.pipeNodeTypeChange.bind(this, option)}
                                                                             style={{
-                                                                                marginRight: 8
+                                                                                marginRight: 8,
+                                                                                marginTop: 8
                                                                             }}
                                                                         >
                                                                             <span className='TreePipePage-button-layout-text'>{option.label}</span>
