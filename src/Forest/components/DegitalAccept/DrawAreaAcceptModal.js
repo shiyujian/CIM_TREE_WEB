@@ -400,32 +400,33 @@ class DrawAreaAcceptModal extends Component {
                 console.log('translateCoords', translateCoords);
                 let coordinatesData = handleMULTIPOLYGONLngLatToLatLng(translateCoords);
                 console.log('coordinatesData', coordinatesData);
-                let data = {
-                    type: 'MultiPolygon',
-                    coordinates: coordinatesData
-                };
-                wkt = wellknown.stringify(data);
-                console.log('wkt', wkt);
-                wkt = wkt.split('), (').join('),(');
-                console.log('wkt', wkt);
-                coords.map((coord, index) => {
-                    // console.log('coord', coord);
-                    let num = computeSignedArea(coord, 2);
-                    actualRegionArea = actualRegionArea + num;
-                });
-                // wkt = 'MULTIPOLYGON((';
+                // let data = {
+                //     type: 'MultiPolygon',
+                //     coordinates: coordinatesData
+                // };
+                // wkt = wellknown.stringify(data);
+                // console.log('wkt', wkt);
+                // wkt = wkt.split('), (').join('),(');
+                // console.log('wkt', wkt);
                 // coords.map((coord, index) => {
-                //     console.log('coord', coord);
+                //     // console.log('coord', coord);
                 //     let num = computeSignedArea(coord, 2);
                 //     actualRegionArea = actualRegionArea + num;
-                //     if (index === 0) {
-                //         // 获取细班选择坐标wkt
-                //         wkt = wkt + getWktData(coord);
-                //     } else {
-                //         wkt = wkt + ',' + getWktData(coord);
-                //     }
                 // });
-                // wkt = wkt + '))';
+                wkt = 'MULTIPOLYGON(';
+                coords.map((coord, index) => {
+                    console.log('coord', coord);
+                    let num = computeSignedArea(coord, 2);
+                    actualRegionArea = actualRegionArea + num;
+                    if (index === 0) {
+                        // 获取细班选择坐标wkt
+                        wkt = wkt + getWktData(coord);
+                    } else {
+                        wkt = wkt + ',' + getWktData(coord);
+                    }
+                });
+                wkt = wkt + ')';
+                console.log('wkt', wkt);
             } else {
                 wkt = 'POLYGON(';
                 // 获取手动框选坐标wkt

@@ -76,9 +76,9 @@ export const getWktData = (coords) => {
     let len = coords.length;
     for (let i = 0; i < coords.length; i++) {
         if (i === 0) {
-            wkt = '(' + wkt + coords[i][1] + ' ' + coords[i][0] + ',';
+            wkt = '((' + wkt + coords[i][1] + ' ' + coords[i][0] + ',';
         } else if (i === len - 1) {
-            wkt = wkt + coords[i][1] + ' ' + coords[i][0] + ',' + coords[0][1] + ' ' + coords[0][0] + ')';
+            wkt = wkt + coords[i][1] + ' ' + coords[i][0] + ',' + coords[0][1] + ' ' + coords[0][0] + '))';
         } else {
             wkt = wkt + coords[i][1] + ' ' + coords[i][0] + ',';
         }

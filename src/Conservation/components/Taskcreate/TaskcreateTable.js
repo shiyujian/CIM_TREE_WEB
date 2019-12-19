@@ -458,7 +458,7 @@ export default class TaskCreateTable extends Component {
             // 选择面积
             let regionArea = 0;
             if (selectMap === '细班选择' && thinAreaNum > 1) {
-                wkt = 'MULTIPOLYGON((';
+                wkt = 'MULTIPOLYGON(';
                 coords.map((coord, index) => {
                     let num = computeSignedArea(coord, 1);
                     regionArea = regionArea + num;
@@ -469,7 +469,7 @@ export default class TaskCreateTable extends Component {
                         wkt = wkt + ',' + getWktData(coord);
                     }
                 });
-                wkt = wkt + '))';
+                wkt = wkt + ')';
             } else if (selectMap === '手动框选') {
                 wkt = 'POLYGON(';
                 // 获取手动框选坐标wkt
