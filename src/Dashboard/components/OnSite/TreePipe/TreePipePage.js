@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import L from 'leaflet';
+import _ from 'underscore';
 import {
     Row,
     Col,
@@ -7,6 +8,7 @@ import {
     Spin,
     message
 } from 'antd';
+import Scrollbar from 'smooth-scrollbar';
 import {
     genPopUpContent
 } from '../../auth';
@@ -14,6 +16,10 @@ import {
     FOREST_GIS_API
 } from '_platform/api';
 import './TreePipePage.less';
+import decoration from './TreePipeImg/decoration.png';
+import hide from './TreePipeImg/hide2.png';
+import display from './TreePipeImg/display2.png';
+import defaultCard from './TreePipeImg/1default.png';
 
 export default class TreePipePage extends Component {
     constructor (props) {
@@ -41,8 +47,10 @@ export default class TreePipePage extends Component {
             treePipeMaterialData: '', // 管线材质的Sql语句
             treePipeNodeTypeData: '', // 管点设备类型的Sql语句
             contents: [], // 搜索的数据
-            treePipeGisQuery: false, // 是否点击查看
-            treePipePopLayer: ''
+            treePipeGisQuery: true, // 是否点击查看
+            treePipePopLayer: '',
+            menuIsExtend: true /* 菜单是否展开 */,
+            menuWidth: 560 /* 菜单宽度 */
         };
         this.tileLayerTreeFilter = null;
         this.tileTreePipeBasic = null;
@@ -113,6 +121,10 @@ export default class TreePipePage extends Component {
             await this.getTileLayerTreeThinClass();
             await this.getTreePipeLayer();
             await this.getTreePipeNodeLayer();
+            let data = Scrollbar.init(document.querySelector('#asideDom'));
+            let resultdata = Scrollbar.init(document.querySelector('#resultAsideDom'));
+            console.log('data', data);
+            console.log('resultdata', resultdata);
         } catch (e) {
             console.log('componentDidMount', e);
         }
@@ -369,241 +381,14 @@ export default class TreePipePage extends Component {
         }
         return pipeNodeTypeResults;
     }
-    render () {
-        const {
-            menuTreeVisible
-        } = this.props;
-        const {
-            treePipe,
-            treePipeNode,
-            contents = [],
-            treePipeCaliberData,
-            treePipeMaterialData,
-            treePipeNodeTypeData,
-            treePipeLoading,
-            treePipeGisQuery
-        } = this.state;
-        // 是否展示管线材质的搜索数据
-        let materialResultVisible = false;
-        let materialResults = [];
-        // 是否展示管线管径的搜索数据
-        let caliberResultVisible = false;
-        let caliberResults = [];
-        // 是否展示管点设备类型的搜索数据
-        let pipeNodeTypeResultVisible = false;
-        let pipeNodeTypeResults = [];
-        if (contents && contents.length > 0) {
-            if (treePipeMaterialData) {
-                materialResultVisible = true;
-                materialResults = this.handleMaterialResult(contents);
-            }
-            if (treePipeCaliberData) {
-                caliberResultVisible = true;
-                caliberResults = this.handleCaliberResult(contents);
-            }
-            if (treePipeNodeTypeData) {
-                pipeNodeTypeResultVisible = true;
-                pipeNodeTypeResults = this.handlePipeNodeTypeResult(contents);
-            }
-        }
-
-        return (
-            <div>
-                {
-                    menuTreeVisible
-                        ? (
-                            <div>
-                                <div className='TreePipePage-menuPanel'>
-                                    <aside className='TreePipePage-aside' draggable='false'>
-                                        <div className='TreePipePage-asideTree'>
-                                            <Spin spinning={treePipeLoading}>
-                                                <div className='TreePipePage-button'>
-                                                    <div className='TreePipePage-GisQueryBorder'>
-                                                        <Checkbox className='TreePipePage-button-layout'
-                                                            checked={treePipeGisQuery}
-                                                            onChange={this.handleChangePipeGisQuery.bind(this)}>
-                                                            地图标注
-                                                        </Checkbox>
-                                                    </div>
-                                                </div>
-                                                <div className='TreePipePage-button'>
-                                                    <Checkbox className='TreePipePage-button-layout'
-                                                        checked={treePipe}
-                                                        onChange={this.handleChangePipeType.bind(this)}>
-                                                        管线
-                                                    </Checkbox>
-                                                    <Checkbox className='TreePipePage-button-layout'
-                                                        checked={treePipeNode}
-                                                        onChange={this.handleChangePipeNodeType.bind(this)}>
-                                                        管点
-                                                    </Checkbox>
-                                                </div>
-                                                {
-                                                    treePipe
-                                                        ? <div className='TreePipePage-button'>
-                                                            <div style={{ marginBottom: 10 }}>
-                                                                <Row className='TreePipePage-menuSwitchTreePipeBorder'>
-                                                                    <span>材质</span>
-                                                                </Row>
-                                                                <Row>
-                                                                    {
-                                                                        this.treePipeMaterialOptions.map((option) => {
-                                                                            return (
-                                                                                <Col span={12} style={{ marginTop: 5 }} key={option.id}>
-                                                                                    <Checkbox checked={this.state[option.id]}
-                                                                                        onChange={this.pipeMaterialChange.bind(this, option)}>
-                                                                                        {option.label}
-                                                                                    </Checkbox>
-                                                                                </Col>
-                                                                            );
-                                                                        })
-                                                                    }
-                                                                </Row>
-                                                            </div>
-                                                            <div style={{ marginBottom: 10 }}>
-                                                                <Row className='TreePipePage-menuSwitchTreePipeBorder'>
-                                                                    <span>管径</span>
-                                                                </Row>
-                                                                <Row>
-                                                                    {
-                                                                        this.treePipeRateOptions.map((option) => {
-                                                                            return (
-                                                                                <Col span={12} style={{ marginTop: 5 }} key={option.id}>
-                                                                                    <Checkbox
-                                                                                        checked={this.state[option.id]}
-                                                                                        onChange={this.pipeCaliberChange.bind(this, option)}>
-                                                                                        {option.label}
-                                                                                    </Checkbox>
-                                                                                </Col>
-                                                                            );
-                                                                        })
-                                                                    }
-                                                                </Row>
-                                                            </div>
-                                                        </div>
-                                                        : ''
-                                                }
-                                                {
-                                                    treePipeNode
-                                                        ? <div className='TreePipePage-button'>
-                                                            <div style={{ marginBottom: 10 }}>
-                                                                <Row className='TreePipePage-menuSwitchTreePipeBorder'>
-                                                                    <span>设备类型</span>
-                                                                </Row>
-                                                                <Row>
-                                                                    {
-                                                                        this.treePipeNodeTypeOptions.map((option) => {
-                                                                            return (
-                                                                                <Col span={12} style={{ marginTop: 5 }} key={option.id}>
-                                                                                    <Checkbox checked={this.state[option.id]}
-                                                                                        onChange={this.pipeNodeTypeChange.bind(this, option)}>
-                                                                                        {option.label}
-                                                                                    </Checkbox>
-                                                                                </Col>
-                                                                            );
-                                                                        })
-                                                                    }
-                                                                </Row>
-                                                            </div>
-                                                        </div>
-                                                        : ''
-                                                }
-                                                <div className='TreePipePage-query-title'>查询结果：</div>
-                                                {
-                                                    treePipe && materialResultVisible
-                                                        ? <div>
-                                                            <div className='TreePipePage-statis-layout'>
-                                                                <span style={{ verticalAlign: 'middle' }}>材质</span>
-                                                                <span className='TreePipePage-data-text'>
-                                                                    数量
-                                                                </span>
-                                                            </div>
-                                                            <div>
-                                                                {
-                                                                    materialResults.map((result) => {
-                                                                        return (
-                                                                            <div className='TreePipePage-mrg10' key={result.ID}>
-                                                                                <span style={{ verticalAlign: 'middle' }}>{result.Name}</span>
-                                                                                <span className='TreePipePage-data-text'>
-                                                                                    {result.children.length}
-                                                                                </span>
-                                                                            </div>
-                                                                        );
-                                                                    })
-                                                                }
-                                                            </div>
-                                                        </div> : ''
-                                                }
-                                                {
-                                                    treePipe && caliberResultVisible
-                                                        ? <div>
-                                                            <div className='TreePipePage-statis-layout'>
-                                                                <span style={{ verticalAlign: 'middle' }}>管径</span>
-                                                                <span className='TreePipePage-data-text'>
-                                                                    数量
-                                                                </span>
-                                                            </div>
-                                                            <div>
-                                                                {
-                                                                    caliberResults.map((result) => {
-                                                                        return (
-                                                                            <div className='TreePipePage-mrg10' key={result.ID}>
-                                                                                <span style={{ verticalAlign: 'middle' }}>{result.Name}</span>
-                                                                                <span className='TreePipePage-data-text'>
-                                                                                    {result.children.length}
-                                                                                </span>
-                                                                            </div>
-                                                                        );
-                                                                    })
-                                                                }
-                                                            </div>
-                                                        </div> : ''
-                                                }
-                                                {
-                                                    treePipeNode && pipeNodeTypeResultVisible
-                                                        ? <div>
-                                                            <div className='TreePipePage-statis-layout'>
-                                                                <span style={{ verticalAlign: 'middle' }}>设备类型</span>
-                                                                <span className='TreePipePage-data-text'>
-                                                                    数量
-                                                                </span>
-                                                            </div>
-                                                            <div>
-                                                                {
-                                                                    pipeNodeTypeResults.map((result) => {
-                                                                        return (
-                                                                            <div className='TreePipePage-mrg10' key={result.ID}>
-                                                                                <span style={{ verticalAlign: 'middle' }}>{result.Name}</span>
-                                                                                <span className='TreePipePage-data-text'>
-                                                                                    {result.children.length}
-                                                                                </span>
-                                                                            </div>
-                                                                        );
-                                                                    })
-                                                                }
-                                                            </div>
-                                                        </div> : ''
-                                                }
-                                            </Spin>
-                                        </div>
-                                    </aside>
-                                </div>
-                            </div>
-                        ) : ''
-                }
-            </div>
-
-        );
-    }
-    handleChangePipeGisQuery = async (e) => {
-        this.setState({
-            treePipeGisQuery: e.target.checked
-        });
+    /* 菜单展开收起 */
+    _extendAndFold = () => {
+        this.setState({ menuIsExtend: !this.state.menuIsExtend });
     }
     handleChangePipeType = async (e) => {
         this.setState({
-            treePipe: e.target.checked,
-            treePipeNode: !e.target.checked
+            treePipe: !this.state.treePipe,
+            treePipeNode: !this.state.treePipeNode
         }, async () => {
             await this.handleQueryTreePipe();
         });
@@ -611,8 +396,8 @@ export default class TreePipePage extends Component {
     handleChangePipeNodeType = async (e) => {
         await this.handleQueryTreePipe();
         this.setState({
-            treePipeNode: e.target.checked,
-            treePipe: !e.target.checked
+            treePipeNode: !this.state.treePipeNode,
+            treePipe: !this.state.treePipe
         }, async () => {
             await this.handleQueryTreePipe();
         });
@@ -894,5 +679,272 @@ export default class TreePipePage extends Component {
         } catch (e) {
             console.log('handleQueryPipeByWkt', e);
         }
+    }
+
+    render () {
+        const {
+            menuTreeVisible
+        } = this.props;
+        const {
+            treePipe,
+            treePipeNode,
+            contents = [],
+            treePipeCaliberData,
+            treePipeMaterialData,
+            treePipeNodeTypeData,
+            treePipeLoading,
+            treePipeGisQuery,
+            menuIsExtend,
+            menuWidth
+        } = this.state;
+        // 是否展示管线材质的搜索数据
+        let materialResultVisible = false;
+        let materialResults = [];
+        // 是否展示管线管径的搜索数据
+        let caliberResultVisible = false;
+        let caliberResults = [];
+        // 是否展示管点设备类型的搜索数据
+        let pipeNodeTypeResultVisible = false;
+        let pipeNodeTypeResults = [];
+        if (contents && contents.length > 0) {
+            if (treePipeMaterialData) {
+                materialResultVisible = true;
+                materialResults = this.handleMaterialResult(contents);
+            }
+            if (treePipeCaliberData) {
+                caliberResultVisible = true;
+                caliberResults = this.handleCaliberResult(contents);
+            }
+            if (treePipeNodeTypeData) {
+                pipeNodeTypeResultVisible = true;
+                pipeNodeTypeResults = this.handlePipeNodeTypeResult(contents);
+            }
+        }
+        return (
+            <div>
+                {
+                    menuTreeVisible
+                        ? (
+                            <div>
+                                <div className='TreePipePage-container'>
+                                    <div className='TreePipePage-r-main'>
+                                        {
+                                            menuIsExtend ? '' : (
+                                                <img src={display}
+                                                    className='TreePipePage-foldBtn'
+                                                    onClick={this._extendAndFold.bind(this)} />
+                                            )
+                                        }
+                                        <div
+                                            className={`TreePipePage-menuPanel`}
+                                            style={
+                                                menuIsExtend
+                                                    ? {
+                                                        width: menuWidth,
+                                                        transform: 'translateX(0)'
+                                                    }
+                                                    : {
+                                                        width: menuWidth,
+                                                        transform: `translateX(-${
+                                                            menuWidth
+                                                        }px)`
+                                                    }
+                                            }
+                                        >
+
+                                            <div className='TreePipePage-menuBackground' />
+                                            <aside className='TreePipePage-aside' id='asideDom'>
+                                                <div className='TreePipePage-MenuNameLayout'>
+                                                    <img src={decoration} />
+                                                    <span className='TreePipePage-MenuName'>灌溉管网</span>
+                                                    <img src={hide}
+                                                        onClick={this._extendAndFold.bind(this)}
+                                                        className='TreePipePage-MenuButton' />
+                                                </div>
+                                                <div className='TreePipePage-asideTree'>
+
+                                                    <div className='TreePipePage-button'>
+                                                        <a key={'管线'}
+                                                            title={'管线'}
+                                                            className={treePipe ? 'TreePipePage-button-layoutSel' : 'TreePipePage-button-layout'}
+                                                            onClick={this.handleChangePipeType.bind(this)}
+                                                            style={{
+                                                                marginRight: 8,
+                                                                marginTop: 8
+                                                            }}
+                                                        >
+                                                            <span className='TreePipePage-button-layout-text'>管线</span>
+                                                        </a>
+                                                        <a key={'管点'}
+                                                            title={'管点'}
+                                                            className={treePipeNode ? 'TreePipePage-button-layoutSel' : 'TreePipePage-button-layout'}
+                                                            onClick={this.handleChangePipeNodeType.bind(this)}
+                                                        >
+                                                            <span className='TreePipePage-button-layout-text'>管点</span>
+                                                        </a>
+                                                    </div>
+                                                    {
+                                                        treePipe
+                                                            ? <div>
+                                                                <div className='TreePipePage-button' style={{ marginTop: 8 }}>
+                                                                    {
+                                                                        this.treePipeMaterialOptions.map((option) => {
+                                                                            return (<a key={option.label}
+                                                                                title={option.label}
+                                                                                className={this.state[option.id] ? 'TreePipePage-button-layoutSel' : 'TreePipePage-button-layout'}
+                                                                                onClick={this.pipeMaterialChange.bind(this, option)}
+                                                                                style={{
+                                                                                    marginRight: 8,
+                                                                                    marginTop: 8
+                                                                                }}
+                                                                            >
+                                                                                <span className='TreePipePage-button-layout-text'>{option.label}</span>
+                                                                            </a>);
+                                                                        })
+                                                                    }
+                                                                </div>
+                                                                <div className='TreePipePage-button' style={{ marginTop: 8 }}>
+                                                                    {
+                                                                        this.treePipeRateOptions.map((option) => {
+                                                                            return (<a key={option.label}
+                                                                                title={option.label}
+                                                                                className={this.state[option.id] ? 'TreePipePage-button-layoutSel' : 'TreePipePage-button-layout'}
+                                                                                onClick={this.pipeCaliberChange.bind(this, option)}
+                                                                                style={{
+                                                                                    marginRight: 8,
+                                                                                    marginTop: 8
+                                                                                }}
+                                                                            >
+                                                                                <span className='TreePipePage-button-layout-text'>{option.label}</span>
+                                                                            </a>);
+                                                                        })
+                                                                    }
+                                                                </div>
+                                                            </div> : ''
+                                                    }
+                                                    {
+                                                        treePipeNode
+                                                            ? <div className='TreePipePage-button' style={{ marginTop: 8 }}>
+                                                                {
+                                                                    this.treePipeNodeTypeOptions.map((option) => {
+                                                                        return (<a key={option.label}
+                                                                            title={option.label}
+                                                                            className={this.state[option.id] ? 'TreePipePage-button-layoutSel' : 'TreePipePage-button-layout'}
+                                                                            onClick={this.pipeNodeTypeChange.bind(this, option)}
+                                                                            style={{
+                                                                                marginRight: 8
+                                                                            }}
+                                                                        >
+                                                                            <span className='TreePipePage-button-layout-text'>{option.label}</span>
+                                                                        </a>);
+                                                                    })
+                                                                }
+                                                            </div> : ''
+                                                    }
+                                                </div>
+                                            </aside>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className='TreePipePage-result-Container'>
+                                    <div className='TreePipePage-result-r-main'>
+                                        <div
+                                            className={`TreePipePage-result-menuPanel`}
+                                            style={
+                                                menuIsExtend
+                                                    ? {
+                                                        width: 280,
+                                                        transform: 'translateX(0)'
+                                                    }
+                                                    : {
+                                                        width: 280,
+                                                        transform: `translateX(-${
+                                                            menuWidth + 288
+                                                        }px)`
+                                                    }
+                                            }
+                                        >
+                                            <div className='TreePipePage-result-menuBackground' />
+                                            <aside className='TreePipePage-result-aside' id='resultAsideDom'>
+                                                <Spin spinning={treePipeLoading}>
+                                                    <div className='TreePipePage-result-MenuNameLayout'>
+                                                        <img src={decoration} />
+                                                        <span className='TreePipePage-result-MenuName'>
+                                                            {treePipe ? '管线' : (treePipeNode ? '管点' : '')}
+                                                        </span>
+                                                    </div>
+                                                    <div className='TreePipePage-result-asideTree'>
+                                                        {
+                                                            treePipe && materialResultVisible
+                                                                ? <div>
+                                                                    {
+                                                                        materialResults.map((result) => {
+                                                                            return (
+                                                                                <div key={result.ID} className='TreePipePage-result-resultlayout'>
+                                                                                    <div className='TreePipePage-result-resultBackground' />
+                                                                                    <span className='TreePipePage-result-type'>
+                                                                                        {result.Name}
+                                                                                    </span>
+                                                                                    <span className='TreePipePage-result-num'>
+                                                                                        {result.children.length}
+                                                                                    </span>
+                                                                                </div>
+                                                                            );
+                                                                        })
+                                                                    }
+                                                                </div> : ''
+                                                        }
+                                                        {
+                                                            treePipe && caliberResultVisible
+                                                                ? <div>
+                                                                    {
+                                                                        caliberResults.map((result) => {
+                                                                            return (
+                                                                                <div key={result.ID} className='TreePipePage-result-resultlayout'>
+                                                                                    <div className='TreePipePage-result-resultBackground' />
+                                                                                    <span className='TreePipePage-result-type'>
+                                                                                        {`管径 ${result.Name}`}
+                                                                                    </span>
+                                                                                    <span className='TreePipePage-result-num'>
+                                                                                        {result.children.length}
+                                                                                    </span>
+                                                                                </div>
+                                                                            );
+                                                                        })
+                                                                    }
+                                                                </div> : ''
+                                                        }
+                                                        {
+                                                            treePipeNode && pipeNodeTypeResultVisible
+                                                                ? <div>
+                                                                    {
+                                                                        pipeNodeTypeResults.map((result) => {
+                                                                            return (
+                                                                                <div key={result.ID} className='TreePipePage-result-resultlayout'>
+                                                                                    <div className='TreePipePage-result-resultBackground' />
+                                                                                    <span className='TreePipePage-result-type'>
+                                                                                        {result.Name}
+                                                                                    </span>
+                                                                                    <span className='TreePipePage-result-num'>
+                                                                                        {result.children.length}
+                                                                                    </span>
+                                                                                </div>
+                                                                            );
+                                                                        })
+                                                                    }
+                                                                </div> : ''
+                                                        }
+                                                    </div>
+                                                </Spin>
+                                            </aside>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : ''
+                }
+            </div>
+
+        );
     }
 }

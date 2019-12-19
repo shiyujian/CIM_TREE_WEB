@@ -1,8 +1,30 @@
+.menuSwitch-fullScreenOut {
+    position: absolute;
+    z-index: 960;
+    top: 35px;
+    left: 44px;
+    display: block;
+    width:64px;
+    height:64px;
+    border:1px solid rgba(60,248,247,1);
+    background-image: url("./MenuSwitchImg/out2.png");
+}
+.menuSwitch-fullScreenIn {
+    position: absolute;
+    z-index: 960;
+    top: 35px;
+    left: 44px;
+    display: block;
+    width:64px;
+    height:64px;
+    border:1px solid rgba(60,248,247,1);
+    background-image: url("./MenuSwitchImg/full-screen2.png");
+}
 .menuSwitch-menuSwitchLeftLayout {
     position: absolute;
     z-index: 960;
-    top: 40px;
-    left: 40px;
+    top: 135px;
+    left: 21px;
 }
 
 .menuSwitch-menuButtonLayout {
@@ -19,6 +41,282 @@
     height: 360px;
     box-shadow: 10px 10px 10px rgba(102,102,102,0.1);
 }
+
+.builddemo{
+    // padding: 2em 0;
+    transform: translate3d(0, 0, 0);
+}
+.buildmenuName {
+    background-image: url("./MenuSwitchImg/0icon_build.png");
+    width:120px;
+    height:120px;
+    display: block;
+    position: absolute;
+    z-index: 999 !important;
+}
+.buildmenuNameSel {
+    background-image: url("./MenuSwitchImg/建设.gif");
+    width:120px;
+    height:120px;
+    display: block;
+    position: absolute;
+    z-index: 999 !important;
+}
+.buildnavbar{
+    width: 120px;
+    height: 120px;
+    line-height: 120px;
+    border-radius: 50%;
+    // margin: 70px auto;
+    margin-top: 70px;
+    position: relative;
+    cursor: pointer;
+    text-align: center;
+    font-size: 1.75em;
+    font-weight: bold;
+    color: #99b977;
+    transition: 0.24s 0.2s;
+}
+.buildnavbar .buildmenu{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    top: -75px;
+    left: -75px;
+    border: 130px solid transparent;
+    cursor:pointer;
+    border-radius: 50%;
+}
+.buildnavbar .buildmenu li{
+    position: absolute;
+    top: -83px;
+    left: -100px;
+    transform-origin: 120px 90px;
+    transition: all 0.5s 0.1s;
+}
+.buildnavbar:hover .buildmenu li{
+    transition: all 0.6s;
+}
+.buildnavbar .buildmenu li a{
+    width: 72px;
+    height: 72px;
+    line-height: 72px;
+    border-radius: 50%;
+    position: absolute;
+    font-size: 60%;
+    color: #99b977;
+    transition: 0.6s;
+}
+.operatedemo{
+    margin-top: 70px;
+    transform: translate3d(0, 0, 0);
+}
+.operatemenuName {
+    background-image: url("./MenuSwitchImg/0icon_operation.png");
+    width:120px;
+    height:120px;
+    display: block;
+    position: absolute;
+    z-index: 999 !important;
+}
+.operatemenuNameSel {
+    background-image: url("./MenuSwitchImg/运营.gif");
+    width:120px;
+    height:120px;
+    display: block;
+    position: absolute;
+    z-index: 999 !important;
+}
+.operatenavbar{
+    width: 120px;
+    height: 120px;
+    line-height: 120px;
+    border-radius: 50%;
+    // margin: 70px auto;
+    position: relative;
+    cursor: pointer;
+    text-align: center;
+    font-size: 1.75em;
+    font-weight: bold;
+    color: #99b977;
+    transition: 0.24s 0.2s;
+}
+.operatenavbar .operatemenu{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    top: -75px;
+    left: -75px;
+    border: 130px solid transparent;
+    cursor:pointer;
+    border-radius: 50%;
+}
+.operatenavbar .operatemenu li{
+    position: absolute;
+    top: -83px;
+    left: -100px;
+    transform-origin: 120px 90px;
+    transition: all 0.5s 0.1s;
+}
+.operatenavbar:hover .operatemenu li{
+    transition: all 0.6s;
+}
+.operatenavbar .operatemenu li a{
+    width: 72px;
+    height: 72px;
+    line-height: 72px;
+    border-radius: 50%;
+    position: absolute;
+    font-size: 60%;
+    color: #99b977;
+    transition: 0.6s;
+}
+.buildnavbar .buildmenu li:nth-child(1){
+    transition-delay: 0.02s;
+    transform: rotate(49deg);
+}
+.buildnavbar .buildmenu li:nth-child(1) a{
+    transition-delay: 0.04s;
+    transform: rotate(675deg);
+}
+.operatenavbar .operatemenu li:nth-child(1){
+    transition-delay: 0.02s;
+    transform: rotate(75deg);
+}
+.operatenavbar .operatemenu li:nth-child(1) a{
+    transition-delay: 0.04s;
+    transform: rotate(635deg);
+}
+.buildnavbar .buildmenu li:nth-child(2){
+    transition-delay: 0.04s;
+    transform: rotate(88.4deg);
+}
+.buildnavbar .buildmenu li:nth-child(2) a{
+    transition-delay: 0.08s;
+    transform: rotate(635deg);
+}
+.operatenavbar .operatemenu li:nth-child(2){
+    transition-delay: 0.04s;
+    transform: rotate(123.3deg);
+}
+.operatenavbar .operatemenu li:nth-child(2) a{
+    transition-delay: 0.08s;
+    transform: rotate(595deg);
+}
+.buildnavbar .buildmenu li:nth-child(3){
+    transition-delay: 0.06s;
+    transform: rotate(127.8deg);
+}
+.buildnavbar .buildmenu li:nth-child(3) a{
+    transition-delay: 0.12s;
+    transform: rotate(595deg);
+}
+.operatenavbar .operatemenu li:nth-child(3){
+    transition-delay: 0.06s;
+    transform: rotate(171.6deg);
+}
+.operatenavbar .operatemenu li:nth-child(3) a{
+    transition-delay: 0.12s;
+    transform: rotate(555deg);
+}
+.buildnavbar .buildmenu li:nth-child(4){
+    transition-delay: 0.08s;
+    transform: rotate(167.2deg);
+}
+.buildnavbar .buildmenu li:nth-child(4) a{
+    transition-delay: 0.16s;
+    transform: rotate(555deg);
+}
+.operatenavbar .operatemenu li:nth-child(4){
+    transition-delay: 0.08s;
+    transform: rotate(220deg);
+}
+.operatenavbar .operatemenu li:nth-child(4) a{
+    transition-delay: 0.16s;
+    transform: rotate(515deg);
+}
+.buildnavbar .buildmenu li:nth-child(5){
+    transition-delay: 0.1s;
+    transform: rotate(206.6deg);
+}
+.buildnavbar .buildmenu li:nth-child(5) a{
+    transition-delay: 0.2s;
+    transform: rotate(515deg);
+}
+.operatenavbar .operatemenu li:nth-child(5){
+    transition-delay: 0.1s;
+    transform: rotate(246deg);
+}
+.operatenavbar .operatemenu li:nth-child(5) a{
+    transition-delay: 0.2s;
+    transform: rotate(515deg);
+}
+.buildnavbar .buildmenu li:nth-child(6){
+    transition-delay: 0.12s;
+    transform: rotate(246deg);
+}
+.buildnavbar .buildmenu li:nth-child(6) a{
+    transition-delay: 0.24s;
+    transform: rotate(475deg);
+}
+.operatenavbar .operatemenu li:nth-child(6){
+    transition-delay: 0.12s;
+    transform: rotate(254deg);
+}
+.operatenavbar .operatemenu li:nth-child(6) a{
+    transition-delay: 0.24s;
+    transform: rotate(475deg);
+}
+.buildnavbar .buildmenu li:nth-child(7){
+    transition-delay: 0.14s;
+    transform: rotate(285.4deg);
+}
+// .buildnavbar .buildmenu li:nth-child(7) a{
+//     transition-delay: 0.28s;
+//     transform: rotate(435deg);
+// }
+.operatenavbar .operatemenu li:nth-child(7){
+    transition-delay: 0.14s;
+    transform: rotate(295deg);
+}
+// .operatenavbar .operatemenu li:nth-child(7) a{
+//     transition-delay: 0.28s;
+//     transform: rotate(435deg);
+// }
+.buildnavbar .buildmenu li:nth-child(8){
+    transition-delay: 0.16s;
+    transform: rotate(324.8deg);
+}
+// .buildnavbar .buildmenu li:nth-child(8) a{
+//     transition-delay: 0.32s;
+//     transform: rotate(395deg);
+// }
+.operatenavbar .operatemenu li:nth-child(8){
+    transition-delay: 0.16s;
+    transform: rotate(336deg);
+}
+// .operatenavbar .operatemenu li:nth-child(8) a{
+//     transition-delay: 0.32s;
+//     transform: rotate(395deg);
+// }
+.buildnavbar .buildmenu li:nth-child(9){
+    transition-delay: 0.18s;
+    transform: rotate(364.2deg);
+}
+// .buildnavbar .buildmenu li:nth-child(9) a{
+//     transition-delay: 0.36s;
+//     transform: rotate(355deg);
+// }
+.operatenavbar .operatemenu li:nth-child(9){
+    transition-delay: 0.18s;
+    transform: rotate(377deg);
+}
+// .operatenavbar .operatemenu li:nth-child(9) a{
+//     transition-delay: 0.36s;
+//     transform: rotate(355deg);
+// }
 
 .menuSwitch-secondMenuButtonSelLayout {
     margin-bottom: 10px;
@@ -57,7 +355,7 @@
 .menuSwitch-menuSwitchRightLayout {
     position: absolute;
     z-index: 960;
-    top: 40px;
+    top: 184px;
     right: 40px;
     width: 76px;
     // height: 438px;
@@ -211,3 +509,47 @@
     margin-left: 16px;
     background-color:white;
 }
+
+.menuSwitch-searchLayout {
+    position: absolute;
+    z-index: 960;
+    top: 45px;
+    right: 34px;
+
+    .menuSwitch-searchInputLayout {
+        background-image: url("./MenuSwitchImg/search2.png") !important;
+        background-color: unset !important;
+        border: unset;
+        width:320px;
+        height:48px;
+        font-size:16px;
+        font-family:Source Han Sans CN;
+        font-weight:300;
+        font-style:italic;
+        color:rgba(97,245,171,1) !important;
+        line-height:40px;
+        opacity:0.6;
+        padding-left: 17px;
+        padding-right: 45px;
+
+        &::-moz-placeholder { 
+            color: rgba(97,245,171,1) !important;
+        }
+        &::-webkit-input-placeholder { 
+            color:rgba(97,245,171,1) !important;
+        }
+        &:-ms-input-placeholder {
+            color:rgba(97,245,171,1) !important;
+        }
+    }
+    .menuSwitch-searchInputRightLayout {
+        width:22px;
+        height:21px;
+        opacity:0.8;
+        border-radius:50%;
+        position: absolute;
+        right: 14px;
+        bottom: 14px;
+    }
+}
+

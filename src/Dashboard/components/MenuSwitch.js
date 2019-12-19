@@ -1,10 +1,33 @@
 import React, { Component } from 'react';
 import './MenuSwitch.less';
-import buildImg from './MenuImg/build.png';
-import buildImgSel from './MenuImg/buildSelect.png';
-import operateImg from './MenuImg/operate.png';
-import operateImgSel from './MenuImg/operateSelect.png';
-import {getUser} from '_platform/auth';
+import {Input} from 'antd';
+import L from 'leaflet';
+import {
+    getIconType
+} from './auth';
+import irrigationSel from './MenuSwitchImg/irrigation3.gif';
+import irrigation from './MenuSwitchImg/irrigation2.png';
+import distributedSel from './MenuSwitchImg/distributed3.gif';
+import distributed from './MenuSwitchImg/distributed2.png';
+import constructionSel from './MenuSwitchImg/construction3.gif';
+import construction from './MenuSwitchImg/construction2.png';
+import defectSel from './MenuSwitchImg/defect3.gif';
+import defect from './MenuSwitchImg/defect2.png';
+import monitorSel from './MenuSwitchImg/monitor3.gif';
+import monitor from './MenuSwitchImg/monitor2.png';
+import mechanicalSel from './MenuSwitchImg/mechanical3.gif';
+import mechanical from './MenuSwitchImg/mechanical2.png';
+import conservationSel from './MenuSwitchImg/conservation3.gif';
+import conservation from './MenuSwitchImg/conservation2.png';
+import ratioSel from './MenuSwitchImg/ratio3.gif';
+import ratio from './MenuSwitchImg/ratio2.png';
+import adoptSel from './MenuSwitchImg/adopt3.gif';
+import adopt from './MenuSwitchImg/adopt2.png';
+import migrateSel from './MenuSwitchImg/migrate3.gif';
+import migrate from './MenuSwitchImg/migrate2.png';
+import searchTopImg from './MenuSwitchImg/1.png';
+import searchRightImg from './MenuSwitchImg/2.png';
+
 // window = window || {};
 export default class MenuSwitch extends Component {
     constructor (props) {
@@ -16,41 +39,65 @@ export default class MenuSwitch extends Component {
     options = [
         {
             label: '灌溉管网',
-            value: 'geojsonFeature_treePipe'
+            value: 'geojsonFeature_treePipe',
+            img: irrigation,
+            imgSel: irrigationSel
         },
         {
             label: '树种筛选',
-            value: 'geojsonFeature_treetype'
+            value: 'geojsonFeature_treetype',
+            img: distributed,
+            imgSel: distributedSel
         },
         {
             label: '辅助管理',
-            value: 'geojsonFeature_auxiliaryManagement'
+            value: 'geojsonFeature_auxiliaryManagement',
+            img: construction,
+            imgSel: constructionSel
         },
         {
             label: '安全隐患',
-            value: 'geojsonFeature_risk'
+            value: 'geojsonFeature_risk',
+            img: defect,
+            imgSel: defectSel
         },
         {
             label: '巡检路线',
-            value: 'geojsonFeature_track'
+            value: 'geojsonFeature_track',
+            img: monitor,
+            imgSel: monitorSel
         },
         {
             label: '机械情况',
-            value: 'geojsonFeature_device'
+            value: 'geojsonFeature_device',
+            img: mechanical,
+            imgSel: mechanicalSel
         }
     ];
     options1 = [
         {
             label: '养护任务',
-            value: 'geojsonFeature_curingTask'
+            value: 'geojsonFeature_curingTask',
+            img: conservation,
+            imgSel: conservationSel
         },
         {
             label: '成活率',
-            value: 'geojsonFeature_survivalRate'
+            value: 'geojsonFeature_survivalRate',
+            img: ratio,
+            imgSel: ratioSel
         },
         {
             label: '苗木结缘',
-            value: 'geojsonFeature_treeAdopt'
+            value: 'geojsonFeature_treeAdopt',
+            img: adopt,
+            imgSel: adoptSel
+        },
+        {
+            label: '苗木迁移',
+            value: 'geojsonFeature_treeTransfer',
+            img: migrate,
+            imgSel: migrateSel
         }
     ]
 
@@ -220,16 +267,19 @@ export default class MenuSwitch extends Component {
         } = this.props;
         let target = e.target;
         let buttonID = target.getAttribute('id');
+        console.log('buttonID', buttonID);
+
         if (dashboardCompomentMenu === buttonID) {
             if (menuTreeVisible) {
-                await getMenuTreeVisible(false);
                 // await switchDashboardCompoment('');
+                await getMenuTreeVisible(false);
             } else {
                 await getMenuTreeVisible(true);
             }
         } else {
+            // await switchDashboardCompoment(buttonID);
+            await switchDashboardCompoment('geojsonFeature_treetype');
             await getMenuTreeVisible(true);
-            await switchDashboardCompoment(buttonID);
         }
     }
     // 视图管理
@@ -391,6 +441,103 @@ export default class MenuSwitch extends Component {
             console.log('exitFullScreen', e);
         }
     }
+    // 点击建设
+    handleBuildMenuClick = async (event) => {
+        let domID = event.target.id;
+        console.log('domID', domID);
+        if (domID === 'buildmenu' || domID === 'buildmenuName') {
+            const {
+                actions: {
+                    switchDashboardMenuType,
+                    getMenuTreeVisible,
+                    switchDashboardCompoment
+                },
+                dashboardMenuType
+            } = this.props;
+            if (dashboardMenuType && dashboardMenuType === 'buildMenu') {
+                await switchDashboardMenuType('');
+            } else {
+                await switchDashboardMenuType('buildMenu');
+            }
+            await switchDashboardCompoment('');
+            await getMenuTreeVisible(false);
+        }
+    }
+    // 点击运营
+    handleOperateMenuClick = async (event) => {
+        let domID = event.target.id;
+        console.log('domID', domID);
+        if (domID === 'operatemenu' || domID === 'operatemenuName') {
+            const {
+                actions: {
+                    switchDashboardMenuType,
+                    getMenuTreeVisible,
+                    switchDashboardCompoment
+                },
+                dashboardMenuType
+            } = this.props;
+            if (dashboardMenuType && dashboardMenuType === 'operateMenu') {
+                await switchDashboardMenuType('');
+            } else {
+                await switchDashboardMenuType('operateMenu');
+            }
+            await switchDashboardCompoment('');
+            await getMenuTreeVisible(false);
+        }
+    }
+    // 搜索苗木
+    handleSearchTreeLocation = async (event) => {
+        const {
+            actions: {
+                getTreeLocation
+            }
+        } = this.props;
+        console.log('event', event);
+        console.log('event.keyCode', event.keyCode);
+
+        let location = {};
+        let value = document.getElementById('searchInput').value;
+        console.log('value', value);
+        let treeData = await getTreeLocation({sxm: value});
+        let treeMess = treeData && treeData.content && treeData.content[0];
+        // 如果根据顺序码查到的数据存在坐标，则不修改左侧树信息，对树节点进行定位
+        if (treeMess && treeMess.X && treeMess.Y) {
+            location.X = treeMess.X;
+            location.Y = treeMess.Y;
+            await this.treeTypeTreeLocation(location);
+            this.setState({
+                searchValue: ''
+            });
+        } else {
+            // 如果根据顺序码查到的数据不存在坐标，则树数据为空，同时没有坐标信息
+            this.setState({
+                searchValue: value
+            });
+        }
+    }
+    // 树种筛选模块搜索树然后进行定位
+    treeTypeTreeLocation = async (data) => {
+        const {
+            map
+        } = this.props;
+        const {
+            treeTypeTreeMarkerLayer
+        } = this.state;
+        if (treeTypeTreeMarkerLayer) {
+            map.removeLayer(treeTypeTreeMarkerLayer);
+        }
+        let iconType = L.divIcon({
+            className: getIconType('treeType')
+        });
+        let marker = L.marker([data.Y, data.X], {
+            icon: iconType
+        });
+        marker.addTo(map);
+        map.panTo([data.Y, data.X]);
+        this.setState({
+            treeTypeTreeMarkerLayer: marker
+        });
+    }
     render () {
         const {
             dashboardCompomentMenu,
@@ -409,53 +556,139 @@ export default class MenuSwitch extends Component {
             fullScreenState = tabs.fullScreenState;
         }
         return (
-            <div >
+            <div>
+                <a
+                    id='fullScreen'
+                    title='全屏展示'
+                    onClick={this.handleFullScreenButton.bind(this)}
+                    className={fullScreenState === 'fullScreen'
+                        ? 'menuSwitch-fullScreenOut'
+                        : 'menuSwitch-fullScreenIn'} />
                 <div className='menuSwitch-menuSwitchLeftLayout'>
-                    <a className='menuSwitch-menuButtonLayout'>
-                        <img src={dashboardMenuType === 'buildMenu' ? buildImgSel : buildImg} id='buildMenu' onClick={this.handleChangeMenuType.bind(this)} />
-                    </a>
-                    <a className='menuSwitch-menuButtonLayout'>
-                        <img src={dashboardMenuType === 'operateMenu' ? operateImgSel : operateImg} id='operateMenu' onClick={this.handleChangeMenuType.bind(this)} />
-                    </a>
-                </div>
-                {
-                    dashboardMenuType === 'buildMenu'
-                        ? (
-                            <div className='menuSwitch-secondMenuLayout'>
+                    <div className='builddemo'>
+                        <a
+                            onClick={this.handleBuildMenuClick.bind(this)}
+                            id='buildmenuName'
+                            className={dashboardMenuType === 'buildMenu'
+                                ? 'buildmenuNameSel'
+                                : 'buildmenuName'} />
+                        <div className='buildnavbar'
+                            id='buildnavbar'
+                            style={
+                                dashboardMenuType === 'buildMenu'
+                                    ? {
+                                        opacity: 1
+                                    } : {
+                                        opacity: 0
+                                    }
+                            }
+                        >
+
+                            <ul className={'buildmenu'}
+                                id='buildmenu'
+                                onClick={this.handleBuildMenuClick.bind(this)}
+                                style={
+                                    dashboardMenuType === 'buildMenu'
+                                        ? {
+                                            transition: 'transform 0.4s 0.08s, z-index   0s  0.5s',
+                                            transform: 'scale(1)',
+                                            zIndex: 1
+                                        } : {
+                                            transform: 'scale(0)',
+                                            transition: 'transform 1.4s 0.07s',
+                                            zIndex: -1
+                                        }
+                                }
+                            >
                                 {
                                     this.options.map((option) => {
+                                        let img = option.img;
+                                        if (dashboardCompomentMenu === option.value) {
+                                            img = option.imgSel;
+                                        }
                                         return (
-                                            <a className={dashboardCompomentMenu === option.value ? 'menuSwitch-secondMenuButtonSelLayout' : 'menuSwitch-secondMenuButtonUnSelLayout'}
-                                                id={option.value}
-                                                key={option.value}
-                                                onClick={this.handleLeftMenuButton.bind(this)}>
-                                                {option.label}
-                                            </a>
+                                            <li>
+                                                <a id={option.value}
+                                                    key={option.value}
+                                                    title={option.label}
+                                                    onClick={this.handleLeftMenuButton.bind(this)}
+                                                    style={{
+                                                        backgroundImage: `url(${img})`
+                                                    }} />
+                                            </li>
                                         );
                                     })
                                 }
-                            </div>
-                        ) : ''
-                }
-                {
-                    dashboardMenuType === 'operateMenu'
-                        ? (
-                            <div className='menuSwitch-secondMenuLayout'>
+                            </ul>
+                        </div>
+                    </div>
+                    <div className='operatedemo'>
+                        <a
+                            onClick={this.handleOperateMenuClick.bind(this)}
+                            id='operatemenuName'
+                            className={dashboardMenuType === 'operateMenu'
+                                ? 'operatemenuNameSel'
+                                : 'operatemenuName'} />
+                        <div className='operatenavbar'
+                            id='operatenavbar'
+                            style={
+                                dashboardMenuType === 'operateMenu'
+                                    ? {
+                                        opacity: 1
+                                    } : {
+                                        opacity: 0
+                                    }
+
+                            }
+                        >
+                            <ul className={'operatemenu'}
+                                id='operatemenu'
+                                onClick={this.handleOperateMenuClick.bind(this)}
+                                style={
+                                    dashboardMenuType === 'operateMenu'
+                                        ? {
+                                            transition: 'transform 0.4s 0.08s, z-index   0s  0.5s',
+                                            transform: 'scale(1)',
+                                            zIndex: 1
+                                        } : {
+                                            transform: 'scale(0)',
+                                            transition: 'transform 1.4s 0.07s',
+                                            zIndex: -1
+                                        }
+                                }
+                            >
                                 {
                                     this.options1.map((option) => {
+                                        let img = option.img;
+                                        if (dashboardCompomentMenu === option.value) {
+                                            img = option.imgSel;
+                                        }
                                         return (
-                                            <a className={dashboardCompomentMenu === option.value ? 'menuSwitch-secondMenuButtonSelLayout' : 'menuSwitch-secondMenuButtonUnSelLayout'}
-                                                id={option.value}
-                                                key={option.value}
-                                                onClick={this.handleLeftMenuButton.bind(this)}>
-                                                {option.label}
-                                            </a>
+                                            <li>
+                                                <a id={option.value}
+                                                    key={option.value}
+                                                    title={option.label}
+                                                    onClick={this.handleLeftMenuButton.bind(this)}
+                                                    style={{
+                                                        backgroundImage: `url(${img})`
+                                                    }} />
+                                            </li>
                                         );
                                     })
                                 }
-                            </div>
-                        ) : ''
-                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div className='menuSwitch-searchLayout'>
+                    <img src={searchTopImg} style={{display: 'block'}} />
+                    <Input placeholder='请输入苗木编码'
+                        id='searchInput'
+                        autocomplete='off'
+                        onPressEnter={this.handleSearchTreeLocation.bind(this)}
+                        className='menuSwitch-searchInputLayout' />
+                    <img src={searchRightImg} className='menuSwitch-searchInputRightLayout' />
+                </div>
                 <div className='menuSwitch-menuSwitchRightLayout'>
                     <a className={dashboardFocus === 'mapFoucs' ? 'menuSwitch-rightMenuMapFoucsButtonSelLayout' : 'menuSwitch-rightMenuMapFoucsButtonUnSelLayout'}
                         id='mapFoucs'
@@ -477,10 +710,10 @@ export default class MenuSwitch extends Component {
                         id='area'
                         title='区域地块'
                         onClick={this.handleRightMenuButton.bind(this)} />
-                    <a className={fullScreenState === 'fullScreen' ? 'menuSwitch-rightMenuFullscreenButtonSelLayout' : 'menuSwitch-rightMenuFullscreenButtonUnSelLayout'}
+                    {/* <a className={fullScreenState === 'fullScreen' ? 'menuSwitch-rightMenuFullscreenButtonSelLayout' : 'menuSwitch-rightMenuFullscreenButtonUnSelLayout'}
                         id='fullScreen'
                         title='全屏展示'
-                        onClick={this.handleFullScreenButton.bind(this)} />
+                        onClick={this.handleFullScreenButton.bind(this)} /> */}
                 </div>
             </div>);
     }

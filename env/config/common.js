@@ -123,7 +123,8 @@ module.exports = {
                 ]
             },
             {
-                test: /\.(png|jpe?g|gif)$/,
+                // test: /\.(png|jpe?g|gif|ttf|eot|svg|woff|woff2)$/,
+                test: /\.(png|jpe?g|gif|ttf)$/,
                 include: SRC,
                 use: [
                     {
@@ -136,7 +137,8 @@ module.exports = {
                 ]
             },
             {
-                test: /\.(png|jpe?g|gif)$/,
+                // test: /\.(png|jpe?g|gif|ttf|eot|svg|woff|woff2)$/,
+                test: /\.(png|jpe?g|gif|ttf)$/,
                 include: NODE_MODULES,
                 use: [
                     {
@@ -148,6 +150,33 @@ module.exports = {
                     }
                 ]
             },
+            // {
+            //     test: /\.(ttf|eot|svg|woff|woff2)$/,
+            //     include: SRC,
+            //     use: [
+            //         {
+            //             loader: 'url-loader',
+            //             options: {
+            //                 limit: 8192,
+            //                 name: 'images/[name].[hash].[ext]'
+            //             }
+            //         }
+            //     ]
+            // },
+            // {
+
+            //     test: /\.(ttf|eot|svg|woff|woff2)$/,
+            //     include: NODE_MODULES,
+            //     use: [
+            //         {
+            //             loader: 'url-loader',
+            //             options: {
+            //                 limit: 8192,
+            //                 name: 'images/[name].[hash].[ext]'
+            //             }
+            //         }
+            //     ]
+            // },
             {
                 test: /\.(ttf|eot|svg|woff(2)?)(\?[a-z0-9]+)?$/,
                 include: NODE_MODULES,
