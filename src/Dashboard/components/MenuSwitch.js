@@ -64,12 +64,12 @@ export default class MenuSwitch extends Component {
             img: defect,
             imgSel: defectSel
         },
-        {
-            label: '巡检路线',
-            value: 'geojsonFeature_track',
-            img: monitor,
-            imgSel: monitorSel
-        },
+        // {
+        //     label: '现场监控',
+        //     value: 'geojsonFeature_camera',
+        //     img: monitor,
+        //     imgSel: monitorSel
+        // },
         {
             label: '机械情况',
             value: 'geojsonFeature_device',
@@ -95,13 +95,13 @@ export default class MenuSwitch extends Component {
             value: 'geojsonFeature_treeAdopt',
             img: adopt,
             imgSel: adoptSel
-        },
-        {
-            label: '苗木迁移',
-            value: 'geojsonFeature_treeTransfer',
-            img: migrate,
-            imgSel: migrateSel
         }
+        // {
+        //     label: '苗木迁移',
+        //     value: 'geojsonFeature_treeTransfer',
+        //     img: migrate,
+        //     imgSel: migrateSel
+        // }
     ]
 
     async componentDidMount () {

@@ -408,7 +408,7 @@ export default class DataView extends Component {
                                             {
                                                 this.environmentOptions.map((option) => {
                                                     let imgurl = option.img;
-                                                    let num = 0;
+                                                    let num = '';
                                                     return (<span key={option.label}
                                                         title={option.label}
                                                         className={'DataViewPage-button-layout'}

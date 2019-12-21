@@ -274,16 +274,6 @@ class OnSite extends Component {
     renderPanel (option) {
         if (option && option.value) {
             switch (option.value) {
-                // 巡检路线
-                case 'geojsonFeature_track':
-                    return (
-                        <TrackTree
-                            {...this.props}
-                            {...this.state}
-                            map={this.map}
-                            featureName={option.value}
-                        />
-                    );
                 // 苗木结缘
                 case 'geojsonFeature_treeAdopt':
                     return (
