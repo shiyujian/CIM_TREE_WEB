@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Tree, Input, Spin } from 'antd';
 import L from 'leaflet';
+import Scrollbar from 'smooth-scrollbar';
 import {
     getIconType
 } from '../../auth';
@@ -10,119 +11,123 @@ import {
 import {
     trim
 } from '_platform/auth';
-const TreeNode = Tree.TreeNode;
-const Search = Input.Search;
+import './TreeType.less';
+import decoration from './TreeTypeImg/decoration.png';
+import hide from './TreeTypeImg/hide2.png';
+import display from './TreeTypeImg/display2.png';
+import searchTopImg from './TreeTypeImg/search0.png';
+import searchRightImg from './TreeTypeImg/2.png';
 export default class TreeTypeTree extends Component {
     constructor (props) {
         super(props);
         this.state = {
             searchTree: [],
             searchValue: '',
-            treeTypeTreeMarkerLayer: '' // 树种筛选树节点图层
+            treetypes: [],
+            treeTypeTreeData: [],
+            treeType1: true,
+            treeType2: true,
+            treeType3: true,
+            treeType4: true,
+            treeType5: true,
+            treeTypeTreeMarkerLayer: '', // 树种筛选树节点图层
+            menuIsExtend: true /* 菜单是否展开 */,
+            menuWidth: 665 /* 菜单宽度 */
         };
         this.tileTreeTypeLayerFilter = null; // 树种筛选图层
     }
+    // 树种
+    treeTypeOptions = [
+        {
+            id: 'treeType1',
+            key: '1',
+            label: '常绿乔木'
+        },
+        {
+            id: 'treeType2',
+            key: '2',
+            label: '落叶乔木'
+        },
+        {
+            id: 'treeType3',
+            key: '3',
+            label: '亚乔木'
+        },
+        {
+            id: 'treeType4',
+            key: '4',
+            label: '灌木'
+        },
+        {
+            id: 'treeType5',
+            key: '5',
+            label: '地被'
+        }
+    ]
 
     componentDidMount () {
+        const {
+            treetypesTree
+        } = this.props;
+        let treetypes = [];
+        let treeTypeTreeData = [];
+        try {
+            let data = Scrollbar.init(document.querySelector('#asideDom'));
+            if (treetypesTree && treetypesTree instanceof Array) {
+                for (let i = 0; i < treetypesTree.length; i++) {
+                    let children = treetypesTree[i].children;
+                    children.map((child) => {
+                        treetypes.push(child);
+                    });
+                }
+            }
+            for (let j = 0; j < treetypesTree.length; j++) {
+                const element = treetypesTree[j];
+                if (element !== undefined) {
+                    treeTypeTreeData.push(element);
+                }
+            }
+        } catch (e) {
+            console.log('获取不分类树种', e);
+        }
+        this.setState({
+            treetypes,
+            treeTypeTreeData
+        });
     }
 
     componentWillUnmount = async () => {
         await this.removeTileTreeTypeLayerFilter();
+        await this.treeTypeTreeCancelLocation();
     }
 
-    render () {
-        let {
-            treetypesTree = [],
-            treetypesTreeLoading
+    // 去除树种筛选瓦片图层
+    removeTileTreeTypeLayerFilter = () => {
+        const {
+            map
+        } = this.props;
+        if (this.tileTreeTypeLayerFilter) {
+            map.removeLayer(this.tileTreeTypeLayerFilter);
+            this.tileTreeTypeLayerFilter = null;
+        }
+    }
+
+    // 取消树节点定位
+    treeTypeTreeCancelLocation = async () => {
+        const {
+            map
         } = this.props;
         const {
-            searchTree,
-            searchValue
+            treeTypeTreeMarkerLayer
         } = this.state;
-        let treeData = [];
-        let defaultCheckedKeys = [];
-        if (searchValue) {
-            treeData = searchTree;
-        } else {
-            let contents = [];
-            for (let j = 0; j < treetypesTree.length; j++) {
-                const element = treetypesTree[j];
-                if (element !== undefined) {
-                    contents.push(element);
-                    defaultCheckedKeys.push(element.key);
-                }
-            }
-            treeData = [
-                {
-                    properties: {
-                        name: '全部'
-                    },
-                    key: '全部',
-                    children: contents
-                }
-            ];
+        if (treeTypeTreeMarkerLayer) {
+            map.removeLayer(treeTypeTreeMarkerLayer);
         }
-        return (
-            <div>
-                <Spin spinning={treetypesTreeLoading}>
-                    <Search
-                        placeholder='请输入树种名称或顺序码'
-                        onSearch={this.handleSearchTree.bind(this)}
-                        style={{ width: '100%', marginBotton: 10, paddingRight: 5 }}
-                    />
-                    <div className={this.genIconClass()}>
-                        <Tree
-                            checkable
-                            showIcon
-                            defaultCheckedKeys={defaultCheckedKeys}
-                            onCheck={this.handleTreeTypeCheck.bind(this)}
-                            showLine
-                        >
-                            {treeData.map(p => {
-                                return this.loop(p);
-                            })}
-                        </Tree>
-                    </div>
-                </Spin>
-            </div>
-
-        );
+        this.setState({
+            treeTypeTreeMarkerLayer: ''
+        });
     }
 
-    genIconClass () {
-        let icClass = '';
-        let featureName = this.props.featureName;
-        switch (featureName) {
-            case 'geojsonFeature_track':
-                icClass = 'tr-people';
-                break;
-            case 'geojsonFeature_risk':
-                icClass = 'tr-hazard';
-                break;
-            case 'geojsonFeature_treetype':
-                icClass = 'tr-area';
-                break;
-        }
-        return icClass;
-    }
-
-    loop (p) {
-        let me = this;
-        if (p) {
-            return (
-                <TreeNode
-                    title={p.properties.name}
-                    key={p.key}
-                    selectable={false}
-                >
-                    {p.children &&
-                        p.children.map(m => {
-                            return me.loop(m);
-                        })}
-                </TreeNode>
-            );
-        }
-    }
     /* 树种筛选多选树节点 */
     handleTreeTypeCheck = async (keys, info) => {
         const {
@@ -165,38 +170,31 @@ export default class TreeTypeTree extends Component {
         ).addTo(map);
     }
 
-    // 去除树种筛选瓦片图层
-    removeTileTreeTypeLayerFilter = () => {
+    handleSearchTree = async (event) => {
         const {
-            map
-        } = this.props;
-        if (this.tileTreeTypeLayerFilter) {
-            map.removeLayer(this.tileTreeTypeLayerFilter);
-            this.tileTreeTypeLayerFilter = null;
-        }
-    }
-
-    handleSearchTree = async (value) => {
-        const {
-            treetypes = [],
             actions: {
                 getTreeLocation
             }
         } = this.props;
+        const {
+            treetypes = []
+        } = this.state;
         try {
+            let value = document.getElementById('searchInput').value;
             value = trim(value);
+            console.log('value', value);
+
             if (value) {
-                let searchTree = [];
                 let keys = [];
                 treetypes.map((tree) => {
                     let name = tree.properties.name;
                     if (name.indexOf(value) !== -1) {
                         keys.push(tree.key);
-                        searchTree.push(tree);
                     }
                 });
+                console.log('keys', keys);
                 // 如果所搜索的数据非树种名称，则查看是否为顺序码
-                if (searchTree.length === 0 && value) {
+                if (keys.length === 0 && value) {
                     let location = {};
                     let treeData = await getTreeLocation({sxm: value});
                     let treeMess = treeData && treeData.content && treeData.content[0];
@@ -205,32 +203,13 @@ export default class TreeTypeTree extends Component {
                         location.X = treeMess.X;
                         location.Y = treeMess.Y;
                         await this.treeTypeTreeLocation(location);
-                        this.setState({
-                            searchValue: '',
-                            searchTree: []
-                        });
-                    } else {
-                        // 如果根据顺序码查到的数据不存在坐标，则树数据为空，同时没有坐标信息
-                        this.setState({
-                            searchValue: value,
-                            searchTree
-                        });
                     }
                 } else {
-                    // 如果搜索的数据为树种名称，则展示搜索数据
-                    this.setState({
-                        searchValue: value,
-                        searchTree
-                    });
+                    await this.handleTreeTypeCheck(keys);
                 }
             } else {
                 // 如果搜索的信息为空，则取消定位信息，同时展示所有的树种信息
-                // await this.props.cancelLocation();
                 await this.treeTypeTreeCancelLocation();
-                this.setState({
-                    searchValue: '',
-                    searchTree: []
-                });
             }
         } catch (e) {
             console.log('handleSearchTree', e);
@@ -260,20 +239,133 @@ export default class TreeTypeTree extends Component {
             treeTypeTreeMarkerLayer: marker
         });
     }
+    /* 菜单展开收起 */
+    _extendAndFold = () => {
+        this.setState({ menuIsExtend: !this.state.menuIsExtend });
+    }
 
-    // 取消树节点定位
-    treeTypeTreeCancelLocation = async () => {
+    // 树种选中
+    treeTypeChange = async (option) => {
         const {
-            map
+            treetypes
+        } = this.state;
+        console.log('treetypes', treetypes);
+
+        try {
+            this.setState({
+                [option.id]: !this.state[option.id]
+            }, () => {
+                this.handleTreeTypeKeys();
+            });
+        } catch (e) {
+            console.log('pipeMaterialChange', e);
+        }
+    }
+    handleTreeTypeKeys = async () => {
+        const {
+            treeTypeTreeData
+        } = this.state;
+        let keys = [];
+        this.treeTypeOptions.map((option) => {
+            if (this.state[option.id]) {
+                let key = option.key;
+                treeTypeTreeData.map((type) => {
+                    if (key === type.key) {
+                        let children = (type && type.children) || [];
+                        children.map((child) => {
+                            if (child.key) {
+                                keys.push(child.key);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+        this.handleTreeTypeCheck(keys);
+    }
+
+    render () {
+        let {
+            treetypesTreeLoading
         } = this.props;
         const {
-            treeTypeTreeMarkerLayer
+            menuIsExtend,
+            menuWidth
         } = this.state;
-        if (treeTypeTreeMarkerLayer) {
-            map.removeLayer(treeTypeTreeMarkerLayer);
-        }
-        this.setState({
-            treeTypeTreeMarkerLayer: ''
-        });
+
+        return (
+            <div>
+                <div className='TreeTypePage-container'>
+                    <div className='TreeTypePage-r-main'>
+                        {
+                            menuIsExtend ? '' : (
+                                <img src={display}
+                                    className='TreeTypePage-foldBtn'
+                                    onClick={this._extendAndFold.bind(this)} />
+                            )
+                        }
+                        <div
+                            className={`TreeTypePage-menuPanel`}
+                            style={
+                                menuIsExtend
+                                    ? {
+                                        width: menuWidth,
+                                        transform: 'translateX(0)'
+                                    }
+                                    : {
+                                        width: menuWidth,
+                                        transform: `translateX(-${
+                                            menuWidth
+                                        }px)`
+                                    }
+                            }
+                        >
+
+                            <div className='TreeTypePage-menuBackground' />
+                            <aside className='TreeTypePage-aside' id='asideDom'>
+                                <Spin spinning={treetypesTreeLoading}>
+                                    <div className='TreeTypePage-MenuNameLayout'>
+                                        <img src={decoration} />
+                                        <span className='TreeTypePage-MenuName'>树种分布</span>
+                                        <img src={hide}
+                                            onClick={this._extendAndFold.bind(this)}
+                                            className='TreeTypePage-MenuHideButton' />
+                                    </div>
+                                    <div className='TreeTypePage-asideTree'>
+                                        <div className='TreeTypePage-button'>
+                                            {
+                                                this.treeTypeOptions.map((option) => {
+                                                    return (<a key={option.label}
+                                                        title={option.label}
+                                                        className={this.state[option.id] ? 'TreeTypePage-button-layoutSel' : 'TreeTypePage-button-layout'}
+                                                        onClick={this.treeTypeChange.bind(this, option)}
+                                                        style={{
+                                                            marginRight: 8,
+                                                            marginTop: 8
+                                                        }}
+                                                    >
+                                                        <span className='TreeTypePage-button-layout-text'>{option.label}</span>
+                                                    </a>);
+                                                })
+                                            }
+                                        </div>
+                                    </div>
+                                </Spin>
+                            </aside>
+                        </div>
+                    </div>
+                </div>
+                <div className='TreeTypePage-searchLayout'>
+                    <img src={searchTopImg} style={{display: 'block'}} />
+                    <Input placeholder='请输入树种或苗木编码'
+                        id='searchInput'
+                        autocomplete='off'
+                        onPressEnter={this.handleSearchTree.bind(this)}
+                        className='TreeTypePage-searchInputLayout' />
+                    <img src={searchRightImg} className='TreeTypePage-searchInputRightLayout' />
+                </div>
+            </div>
+
+        );
     }
 }

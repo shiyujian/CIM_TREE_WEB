@@ -3,10 +3,10 @@ import { Button, Popconfirm, Notification } from 'antd';
 import './ViewPositionManage.less';
 import SaveUserMapCustomPositionModal from './SaveUserMapCustomPositionModal';
 // 自定义视图
-import areaViewImg from '../../InitialPositionImg/areaView.png';
-import customViewImg from '../../InitialPositionImg/customView.png';
-import customViewCloseUnSelImg from '../../InitialPositionImg/delete1.png';
-import customViewCloseSelImg from '../../InitialPositionImg/delete2.png';
+import areaViewImg from './InitialPositionImg/areaView.png';
+import customViewImg from './InitialPositionImg/customView.png';
+import customViewCloseUnSelImg from './InitialPositionImg/delete1.png';
+import customViewCloseSelImg from './InitialPositionImg/delete2.png';
 import {
     PROJECTPOSITIONCENTER
 } from '_platform/api';

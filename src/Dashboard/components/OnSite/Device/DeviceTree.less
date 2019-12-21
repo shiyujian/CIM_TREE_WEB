@@ -1,113 +1,332 @@
-.DeviceTree-button {
-    display: inline-block;
-    width: 220px;
+@font-face {
+    font-family: Digital-7;
+    src: url('../digital-7.ttf');
 }
-
-.DeviceTree-button-layout {
-    width: 105px;
-    margin-bottom: 10px;
-}
-
-.DeviceTree-mrg10 {
-	white-space: nowrap;
-    width: 220px;
-    margin-bottom: 20px;
-}
-
-.DeviceTree-statis-layout {
-	white-space: nowrap;
-    width: 100%;
-    margin-bottom: 10px;
-    border-bottom:1px dashed #8c8383; 
-    padding-bottom: 10px;
-    width: 220px;
-}
-
-.DeviceTree-menuPanel {
+.DeviceTreePage-container{
+    display: flex;
     position: absolute;
-    left: 330px;
-    top: 40px;
-    height: 80%;
-    width: 260px;
-    transition: all 0.3s;
-    z-index: 980;
+    // width: calc(~'100% - 44px');
+    left: 44px;
+    top: 610px;
+    width: 820px;
+    height: 246px;
 
-    .DeviceTree-aside {
+    .DeviceTreePage-r-main{
+    flex:1 1 auto;
+    position: relative;
+    overflow: hidden;
+    }
+
+    .DeviceTreePage-foldBtn {
         position: absolute;
-        left: 0;
-        width: 100%;
-        top: 0;
-        bottom: 0;
-        background-color: rgba(255,255,255, 0.9);
-        color: #333;
-        z-index: 999;
-        overflow-x: hidden;
-        overflow-y: auto;
+        width: 64px;
+        height: 64px;
+        text-align: center;
+        cursor: pointer;
+        z-index: 500;
+        -webkit-transition: all .3s;
+        -o-transition: all .3s;
+        transition: all .3s;
+        // border:1px solid rgba(97,245,171,1);
+    }
 
-        .DeviceTree-asideTree {
-            margin-top: 20px;
-            margin-left: 20px;
+    .DeviceTreePage-menuPanel {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 246px;
+        transition: all 0.8s;
+        z-index: 980;
+        // background:rgba(19,34,36,0.8);
+        // background-image: url("./DeviceImgs/bottom1.png");
+        // background-repeat: no-repeat;
+  
+        .DeviceTreePage-menuBackground {
+            background-image: url("./DeviceImgs/bottom4.png");
+            background-repeat: no-repeat;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            bottom: 0;
+            // background: rgba(19,34,36,1);
+            opacity: 0.7;
+        }
+        .DeviceTreePage-aside {
+            position: absolute;
+            left: 24px;
+            width: calc(~'100% - 24px');;
+            height: 100%;
+            color: #333;
+            z-index: 999;
+            overflow: auto;
+
+            .DeviceTreePage-MenuNameLayout { 
+                display: inline-block;
+                margin-top: 18px;
+                width: 100%;
+            }
+             .DeviceTreePage-MenuName {
+                width: 65px;
+                height: 17px;
+                font-size: 16px;
+                font-family: Microsoft YaHei;
+                font-weight: bold;
+                color: #61f5ab;
+                position: absolute;
+                left: 12px;
+                top: 18px;
+            }
+            .DeviceTreePage-MenuHideButton {
+                float: right;
+                cursor: pointer;
+                margin-right: 23px;
+            }
+            .DeviceTreePage-asideTree {
+                margin-top: 10px;
+                // margin-left: 10px;
+            }
+            .DeviceTreePage-StatusButton {
+                display: inline-block;
+                // width: 220px;
+            }
+            .DeviceTreePage-button-statusSel {
+                width:72px;
+                height:32px;
+                border:1px solid rgba(60,248,247,1);
+                background-image: url("./DeviceImgs/3selection.png");
+                display: inline-block;
+                opacity: 0.8;
+            }
+            .DeviceTreePage-button-status {
+                width:72px;
+                height:32px;
+                background-image: url("./DeviceImgs/3levitate.png");
+                display: inline-block;
+                // border:1px solid rgba(60,248,247,1);
+                opacity: 0.8;
+            }
+            .DeviceTreePage-button-status-textSel {
+                width:72px;
+                height:32px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:400;
+                color:rgba(102,255,179,1);
+                line-height:32px;
+                text-align: center;
+                display: block;
+            }
+            .DeviceTreePage-button-status-text {
+                width:72px;
+                height:32px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:400;
+                color:rgba(161,182,194,1);
+                line-height:32px;
+                text-align: center;
+                display: block;
+            }
+            .DeviceTreePage-TimeButton {
+                display: inline-block;
+                margin-left: 67px;
+            }
+            .DeviceTreePage-button-timeSel {
+                width:72px;
+                height:32px;
+                border:1px solid rgba(60,248,247,1);
+                background-image: url("./DeviceImgs/3selection.png");
+                display: inline-block;
+                opacity: 0.8;
+            }
+            .DeviceTreePage-button-time {
+                width:72px;
+                height:32px;
+                background-image: url("./DeviceImgs/3levitate.png");
+                display: inline-block;
+                // border:1px solid rgba(60,248,247,1);
+                opacity: 0.8;
+            }
+            .DeviceTreePage-button-customTimeSel {
+                background-color: unset !important;
+                width:148px;
+                height:32px;
+                border:1px solid rgba(60,248,247,1);
+                background-image: url("./DeviceImgs/4selection.png");
+                display: inline-block;
+                position: absolute;
+                // opacity: 0.8;
+
+                span.ant-calendar-picker-input.ant-input {
+                    box-sizing: border-box;
+                    margin: 0;
+                    padding: 0;
+                    font-variant: tabular-nums;
+                    list-style: none;
+                    font-feature-settings: 'tnum';
+                    position: relative;
+                    display: inline-block;
+                    width: 100%;
+                    height: 32px;
+                    background-image: none;
+                    transition: all 0.3s;
+                    background-color: unset;
+                    font-size:14px;
+                    font-family:Microsoft YaHei;
+                    font-weight:400;
+                    color:rgba(102,255,179,1);
+                    line-height:40px;
+                    border: unset;
+                }
+                input.ant-calendar-range-picker-input {
+                    width: 45%;
+                    height: 100%;
+                    text-align: center;
+                    background-color: transparent;
+                    border: unset;
+                    outline: 0;
+                    padding: unset;
+                    font-size: 12px;
+                    vertical-align: top;
+                }
+                span.ant-calendar-range-picker-separator {
+                    color:rgba(102,255,179,1);
+                    vertical-align: top;
+                }
+            }
+            .DeviceTreePage-button-customTime {
+                background-color: unset !important;
+                width:148px;
+                height:32px;
+                background-image: url("./DeviceImgs/4levitate.png");
+                display: inline-block;
+                position: absolute;
+                // opacity: 0.8;
+
+                span.ant-calendar-picker-input.ant-input {
+                    box-sizing: border-box;
+                    margin: 0;
+                    padding: 0;
+                    font-variant: tabular-nums;
+                    list-style: none;
+                    font-feature-settings: 'tnum';
+                    position: relative;
+                    display: inline-block;
+                    width: 100%;
+                    height: 32px;
+                    background-image: none;
+                    transition: all 0.3s;
+                    background-color: unset;
+                    font-size:14px;
+                    font-family:Microsoft YaHei;
+                    font-weight:400;
+                    color:rgba(93,110,120,1);
+                    line-height:40px;
+                    border: unset;
+                }
+                input.ant-calendar-range-picker-input {
+                    width: 45%;
+                    height: 100%;
+                    text-align: center;
+                    background-color: transparent;
+                    border: unset;
+                    outline: 0;
+                    padding: unset;
+                    font-size: 12px;
+                    vertical-align: top;
+                }
+                span.ant-calendar-range-picker-separator {
+                    color:rgba(161,182,194,1);
+                    vertical-align: top;
+                }
+            }
+            .DeviceTreePage-button-time-textSel {
+                width:72px;
+                height:32px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:400;
+                color:rgba(102,255,179,1);
+                line-height:32px;
+                text-align: center;
+                display: block;
+            }
+            .DeviceTreePage-button-time-text {
+                width:72px;
+                height:32px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:400;
+                color:rgba(161,182,194,1);
+                line-height:32px;
+                text-align: center;
+                display: block;
+            }
+            .DeviceTreePage-button {
+                display: block;
+                // width: 220px;
+            }
+            .DeviceTreePage-button-layout {
+                width:148px;
+                height:71px;
+                // border:1px solid rgba(60,248,247,1);
+                border-radius:2px;
+                background-image: url("./DeviceImgs/2levitate.png");
+                display: inline-block;
+            }
+            .DeviceTreePage-button-layoutSel {
+                width:148px;
+                height:71px;
+                border:1px solid rgba(60,248,247,1);
+                border-radius:2px;
+                background-image: url("./DeviceImgs/2selection.png");
+                display: inline-block;
+            }
+            .DeviceTreePage-button-layout-text {
+                width: 148px;
+                height:14px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:bold;
+                color:rgba(255,255,255,1);
+                line-height: 40px;
+                margin-left: 12px;
+                display: inline-block;
+                // margin-top: 20px;
+            }
+            .DeviceTreePage-button-layout-img {
+                width:17px;
+                height:17px;
+                // opacity:0.6;
+                display: inline-block;
+                margin-top: 10px;
+                margin-left: 12px;
+            }
+            .DeviceTreePage-button-layout-numSel {
+                width: 105px;
+                height: 22px;
+                font-size: 32px;
+                font-family: Digital-7;
+                font-weight: 400;
+                display: inline-block;
+                color: #66ffb3;
+                line-height: 40px;
+                position: absolute;
+                text-align: right;
+            }
+            .DeviceTreePage-button-layout-num {
+                width: 105px;
+                height: 22px;
+                font-size: 32px;
+                font-family: Digital-7;
+                font-weight: 400;
+                display: inline-block;
+                color: #66ffb3;
+                line-height: 40px;
+                position: absolute;
+                text-align: right;
+                opacity:0.02;
+            }
         }
     }
-}
-
-.DeviceTree-data-text {
-    float: right;
-    // margin-right: 23px;
-}
-
-.DeviceTree-menuSwitchDeviceTypeLayout {
-    position: absolute;
-    z-index: 960;
-    top: 350px;
-    right: 40px;
-    width: 122px;
-    height: 315px;
-    display: block;
-    background-image: url('../../RiskImg/background.png');
-}
-.DeviceTree-menuLabel {
-    display: inline-block;
-    position: relative;
-    width: 56px;
-    left: 7px;
-    bottom: 13px;
-}
-.DeviceTree-menuLabel1 {
-    display: inline-block;
-    position: relative;
-    width: 84px;
-    left: 7px;
-    bottom: 13px;
-}
-.DeviceTree-menuSwitchDeviceTypeDataLayout {
-    margin-top: 20px;
-}
-.DeviceTree-rightMenuDeviceTypeImgLayout {
-    margin-left: 14px;
-    margin-top: -31px;
-    height: 20px;
-    width: 20px;
-}
-
-.DeviceTree-rightMenuDeviceTypeSelLayout {
-    margin-bottom: 10px;
-    display: inline-block;
-    background-image: url('../../RiskImg/select.png');
-    background-size: 100% 100%;
-    width: 18px;
-    height: 18px;
-    margin-left: 4px;
-    margin-top: 6px;
-}
-
-.DeviceTree-rightMenuDeviceTypeUnSelLayout {
-    margin-bottom: 10px;
-    display: inline-block;
-    background-image: url('../../RiskImg/unSelect.png');
-    background-size: 100% 100%;
-    width: 18px;
-    height: 18px;
-    margin-left: 4px;
-    margin-top: 6px;
 }

@@ -200,84 +200,75 @@ export const genPopUpContent = (geo) => {
     const { properties = {} } = geo;
     switch (geo.type) {
         case 'track': {
-            return `<div class="popupBox">
-						<h2><span>姓名：</span>${properties.name}</h2>
+            return `<<div class="ViewPopContentLayout">
+                        <h2 class="ViewPopContentLayout-firstText"><span>姓名：</span>${properties.name}</h2>
 						<h2><span>联系方式：</span>${properties.phone}</h2>
 						<h2><span>标段：</span>${properties.sectionName}</h2>
 					</div>`;
         }
         case 'riskQuality': {
-            return `<div>
-						<h2><span>隐患内容：</span>${properties.name}</h2>
-                        <h2><span>隐患类型：</span>${properties.riskType}</h2>
-                        <h2><span>隐患描述：</span>${properties.Problem}</h2>
+            return `<div class="ViewPopContentLayout">
+                        <h2 class="ViewPopContentLayout-firstText"><span>问题内容：</span>${properties.name}</h2>
+                        <h2><span>问题类型：</span>${properties.riskType}</h2>
+                        <h2><span>问题描述：</span>${properties.Problem}</h2>
 						<h2><span>整改状态：</span>${properties.status}</h2>
-                        <div class="btnRow">
-                            <a href="javascript:;" class="btnViewRisk" data-id=${geo.key}>查看详情</a>
-                        </div>
 					</div>`;
         }
         case 'riskDanger': {
-            return `<div>
-						<h2><span>隐患内容：</span>${properties.name}</h2>
-                        <h2><span>隐患类型：</span>${properties.riskType}</h2>
-                        <h2><span>隐患描述：</span>${properties.Problem}</h2>
+            return `<div class="ViewPopContentLayout">
+                        <h2 class="ViewPopContentLayout-firstText"><span>问题内容：</span>${properties.name}</h2>
+                        <h2><span>问题类型：</span>${properties.riskType}</h2>
+                        <h2><span>问题描述：</span>${properties.Problem}</h2>
 						<h2><span>整改状态：</span>${properties.status}</h2>
-                        <div class="btnRow">
-                            <a href="javascript:;" class="btnViewRisk" data-id=${geo.key}>查看详情</a>
-                        </div>
 					</div>`;
         }
         case 'riskOther': {
-            return `<div>
-						<h2><span>隐患内容：</span>${properties.name}</h2>
-                        <h2><span>隐患类型：</span>${properties.riskType}</h2>
-                        <h2><span>隐患描述：</span>${properties.Problem}</h2>
+            return `<div class="ViewPopContentLayout">
+                        <h2 class="ViewPopContentLayout-firstText"><span>问题内容：</span>${properties.name}</h2>
+                        <h2><span>问题类型：</span>${properties.riskType}</h2>
+                        <h2><span>问题描述：</span>${properties.Problem}</h2>
 						<h2><span>整改状态：</span>${properties.status}</h2>
-                        <div class="btnRow">
-                            <a href="javascript:;" class="btnViewRisk" data-id=${geo.key}>查看详情</a>
-                        </div>
 					</div>`;
         }
         case 'planCuringTask': {
-            return `<div class="popupBox">
-                    <h2><span>养护类型：</span>${properties.typeName}</h2>
-                    <h2><span>状态：</span>${properties.status}</h2>
-                    <h2><span>养护人：</span>${properties.CuringMans}</h2>
-                    <h2><span>标段：</span>${properties.sectionName}</h2>
-                    <h2><span>小班：</span>${properties.smallClassName}</h2>
-                    <h2><span>细班：</span>${properties.thinClassName}</h2>
-                    <h2><span>养护面积：</span>${properties.Area}</h2>
-                    <h2><span>创建时间：</span>${properties.CreateTime}</h2>
-                    <h2><span>计划开始时间：</span>${properties.PlanStartTime}</h2>
-                    <h2><span>计划结束时间：</span>${properties.PlanEndTime}</h2>
-                </div>`;
+            return `<div class="ViewPopContentLayout">
+                        <h2 class="ViewPopContentLayout-firstText"><span>养护类型：</span>${properties.typeName}</h2>
+                        <h2><span>状态：</span>${properties.status}</h2>
+                        <h2><span>养护人：</span>${properties.CuringMans}</h2>
+                        <h2><span>标段：</span>${properties.sectionName}</h2>
+                        <h2><span>小班：</span>${properties.smallClassName}</h2>
+                        <h2><span>细班：</span>${properties.thinClassName}</h2>
+                        <h2><span>养护面积：</span>${properties.Area}</h2>
+                        <h2><span>创建时间：</span>${properties.CreateTime}</h2>
+                        <h2><span>计划开始时间：</span>${properties.PlanStartTime}</h2>
+                        <h2><span>计划结束时间：</span>${properties.PlanEndTime}</h2>
+                    </div>`;
             // <h2 class="btnRow">
             //     <a href="javascript:;" class="btnViewTask" data-id=${properties.ID}>查看详情</a>
             // </h2>
         }
         case 'realCuringTask': {
-            return `<div class="popupBox">
-                    <h2><span>养护类型：</span>${properties.typeName}</h2>
-                    <h2><span>状态：</span>${properties.status}</h2>
-                    <h2><span>养护人：</span>${properties.CuringMans}</h2>
-                    <h2><span>标段：</span>${properties.sectionName}</h2>
-                    <h2><span>小班：</span>${properties.smallClassName}</h2>
-                    <h2><span>细班：</span>${properties.thinClassName}</h2>
-                    <h2><span>养护面积：</span>${properties.Area}</h2>
-                    <h2><span>创建时间：</span>${properties.CreateTime}</h2>
-                    <h2><span>计划开始时间：</span>${properties.PlanStartTime}</h2>
-                    <h2><span>计划结束时间：</span>${properties.PlanEndTime}</h2>
-                    <h2><span>实际开始时间：</span>${properties.StartTime}</h2>
-                    <h2><span>实际结束时间：</span>${properties.EndTime}</h2>
-                </div>`;
+            return `<div class="ViewPopContentLayout">
+                        <h2 class="ViewPopContentLayout-firstText"><span>养护类型：</span>${properties.typeName}</h2>
+                        <h2><span>状态：</span>${properties.status}</h2>
+                        <h2><span>养护人：</span>${properties.CuringMans}</h2>
+                        <h2><span>标段：</span>${properties.sectionName}</h2>
+                        <h2><span>小班：</span>${properties.smallClassName}</h2>
+                        <h2><span>细班：</span>${properties.thinClassName}</h2>
+                        <h2><span>养护面积：</span>${properties.Area}</h2>
+                        <h2><span>创建时间：</span>${properties.CreateTime}</h2>
+                        <h2><span>计划开始时间：</span>${properties.PlanStartTime}</h2>
+                        <h2><span>计划结束时间：</span>${properties.PlanEndTime}</h2>
+                        <h2><span>实际开始时间：</span>${properties.StartTime}</h2>
+                        <h2><span>实际结束时间：</span>${properties.EndTime}</h2>
+                    </div>`;
             // <h2 class="btnRow">
             //     <a href="javascript:;" class="btnViewTask" data-id=${properties.ID}>查看详情</a>
             // </h2>
         }
         case 'survivalRate': {
-            return `<div class="popupBox">
-                    <h2><span>标段：</span>${properties.sectionName}</h2>
+            return `<div class="ViewPopContentLayout">
+                    <h2 class="ViewPopContentLayout-firstText"><span>标段：</span>${properties.sectionName}</h2>
                     <h2><span>小班：</span>${properties.smallClassName}</h2>
                     <h2><span>细班：</span>${properties.thinClassName}</h2>
                     <h2><span>树种：</span>${properties.treetype}</h2>
@@ -288,8 +279,8 @@ export const genPopUpContent = (geo) => {
             // </h2>
         }
         case 'adoptTree': {
-            return `<div>
-                        <h2><span>顺序码：</span>${properties.SXM}</h2>
+            return `<div class="ViewPopContentLayout">
+                        <h2 class="ViewPopContentLayout-firstText"><span>顺序码：</span>${properties.SXM}</h2>
 						<h2><span>领养人：</span>${properties.Aadopter}</h2>
                         <h2><span>领养时间：</span>${properties.AdoptTime}</h2>
                         <h2 class="btnRow">
@@ -298,8 +289,8 @@ export const genPopUpContent = (geo) => {
 					</div>`;
         }
         case 'treePipe': {
-            return `<div>
-                        <h2><span>类型：</span>${geo.typeName}</h2>
+            return `<div class="ViewPopContentLayout">
+                        <h2 class="ViewPopContentLayout-firstText"><span>类型：</span>${geo.typeName}</h2>
                         <h2><span>创建时间：</span>${geo.CreateTime}</h2>
                         <h2><span>标段：</span>${geo.Section}</h2>
                         <h2><span>细班：</span>${geo.ThinClass}</h2>
@@ -310,8 +301,8 @@ export const genPopUpContent = (geo) => {
 					</div>`;
         }
         case 'treePipeNode': {
-            return `<div>
-                        <h2><span>类型：</span>${geo.typeName}</h2>
+            return `<div class="ViewPopContentLayout">
+                        <h2 class="ViewPopContentLayout-firstText"><span>类型：</span>${geo.typeName}</h2>
                         <h2><span>创建时间：</span>${geo.CreateTime}</h2>
                         <h2><span>标段：</span>${geo.Section}</h2>
                         <h2><span>细班：</span>${geo.ThinClass}</h2>
@@ -323,24 +314,25 @@ export const genPopUpContent = (geo) => {
 					</div>`;
         }
         case 'device': {
-            return `<div>
-                    <h2><span>项目：</span>${properties.projectName}</h2>
-                    <h2><span>标段：</span>${properties.sectionName}</h2>
-                    <h2><span>机械名称：</span>${properties.name}</h2>
-                    <h2><span>机械编号：</span>${properties.indexNum}</h2>
-                    <h2><span>进场时间：</span>${properties.enterTime}</h2>
-                    <h2><span>司机姓名：</span>${properties.contacter}</h2>
-                    <h2><span>联系方式：</span>${properties.phone}</h2>
-                    <h2><span>设备照片：</span>
-                        <a href="javascript:;" class="btnViewDevicePic" data-id=${geo.key}>
-                        ${properties.images ? '查看' : ''}
-                        </a>
-                    </h2>
-                    <h2><span>设备轨迹：</span>
-                        <a href="javascript:;" class="btnViewDeviceTrack" data-id=${properties.carNo}>
-                        ${!properties.trackStatus ? '查看' : ''}
-                        </a>
-                    </h2>
+            return `<div class="ViewPopContentLayout">
+                        <h2 class="ViewPopContentLayout-firstText"><span>项目：</span>${properties.projectName}</h2>
+                        <h2><span>标段：</span>${properties.sectionName}</h2>
+                        <h2><span>机械名称：</span>${properties.name}</h2>
+                        <h2><span>机械编号：</span>${properties.indexNum}</h2>
+                        <h2><span>进场时间：</span>${properties.enterTime}</h2>
+                        <h2><span>司机姓名：</span>${properties.contacter}</h2>
+                        <h2><span>联系方式：</span>${properties.phone}</h2>
+                        <h2><span>设备照片：</span>
+                            <a href="javascript:;" class="btnViewDevicePic" data-id=${geo.key}>
+                            ${properties.images ? '查看' : ''}
+                            </a>
+                        </h2>
+                        <h2><span>设备轨迹：</span>
+                            <a href="javascript:;" class="btnViewDeviceTrack" data-id=${properties.carNo}>
+                            ${!properties.trackStatus ? '查看' : ''}
+                            </a>
+                        </h2>
+                    </div>
                 </div>`;
         }
         default: {
@@ -626,7 +618,7 @@ export const handleRiskData = (datas) => {
     if (datas && datas instanceof Array && datas.length > 0) {
         datas.forEach((v, index) => {
             // 去除坐标为0的点  和  名称为空的点（名称为空的点   type类型也不一样）
-            if (v['X'] === 0 || v['Y'] === 0 || v['ProblemType'] === '') {
+            if (v['X'] === 0 || v['Y'] === 0 || v['ProblemType'] === '' || v.EventType === 2) {
                 return;
             }
             let level = v['EventType'];

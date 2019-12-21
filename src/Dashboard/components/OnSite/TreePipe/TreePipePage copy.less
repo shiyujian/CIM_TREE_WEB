@@ -1,0 +1,152 @@
+.TreePipePage-menuSwitchTreePipeLayout {
+    position: absolute;
+    z-index: 960;
+    top: 350px;
+    right: 40px;
+    width: 225px;
+    height: 257px;
+    display: block;
+}
+.TreePipePage-menuSwitchTreePipeBorder {
+    border-bottom: 1px dashed #000;
+    width: 220px;
+}
+
+.TreePipePage-menuPanel {
+    position: absolute;
+    left: 330px;
+    top: 40px;
+    height: 80%;
+    width: 260px;
+    transition: all 0.3s;
+    z-index: 980;
+
+    .TreePipePage-aside {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        top: 0;
+        bottom: 0;
+        background-color: rgba(255,255,255, 0.9);
+        color: #333;
+        z-index: 999;
+        overflow-x: hidden;
+        overflow-y: auto;
+
+        .TreePipePage-asideTree {
+            margin-top: 20px;
+            margin-left: 20px;
+        }
+    }
+}
+.TreePipePage-GisQueryBorder {
+    margin-bottom: 10px;
+    border-bottom:1px dashed #8c8383; 
+    width: 220px;
+}
+
+.TreePipePage-button {
+    display: inline-block;
+    width: 220px;
+}
+
+.TreePipePage-button-layout {
+    width: 105px;
+    margin-bottom: 10px;
+}
+
+.TreePipePage-mrg10 {
+	white-space: nowrap;
+    width: 220px;
+    margin-bottom: 20px;
+}
+
+
+.TreePipePage-statis-layout {
+	white-space: nowrap;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    border-bottom:1px dashed #8c8383; 
+    padding-bottom: 10px;
+    width: 220px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.TreePipePage-data-text {
+    float: right;
+    // margin-right: 23px;
+}
+.TreePipePage-query-title {
+    font-size: 15px;
+    font-weight: bold;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.TreePipePageTest-container{
+    display: flex;
+    position: absolute;
+    width: calc(~'100% - 50px');
+    height: 100%;
+    left: 50px;
+    // height: 330px;
+    bottom: 0px;
+    
+    .TreePipePageTest-r-main{
+    flex:1 1 auto;
+    position: relative;
+    overflow: hidden;
+    }
+
+    .TreePipePageTest-buttonStyle {
+        display: inline-block;
+    }
+
+    .TreePipePageTest-menuPanel {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 300px;
+        transition: all .3s;
+        z-index: 980;
+        opacity: 0.7;
+  
+        .TreePipePageTest-aside {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            // top: 0;
+            height: 100%;
+            background-color: #FFFFFF;
+            color: #333;
+            z-index: 999;
+            overflow: auto;
+            .TreePipePageTest-asideTree {
+                margin-top: 20px;
+                margin-left: 20px;
+            }
+
+            
+            
+        }
+    }
+
+    .TreePipePageTest-foldBtn {
+        position: absolute;
+        width: 50px;
+        text-align: center;
+        border: solid #EEE;
+        border-width: 1px 1px 1px 0;
+        border-radius: 0 5px 5px 0;
+        background: #fff;
+        padding: 12px 5px;
+        cursor: col-resize;
+        z-index: 500;
+        transition: all .3s;
+        height: fit-content;
+        opacity: 0.7;
+        bottom: 130px;
+    }
+
+}

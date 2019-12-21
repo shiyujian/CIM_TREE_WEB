@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-12-19 09:48:11
+ * @Last Modified time: 2019-12-21 17:45:27
  */
 import React, { Component } from 'react';
 import {
@@ -17,11 +17,12 @@ import {
     Form
 } from 'antd';
 import L from 'leaflet';
+import Scrollbar from 'smooth-scrollbar';
 import './OnSite.less';
+import AreaTree from './Area/AreaTree';
 import RiskTree from './Risk/RiskTree';
 import TrackTree from './Track/TrackTree';
 import TreeTypeTree from './TreeType/TreeTypeTree';
-import OnSiteAreaTree from './OnSiteAreaTree';
 import TreeMessGisOnClickHandle from './TreeMess/TreeMessGisOnClickHandle';
 import CuringTaskTree from './Conservation/CuringTaskTree';
 import SurvivalRateTree from './SurvivalRate/SurvivalRateTree';
@@ -31,6 +32,8 @@ import TreePipePage from './TreePipe/TreePipePage';
 import AreaDistanceMeasure from './AreaDistanceMeasure/AreaDistanceMeasure';
 import ViewPositionManage from './MapCustom/ViewPositionManage';
 import DeviceTree from './Device/DeviceTree';
+import DataVIew from './DataView/DataVIew';
+import MenuSwitch from '../MenuSwitch';
 import {
     fillAreaColor,
     handleCoordinates
@@ -43,7 +46,6 @@ import {
 } from '_platform/api';
 import {handleAreaLayerData} from '_platform/gisAuth';
 import {getUser} from '_platform/auth';
-import MenuSwitch from '../MenuSwitch';
 
 class OnSite extends Component {
     // export default class OnSite extends Component {
@@ -69,32 +71,8 @@ class OnSite extends Component {
     // 左侧菜单栏的Tree型数据
     options = [
         {
-            label: '巡检路线',
-            value: 'geojsonFeature_track'
-        },
-        {
-            label: '安全隐患',
-            value: 'geojsonFeature_risk'
-        },
-        {
-            label: '树种筛选',
-            value: 'geojsonFeature_treetype'
-        },
-        {
-            label: '养护任务',
-            value: 'geojsonFeature_curingTask'
-        },
-        {
-            label: '成活率',
-            value: 'geojsonFeature_survivalRate'
-        },
-        {
             label: '工程影像',
             value: 'geojsonFeature_projectPic'
-        },
-        {
-            label: '苗木结缘',
-            value: 'geojsonFeature_treeAdopt'
         }
     ];
 
@@ -105,9 +83,16 @@ class OnSite extends Component {
                 getCustomViewByUserID
             }
         } = this.props;
-        let user = getUser();
-        await getCustomViewByUserID({id: user.ID});
-        await this.initMap();
+        try {
+            if (document.querySelector('#mapid')) {
+                Scrollbar.init(document.querySelector('#mapid'));
+            };
+            let user = getUser();
+            await getCustomViewByUserID({ id: user.ID });
+            await this.initMap();
+        } catch (e) {
+
+        }
     }
     /* 初始化地图 */
     initMap () {
@@ -209,7 +194,7 @@ class OnSite extends Component {
             } else {
                 this.tileTreeLayerBasic = L.tileLayer(
                     FOREST_GIS_API +
-                            '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                    '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
                     {
                         opacity: 1.0,
                         subdomains: [1, 2, 3],
@@ -236,7 +221,7 @@ class OnSite extends Component {
             } else {
                 this.tileTreeWinterThinClassLayerBasic = L.tileLayer(
                     FOREST_GIS_API +
-                            'geoserver/gwc/service/wmts?layer=xatree%3Aland&style=&tilematrixset=My_EPSG%3A43261&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                    'geoserver/gwc/service/wmts?layer=xatree%3Aland&style=&tilematrixset=My_EPSG%3A43261&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
                     {
                         opacity: 1.0,
                         subdomains: [1, 2, 3],
@@ -259,7 +244,7 @@ class OnSite extends Component {
             } else {
                 this.tileTreeWinterProjectLayerBasic = L.tileLayer(
                     FOREST_GIS_API +
-                            'geoserver/gwc/service/wmts?layer=xatree%3Athinclass&style=&tilematrixset=My_EPSG%3A43261&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                    'geoserver/gwc/service/wmts?layer=xatree%3Athinclass&style=&tilematrixset=My_EPSG%3A43261&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
                     {
                         opacity: 1.0,
                         subdomains: [1, 2, 3],
@@ -285,46 +270,8 @@ class OnSite extends Component {
     }
     /* 渲染菜单panel */
     renderPanel (option) {
-        const {
-            treetypesTree
-        } = this.props;
-        let treetypes = [];
-        try {
-            if (treetypesTree && treetypesTree instanceof Array) {
-                for (let i = 0; i < treetypesTree.length; i++) {
-                    let children = treetypesTree[i].children;
-                    children.map((child) => {
-                        treetypes.push(child);
-                    });
-                }
-            }
-        } catch (e) {
-            console.log('获取不分类树种', e);
-        }
         if (option && option.value) {
             switch (option.value) {
-                // 巡检路线
-                case 'geojsonFeature_track':
-                    return (
-                        <TrackTree
-                            {...this.props}
-                            {...this.state}
-                            map={this.map}
-                            featureName={option.value}
-                        />
-                    );
-                // 树种筛选
-                case 'geojsonFeature_treetype':
-                    return (
-                        <TreeTypeTree
-                            {...this.props}
-                            {...this.state}
-                            map={this.map}
-                            removeTileTreeLayerBasic={this.removeTileTreeLayerBasic.bind(this)}
-                            featureName={option.value}
-                            treetypes={treetypes}
-                        />
-                    );
                 // 苗木结缘
                 case 'geojsonFeature_treeAdopt':
                     return (
@@ -337,6 +284,152 @@ class OnSite extends Component {
             }
         }
     }
+    // 细班选择处理
+    _handleAreaSelect = async (keys, info) => {
+        const {
+            areaLayerList,
+            realThinClassLayerList
+        } = this.state;
+        const {
+            dashboardCompomentMenu
+        } = this.props;
+        // 当前选中的节点
+        let areaEventTitle = info.node.props.title;
+        this.setState({
+            areaEventKey: keys[0],
+            areaEventTitle
+        });
+        try {
+            const eventKey = keys[0];
+            for (let v in areaLayerList) {
+                areaLayerList[v].map((layer) => {
+                    this.map.removeLayer(layer);
+                });
+            }
+            if (eventKey) {
+                // 细班的key加入了标段，首先对key进行处理
+                let handleKey = eventKey.split('-');
+                // 如果选中的是细班，则直接添加图层
+                if (handleKey.length === 5) {
+                    // 如果之前添加过，直接将添加过的再次添加，不用再次请求
+                    if (areaLayerList[eventKey]) {
+                        areaLayerList[eventKey].map((layer) => {
+                            layer.addTo(this.map);
+                            this.map.fitBounds(layer.getBounds());
+                        });
+                    } else {
+                        // 如果不是添加过，需要请求数据
+                        await this._addAreaLayer(eventKey);
+                    }
+                }
+                if (dashboardCompomentMenu === 'geojsonFeature_auxiliaryManagement') {
+                    let selectNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
+                    let selectSectionNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
+                    if (this.tileTreeLayerBasic) {
+                        this.map.removeLayer(this.tileTreeLayerBasic);
+                    }
+                    this.handleRemoveRealThinClassLayer();
+                    if (realThinClassLayerList[eventKey]) {
+                        realThinClassLayerList[eventKey].addTo(this.map);
+                    } else {
+                        var url = FOREST_GIS_API +
+                            `/geoserver/xatree/wms?cql_filter=No+LIKE+%27%25${selectNo}%25%27%20and%20Section+LIKE+%27%25${selectSectionNo}%25%27`;
+                        let thinClassLayer = L.tileLayer.wms(url,
+                            {
+                                layers: 'xatree:treelocation',
+                                crs: L.CRS.EPSG4326,
+                                format: 'image/png',
+                                maxZoom: 22,
+                                transparent: true
+                            }
+                        ).addTo(this.map);
+                        realThinClassLayerList[eventKey] = thinClassLayer;
+                        this.setState({
+                            realThinClassLayerList
+                        });
+                    }
+                }
+            }
+        } catch (e) {
+            console.log('处理选中节点', e);
+        }
+    }
+    // 选中细班，则在地图上加载细班图层
+    _addAreaLayer = async (eventKey) => {
+        const {
+            areaLayerList,
+            areaDataList
+        } = this.state;
+        const {
+            actions: { getTreearea }
+        } = this.props;
+        try {
+            let coords = await handleAreaLayerData(eventKey, getTreearea);
+            if (!areaDataList[eventKey]) {
+                let handleKey = eventKey.split('-');
+                let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
+                let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
+                let rst = await getTreearea({}, { no: no });
+                if (rst && rst.content && rst.content instanceof Array && rst.content.length > 0) {
+                    let data = rst.content.find(content => content.Section === section);
+                    areaDataList[eventKey] = data;
+                }
+            }
+            console.log('coords', coords);
+
+            if (coords && coords instanceof Array && coords.length > 0) {
+                for (let i = 0; i < coords.length; i++) {
+                    let str = coords[i];
+                    let treearea = handleCoordinates(str);
+                    let message = {
+                        key: 3,
+                        type: 'Feature',
+                        properties: { name: '', type: 'area' },
+                        geometry: { type: 'Polygon', coordinates: treearea }
+                    };
+                    let layer = this._createMarker(message);
+                    if (i === coords.length - 1) {
+                        this.map.fitBounds(layer.getBounds());
+                    }
+                    if (areaLayerList[eventKey]) {
+                        areaLayerList[eventKey].push(layer);
+                    } else {
+                        areaLayerList[eventKey] = [layer];
+                    }
+                }
+                this.setState({
+                    areaLayerList,
+                    areaDataList
+                });
+            };
+        } catch (e) {
+            console.log('加载细班图层', e);
+        }
+    }
+    // 切换为2D
+    toggleTileLayer (index) {
+        this.tileLayer.setUrl(TILEURLS[index]);
+        this.setState({
+            TileLayerUrl: TILEURLS[index],
+            mapLayerBtnType: !this.state.mapLayerBtnType
+        });
+    }
+    /* 在地图上添加marker和polygan */
+    _createMarker (geo) {
+        try {
+            if (geo.properties.type === 'area') {
+                // 创建区域图形
+                let layer = L.polygon(geo.geometry.coordinates, {
+                    color: '#201ffd',
+                    fillColor: fillAreaColor(geo.key),
+                    fillOpacity: 0.3
+                }).addTo(this.map);
+                return layer;
+            }
+        } catch (e) {
+            console.log('_createMarker', e);
+        }
+    }
     render () {
         const {
             dashboardCompomentMenu,
@@ -344,12 +437,16 @@ class OnSite extends Component {
             menuTreeVisible,
             dashboardDataMeasurement,
             dashboardRightMenu,
+            dashboardDataView,
             dashboardFocus,
             platform: {
                 tabs = {},
                 tree = {}
             }
         } = this.props;
+        const {
+            mapLayerBtnType
+        } = this.state;
         let fullScreenState = '';
         if (tabs && tabs.fullScreenState) {
             fullScreenState = tabs.fullScreenState;
@@ -360,13 +457,15 @@ class OnSite extends Component {
         } else if (tree.onSiteThinClassTree && tree.onSiteThinClassTree instanceof Array && tree.onSiteThinClassTree.length > 0) {
             onSiteAreaTreeData = tree.onSiteThinClassTree;
         }
+
         return (
             <div className={fullScreenState === 'fullScreen' ? 'map-containerFullScreen' : 'map-container'}>
                 <div
                     ref='appendBody'
                     className='dashboard-map r-main'
+                    id='onSiteDom'
                 >
-                    <MenuSwitch {...this.props} {...this.state} />
+                    <MenuSwitch {...this.props} {...this.state} map={this.map} />
                     <GetMenuTree {...this.props} {...this.state} />
                     { // 左侧第二级菜单的树形结构
                         menuTreeVisible
@@ -391,18 +490,25 @@ class OnSite extends Component {
                     { // 右侧菜单当选择区域地块时，显示区域地块树
                         dashboardRightMenu && dashboardRightMenu === 'area'
                             ? (
-                                <div className='dashboard-rightAreaMenu'>
-                                    <aside className='dashboard-rightAreaMenu-aside' draggable='false'>
-                                        <div className='dashboard-rightAreaMenu-areaTree'>
-                                            <OnSiteAreaTree
-                                                {...this.props}
-                                                treeData={onSiteAreaTreeData || []}
-                                                // selectedKeys={this.state.areaEventKey}
-                                                onSelect={this._handleAreaSelect.bind(this)}
-                                            />
-                                        </div>
-                                    </aside>
-                                </div>
+                                <AreaTree
+                                    {...this.props}
+                                    {...this.state}
+                                    map={this.map}
+                                    treeData={onSiteAreaTreeData || []}
+                                    // selectedKeys={this.state.areaEventKey}
+                                    onSelect={this._handleAreaSelect.bind(this)}
+                                />
+                            ) : ''
+                    }
+                    {// 右侧菜单当选择区域地块时，显示区域地块树
+                        dashboardDataView && dashboardDataView === 'dataView'
+                            ? (
+                                <DataVIew
+                                    {...this.props}
+                                    {...this.state}
+                                    map={this.map}
+                                    treeData={onSiteAreaTreeData || []}
+                                />
                             ) : ''
                     }
                     { // 视图管理
@@ -412,6 +518,17 @@ class OnSite extends Component {
                                     {...this.props}
                                     {...this.state}
                                     map={this.map}
+                                />
+                            ) : ''
+                    }
+                    { // 树种筛选
+                        dashboardCompomentMenu && dashboardCompomentMenu === 'geojsonFeature_treetype'
+                            ? (
+                                <TreeTypeTree
+                                    {...this.props}
+                                    {...this.state}
+                                    map={this.map}
+                                    removeTileTreeLayerBasic={this.removeTileTreeLayerBasic.bind(this)}
                                 />
                             ) : ''
                     }
@@ -489,26 +606,16 @@ class OnSite extends Component {
                     }
                     <div className='dashboard-gisTypeBut'>
                         <div>
-                            <Button
-                                type={
-                                    this.state.mapLayerBtnType
-                                        ? 'primary'
-                                        : 'default'
-                                }
+                            <a
                                 onClick={this.toggleTileLayer.bind(this, 1)}
-                            >
+                                className={mapLayerBtnType ? 'dashboard-gisTypeButSel' : 'dashboard-gisTypeButUnSel'}>
                                 卫星图
-                            </Button>
-                            <Button
-                                type={
-                                    this.state.mapLayerBtnType
-                                        ? 'default'
-                                        : 'primary'
-                                }
+                            </a>
+                            <a
                                 onClick={this.toggleTileLayer.bind(this, 2)}
-                            >
+                                className={mapLayerBtnType ? 'dashboard-gisTypeButUnSel' : 'dashboard-gisTypeButSel'}>
                                 地图
-                            </Button>
+                            </a>
                         </div>
                     </div>
                     <div>
@@ -529,167 +636,6 @@ class OnSite extends Component {
                 </div>
             </div>
         );
-    }
-    // 细班选择处理
-    _handleAreaSelect = async (keys, info) => {
-        const {
-            areaLayerList,
-            realThinClassLayerList
-        } = this.state;
-        const {
-            dashboardCompomentMenu
-        } = this.props;
-        // 当前选中的节点
-        let areaEventTitle = info.node.props.title;
-        this.setState({
-            areaEventKey: keys[0],
-            areaEventTitle
-        });
-        try {
-            const eventKey = keys[0];
-            for (let v in areaLayerList) {
-                areaLayerList[v].map((layer) => {
-                    this.map.removeLayer(layer);
-                });
-            }
-            if (eventKey) {
-                // 细班的key加入了标段，首先对key进行处理
-                let handleKey = eventKey.split('-');
-                // 如果选中的是细班，则直接添加图层
-                if (handleKey.length === 5) {
-                    // 如果之前添加过，直接将添加过的再次添加，不用再次请求
-                    if (areaLayerList[eventKey]) {
-                        areaLayerList[eventKey].map((layer) => {
-                            layer.addTo(this.map);
-                            this.map.fitBounds(layer.getBounds());
-                        });
-                    } else {
-                    // 如果不是添加过，需要请求数据
-                        await this._addAreaLayer(eventKey);
-                    }
-                }
-                if (dashboardCompomentMenu === 'geojsonFeature_auxiliaryManagement') {
-                    let selectNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
-                    let selectSectionNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
-                    if (this.tileTreeLayerBasic) {
-                        this.map.removeLayer(this.tileTreeLayerBasic);
-                    }
-                    this.handleRemoveRealThinClassLayer();
-                    if (realThinClassLayerList[eventKey]) {
-                        realThinClassLayerList[eventKey].addTo(this.map);
-                    } else {
-                        var url = FOREST_GIS_API +
-                        `/geoserver/xatree/wms?cql_filter=No+LIKE+%27%25${selectNo}%25%27%20and%20Section+LIKE+%27%25${selectSectionNo}%25%27`;
-                        let thinClassLayer = L.tileLayer.wms(url,
-                            {
-                                layers: 'xatree:treelocation',
-                                crs: L.CRS.EPSG4326,
-                                format: 'image/png',
-                                maxZoom: 22,
-                                transparent: true
-                            }
-                        ).addTo(this.map);
-                        realThinClassLayerList[eventKey] = thinClassLayer;
-                        this.setState({
-                            realThinClassLayerList
-                        });
-                    }
-                }
-            }
-        } catch (e) {
-            console.log('处理选中节点', e);
-        }
-    }
-    // 选中细班，则在地图上加载细班图层
-    _addAreaLayer = async (eventKey) => {
-        const {
-            areaLayerList
-        } = this.state;
-        const {
-            actions: { getTreearea }
-        } = this.props;
-        try {
-            let coordsList = await handleAreaLayerData(eventKey, getTreearea);
-            if (coordsList && coordsList instanceof Array && coordsList.length > 0) {
-                for (let t = 0; t < coordsList.length; t++) {
-                    let coords = coordsList[t];
-                    if (coords && coords instanceof Array && coords.length > 0) {
-                        for (let i = 0; i < coords.length; i++) {
-                            let str = coords[i];
-                            let treearea = handleCoordinates(str);
-                            let message = {
-                                key: 3,
-                                type: 'Feature',
-                                properties: {name: '', type: 'area'},
-                                geometry: { type: 'Polygon', coordinates: treearea }
-                            };
-                            let layer = this._createMarker(message);
-                            if (i === coords.length - 1) {
-                                this.map.fitBounds(layer.getBounds());
-                            }
-                            if (areaLayerList[eventKey]) {
-                                areaLayerList[eventKey].push(layer);
-                            } else {
-                                areaLayerList[eventKey] = [layer];
-                            }
-                        }
-                        this.setState({
-                            areaLayerList
-                        });
-                    };
-                }
-            }
-            // if (coords && coords instanceof Array && coords.length > 0) {
-            //     for (let i = 0; i < coords.length; i++) {
-            //         let str = coords[i];
-            //         let treearea = handleCoordinates(str);
-            //         let message = {
-            //             key: 3,
-            //             type: 'Feature',
-            //             properties: {name: '', type: 'area'},
-            //             geometry: { type: 'Polygon', coordinates: treearea }
-            //         };
-            //         let layer = this._createMarker(message);
-            //         if (i === coords.length - 1) {
-            //             this.map.fitBounds(layer.getBounds());
-            //         }
-            //         if (areaLayerList[eventKey]) {
-            //             areaLayerList[eventKey].push(layer);
-            //         } else {
-            //             areaLayerList[eventKey] = [layer];
-            //         }
-            //     }
-            //     this.setState({
-            //         areaLayerList
-            //     });
-            // };
-        } catch (e) {
-            console.log('加载细班图层', e);
-        }
-    }
-    // 切换为2D
-    toggleTileLayer (index) {
-        this.tileLayer.setUrl(TILEURLS[index]);
-        this.setState({
-            TileLayerUrl: TILEURLS[index],
-            mapLayerBtnType: !this.state.mapLayerBtnType
-        });
-    }
-    /* 在地图上添加marker和polygan */
-    _createMarker (geo) {
-        try {
-            if (geo.properties.type === 'area') {
-                // 创建区域图形
-                let layer = L.polygon(geo.geometry.coordinates, {
-                    color: '#201ffd',
-                    fillColor: fillAreaColor(geo.key),
-                    fillOpacity: 0.3
-                }).addTo(this.map);
-                return layer;
-            }
-        } catch (e) {
-            console.log('_createMarker', e);
-        }
     }
 }
 export default Form.create()(OnSite);

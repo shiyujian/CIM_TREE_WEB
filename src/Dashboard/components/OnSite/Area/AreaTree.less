@@ -1,0 +1,143 @@
+@font-face {
+    font-family: Digital-7;
+    src: url('../digital-7.ttf');
+}
+.AreaTreePage-container{
+    display: flex;
+    position: absolute;
+    right: 120px;
+    top: 184px;
+    height: 552px;
+    width: 420px;
+    transition: all 0.3s;
+    z-index: 980;
+
+    .AreaTreePage-r-main{
+        flex:1 1 auto;
+        position: relative;
+        overflow: hidden;
+        }
+    
+        .AreaTreePage-menuPanel {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 552px;
+            transition: all 0.8s;
+            z-index: 980;
+            // background:rgba(19,34,36,0.8);
+            // background-image: url("./ConservationImg/bottom1.png");
+            // background-repeat: no-repeat;
+
+            .AreaTreePage-menuBackground {
+                background-image: url("./AreaImg/floatinglayer1.png");
+                background-repeat: no-repeat;
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                bottom: 0;
+                // background: rgba(19,34,36,1);
+                opacity: 0.7;
+            }
+            .AreaTreePage-aside {
+                position: absolute;
+                // left: 24px;
+                width: 100%;
+                height: 100%;
+                color: #333;
+                z-index: 999;
+                overflow-x: hidden;
+                overflow-y: auto;
+                display: flex;
+
+                .AreaTreePage-aside-Project {
+                    width: 180px;
+                    height: 100%;
+                    display: inline-block;
+                    padding-top: 15px;
+
+                    .AreaTreePage-aside-Project-text {
+                        width:180px;
+                        height:32px;
+                        font-size:14px;
+                        font-family:Microsoft YaHei;
+                        font-weight:400;
+                        color:rgba(161,182,194,1);
+                        line-height:32px;
+                        display: block;
+                        padding-left: 23px;
+                        vertical-align: middle;
+                        white-space: nowrap;
+                        max-width: 165px;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+
+                    .AreaTreePage-aside-Project-textSel {
+                        width:180px;
+                        height:32px;
+                        font-size:14px;
+                        font-family:Microsoft YaHei;
+                        font-weight:400;
+                        color:rgba(102,255,179,1);
+                        line-height:32px;
+                        display: block;
+                        padding-left: 23px;
+                        vertical-align: middle;
+                        white-space: nowrap;
+                        max-width: 165px;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        background: rgba(102,255,179,0.2);
+                    }
+                }
+
+                .AreaTreePage-aside-areaTree {
+                    width: calc(~'100% - 180px');
+                    height: 100%;
+                    display: inline-block;
+                    vertical-align: top;
+                    padding-top: 15px;
+                }
+
+                span.ant-tree-node-content-wrapper.ant-tree-node-content-wrapper-close {
+                    font-size: 14px;
+                    font-family: Microsoft YaHei;
+                    font-weight: 400;
+                    color: rgba(161,182,194,1);
+                    line-height: 24px;
+                    height: 24px;
+                }
+
+                span.ant-tree-title {
+                    font-size: 14px;
+                    font-family: Microsoft YaHei;
+                    font-weight: 400;
+                    color: rgba(161,182,194,1);
+                    line-height: 24px;
+                    height: 24px;
+                }
+
+                span.ant-tree-switcher.ant-tree-switcher_close {
+                    line-height: 24px;
+                    height: 24px;
+                    color: rgba(161,182,194,1);
+                }
+
+                span.ant-tree-switcher.ant-tree-switcher_open {
+                    line-height: 24px;
+                    height: 24px;
+                    color: rgba(161,182,194,1);
+                }
+
+                li.ant-tree-treenode-switcher-close {
+                    padding-top: 4px;
+                }
+
+                span.ant-tree-node-content-wrapper.ant-tree-node-content-wrapper-normal.ant-tree-node-selected {
+                    background-color: rgba(102,255,179,1)
+                }
+            }
+        }
+
+}

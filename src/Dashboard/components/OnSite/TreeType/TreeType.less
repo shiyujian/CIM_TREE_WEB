@@ -1,0 +1,163 @@
+@font-face {
+    font-family: Digital-7;
+    src: url('../digital-7.ttf');
+}
+.TreeTypePage-container{
+    display: flex;
+    position: absolute;
+    // width: calc(~'100% - 44px');
+    left: 44px;
+    top: 610px;
+    width: 665px;
+    height: 265px;
+
+    .TreeTypePage-r-main{
+    flex:1 1 auto;
+    position: relative;
+    overflow: hidden;
+    }
+
+    .TreeTypePage-foldBtn {
+        position: absolute;
+        width: 64px;
+        height: 64px;
+        text-align: center;
+        cursor: pointer;
+        z-index: 500;
+        -webkit-transition: all .3s;
+        -o-transition: all .3s;
+        transition: all .3s;
+        // border:1px solid rgba(97,245,171,1);
+    }
+
+    .TreeTypePage-menuPanel {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 265px;
+        transition: all 0.8s;
+        z-index: 980;
+        // background:rgba(19,34,36,0.8);
+        // background-image: url("./TreeTypeImg/bottom1.png");
+        // background-repeat: no-repeat;
+  
+        .TreeTypePage-menuBackground {
+            background-image: url("./TreeTypeImg/bottom1.png");
+            background-repeat: no-repeat;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            bottom: 0;
+            // background: rgba(19,34,36,1);
+            opacity: 0.7;
+        }
+        .TreeTypePage-aside {
+            position: absolute;
+            left: 24px;
+            width: calc(~'100% - 24px');;
+            height: 100%;
+            color: #333;
+            z-index: 999;
+            overflow: auto;
+
+            .TreeTypePage-MenuNameLayout { 
+                display: inline-block;
+                margin-top: 18px;
+                width: 100%;
+            }
+             .TreeTypePage-MenuName {
+                width: 65px;
+                height: 17px;
+                font-size: 16px;
+                font-family: Microsoft YaHei;
+                font-weight: bold;
+                color: #61f5ab;
+                position: absolute;
+                left: 12px;
+                top: 18px;
+            }
+            .TreeTypePage-MenuHideButton {
+                float: right;
+                cursor: pointer;
+                margin-right: 15px;
+            }
+            .TreeTypePage-asideTree {
+                margin-top: 10px;
+                // margin-left: 10px;
+            }
+            .TreeTypePage-button {
+                display: block;
+                // width: 220px;
+            }
+            .TreeTypePage-button-layout {
+                width:148px;
+                height:71px;
+                // border:1px solid rgba(60,248,247,1);
+                border-radius:2px;
+                background-image: url("./TreeTypeImg/2levitate.png");
+                display: inline-block;
+            }
+            .TreeTypePage-button-layoutSel {
+                width:148px;
+                height:71px;
+                border:1px solid rgba(60,248,247,1);
+                border-radius:2px;
+                background-image: url("./TreeTypeImg/2selection.png");
+                display: inline-block;
+            }
+            .TreeTypePage-button-layout-text {
+                width:28px;
+                height:14px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:bold;
+                color:rgba(255,255,255,1);
+                line-height: 60px;
+                margin-left: 10px;
+            }
+        }
+    }
+}
+
+.TreeTypePage-searchLayout {
+    position: absolute;
+    z-index: 960;
+    top: 45px;
+    right: 34px;
+
+    .TreeTypePage-searchInputLayout {
+        background-image: url("./TreeTypeImg/search2.png") !important;
+        background-color: unset !important;
+        border: unset;
+        width:320px;
+        height:48px;
+        font-size:16px;
+        font-family:Source Han Sans CN;
+        font-weight:300;
+        font-style:italic;
+        color:rgba(97,245,171,1) !important;
+        line-height:40px;
+        opacity:0.6;
+        padding-left: 17px;
+        padding-right: 45px;
+
+        &::-moz-placeholder { 
+            color: rgba(97,245,171,1) !important;
+        }
+        &::-webkit-input-placeholder { 
+            color:rgba(97,245,171,1) !important;
+        }
+        &:-ms-input-placeholder {
+            color:rgba(97,245,171,1) !important;
+        }
+    }
+    .TreeTypePage-searchInputRightLayout {
+        width:22px;
+        height:21px;
+        opacity:0.8;
+        border-radius:50%;
+        position: absolute;
+        right: 14px;
+        bottom: 14px;
+    }
+}
