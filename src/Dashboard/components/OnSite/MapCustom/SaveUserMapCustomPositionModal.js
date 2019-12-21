@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Input, Modal, Form, Notification } from 'antd';
 import { PROJECTPOSITIONCENTER } from '_platform/api';
-import './SaveUserMapCustomPositionModal.less';
 import {
     getUser,
     trim

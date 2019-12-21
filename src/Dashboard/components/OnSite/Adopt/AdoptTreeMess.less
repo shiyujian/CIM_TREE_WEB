@@ -1,3 +1,7 @@
+@font-face {
+    font-family: Digital-7;
+    src: url('../digital-7.ttf');
+}
 .web {
     .ant-modal-content {
         position: relative;
@@ -15,16 +19,16 @@
         word-wrap: break-word;
     }
     .adoptTreeMess-background{
-        background-image: url('../../TreeAdoptImg/background.png');
-        background-size: 900px 450px;
-        height: 450px;
-        // padding-left: 66px;
-        // padding-top: 50px;
-        // padding-right: 50px;
+        background-image: url('./AdoptImg/pop-ups2.png');
+        // background-size: 900px 450px;
+        width: 900px;
+        height: 500px;
+        // opacity:0.1;
+        border-radius:2px;
     }
     .adoptTreeMess-modal-closeImg {
         cursor: pointer;
-        padding-left: 837px;
+        padding-left: 840px;
         padding-top: 40px;
     }
     // 结缘信息
@@ -35,14 +39,18 @@
     // 结缘时间
     .adoptTreeMess-modal-top-adopt {
         text-align: center;
-        padding-top: 87.5px; 
+        padding-top: 140px; 
+        
     }
     // 结缘时间
     .adoptTreeMess-modal-top-time {
         text-align: center;
-        color: #ffffff;
-        font-weight: bold;
-        font-size: 14px;
+        height:13px;
+        font-size:20px;
+        font-family:Digital-7;
+        font-weight:400;
+        color:rgba(102,255,179,1);
+        line-height:18px;
     }
     // 结缘树木的人的名字和树种名称
     .adoptTreeMess-modal-top-name {
@@ -62,19 +70,36 @@
     .adoptTreeMess-curingTaskType-layout {
         display:flex;
         flex-wrap:wrap;
+        width: 766px;
+        margin: 35px 67px 0px 67px;
+        height: 80px;
     }
     // 养护类型的名称
     .adoptTreeMess-curingTaskTypeName {
         text-align: center;
-        // font-family: "Microsoft YaHei";
+        height:15px;
+        font-size:14px;
+        font-family:Microsoft YaHei;
+        font-weight:400;
+        color:rgba(161,182,194,1);
+        line-height:48px;
         color: #ffffff;
     }
     // 各个类型的养护次数
     .adoptTreeMess-curingTaskTypeNum {
         text-align: center;
-        // font-family: "Microsoft YaHei";
         color: #ffffff;
-        // font-weight: bold;
+        height:14px;
+        font-size:20px;
+        font-family:Digital-7;
+        font-weight:400;
+        color:rgba(102,255,179,1);
+        line-height:48px;
+        margin-top: 20px;
+    }
+    .adoptTreeMess-message-layout {
+        display: flex;
+        margin: 20px 67px 0px 67px;
     }
     // 苗木信息整体设置
     .adoptTreeMess-treeMess {
@@ -107,28 +132,40 @@
     // 苗木信息的每一行中的标题
     .adoptTreeMess-lineTitle {
         vertical-align: middle;
-        color: #1793ff;
         width: 56px;
         display: inline-block;
+        height: 21px;
+        font-size: 14px;
+        font-family: Microsoft YaHei;
+        font-weight: 400;
+        color: rgba(161,182,194,1);
     }
     // 苗木的具体信息
     .adoptTreeMess-modal-data-text {
-        // float: right;
         margin-left: 20px;
         vertical-align: middle;
         white-space: nowrap;
         max-width: 300px;
         overflow: hidden;
+        -o-text-overflow: ellipsis;
         text-overflow: ellipsis;
-        // padding-top: 2px;
         display: inline-block;
+        height: 21px;
+        font-size: 14px;
+        font-family: Microsoft YaHei;
+        font-weight: 400;
+        color: rgba(255,255,255,1);
     }
     // 养护详情中的养护类型
     .adoptTreeMess-table-type-data {
         vertical-align: middle;
-        max-width: 65px;
+        width: 65px;
         display: inline-block;
-        min-width: 30px;
+        height: 21px;
+        font-size: 14px;
+        font-family: Microsoft YaHei;
+        font-weight: 400;
+        color: rgba(255,255,255,1);
     }
     // 养护详情中的人员
     .adoptTreeMess-table-person-data {
@@ -139,10 +176,20 @@
         overflow: hidden;
         text-overflow: ellipsis;
         width: 50px;
+        height: 21px;
+        font-size: 14px;
+        font-family: Microsoft YaHei;
+        font-weight: 400;
+        color: rgba(255,255,255,1);
     }
     // 养护详情中的时间
     .adoptTreeMess-table-time-data {
         vertical-align: middle;
         width: 65px;
+        height: 21px;
+        font-size: 14px;
+        font-family: Microsoft YaHei;
+        font-weight: 400;
+        color: rgba(255,255,255,1);
     }
 }

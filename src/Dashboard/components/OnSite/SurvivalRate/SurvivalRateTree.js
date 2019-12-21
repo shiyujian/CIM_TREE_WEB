@@ -1,16 +1,13 @@
 import React, { Component } from 'react';
 import { Tree, Spin } from 'antd';
 import L from 'leaflet';
+import Scrollbar from 'smooth-scrollbar';
 import { FOREST_GIS_API } from '_platform/api';
 import './SurvivalRateTree.less';
-// 存活率图片
-import hundredImg from '../../SurvivalRateImg/90~100.png';
-import ninetyImg from '../../SurvivalRateImg/80~90.png';
-import eightyImg from '../../SurvivalRateImg/70~80.png';
-import seventyImg from '../../SurvivalRateImg/60~70.png';
-import sixtyImg from '../../SurvivalRateImg/50~60.png';
-import fiftyImg from '../../SurvivalRateImg/40~50.png';
-import foutyImg from '../../SurvivalRateImg/0~40.png';
+
+import decoration from './SurvivalRateImg/decoration.png';
+import hide from './SurvivalRateImg/hide2.png';
+import display from './SurvivalRateImg/display2.png';
 import {
     genPopUpContent,
     getThinClassName
@@ -34,7 +31,9 @@ export default class SurvivalRateTree extends Component {
             survivalRateMarkerLayerList: {},
             survivalRateRateData: '',
             survivalRateSectionData: '',
-            switchSurvivalRateFirst: false // 第一次切换至成活率模块时，因标段数据初始化太麻烦，所以用此字段代表未曾选择过标段数据，只需要根据成活率范围查找
+            switchSurvivalRateFirst: false, // 第一次切换至成活率模块时，因标段数据初始化太麻烦，所以用此字段代表未曾选择过标段数据，只需要根据成活率范围查找
+            menuIsExtend: true /* 菜单是否展开 */,
+            menuWidth: 665 /* 菜单宽度 */
         };
         this.tileSurvivalRateLayerFilter = null; // 成活率范围和标段筛选图层
         this.tileTreeSurvivalRateLayerBasic = null; // 成活率全部图层
@@ -44,67 +43,50 @@ export default class SurvivalRateTree extends Component {
         {
             id: 'survivalRateHundred',
             label: '90%~100%',
-            img: hundredImg
+            color: '#42645b'
         },
         {
             id: 'survivalRateNinety',
             label: '80%~90%',
-            img: ninetyImg
+            color: '#16e07f'
         },
         {
             id: 'survivalRateEighty',
             label: '70%~80%',
-            img: eightyImg
+            color: '#007bff'
         },
         {
             id: 'survivalRateSeventy',
             label: '60%~70%',
-            img: seventyImg
+            color: '#00ffff'
         },
         {
             id: 'survivalRateSixty',
             label: '50%~60%',
-            img: sixtyImg
+            color: '#ffff00'
         },
         {
             id: 'survivalRateFifty',
             label: '40%~50%',
-            img: fiftyImg
+            color: '#ff9900'
         },
         {
             id: 'survivalRateFourty',
             label: '0%~40%',
-            img: foutyImg
+            color: '#ff3633'
         }
     ]
-
-    loop (data = [], loopTime) {
-        if (loopTime) {
-            loopTime = loopTime + 1;
-        } else {
-            loopTime = 1;
-        }
-        if (data) {
-            return (
-                <TreeNode
-                    title={data.Name}
-                    key={data.No}
-                    selectable={false}
-                >
-                    {data.children &&
-                        data.children.map(m => {
-                            return this.loop(m, loopTime);
-                        })}
-                </TreeNode>
-            );
-        }
-    }
 
     componentDidMount = async () => {
         const {
             map
         } = this.props;
         if (map) {
+            console.log('document.querySelector', document.querySelector('#survivalRateAsideDom'));
+            if (document.querySelector('#survivalRateAsideDom')) {
+                let survivalRateAsideDom = Scrollbar.init(document.querySelector('#survivalRateAsideDom'));
+                console.log('survivalRateAsideDom', survivalRateAsideDom);
+            }
             await map.on('click', this.handleSurvivalRateMapClickFunction);
             await this.getTileTreeSurvivalRateBasic();
             await this.getSurvivalRateRateDataDefault();
@@ -116,6 +98,10 @@ export default class SurvivalRateTree extends Component {
         } = this.props;
         map.off('click', this.handleSurvivalRateMapClickFunction);
         await this.removeTileTreeSurvivalRateLayer();
+    }
+    /* 菜单展开收起 */
+    _extendAndFold = () => {
+        this.setState({ menuIsExtend: !this.state.menuIsExtend });
     }
     // 成活率点击事件
     handleSurvivalRateMapClickFunction = (e) => {
@@ -169,68 +155,6 @@ export default class SurvivalRateTree extends Component {
         for (let v in survivalRateMarkerLayerList) {
             map.removeLayer(survivalRateMarkerLayerList[v]);
         }
-    }
-    render () {
-        const {
-            survivalRateTree = [],
-            survivalRateTreeLoading,
-            menuTreeVisible
-        } = this.props;
-        let treeData = [
-            {
-                Name: '全部',
-                No: '全部',
-                children: survivalRateTree
-            }
-        ];
-        return (
-            <div>
-                {
-                    menuTreeVisible
-                        ? (
-                            <div>
-                                <div className='SurvivalRateTree-menuPanel'>
-                                    <aside className='SurvivalRateTree-aside' draggable='false'>
-                                        <div className='SurvivalRateTree-asideTree'>
-                                            <Spin spinning={survivalRateTreeLoading}>
-                                                <Tree
-                                                    showLine
-                                                    checkable
-                                                    defaultCheckedKeys={['全部']}
-                                                    onCheck={this._handleSurvivalRateCheck.bind(this)}
-                                                >
-                                                    {treeData.map(p => {
-                                                        return this.loop(p);
-                                                    })}
-                                                </Tree>
-                                            </Spin>
-                                        </div>
-                                    </aside>
-                                </div>
-                                <div>
-                                    <div className='SurvivalRateTree-menuSwitchSurvivalRateLayout'>
-                                        {
-                                            this.survivalRateOptions.map((option) => {
-                                                return (
-                                                    <div style={{ display: 'inlineBlock' }} key={option.id}>
-                                                        <img src={option.img}
-                                                            title={option.label}
-                                                            className='SurvivalRateTree-rightMenuSurvivalRateImgLayout' />
-                                                        <a className={this.state[option.id] ? 'SurvivalRateTree-rightMenuSurvivalRateSelLayout' : 'SurvivalRateTree-rightMenuSurvivalRateUnSelLayout'}
-                                                            title={option.label}
-                                                            key={option.id}
-                                                            onClick={this.handleSurvivalRateButton.bind(this, option)} />
-                                                    </div>
-                                                );
-                                            })
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-                        ) : ''
-                }
-            </div>
-        );
     }
     // 切换到成活率模块后对成活率标段数据进行处理
     getSurvivalRateRateDataDefault = () => {
@@ -462,5 +386,80 @@ export default class SurvivalRateTree extends Component {
         } catch (e) {
             console.log('getSurvivalRateInfo', e);
         }
+    }
+    render () {
+        const {
+            menuIsExtend,
+            menuWidth
+        } = this.state;
+        return (
+            <div>
+                <div>
+                    <div className='SurvivalRatePage-container'>
+                        <div className='SurvivalRatePage-r-main'>
+                            {
+                                menuIsExtend ? '' : (
+                                    <img src={display}
+                                        className='SurvivalRatePage-foldBtn'
+                                        onClick={this._extendAndFold.bind(this)} />
+                                )
+                            }
+                            <div
+                                className={`SurvivalRatePage-menuPanel`}
+                                style={
+                                    menuIsExtend
+                                        ? {
+                                            width: menuWidth,
+                                            transform: 'translateX(0)'
+                                        }
+                                        : {
+                                            width: menuWidth,
+                                            transform: `translateX(-${
+                                                menuWidth
+                                            }px)`
+                                        }
+                                }
+                            >
+                                <div className='SurvivalRatePage-menuBackground' />
+                                <aside className='SurvivalRatePage-aside' id='survivalRateAsideDom'>
+                                    <div className='SurvivalRatePage-MenuNameLayout'>
+                                        <img src={decoration} />
+                                        <span className='SurvivalRatePage-MenuName'>成活率</span>
+                                        <img src={hide}
+                                            onClick={this._extendAndFold.bind(this)}
+                                            className='SurvivalRatePage-MenuHideButton' />
+                                    </div>
+                                    <div className='SurvivalRatePage-asideTree'>
+                                        <div className='SurvivalRatePage-button'>
+                                            {
+                                                this.survivalRateOptions.map((option) => {
+                                                    return (<a key={option.label}
+                                                        title={option.label}
+                                                        className={this.state[option.id] ? 'SurvivalRatePage-button-layoutSel' : 'SurvivalRatePage-button-layout'}
+                                                        onClick={this.handleSurvivalRateButton.bind(this, option)}
+                                                        style={{
+                                                            marginRight: 8,
+                                                            marginTop: 8
+                                                        }}
+                                                    >
+                                                        <span className='SurvivalRatePage-button-layout-text'>{option.label}</span>
+                                                        {/* <img src={imgurl} className='SurvivalRatePage-button-layout-img' /> */}
+                                                        <span className='SurvivalRatePage-button-layout-img' />
+                                                        <span style={{color: `${option.color}`}}
+                                                            className={this.state[option.id] ? 'SurvivalRatePage-button-layout-numSel' : 'SurvivalRatePage-button-layout-num'}>
+                                                            ——
+                                                        </span>
+                                                    </a>);
+                                                })
+                                            }
+                                        </div>
+                                    </div>
+                                </aside>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
     }
 }

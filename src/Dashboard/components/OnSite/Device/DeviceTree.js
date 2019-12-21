@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Tree, Button, DatePicker, Spin, Checkbox, Modal, Row } from 'antd';
 import L from 'leaflet';
+import Scrollbar from 'smooth-scrollbar';
 import './DeviceTree.less';
 import moment from 'moment';
 import DeviceDetail from './DeviceDetail';
@@ -17,6 +18,10 @@ import deviceDitchingMachineImg from './DeviceImgs/开沟机.png';
 import deviceSprinklerImg from './DeviceImgs/洒水车.png';
 import deviceDiggerImg from './DeviceImgs/挖坑机.png';
 
+import decoration from './DeviceImgs/decoration.png';
+import hide from './DeviceImgs/hide2.png';
+import display from './DeviceImgs/display2.png';
+
 const { RangePicker } = DatePicker;
 
 export default class DeviceTree extends Component {
@@ -26,7 +31,6 @@ export default class DeviceTree extends Component {
             stime: moment().format('YYYY-MM-DD 00:00:00'),
             etime: moment().format('YYYY-MM-DD 23:59:59'),
             timeType: 'today',
-            searchData: [],
             deviceProgress: true, // 正在进行
             deviceComplete: false, // 已完成
             deviceMarkerLayerList: {}, // 机械图标图层List
@@ -45,7 +49,9 @@ export default class DeviceTree extends Component {
             // 机械详情弹窗
             deviceMess: {}, // 机械详情
             isShowDevice: false, // 是否显示机械详情弹窗
-            deviceTrackLayerList: {}
+            deviceTrackLayerList: {},
+            menuIsExtend: true /* 菜单是否展开 */,
+            menuWidth: 820 /* 菜单宽度 */
         };
     }
 
@@ -107,6 +113,10 @@ export default class DeviceTree extends Component {
             deviceTreeDataDay
         } = this.props;
         try {
+            if (document.querySelector('#deviceAsideDom')) {
+                let deviceAsideDom = Scrollbar.init(document.querySelector('#deviceAsideDom'));
+                console.log('deviceAsideDom', deviceAsideDom);
+            }
             if (deviceTreeDataDay && deviceTreeDataDay instanceof Array && deviceTreeDataDay.length >= 0) {
                 await this.handleDeviceSearchData(deviceTreeDataDay);
             }
@@ -123,6 +133,10 @@ export default class DeviceTree extends Component {
         } catch (e) {
             console.log('componentWillUnmount', e);
         }
+    }
+    /* 菜单展开收起 */
+    _extendAndFold = () => {
+        this.setState({ menuIsExtend: !this.state.menuIsExtend });
     }
     handleDeviceModalOk = async (e) => {
         const {
@@ -202,8 +216,7 @@ export default class DeviceTree extends Component {
     // 搜索之后的机械数据
     handleDeviceSearchData = (searchData) => {
         this.setState({
-            deviceSearchData: searchData,
-            searchData
+            deviceSearchData: searchData
         }, () => {
             this.handleDeviceTypeAddLayer();
         });
@@ -259,8 +272,8 @@ export default class DeviceTree extends Component {
     // 已完成
     handleDeviceComplete = (e) => {
         this.setState({
-            deviceComplete: e.target.checked,
-            deviceProgress: !e.target.checked
+            deviceComplete: !this.state.deviceComplete,
+            deviceProgress: !this.state.deviceProgress
         }, () => {
             this.query();
         });
@@ -268,8 +281,8 @@ export default class DeviceTree extends Component {
     // 正在进行
     handleDeviceProgress = (e) => {
         this.setState({
-            deviceProgress: e.target.checked,
-            deviceComplete: !e.target.checked
+            deviceProgress: !this.state.deviceProgress,
+            deviceComplete: !this.state.deviceComplete
         }, () => {
             this.query();
         });
@@ -372,9 +385,6 @@ export default class DeviceTree extends Component {
                 }
                 await getDeviceTreeLoading(false);
                 await this.handleDeviceSearchData(devices);
-                this.setState({
-                    searchData: devices
-                });
             } else {
                 let postdata = {
                     stime: stime,
@@ -387,9 +397,6 @@ export default class DeviceTree extends Component {
                     let devices = handleLocationDeviceData(content, thinClassTree);
                     await getDeviceTreeLoading(false);
                     await this.handleDeviceSearchData(devices);
-                    this.setState({
-                        searchData: devices
-                    });
                 }
             }
         } catch (e) {
@@ -441,7 +448,7 @@ export default class DeviceTree extends Component {
                 title: geo.properties.name
             });
             marker.bindPopup(
-                L.popup({ maxWidth: 240 }).setContent(
+                L.popup({ padding: 0 }).setContent(
                     genPopUpContent(geo)
                 )
             );
@@ -461,140 +468,100 @@ export default class DeviceTree extends Component {
     render () {
         let {
             deviceTreeData = [],
-            deviceTreeLoading = false,
-            menuTreeVisible
+            deviceTreeLoading = false
         } = this.props;
         const {
             timeType,
             stime,
             etime,
-            searchData,
+            deviceSearchData,
             deviceProgress,
             deviceComplete,
-            isShowDevice
+            isShowDevice,
+            menuIsExtend,
+            menuWidth
         } = this.state;
         let contents = [];
-        if (!etime && !stime && deviceComplete) {
-            for (let j = 0; j < deviceTreeData.length; j++) {
-                const element = deviceTreeData[j];
-                if (element !== undefined) {
-                    contents.push(element);
-                }
+        for (let j = 0; j < deviceSearchData.length; j++) {
+            const element = deviceSearchData[j];
+            if (element !== undefined) {
+                contents.push(element);
             }
-        } else {
-            for (let j = 0; j < searchData.length; j++) {
-                const element = searchData[j];
-                if (element !== undefined) {
-                    contents.push(element);
-                }
-            }
-        };
+        }
+        console.log('contents', contents);
 
         return (
             <div>
-                {
-                    menuTreeVisible
-                        ? (
-                            <div>
-                                <div className='DeviceTree-menuPanel'>
-                                    <aside className='DeviceTree-aside' draggable='false'>
-                                        <div className='DeviceTree-asideTree'>
-                                            <Spin spinning={deviceTreeLoading}>
-                                                {/* <div className='DeviceTree-button'>
-                                                    <Checkbox className='DeviceTree-button-layout'
-                                                        checked={deviceProgress}
-                                                        onChange={this.handleDeviceProgress.bind(this)}>
-                                                        正进行
-                                                    </Checkbox>
-                                                    <Checkbox className='DeviceTree-button-layout'
-                                                        checked={deviceComplete}
-                                                        onChange={this.handleDeviceComplete.bind(this)}>
-                                                        已完成
-                                                    </Checkbox>
-
-                                                </div>
-                                                <div className='DeviceTree-button'>
-                                                    <Button className='DeviceTree-button-layout' style={{ marginRight: 10 }}
-                                                        type={timeType === 'all' ? 'primary' : 'default'}
-                                                        id='all' onClick={this.handleTimeChange.bind(this)}>
-                                                        全部
-                                                    </Button>
-                                                    <Button className='DeviceTree-button-layout' id='today'
-                                                        type={timeType === 'today' ? 'primary' : 'default'}
-                                                        onClick={this.handleTimeChange.bind(this)}>
-                                                        今天
-                                                    </Button>
-                                                </div>
-                                                <div className='DeviceTree-button'>
-                                                    <Button className='DeviceTree-button-layout' style={{ marginRight: 10 }}
-                                                        type={timeType === 'week' ? 'primary' : 'default'}
-                                                        id='week' onClick={this.handleTimeChange.bind(this)}>
-                                                        一周内
-                                                    </Button>
-                                                    <Button className='DeviceTree-button-layout' id='custom'
-                                                        type={timeType === 'custom' ? 'primary' : 'default'}
-                                                        onClick={this.handleTimeChange.bind(this)}>
-                                                        自定义
-                                                    </Button>
-                                                </div> */}
-                                                {
-                                                    timeType === 'custom'
-                                                        ? <RangePicker
-                                                            style={{ width: 220, marginBottom: 10 }}
-                                                            showTime={{ format: 'YYYY-MM-DD HH:mm:ss' }}
-                                                            format='YYYY-MM-DD HH:mm:ss'
-                                                            placeholder={['Start Time', 'End Time']}
-                                                            onChange={this.handleDateChange.bind(this)}
-                                                        />
-                                                        : ''
-                                                }
-                                                <div className='DeviceTree-statis-layout'>
-                                                    <span style={{ verticalAlign: 'middle' }}>类型</span>
-                                                    <span className='DeviceTree-data-text'>
-                                                        数量
-                                                    </span>
-                                                </div>
-                                                <div>
-                                                    {
-                                                        contents.map((content) => {
-                                                            return (
-                                                                <Row className='DeviceTree-mrg10' key={content.key}>
-                                                                    <span style={{ verticalAlign: 'middle' }}>{content.properties.name}</span>
-                                                                    <span className='DeviceTree-data-text'>
-                                                                        {content.children.length}
-                                                                    </span>
-                                                                </Row>
-                                                            );
-                                                        })
-                                                    }
-                                                </div>
-                                            </Spin>
-                                        </div>
-                                    </aside>
-                                </div>
-                                <div>
-                                    <div className='DeviceTree-menuSwitchDeviceTypeLayout'>
-                                        {
-                                            this.deviceTypeOptions.map((option) => {
-                                                return (
-                                                    <div style={{ display: 'inlineBlock', marginTop: 10, height: 20 }} key={option.id}>
-                                                        <p className='DeviceTree-menuLabel'>{option.label}</p>
-                                                        <img src={option.img}
-                                                            title={option.label}
-                                                            className='DeviceTree-rightMenuDeviceTypeImgLayout' />
-                                                        <a className={this.state[option.id] ? 'DeviceTree-rightMenuDeviceTypeSelLayout' : 'DeviceTree-rightMenuDeviceTypeUnSelLayout'}
-                                                            title={option.label}
-                                                            key={option.id}
-                                                            onClick={this.handleDeviceTypeButton.bind(this, option)} />
-                                                    </div>
-                                                );
-                                            })
+                <div>
+                    <div className='DeviceTreePage-container'>
+                        <div className='DeviceTreePage-r-main'>
+                            {
+                                menuIsExtend ? '' : (
+                                    <img src={display}
+                                        className='DeviceTreePage-foldBtn'
+                                        onClick={this._extendAndFold.bind(this)} />
+                                )
+                            }
+                            <div
+                                className={`DeviceTreePage-menuPanel`}
+                                style={
+                                    menuIsExtend
+                                        ? {
+                                            width: menuWidth,
+                                            transform: 'translateX(0)'
                                         }
+                                        : {
+                                            width: menuWidth,
+                                            transform: `translateX(-${
+                                                menuWidth
+                                            }px)`
+                                        }
+                                }
+                            >
+                                <div className='DeviceTreePage-menuBackground' />
+                                <aside className='DeviceTreePage-aside' id='deviceAsideDom'>
+                                    <div className='DeviceTreePage-MenuNameLayout'>
+                                        <img src={decoration} />
+                                        <span className='DeviceTreePage-MenuName'>机械情况</span>
+                                        <img src={hide}
+                                            onClick={this._extendAndFold.bind(this)}
+                                            className='DeviceTreePage-MenuHideButton' />
                                     </div>
-                                </div>
+                                    <div className='DeviceTreePage-asideTree'>
+                                        <div className='DeviceTreePage-button'>
+                                            {
+                                                this.deviceTypeOptions.map((option) => {
+                                                    let num = 0;
+                                                    contents.map((typeData) => {
+                                                        if (typeData && typeData.key === option.label) {
+                                                            num = (typeData.children && typeData.children.length) || 0;
+                                                        }
+                                                    });
+                                                    return (<a key={option.label}
+                                                        title={option.label}
+                                                        className={this.state[option.id] ? 'DeviceTreePage-button-layoutSel' : 'DeviceTreePage-button-layout'}
+                                                        onClick={this.handleDeviceTypeButton.bind(this, option)}
+                                                        style={{
+                                                            marginRight: 8,
+                                                            marginTop: 8
+                                                        }}
+                                                    >
+                                                        <span className='DeviceTreePage-button-layout-text'>{option.label}</span>
+                                                        {/* <img src={imgurl} className='DeviceTreePage-button-layout-img' /> */}
+                                                        <span className='DeviceTreePage-button-layout-img' />
+                                                        <span className={this.state[option.id] ? 'DeviceTreePage-button-layout-numSel' : 'DeviceTreePage-button-layout-num'}>
+                                                            {num}
+                                                        </span>
+                                                    </a>);
+                                                })
+                                            }
+                                        </div>
+                                    </div>
+                                </aside>
                             </div>
-                        ) : ''
-                }
+                        </div>
+                    </div>
+                </div>
                 {
                     isShowDevice
                         ? <DeviceDetail

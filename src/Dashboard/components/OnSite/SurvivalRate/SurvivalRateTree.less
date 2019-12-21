@@ -1,62 +1,332 @@
-.SurvivalRateTree-menuSwitchSurvivalRateLayout {
+@font-face {
+    font-family: Digital-7;
+    src: url('../digital-7.ttf');
+}
+.SurvivalRatePage-container{
+    display: flex;
     position: absolute;
-    z-index: 960;
-    top: 350px;
-    right: 40px;
-    width: 76px;
-    height: 284px;
-    display: block;
-    background-image: url('../../SurvivalRateImg/backGround.png');
-}
-.SurvivalRateTree-rightMenuSurvivalRateImgLayout {
-    margin-left: 18px;
-    margin-top: -31px;
-}
-.SurvivalRateTree-rightMenuSurvivalRateSelLayout {
-    margin-bottom: 10px;
-    display: inline-block;
-    background-image: url('../../SurvivalRateImg/select.png');
-    background-size: 100% 100%;
-    width: 18px;
-    height: 18px;
-    margin-left: 4px;
-    margin-top: 6px;
-}
+    // width: calc(~'100% - 44px');
+    left: 44px;
+    top: 610px;
+    width: 820px;
+    height: 246px;
 
-.SurvivalRateTree-rightMenuSurvivalRateUnSelLayout {
-    margin-bottom: 10px;
-    display: inline-block;
-    background-image: url('../../SurvivalRateImg/unSelect.png');
-    background-size: 100% 100%;
-    width: 18px;
-    height: 18px;
-    margin-left: 4px;
-    margin-top: 6px;
-}
-.SurvivalRateTree-menuPanel {
-    position: absolute;
-    left: 330px;
-    top: 40px;
-    height: 80%;
-    width: 260px;
-    transition: all 0.3s;
-    z-index: 980;
+    .SurvivalRatePage-r-main{
+    flex:1 1 auto;
+    position: relative;
+    overflow: hidden;
+    }
 
-    .SurvivalRateTree-aside {
+    .SurvivalRatePage-foldBtn {
         position: absolute;
-        left: 0;
-        width: 100%;
-        top: 0;
-        bottom: 0;
-        background-color: rgba(255,255,255, 0.9);
-        color: #333;
-        z-index: 999;
-        overflow-x: hidden;
-        overflow-y: auto;
+        width: 64px;
+        height: 64px;
+        text-align: center;
+        cursor: pointer;
+        z-index: 500;
+        -webkit-transition: all .3s;
+        -o-transition: all .3s;
+        transition: all .3s;
+        // border:1px solid rgba(97,245,171,1);
+    }
 
-        .SurvivalRateTree-asideTree {
-            margin-top: 20px;
-            margin-left: 20px;
+    .SurvivalRatePage-menuPanel {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 246px;
+        transition: all 0.8s;
+        z-index: 980;
+        // background:rgba(19,34,36,0.8);
+        // background-image: url("./SurvivalRateImg/bottom1.png");
+        // background-repeat: no-repeat;
+  
+        .SurvivalRatePage-menuBackground {
+            background-image: url("./SurvivalRateImg/bottom1.png");
+            background-repeat: no-repeat;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            bottom: 0;
+            // background: rgba(19,34,36,1);
+            opacity: 0.7;
+        }
+        .SurvivalRatePage-aside {
+            position: absolute;
+            left: 24px;
+            width: calc(~'100% - 24px');;
+            height: 100%;
+            color: #333;
+            z-index: 999;
+            overflow: auto;
+
+            .SurvivalRatePage-MenuNameLayout { 
+                display: inline-block;
+                margin-top: 18px;
+                width: 100%;
+            }
+             .SurvivalRatePage-MenuName {
+                width: 65px;
+                height: 17px;
+                font-size: 16px;
+                font-family: Microsoft YaHei;
+                font-weight: bold;
+                color: #61f5ab;
+                position: absolute;
+                left: 12px;
+                top: 18px;
+            }
+            .SurvivalRatePage-MenuHideButton {
+                float: right;
+                cursor: pointer;
+                margin-right: 23px;
+            }
+            .SurvivalRatePage-asideTree {
+                margin-top: 10px;
+                // margin-left: 10px;
+            }
+            .SurvivalRatePage-StatusButton {
+                display: inline-block;
+                // width: 220px;
+            }
+            .SurvivalRatePage-button-statusSel {
+                width:72px;
+                height:32px;
+                border:1px solid rgba(60,248,247,1);
+                background-image: url("./SurvivalRateImg/3selection.png");
+                display: inline-block;
+                opacity: 0.8;
+            }
+            .SurvivalRatePage-button-status {
+                width:72px;
+                height:32px;
+                background-image: url("./SurvivalRateImg/3levitate.png");
+                display: inline-block;
+                // border:1px solid rgba(60,248,247,1);
+                opacity: 0.8;
+            }
+            .SurvivalRatePage-button-status-textSel {
+                width:72px;
+                height:32px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:400;
+                color:rgba(102,255,179,1);
+                line-height:32px;
+                text-align: center;
+                display: block;
+            }
+            .SurvivalRatePage-button-status-text {
+                width:72px;
+                height:32px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:400;
+                color:rgba(161,182,194,1);
+                line-height:32px;
+                text-align: center;
+                display: block;
+            }
+            .SurvivalRatePage-TimeButton {
+                display: inline-block;
+                margin-left: 67px;
+            }
+            .SurvivalRatePage-button-timeSel {
+                width:72px;
+                height:32px;
+                border:1px solid rgba(60,248,247,1);
+                background-image: url("./SurvivalRateImg/3selection.png");
+                display: inline-block;
+                opacity: 0.8;
+            }
+            .SurvivalRatePage-button-time {
+                width:72px;
+                height:32px;
+                background-image: url("./SurvivalRateImg/3levitate.png");
+                display: inline-block;
+                // border:1px solid rgba(60,248,247,1);
+                opacity: 0.8;
+            }
+            .SurvivalRatePage-button-customTimeSel {
+                background-color: unset !important;
+                width:148px;
+                height:32px;
+                border:1px solid rgba(60,248,247,1);
+                background-image: url("./SurvivalRateImg/4selection.png");
+                display: inline-block;
+                position: absolute;
+                // opacity: 0.8;
+
+                span.ant-calendar-picker-input.ant-input {
+                    box-sizing: border-box;
+                    margin: 0;
+                    padding: 0;
+                    font-variant: tabular-nums;
+                    list-style: none;
+                    font-feature-settings: 'tnum';
+                    position: relative;
+                    display: inline-block;
+                    width: 100%;
+                    height: 32px;
+                    background-image: none;
+                    transition: all 0.3s;
+                    background-color: unset;
+                    font-size:14px;
+                    font-family:Microsoft YaHei;
+                    font-weight:400;
+                    color:rgba(102,255,179,1);
+                    line-height:40px;
+                    border: unset;
+                }
+                input.ant-calendar-range-picker-input {
+                    width: 45%;
+                    height: 100%;
+                    text-align: center;
+                    background-color: transparent;
+                    border: unset;
+                    outline: 0;
+                    padding: unset;
+                    font-size: 12px;
+                    vertical-align: top;
+                }
+                span.ant-calendar-range-picker-separator {
+                    color:rgba(102,255,179,1);
+                    vertical-align: top;
+                }
+            }
+            .SurvivalRatePage-button-customTime {
+                background-color: unset !important;
+                width:148px;
+                height:32px;
+                background-image: url("./SurvivalRateImg/4levitate.png");
+                display: inline-block;
+                position: absolute;
+                // opacity: 0.8;
+
+                span.ant-calendar-picker-input.ant-input {
+                    box-sizing: border-box;
+                    margin: 0;
+                    padding: 0;
+                    font-variant: tabular-nums;
+                    list-style: none;
+                    font-feature-settings: 'tnum';
+                    position: relative;
+                    display: inline-block;
+                    width: 100%;
+                    height: 32px;
+                    background-image: none;
+                    transition: all 0.3s;
+                    background-color: unset;
+                    font-size:14px;
+                    font-family:Microsoft YaHei;
+                    font-weight:400;
+                    color:rgba(93,110,120,1);
+                    line-height:40px;
+                    border: unset;
+                }
+                input.ant-calendar-range-picker-input {
+                    width: 45%;
+                    height: 100%;
+                    text-align: center;
+                    background-color: transparent;
+                    border: unset;
+                    outline: 0;
+                    padding: unset;
+                    font-size: 12px;
+                    vertical-align: top;
+                }
+                span.ant-calendar-range-picker-separator {
+                    color:rgba(161,182,194,1);
+                    vertical-align: top;
+                }
+            }
+            .SurvivalRatePage-button-time-textSel {
+                width:72px;
+                height:32px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:400;
+                color:rgba(102,255,179,1);
+                line-height:32px;
+                text-align: center;
+                display: block;
+            }
+            .SurvivalRatePage-button-time-text {
+                width:72px;
+                height:32px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:400;
+                color:rgba(161,182,194,1);
+                line-height:32px;
+                text-align: center;
+                display: block;
+            }
+            .SurvivalRatePage-button {
+                display: block;
+                // width: 220px;
+            }
+            .SurvivalRatePage-button-layout {
+                width:148px;
+                height:71px;
+                // border:1px solid rgba(60,248,247,1);
+                border-radius:2px;
+                background-image: url("./SurvivalRateImg/2levitate.png");
+                display: inline-block;
+            }
+            .SurvivalRatePage-button-layoutSel {
+                width:148px;
+                height:71px;
+                border:1px solid rgba(60,248,247,1);
+                border-radius:2px;
+                background-image: url("./SurvivalRateImg/2selection.png");
+                display: inline-block;
+            }
+            .SurvivalRatePage-button-layout-text {
+                width: 148px;
+                height:14px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:bold;
+                color:rgba(255,255,255,1);
+                line-height: 40px;
+                margin-left: 12px;
+                display: inline-block;
+                // margin-top: 20px;
+            }
+            .SurvivalRatePage-button-layout-img {
+                width:17px;
+                height:17px;
+                // opacity:0.6;
+                display: inline-block;
+                margin-top: 10px;
+                margin-left: 12px;
+            }
+            .SurvivalRatePage-button-layout-numSel {
+                width: 105px;
+                height: 22px;
+                font-size: 32px;
+                font-family: Digital-7;
+                font-weight: 400;
+                display: inline-block;
+                color: #66ffb3;
+                line-height: 40px;
+                position: absolute;
+                text-align: right;
+            }
+            .SurvivalRatePage-button-layout-num {
+                width: 105px;
+                height: 22px;
+                font-size: 32px;
+                font-family: Digital-7;
+                font-weight: 400;
+                display: inline-block;
+                color: #66ffb3;
+                line-height: 40px;
+                position: absolute;
+                text-align: right;
+                opacity:0.02;
+            }
         }
     }
 }

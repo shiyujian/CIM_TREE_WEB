@@ -414,7 +414,7 @@ export default class TrackTree extends Component {
                 title: geo.properties.name
             });
             marker.bindPopup(
-                L.popup({ maxWidth: 240 }).setContent(
+                L.popup({ padding: 0 }).setContent(
                     genPopUpContent(geo)
                 )
             );

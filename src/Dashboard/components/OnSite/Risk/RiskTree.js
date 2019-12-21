@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Tree, Button, DatePicker, Spin, Checkbox, Modal, Row } from 'antd';
 import L from 'leaflet';
+import Scrollbar from 'smooth-scrollbar';
 import L1 from 'leaflet.markercluster';
 // import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
@@ -8,12 +9,18 @@ import './RiskTree.less';
 import moment from 'moment';
 import RiskDetail from './RiskDetail';
 import { handleRiskData, getIconType, genPopUpContent } from '../../auth';
-// 安全隐患类型图片
-import riskDangerImg from '../../RiskImg/danger.png';
-import riskQualityImg from '../../RiskImg/quality.png';
-import riskOtherImg from '../../RiskImg/other.png';
 
-const TreeNode = Tree.TreeNode;
+// 质量缺陷
+import defectImg from './ProblemImg/defect1.png';
+import defectImgSel from './ProblemImg/defect2.png';
+// 安全隐患
+import unSafeImg from './ProblemImg/unsafe1.png';
+import unSafeImgSel from './ProblemImg/unsafe2.png';
+
+import decoration from './ProblemImg/decoration.png';
+import hide from './ProblemImg/hide2.png';
+import display from './ProblemImg/display2.png';
+
 const { RangePicker } = DatePicker;
 let heatMarkerLayer = new L1.MarkerClusterGroup();
 export default class RiskTree extends Component {
@@ -22,6 +29,8 @@ export default class RiskTree extends Component {
         this.state = {
             stime: moment().format('YYYY-MM-DD 00:00:00'),
             etime: moment().format('YYYY-MM-DD 23:59:59'),
+            dateStime: '',
+            dateEtime: '',
             timeType: 'today',
             searchData: [],
             riskRectify: false,
@@ -31,66 +40,36 @@ export default class RiskTree extends Component {
             // 安全隐患类型的点击状态，展示是否选中的图片
             riskTypeQuality: true,
             riskTypeDanger: true,
-            riskTypeOther: true,
+            // riskTypeOther: true,
             // 隐患详情弹窗
             riskMess: {}, // 隐患详情
-            isShowRisk: false // 是否显示隐患详情弹窗
+            isShowRisk: false, // 是否显示隐患详情弹窗
+            menuIsExtend: true /* 菜单是否展开 */,
+            menuWidth: 665 /* 菜单宽度 */
 
         };
     }
 
-    // 安全隐患类型
-    riskTypeOptions = [
+    // 问题类型
+    problemTypeOptions = [
         {
             id: 'riskTypeQuality',
             label: '质量缺陷',
-            img: riskQualityImg
+            img: defectImg,
+            selImg: defectImgSel
         },
         {
             id: 'riskTypeDanger',
             label: '安全隐患',
-            img: riskDangerImg
-        },
-        {
-            id: 'riskTypeOther',
-            label: '其他',
-            img: riskOtherImg
+            img: unSafeImg,
+            selImg: unSafeImgSel
         }
+        // {
+        //     id: 'riskTypeOther',
+        //     label: '其他',
+        //     img: riskOtherImg
+        // }
     ]
-    genIconClass () {
-        let icClass = '';
-        let featureName = this.props.featureName;
-        switch (featureName) {
-            case 'geojsonFeature_track':
-                icClass = 'tr-people';
-                break;
-            case 'geojsonFeature_risk':
-                icClass = 'tr-hazard';
-                break;
-            case 'geojsonFeature_treetype':
-                icClass = 'tr-area';
-                break;
-        }
-        return icClass;
-    }
-
-    loop (p) {
-        let me = this;
-        if (p) {
-            return (
-                <TreeNode
-                    title={p.properties.name}
-                    key={p.key}
-                    selectable={false}
-                >
-                    {p.children &&
-                        p.children.map(m => {
-                            return me.loop(m);
-                        })}
-                </TreeNode>
-            );
-        }
-    }
     componentDidMount = async () => {
         const {
             riskTreeDay
@@ -99,8 +78,12 @@ export default class RiskTree extends Component {
             if (riskTreeDay && riskTreeDay instanceof Array && riskTreeDay.length >= 0) {
                 await this.handleRiskSearchData(riskTreeDay);
             }
+            if (document.querySelector('#ProblemAsideDom')) {
+                let ProblemAsideDom = Scrollbar.init(document.querySelector('#ProblemAsideDom'));
+                console.log('ProblemAsideDom', ProblemAsideDom);
+            }
             // 隐患详情点击事件
-            document.querySelector('.leaflet-popup-pane').addEventListener('click', this.handleRiskModalOk);
+            // document.querySelector('.leaflet-popup-pane').addEventListener('click', this.handleRiskModalOk);
         } catch (e) {
             console.log('componentDidMount', e);
         }
@@ -108,10 +91,14 @@ export default class RiskTree extends Component {
     componentWillUnmount = async () => {
         try {
             await this.handleRemoveAllRiskLayer();
-            document.querySelector('.leaflet-popup-pane').removeEventListener('click', this.handleRiskModalOk);
+            // document.querySelector('.leaflet-popup-pane').removeEventListener('click', this.handleRiskModalOk);
         } catch (e) {
             console.log('componentWillUnmount', e);
         }
+    }
+    /* 菜单展开收起 */
+    _extendAndFold = () => {
+        this.setState({ menuIsExtend: !this.state.menuIsExtend });
     }
     handleRiskModalOk = async (e) => {
         let target = e.target;
@@ -162,7 +149,7 @@ export default class RiskTree extends Component {
         try {
             let checkedKeys = [];
             this.handleRemoveAllRiskLayer();
-            this.riskTypeOptions.map((option) => {
+            this.problemTypeOptions.map((option) => {
                 if (this.state[option.id]) {
                     checkedKeys.push(option.label);
                 }
@@ -173,6 +160,8 @@ export default class RiskTree extends Component {
             } else {
                 checkedData = riskTree;
             }
+            console.log('checkedData', checkedData);
+
             checkedData.map((riskData) => {
                 checkedKeys.map((checkedKey) => {
                     if (riskData && riskData.key === checkedKey) {
@@ -201,174 +190,11 @@ export default class RiskTree extends Component {
             console.log('handleRiskTypeAddLayer', e);
         }
     }
-    render () {
-        let {
-            riskTree = [],
-            riskTreeLoading,
-            menuTreeVisible
-        } = this.props;
-        const {
-            timeType,
-            stime,
-            etime,
-            searchData,
-            riskRectify,
-            riskNotRectify
-        } = this.state;
-        let contents = [];
-        if (!etime && !stime && riskNotRectify) {
-            for (let j = 0; j < riskTree.length; j++) {
-                const element = riskTree[j];
-                if (element !== undefined) {
-                    contents.push(element);
-                }
-            }
-        } else {
-            for (let j = 0; j < searchData.length; j++) {
-                const element = searchData[j];
-                if (element !== undefined) {
-                    contents.push(element);
-                }
-            }
-        };
-
-        return (
-            <div>
-                {
-                    menuTreeVisible
-                        ? (
-                            <div>
-                                <div className='RiskTree-menuPanel'>
-                                    <aside className='RiskTree-aside' draggable='false'>
-                                        <div className='RiskTree-asideTree'>
-                                            <Spin spinning={riskTreeLoading}>
-                                                <div className='RiskTree-button'>
-                                                    <Checkbox className='RiskTree-button-layout'
-                                                        checked={riskNotRectify}
-                                                        onChange={this.handleRiskNotRectify.bind(this)}>
-                                                        未整改
-                                                    </Checkbox>
-                                                    <Checkbox className='RiskTree-button-layout'
-                                                        checked={riskRectify}
-                                                        onChange={this.handleRiskRectify.bind(this)}>
-                                                        已整改
-                                                    </Checkbox>
-                                                </div>
-                                                <div className='RiskTree-button'>
-                                                    <Button className='RiskTree-button-layout' style={{ marginRight: 10 }}
-                                                        type={timeType === 'all' ? 'primary' : 'default'}
-                                                        id='all' onClick={this.handleTimeChange.bind(this)}>
-                                                        全部
-                                                    </Button>
-                                                    <Button className='RiskTree-button-layout' id='today'
-                                                        type={timeType === 'today' ? 'primary' : 'default'}
-                                                        onClick={this.handleTimeChange.bind(this)}>
-                                                        今天
-                                                    </Button>
-                                                </div>
-                                                <div className='RiskTree-button'>
-                                                    <Button className='RiskTree-button-layout' style={{ marginRight: 10 }}
-                                                        type={timeType === 'week' ? 'primary' : 'default'}
-                                                        id='week' onClick={this.handleTimeChange.bind(this)}>
-                                                        一周内
-                                                    </Button>
-                                                    <Button className='RiskTree-button-layout' id='custom'
-                                                        type={timeType === 'custom' ? 'primary' : 'default'}
-                                                        onClick={this.handleTimeChange.bind(this)}>
-                                                        自定义
-                                                    </Button>
-                                                </div>
-                                                {
-                                                    timeType === 'custom'
-                                                        ? <RangePicker
-                                                            style={{ width: 220, marginBottom: 10 }}
-                                                            showTime={{ format: 'YYYY-MM-DD HH:mm:ss' }}
-                                                            format='YYYY-MM-DD HH:mm:ss'
-                                                            placeholder={['Start Time', 'End Time']}
-                                                            onChange={this.handleDateChange.bind(this)}
-                                                        />
-                                                        : ''
-                                                }
-                                                <div className='RiskTree-statis-layout'>
-                                                    <span style={{ verticalAlign: 'middle' }}>类型</span>
-                                                    <span className='RiskTree-data-text'>
-                                                        数量
-                                                    </span>
-                                                </div>
-                                                <div>
-                                                    {
-                                                        contents.map((content) => {
-                                                            return (
-                                                                <Row className='RiskTree-mrg10' key={content.key}>
-                                                                    <span style={{ verticalAlign: 'middle' }}>{content.properties.name}</span>
-                                                                    <span className='RiskTree-data-text'>
-                                                                        {content.children.length}
-                                                                    </span>
-                                                                </Row>
-                                                            );
-                                                        })
-                                                    }
-                                                </div>
-                                            </Spin>
-                                        </div>
-                                    </aside>
-                                </div>
-                                <div>
-                                    <div className='RiskTree-menuSwitchRiskTypeLayout'>
-                                        {
-                                            this.riskTypeOptions.map((option) => {
-                                                return (
-                                                    <div style={{ display: 'inlineBlock', marginTop: 10, height: 20 }} key={option.id}>
-                                                        <p className='RiskTree-menuLabel'>{option.label}</p>
-                                                        <img src={option.img}
-                                                            title={option.label}
-                                                            className='RiskTree-rightMenuRiskTypeImgLayout' />
-                                                        <a className={this.state[option.id] ? 'RiskTree-rightMenuRiskTypeSelLayout' : 'RiskTree-rightMenuRiskTypeUnSelLayout'}
-                                                            title={option.label}
-                                                            key={option.id}
-                                                            onClick={this.handleRiskTypeButton.bind(this, option)} />
-                                                    </div>
-                                                );
-                                            })
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-                        ) : ''
-                }
-                <Modal
-                    title='隐患详情'
-                    width={800}
-                    visible={this.state.isShowRisk}
-                    onCancel={this._handleCancelVisible.bind(this)}
-                    footer={null}
-                >
-                    <div>
-                        <RiskDetail
-                            {...this.props}
-                            riskMess={this.state.riskMess}
-                        />
-                        <Row style={{ marginTop: 10 }}>
-                            <Button
-                                onClick={this._handleCancelVisible.bind(
-                                    this
-                                )}
-                                style={{ float: 'right' }}
-                                type='primary'
-                            >
-                                关闭
-                            </Button>
-                        </Row>
-                    </div>
-                </Modal>
-            </div>
-        );
-    }
     // 未整改
     handleRiskNotRectify = (e) => {
         this.setState({
-            riskNotRectify: e.target.checked,
-            riskRectify: !e.target.checked
+            riskNotRectify: !this.state.riskNotRectify,
+            riskRectify: !this.state.riskRectify
         }, () => {
             this.query();
         });
@@ -376,13 +202,13 @@ export default class RiskTree extends Component {
     // 已整改
     handleRiskRectify = (e) => {
         this.setState({
-            riskRectify: e.target.checked,
-            riskNotRectify: !e.target.checked
+            riskRectify: !this.state.riskRectify,
+            riskNotRectify: !this.state.riskNotRectify
         }, () => {
             this.query();
         });
     }
-    handleTimeChange = (e) => {
+    handleTimeChange = (timeType) => {
         const {
             riskRectify
         } = this.state;
@@ -390,10 +216,10 @@ export default class RiskTree extends Component {
             riskTree = []
         } = this.props;
         try {
-            let target = e.target;
-            let timeType = target.getAttribute('id');
             this.setState({
-                timeType
+                timeType,
+                dateStime: '',
+                dateEtime: ''
             });
             let stime = '';
             let etime = '';
@@ -435,8 +261,11 @@ export default class RiskTree extends Component {
     }
     handleDateChange = (value) => {
         this.setState({
-            stime: value[0] ? moment(value[0]).format('YYYY-MM-DD HH:mm:ss') : '',
-            etime: value[1] ? moment(value[1]).format('YYYY-MM-DD HH:mm:ss') : ''
+            dateStime: value[0] ? moment(value[0]).format('YYYY-MM-DD') : '',
+            dateEtime: value[1] ? moment(value[1]).format('YYYY-MM-DD') : '',
+            timeType: 'custom',
+            stime: value[0] ? moment(value[0]).format('YYYY-MM-DD') : '',
+            etime: value[1] ? moment(value[1]).format('YYYY-MM-DD') : ''
         }, () => {
             this.query();
         });
@@ -500,9 +329,6 @@ export default class RiskTree extends Component {
                 }
                 await getRiskTreeLoading(false);
                 await this.handleRiskSearchData(risks);
-                this.setState({
-                    searchData: risks
-                });
             } else {
                 let postdata = {
                     stime: stime,
@@ -515,9 +341,6 @@ export default class RiskTree extends Component {
                     let risks = handleRiskData(content);
                     await getRiskTreeLoading(false);
                     await this.handleRiskSearchData(risks);
-                    this.setState({
-                        searchData: risks
-                    });
                 }
             }
         } catch (e) {
@@ -565,7 +388,7 @@ export default class RiskTree extends Component {
                 title: geo.properties.name
             });
             marker.bindPopup(
-                L.popup({ maxWidth: 240 }).setContent(
+                L.popup({ padding: 0 }).setContent(
                     genPopUpContent(geo)
                 )
             );
@@ -580,5 +403,229 @@ export default class RiskTree extends Component {
         this.setState({
             isShowRisk: false
         });
+    }
+    render () {
+        let {
+            riskTree = [],
+            riskTreeLoading,
+            menuTreeVisible
+        } = this.props;
+        const {
+            timeType,
+            stime,
+            etime,
+            riskRectify,
+            riskNotRectify,
+            menuIsExtend,
+            menuWidth,
+            dateStime,
+            dateEtime,
+            riskSearchData
+        } = this.state;
+        let contents = [];
+        for (let j = 0; j < riskSearchData.length; j++) {
+            const element = riskSearchData[j];
+            if (element !== undefined) {
+                contents.push(element);
+            }
+        }
+        console.log('contents', contents);
+
+        return (
+            <div>
+                <div className='ProblemPage-container'>
+                    <div className='ProblemPage-r-main'>
+                        {
+                            menuIsExtend ? '' : (
+                                <img src={display}
+                                    className='ProblemPage-foldBtn'
+                                    onClick={this._extendAndFold.bind(this)} />
+                            )
+                        }
+                        <div
+                            className={`ProblemPage-menuPanel`}
+                            style={
+                                menuIsExtend
+                                    ? {
+                                        width: menuWidth,
+                                        transform: 'translateX(0)'
+                                    }
+                                    : {
+                                        width: menuWidth,
+                                        transform: `translateX(-${
+                                            menuWidth
+                                        }px)`
+                                    }
+                            }
+                        >
+                            <div className='ProblemPage-menuBackground' />
+                            <aside className='ProblemPage-aside' id='ConservationAsideDom'>
+                                <div className='ProblemPage-MenuNameLayout'>
+                                    <img src={decoration} />
+                                    <span className='ProblemPage-MenuName'>苗木养护</span>
+                                    <img src={hide}
+                                        onClick={this._extendAndFold.bind(this)}
+                                        className='ProblemPage-MenuHideButton' />
+                                </div>
+                                <div className='ProblemPage-asideTree'>
+                                    <div className='ProblemPage-StatusButton'>
+                                        <a key='未整改'
+                                            title='未整改'
+                                            className={riskNotRectify ? 'ProblemPage-button-statusSel' : 'ProblemPage-button-status'}
+                                            onClick={this.handleRiskNotRectify.bind(this)}
+                                            style={{
+                                                marginRight: 8
+                                                // marginTop: 8
+                                            }}
+                                        >
+                                            <span className={riskNotRectify ? 'ProblemPage-button-status-textSel' : 'ProblemPage-button-status-text'}>
+                                                未整改
+                                            </span>
+                                        </a>
+                                        <a key='已整改'
+                                            title='已整改'
+                                            className={riskRectify ? 'ProblemPage-button-statusSel' : 'ProblemPage-button-status'}
+                                            onClick={this.handleRiskRectify.bind(this)}
+                                            style={{
+                                                marginRight: 8
+                                                // marginTop: 8
+                                            }}
+                                        >
+                                            <span className={riskRectify ? 'ProblemPage-button-status-textSel' : 'ProblemPage-button-status-text'}>
+                                                已整改
+                                            </span>
+                                        </a>
+                                    </div>
+                                    <div className='ProblemPage-TimeButton'>
+                                        <a key='今天'
+                                            title='今天'
+                                            id='today'
+                                            className={timeType === 'today' ? 'ProblemPage-button-timeSel' : 'ProblemPage-button-time'}
+                                            onClick={this.handleTimeChange.bind(this, 'today')}
+                                            style={{
+                                                marginRight: 8
+                                                // marginTop: 8
+                                            }}
+                                        >
+                                            <span className={timeType === 'today' ? 'ProblemPage-button-time-textSel' : 'ProblemPage-button-time-text'}>
+                                                今天
+                                            </span>
+                                        </a>
+                                        <a key='一周内'
+                                            title='一周内'
+                                            id='week'
+                                            className={timeType === 'week' ? 'ProblemPage-button-timeSel' : 'ProblemPage-button-time'}
+                                            onClick={this.handleTimeChange.bind(this, 'week')}
+                                            style={{
+                                                marginRight: 8
+                                                // marginTop: 8
+                                            }}
+                                        >
+                                            <span className={timeType === 'week' ? 'ProblemPage-button-time-textSel' : 'ProblemPage-button-time-text'}>
+                                                一周内
+                                            </span>
+                                        </a>
+                                        <a key='全部'
+                                            title='全部'
+                                            id='all'
+                                            className={timeType === 'all' ? 'ProblemPage-button-timeSel' : 'ProblemPage-button-time'}
+                                            onClick={this.handleTimeChange.bind(this, 'all')}
+                                            style={{
+                                                marginRight: 8
+                                                // marginTop: 8
+                                            }}
+                                        >
+                                            <span className={timeType === 'all' ? 'ProblemPage-button-time-textSel' : 'ProblemPage-button-time-text'}>
+                                                全部
+                                            </span>
+                                        </a>
+                                        <a key='custom'
+                                            title='custom'
+                                            id='custom'
+                                            className={timeType === 'custom' ? 'ProblemPage-button-customTimeSel' : 'ProblemPage-button-customTime'}
+                                            style={{
+                                                marginRight: 8
+                                                // marginTop: 8
+                                            }}
+                                        >
+                                            <RangePicker
+                                                allowClear={false}
+                                                style={{ width: '100%', height: '100%' }}
+                                                value={
+                                                    dateStime && dateEtime
+                                                        ? [
+                                                            moment(dateStime, 'YYYY-MM-DD'),
+                                                            moment(dateEtime, 'YYYY-MM-DD')
+                                                        ] : null
+                                                }
+                                                format='YYYY-MM-DD'
+                                                placeholder={['开始时间', '结束时间']}
+                                                onChange={this.handleDateChange.bind(this)}
+                                            />
+                                        </a>
+                                    </div>
+                                    <div className='ProblemPage-button'>
+                                        {
+                                            this.problemTypeOptions.map((option) => {
+                                                let imgurl = option.img;
+                                                if (this.state[option.id]) {
+                                                    imgurl = option.selImg;
+                                                }
+                                                let num = 0;
+                                                contents.map((typeData) => {
+                                                    if (typeData && typeData.key === option.label) {
+                                                        num = (typeData.children && typeData.children.length) || 0;
+                                                    }
+                                                });
+                                                return (<a key={option.label}
+                                                    title={option.label}
+                                                    className={this.state[option.id] ? 'ProblemPage-button-layoutSel' : 'ProblemPage-button-layout'}
+                                                    onClick={this.handleRiskTypeButton.bind(this, option)}
+                                                    style={{
+                                                        marginRight: 8,
+                                                        marginTop: 8
+                                                    }}
+                                                >
+                                                    <span className='ProblemPage-button-layout-text'>{option.label}</span>
+                                                    <img src={imgurl} className='ProblemPage-button-layout-img' />
+                                                    <span className={this.state[option.id] ? 'ProblemPage-button-layout-numSel' : 'ProblemPage-button-layout-num'}>
+                                                        {num}
+                                                    </span>
+                                                </a>);
+                                            })
+                                        }
+                                    </div>
+                                </div>
+                            </aside>
+                        </div>
+                    </div>
+                </div>
+                <Modal
+                    title='隐患详情'
+                    width={800}
+                    visible={this.state.isShowRisk}
+                    onCancel={this._handleCancelVisible.bind(this)}
+                    footer={null}
+                >
+                    <div>
+                        <RiskDetail
+                            {...this.props}
+                            riskMess={this.state.riskMess}
+                        />
+                        <Row style={{ marginTop: 10 }}>
+                            <Button
+                                onClick={this._handleCancelVisible.bind(
+                                    this
+                                )}
+                                style={{ float: 'right' }}
+                                type='primary'
+                            >
+                                关闭
+                            </Button>
+                        </Row>
+                    </div>
+                </Modal>
+            </div>
+        );
     }
 }

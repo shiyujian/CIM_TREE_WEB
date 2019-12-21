@@ -15,7 +15,7 @@ import './TreeType.less';
 import decoration from './TreeTypeImg/decoration.png';
 import hide from './TreeTypeImg/hide2.png';
 import display from './TreeTypeImg/display2.png';
-import searchTopImg from './TreeTypeImg/1.png';
+import searchTopImg from './TreeTypeImg/search0.png';
 import searchRightImg from './TreeTypeImg/2.png';
 export default class TreeTypeTree extends Component {
     constructor (props) {

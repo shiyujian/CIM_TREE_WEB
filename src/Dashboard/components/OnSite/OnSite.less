@@ -47,9 +47,46 @@
 }
 .dashboard-map {
     position: relative;
+    .leaflet-popup-content-wrapper {
+        background: unset;
+    }
+    .leaflet-popup-content {
+        margin: 0;
+    }
     .leaflet-popup-content h2 {
         font-weight: 400 !important;
         font-size: 12px !important;
+        margin-left: 15px;
+        margin-bottom: 0px;
+        color: rgba(255,255,255,1);
+    }
+    .leaflet-popup.leaflet-zoom-animated {
+        width: 280px;
+        height:420px;
+        background:rgba(19,34,36,1);
+        opacity:0.9;
+        background-image: url("./Device/DeviceImgs//bottom5.png");
+        font-size:14px;
+        font-family:Microsoft YaHei;
+        font-weight:400;
+        color:rgba(255,255,255,1);
+        line-height:40px;
+    }
+    a.leaflet-popup-close-button {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        padding: 4px 4px 0 0;
+        border: none;
+        text-align: center;
+        width: 15px;
+        height: 48px;
+        font: 16px/14px Tahoma, Verdana, sans-serif;
+        color: #c3c3c3;
+        text-decoration: none;
+        font-weight: bold;
+        background: transparent;
+        
     }
 
     .dashboard-menuPanel {
@@ -99,7 +136,7 @@
         height: 41px !important;
         top: -33px;
         left: -8px;
-        background-image: url('../ImageIcon/tree.png');
+        background-image: url('./TreeType/TreeTypeImg/定位.png');
         background-size: 100% 100%;
     }
 
@@ -109,7 +146,7 @@
         height: 26px !important;
         top: -5px;
         left: -4px;
-        background-image: url('../RiskImg/quality.png');
+        background-image: url('./Risk/ProblemImg/defect2.png');
         background-size: 100% 100%;
     }
 
@@ -119,7 +156,7 @@
         height: 26px !important;
         top: -5px;
         left: -4px;
-        background-image: url('../RiskImg/danger.png');
+        background-image: url('./Risk/ProblemImg/unsafe2.png');
         background-size: 100% 100%;
     }
 
@@ -129,7 +166,7 @@
         height: 26px !important;
         top: -5px;
         left: -4px;
-        background-image: url('../RiskImg/other.png');
+        background-image: url('./Risk/ProblemImg/unsafe2.png');
         background-size: 100% 100%;
     }
 
@@ -165,7 +202,7 @@
         height: 25px !important;
         top: -13px;
         left: -6px;
-        background-image: url('../CuringTaskImg/feed.png');
+        background-image: url('./Conservation/ConservationImg/icon_fertilize2.png');
         background-size: 100% 100%;
     }
 
@@ -175,7 +212,7 @@
         height: 25px !important;
         top: -13px;
         left: -6px;
-        background-image: url('../CuringTaskImg/drain.png');
+        background-image: url('./Conservation/ConservationImg/icon_drainage2.png');
         background-size: 100% 100%;
     }
     /*养护任务补植*/
@@ -184,7 +221,7 @@
         height: 25px !important;
         top: -13px;
         left: -6px;
-        background-image: url('../CuringTaskImg/replanting.png');
+        background-image: url('./Conservation/ConservationImg/icon_replanting2.png');
         background-size: 100% 100%;
     }
     /*养护任务病虫害防治*/
@@ -193,7 +230,7 @@
         height: 25px !important;
         top: -13px;
         left: -6px;
-        background-image: url('../CuringTaskImg/worm.png');
+        background-image: url('./Conservation/ConservationImg/icon_pest2.png');
         background-size: 100% 100%;
     }
     /*养护任务修剪*/
@@ -202,7 +239,7 @@
         height: 25px !important;
         top: -13px;
         left: -6px;
-        background-image: url('../CuringTaskImg/trim.png');
+        background-image: url('./Conservation/ConservationImg/icon_prune2.png');
         background-size: 100% 100%;
     }
     /*养护任务除草*/
@@ -211,7 +248,7 @@
         height: 25px !important;
         top: -13px;
         left: -6px;
-        background-image: url('../CuringTaskImg/weed.png');
+        background-image: url('./Conservation/ConservationImg/icon_weeding2.png');
         background-size: 100% 100%;
     }
     /*养护任务浇水*/
@@ -220,7 +257,7 @@
         height: 25px !important;
         top: -13px;
         left: -6px;
-        background-image: url('../CuringTaskImg/watering.png');
+        background-image: url('./Conservation/ConservationImg/icon_watering2.png');
         background-size: 100% 100%;
     }
     /*养护任务其他*/
@@ -229,7 +266,7 @@
         height: 25px !important;
         top: -13px;
         left: -6px;
-        background-image: url('../CuringTaskImg/other.png');
+        background-image: url('./Conservation/ConservationImg/icon_other2.png');
         background-size: 100% 100%;
     }
 
@@ -337,6 +374,37 @@
         z-index: 960;
         bottom: 62px;
         right: 44px;
+
+        .dashboard-gisTypeButSel {
+            width:123px;
+            height:48px;
+            border:1px solid rgba(97,245,171,1);
+            opacity:0.8;
+            background-image: url("./OnSiteImg/3selected.png");
+            text-align: center;
+            line-height: 48px;
+            display: inline-block;
+            font-size: 16px;
+            font-family: Source Han Sans CN;
+            font-weight: 500;
+            color:rgba(97,245,171,1);
+        }
+
+        .dashboard-gisTypeButUnSel {
+            width:123px;
+            height:48px;
+            opacity:0.3;
+            background-image: url("./OnSiteImg/2levitate.png");
+            width: 123px;
+            text-align: center;
+            opacity: 0.8;
+            line-height: 48px;
+            display: inline-block;
+            font-size: 16px;
+            font-family: Source Han Sans CN;
+            font-weight: 500;
+            color: rgba(60,248,247,1);
+        }
     }
 
     .dashboard-editPolygonLayout {
@@ -357,70 +425,6 @@
         background-color: #fff;
     }
 
-    .dashboard-menuSwitchSurvivalRateLayout {
-        position: absolute;
-        z-index: 960;
-        top: 350px;
-        right: 40px;
-        width: 76px;
-        height: 284px;
-        display: block;
-        background-image: url('../SurvivalRateImg/backGround.png');
-    }
-    .dashboard-rightMenuSurvivalRateImgLayout {
-        margin-left: 18px;
-        margin-top: -31px;
-    }
-
-    .dashboard-rightMenuSurvivalRateSelLayout {
-        margin-bottom: 10px;
-        display: inline-block;
-        background-image: url('../SurvivalRateImg/select.png');
-        background-size: 100% 100%;
-        width: 18px;
-        height: 18px;
-        margin-left: 4px;
-        margin-top: 6px;
-    }
-
-    .dashboard-rightMenuSurvivalRateUnSelLayout {
-        margin-bottom: 10px;
-        display: inline-block;
-        background-image: url('../SurvivalRateImg/unSelect.png');
-        background-size: 100% 100%;
-        width: 18px;
-        height: 18px;
-        margin-left: 4px;
-        margin-top: 6px;
-    }
-
-    .dashboard-menuSwitchRiskTypeLayout {
-        position: absolute;
-        z-index: 960;
-        top: 350px;
-        right: 40px;
-        width: 122px;
-        height: 122px;
-        display: block;
-        background-image: url('../RiskImg/background.png');
-    }
-
-    .dashboard-menuLabel {
-        display: inline-block;
-        position: relative;
-        width: 56px;
-        left: 7px;
-        bottom: 13px;
-    }
-
-    .dashboard-menuLabel1 {
-        display: inline-block;
-        position: relative;
-        width: 84px;
-        left: 7px;
-        bottom: 13px;
-    }
-
     .dashboard-menuSwitchRiskTypeDataLayout {
         margin-top: 20px;
     }
@@ -429,79 +433,6 @@
         margin-top: -31px;
     }
 
-    .dashboard-rightMenuRiskTypeSelLayout {
-        margin-bottom: 10px;
-        display: inline-block;
-        background-image: url('../RiskImg/select.png');
-        background-size: 100% 100%;
-        width: 18px;
-        height: 18px;
-        margin-left: 4px;
-        margin-top: 6px;
-    }
-
-    .dashboard-rightMenuRiskTypeUnSelLayout {
-        margin-bottom: 10px;
-        display: inline-block;
-        background-image: url('../RiskImg/unSelect.png');
-        background-size: 100% 100%;
-        width: 18px;
-        height: 18px;
-        margin-left: 4px;
-        margin-top: 6px;
-    }
-
-    .dashboard-menuSwitchCuringTaskTypeLayout {
-        position: absolute;
-        z-index: 960;
-        top: 350px;
-        right: 40px;
-        width: 144px;
-        height: 175px;
-        display: block;
-        background-image: url('../CuringTaskImg/background.png');
-    }
-
-    dashboard-menuSwitchCuringTaskTypeDataLayout {
-        margin-top: 20px;
-    }
-    .dashboard-rightMenuCuringTaskTypeImgLayout {
-        margin-left: 14px;
-        margin-top: -31px;
-    }
-
-    .dashboard-rightMenuCuringTaskTypeSelLayout {
-        margin-bottom: 10px;
-        display: inline-block;
-        background-image: url('../CuringTaskImg/select.png');
-        background-size: 100% 100%;
-        width: 18px;
-        height: 18px;
-        margin-left: 4px;
-        margin-top: 6px;
-    }
-
-    .dashboard-rightMenuCuringTaskTypeUnSelLayout {
-        margin-bottom: 10px;
-        display: inline-block;
-        background-image: url('../CuringTaskImg/unSelect.png');
-        background-size: 100% 100%;
-        width: 18px;
-        height: 18px;
-        margin-left: 4px;
-        margin-top: 6px;
-    }
-
-    .dashboard-menuSwitchTreePipeLayout {
-        position: absolute;
-        z-index: 960;
-        top: 350px;
-        right: 40px;
-        width: 225px;
-        height: 200px;
-        display: block;
-        background-image: url('../RiskImg/background.png');
-    }
     .dashboard-menuSwitchTreePipeBorder {
         border-bottom: 1px dashed #000;
         width: 205px;
@@ -569,37 +500,30 @@
         text-decoration: none;
     }
 
+    .ViewPopContentLayout {
+        background: #132224;
+        font-size: 14px;
+        font-family: Microsoft YaHei;
+        font-weight: 400;
+        color: #ffffff;
+        line-height: 40px;
+        width: 280px;
+        height: 440px;
+        width: 280px;
+        height: 405px;
+
+        .ViewPopContentLayout-firstText {
+            margin-top: 10px;
+        }
+
+        .h2 {
+            color: rgba(255,255,255,1);
+        }
+    }
+
     /*修改菜单边距*/
     .aside .ant-collapse-content {
         padding: 0 8px;
-    }
-    // 小班细班树
-    .dashboard-rightAreaMenu {
-        position: absolute;
-        right: 120px;
-        top: 40px;
-        height: 80%;
-        width: 260px;
-        transition: all 0.3s;
-        z-index: 980;
-
-        .dashboard-rightAreaMenu-aside {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            top: 0;
-            bottom: 0;
-            background-color: rgba(255,255,255, 0.9);
-            color: #333;
-            z-index: 999;
-            overflow-x: hidden;
-            overflow-y: auto;
-
-            .dashboard-rightAreaMenu-areaTree {
-                margin-top: 20px;
-                margin-left: 20px;
-            }
-        }
     }
 
     //视图管理模块

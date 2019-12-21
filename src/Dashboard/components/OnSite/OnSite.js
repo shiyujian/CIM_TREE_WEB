@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-12-19 14:48:44
+ * @Last Modified time: 2019-12-21 14:59:53
  */
 import React, { Component } from 'react';
 import {
@@ -17,11 +17,12 @@ import {
     Form
 } from 'antd';
 import L from 'leaflet';
+import Scrollbar from 'smooth-scrollbar';
 import './OnSite.less';
+import AreaTree from './Area/AreaTree';
 import RiskTree from './Risk/RiskTree';
 import TrackTree from './Track/TrackTree';
 import TreeTypeTree from './TreeType/TreeTypeTree';
-import OnSiteAreaTree from './OnSiteAreaTree';
 import TreeMessGisOnClickHandle from './TreeMess/TreeMessGisOnClickHandle';
 import CuringTaskTree from './Conservation/CuringTaskTree';
 import SurvivalRateTree from './SurvivalRate/SurvivalRateTree';
@@ -31,6 +32,8 @@ import TreePipePage from './TreePipe/TreePipePage';
 import AreaDistanceMeasure from './AreaDistanceMeasure/AreaDistanceMeasure';
 import ViewPositionManage from './MapCustom/ViewPositionManage';
 import DeviceTree from './Device/DeviceTree';
+import DataVIew from './DataView/DataVIew';
+
 import {
     fillAreaColor,
     handleAreaLayerData,
@@ -70,32 +73,8 @@ class OnSite extends Component {
     // 左侧菜单栏的Tree型数据
     options = [
         {
-            label: '巡检路线',
-            value: 'geojsonFeature_track'
-        },
-        {
-            label: '安全隐患',
-            value: 'geojsonFeature_risk'
-        },
-        // {
-        //     label: '树种筛选',
-        //     value: 'geojsonFeature_treetype'
-        // },
-        // {
-        //     label: '养护任务',
-        //     value: 'geojsonFeature_curingTask'
-        // },
-        {
-            label: '成活率',
-            value: 'geojsonFeature_survivalRate'
-        },
-        {
             label: '工程影像',
             value: 'geojsonFeature_projectPic'
-        },
-        {
-            label: '苗木结缘',
-            value: 'geojsonFeature_treeAdopt'
         }
     ];
 
@@ -106,9 +85,16 @@ class OnSite extends Component {
                 getCustomViewByUserID
             }
         } = this.props;
-        let user = getUser();
-        await getCustomViewByUserID({ id: user.ID });
-        await this.initMap();
+        try {
+            if (document.querySelector('#mapid')) {
+                Scrollbar.init(document.querySelector('#mapid'));
+            };
+            let user = getUser();
+            await getCustomViewByUserID({ id: user.ID });
+            await this.initMap();
+        } catch (e) {
+
+        }
     }
     /* 初始化地图 */
     initMap () {
@@ -463,12 +449,16 @@ class OnSite extends Component {
             menuTreeVisible,
             dashboardDataMeasurement,
             dashboardRightMenu,
+            dashboardDataView,
             dashboardFocus,
             platform: {
                 tabs = {},
                 tree = {}
             }
         } = this.props;
+        const {
+            mapLayerBtnType
+        } = this.state;
         let fullScreenState = '';
         if (tabs && tabs.fullScreenState) {
             fullScreenState = tabs.fullScreenState;
@@ -485,6 +475,7 @@ class OnSite extends Component {
                 <div
                     ref='appendBody'
                     className='dashboard-map r-main'
+                    id='onSiteDom'
                 >
                     <MenuSwitch {...this.props} {...this.state} map={this.map} />
                     <GetMenuTree {...this.props} {...this.state} />
@@ -511,18 +502,25 @@ class OnSite extends Component {
                     { // 右侧菜单当选择区域地块时，显示区域地块树
                         dashboardRightMenu && dashboardRightMenu === 'area'
                             ? (
-                                <div className='dashboard-rightAreaMenu'>
-                                    <aside className='dashboard-rightAreaMenu-aside' draggable='false'>
-                                        <div className='dashboard-rightAreaMenu-areaTree'>
-                                            <OnSiteAreaTree
-                                                {...this.props}
-                                                treeData={onSiteAreaTreeData || []}
-                                                // selectedKeys={this.state.areaEventKey}
-                                                onSelect={this._handleAreaSelect.bind(this)}
-                                            />
-                                        </div>
-                                    </aside>
-                                </div>
+                                <AreaTree
+                                    {...this.props}
+                                    {...this.state}
+                                    map={this.map}
+                                    treeData={onSiteAreaTreeData || []}
+                                    // selectedKeys={this.state.areaEventKey}
+                                    onSelect={this._handleAreaSelect.bind(this)}
+                                />
+                            ) : ''
+                    }
+                    {// 右侧菜单当选择区域地块时，显示区域地块树
+                        dashboardDataView && dashboardDataView === 'dataView'
+                            ? (
+                                <DataVIew
+                                    {...this.props}
+                                    {...this.state}
+                                    map={this.map}
+                                    treeData={onSiteAreaTreeData || []}
+                                />
                             ) : ''
                     }
                     { // 视图管理
@@ -620,26 +618,16 @@ class OnSite extends Component {
                     }
                     <div className='dashboard-gisTypeBut'>
                         <div>
-                            <Button
-                                type={
-                                    this.state.mapLayerBtnType
-                                        ? 'primary'
-                                        : 'default'
-                                }
+                            <a
                                 onClick={this.toggleTileLayer.bind(this, 1)}
-                            >
+                                className={mapLayerBtnType ? 'dashboard-gisTypeButSel' : 'dashboard-gisTypeButUnSel'}>
                                 卫星图
-                            </Button>
-                            <Button
-                                type={
-                                    this.state.mapLayerBtnType
-                                        ? 'default'
-                                        : 'primary'
-                                }
+                            </a>
+                            <a
                                 onClick={this.toggleTileLayer.bind(this, 2)}
-                            >
+                                className={mapLayerBtnType ? 'dashboard-gisTypeButUnSel' : 'dashboard-gisTypeButSel'}>
                                 地图
-                            </Button>
+                            </a>
                         </div>
                     </div>
                     <div>

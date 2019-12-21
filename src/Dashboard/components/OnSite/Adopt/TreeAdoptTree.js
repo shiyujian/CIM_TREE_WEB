@@ -54,6 +54,7 @@ export default class TreeAdoptTree extends Component {
             map
         } = this.props;
         if (map) {
+            map.panTo([38.9966207742691, 116.035585999489]);
             // 添加地图点击事件
             await map.on('click', this.handleAdoptTreeGisClickFunction);
             // 加载苗木结缘图层

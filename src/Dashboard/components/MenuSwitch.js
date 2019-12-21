@@ -14,8 +14,8 @@ import distributedSel from './MenuSwitchImg/distributed3.gif';
 import distributed from './MenuSwitchImg/distributed2.png';
 import constructionSel from './MenuSwitchImg/construction3.gif';
 import construction from './MenuSwitchImg/construction2.png';
-import defectSel from './MenuSwitchImg/defect3.gif';
-import defect from './MenuSwitchImg/defect2.png';
+import defectSel from './MenuSwitchImg/problem3.gif';
+import defect from './MenuSwitchImg/problem2.png';
 import monitorSel from './MenuSwitchImg/monitor3.gif';
 import monitor from './MenuSwitchImg/monitor2.png';
 import mechanicalSel from './MenuSwitchImg/mechanical3.gif';
@@ -28,7 +28,7 @@ import adoptSel from './MenuSwitchImg/adopt3.gif';
 import adopt from './MenuSwitchImg/adopt2.png';
 import migrateSel from './MenuSwitchImg/migrate3.gif';
 import migrate from './MenuSwitchImg/migrate2.png';
-import searchTopImg from './MenuSwitchImg/1.png';
+import searchTopImg from './MenuSwitchImg/search0.png';
 import searchRightImg from './MenuSwitchImg/2.png';
 
 // window = window || {};
@@ -59,7 +59,7 @@ export default class MenuSwitch extends Component {
             imgSel: constructionSel
         },
         {
-            label: '安全隐患',
+            label: '问题上报',
             value: 'geojsonFeature_risk',
             img: defect,
             imgSel: defectSel
@@ -361,6 +361,8 @@ export default class MenuSwitch extends Component {
         } = this.props;
         let target = e.target;
         let buttonID = target.getAttribute('id');
+        console.log('buttonID', buttonID);
+
         if (dashboardDataMeasurement === buttonID) {
             await switchDashboardDataMeasurement('');
             await switchAreaDistanceMeasureMenu('');
@@ -382,6 +384,22 @@ export default class MenuSwitch extends Component {
             await switchDashboardRightMenu('');
         } else {
             await switchDashboardRightMenu(buttonID);
+        }
+    }
+    // 数据看板
+    handleDataViewButton = async (e) => {
+        const {
+            actions: {
+                switchDashboardDataView
+            },
+            dashboardDataView
+        } = this.props;
+        let target = e.target;
+        let buttonID = target.getAttribute('id');
+        if (dashboardDataView === buttonID) {
+            await switchDashboardDataView('');
+        } else {
+            await switchDashboardDataView(buttonID);
         }
     }
     // 全屏展示
@@ -548,6 +566,7 @@ export default class MenuSwitch extends Component {
             dashboardMenuType,
             dashboardRightMenu,
             dashboardAreaTreeLayer,
+            dashboardDataView,
             dashboardDataMeasurement,
             dashboardFocus,
             dashboardTreeMess,
@@ -561,6 +580,7 @@ export default class MenuSwitch extends Component {
         }
         return (
             <div>
+                <div className='menuSwitch-mapCover' />
                 <a
                     id='fullScreen'
                     title='全屏展示'
@@ -705,10 +725,10 @@ export default class MenuSwitch extends Component {
                         </div> : ''
                 }
                 <div className='menuSwitch-menuSwitchRightLayout'>
-                    <a className={dashboardFocus === 'mapFoucs' ? 'menuSwitch-rightMenuMapFoucsButtonSelLayout' : 'menuSwitch-rightMenuMapFoucsButtonUnSelLayout'}
-                        id='mapFoucs'
-                        title='视图管理'
-                        onClick={this.handleMapFoucsButton.bind(this)} />
+                    <a className={dashboardRightMenu === 'area' ? 'menuSwitch-rightMenuAreaButtonSelLayout' : 'menuSwitch-rightMenuAreaButtonUnSelLayout'}
+                        id='area'
+                        title='区域地块'
+                        onClick={this.handleRightMenuButton.bind(this)} />
                     <a className={dashboardTreeMess === 'dashboardTreeMess' ? 'menuSwitch-rightMenuTreeMessButtonSelLayout' : 'menuSwitch-rightMenuTreeMessButtonUnSelLayout'}
                         id='dashboardTreeMess'
                         title='树木信息'
@@ -717,14 +737,14 @@ export default class MenuSwitch extends Component {
                         id='removeTileTreeLayerBasic'
                         title='图层控制'
                         onClick={this.handleTileTreeLayerBasicButton.bind(this)} />
-                    <a className={dashboardDataMeasurement === 'dataMeasurement' ? 'menuSwitch-rightMenuAreameasureButtonSelLayout' : 'menuSwitch-rightMenuAreameasureButtonUnSelLayout'}
+                    {/* <a className={dashboardDataMeasurement === 'dataMeasurement' ? 'menuSwitch-rightMenuAreameasureButtonSelLayout' : 'menuSwitch-rightMenuAreameasureButtonUnSelLayout'}
                         id='dataMeasurement'
                         title='数据测量'
-                        onClick={this.handleAreaMeasureButton.bind(this)} />
-                    <a className={dashboardRightMenu === 'area' ? 'menuSwitch-rightMenuAreaButtonSelLayout' : 'menuSwitch-rightMenuAreaButtonUnSelLayout'}
-                        id='area'
-                        title='区域地块'
-                        onClick={this.handleRightMenuButton.bind(this)} />
+                        onClick={this.handleAreaMeasureButton.bind(this)} /> */}
+                    <a className={dashboardDataView === 'dataView' ? 'menuSwitch-rightMenuDataViewButtonSelLayout' : 'menuSwitch-rightMenuDataViewButtonUnSelLayout'}
+                        id='dataView'
+                        title='数据看板'
+                        onClick={this.handleDataViewButton.bind(this)} />
                     {/* <a className={fullScreenState === 'fullScreen' ? 'menuSwitch-rightMenuFullscreenButtonSelLayout' : 'menuSwitch-rightMenuFullscreenButtonUnSelLayout'}
                         id='fullScreen'
                         title='全屏展示'

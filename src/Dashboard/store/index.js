@@ -7,7 +7,8 @@ import {
     SYSTEM_API,
     TREE_API,
     CURING_API,
-    GARDEN_API
+    GARDEN_API,
+    FOREST_API
 } from '_platform/api';
 const ID = 'dashboard';
 // 获取隐患列表
@@ -74,6 +75,8 @@ export const switchDashboardAreaTreeLayer = createAction(`${ID}切换二维展�
 export const switchDashboardDataMeasurement = createAction(`${ID}切换二维展示数据测量`);
 export const switchDashboardFocus = createAction(`${ID}切换二维展示聚焦初始位置`);
 export const switchDashboardTreeMess = createAction(`${ID}切换二维展示树木信息`);
+export const switchDashboardDataView = createAction(`${ID}切换二维展示数据看板按钮`);
+
 export const getAreaTreeLoading = createAction(`${ID}区域地块树加载loading`);
 export const getRiskTreeLoading = createAction(`${ID}安全隐患树加载loading`);
 export const getTrackTreeLoading = createAction(`${ID}巡检路线树加载loading`);
@@ -87,6 +90,26 @@ export const getDeviceTreeLoading = createAction(`${ID}机械设备树加载load
 export const getDeviceTree = createAction(`${ID}机械设备树数据`);
 export const getDeviceTreeDay = createAction(`${ID}机械设备树数据天`);
 
+// 获取今日人员投入
+export const getWorkMansbyday = forestFetchAction(`${GARDEN_API}/workmansbyday`, [], 'GET');
+// 获取今日机械投入
+export const getDeviceWorksbyday = forestFetchAction(`${GARDEN_API}/deviceworksbyday`, [], 'GET');
+// 获取人员每日进离场统计
+export const getStatworkmans = forestFetchAction(`${GARDEN_API}/statworkmans`, [], 'GET');
+// 根据类型获取苗木相关信息
+export const getTotalstat = forestFetchAction(`${FOREST_API}/bigdata/totalstat`, [], 'GET');
+// 根据标段获取天气相关信息
+export const getEnvs = forestFetchAction(`${GARDEN_API}/envs`, [], 'GET');
+// 根据标段获取机械相关信息
+export const getStatdevice4total = forestFetchAction(`${GARDEN_API}/statdevice4total`, [], 'GET');
+// 根据标段获取园林附属设施相关信息
+export const getGardentotalstat = forestFetchAction(`${FOREST_API}/bigdata/gardentotalstat`, [], 'GET');
+// 根据标段获取苗圃出圃进场统计
+export const getNurserytotal = forestFetchAction(`${TREE_API}/nurserytotal`, [], 'GET');
+// 获取今日定位统计
+export const getLocationStatByDay = forestFetchAction(`${TREE_API}/locationtotalstat`, [], 'GET');
+// 获取今日栽植统计
+export const getTreePlantStatByDay = forestFetchAction(`${TREE_API}/treestat`, [], 'GET');
 export const actions = {
     getRisk,
     getRiskContactSheet,
@@ -130,6 +153,7 @@ export const actions = {
     switchDashboardAreaTreeLayer,
     switchDashboardDataMeasurement,
     switchDashboardFocus,
+    switchDashboardDataView,
     switchDashboardTreeMess,
     getAreaTreeLoading,
     getRiskTreeLoading,
@@ -142,7 +166,18 @@ export const actions = {
     switchAreaDistanceMeasureMenu,
     getDeviceTreeDay,
     getDeviceTreeLoading,
-    getDeviceTree
+    getDeviceTree,
+
+    getWorkMansbyday,
+    getDeviceWorksbyday,
+    getStatworkmans,
+    getTotalstat,
+    getEnvs,
+    getStatdevice4total,
+    getGardentotalstat,
+    getNurserytotal,
+    getLocationStatByDay,
+    getTreePlantStatByDay
 };
 export default handleActions(
     {
@@ -258,6 +293,12 @@ export default handleActions(
             return {
                 ...state,
                 dashboardFocus: payload
+            };
+        },
+        [switchDashboardDataView]: (state, { payload }) => {
+            return {
+                ...state,
+                dashboardDataView: payload
             };
         },
         [switchDashboardTreeMess]: (state, { payload }) => {
