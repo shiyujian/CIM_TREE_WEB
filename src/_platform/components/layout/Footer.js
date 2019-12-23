@@ -23,6 +23,11 @@ export default class Footer extends Component {
                         {loadFooterCompany}
                     </a>
                 </span>
+                <div>
+                    <a href='http://www.beian.miit.gov.cn/' target='_Blank'>
+                        浙ICP备18040969号-4
+                    </a>
+                </div>
             </footer>
         );
     }

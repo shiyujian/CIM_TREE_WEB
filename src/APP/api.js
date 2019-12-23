@@ -12,7 +12,7 @@ import {tree_menus, tree_ignoreModules, tree_headLogo, tree_footerYear, tree_foo
 let static_menus = [];
 let static_ignoreModules = [];
 let static_headLogo;
-let static_footerYear = '2018';
+let static_footerYear = '2019';
 let static_footerCompany = '华东工程数字技术有限公司';
 
 if (__env__ == 'tree') {

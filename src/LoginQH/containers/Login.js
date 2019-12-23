@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions } from '../store/login';
 import { actions as platformActions } from '_platform/store/global';
+import {loadFooterYear, loadFooterCompany} from 'APP/api';
 import {
     Form,
     Input,
@@ -899,6 +900,19 @@ class Login extends Component {
                                 )
                         )
                     }
+                </div>
+                <div className='login-footer'>
+                    <div>
+                        <span>&copy;{loadFooterYear}&nbsp;</span>
+                        <span>
+                            {loadFooterCompany}
+                        </span>
+                    </div>
+                    <div>
+                        <a href='http://www.beian.miit.gov.cn/' target='_Blank' style={{color: 'white'}}>
+                            浙ICP备18040969号-4
+                        </a>
+                    </div>
                 </div>
             </div>
         );
