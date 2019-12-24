@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-12-21 17:45:27
+ * @Last Modified time: 2019-12-24 10:44:45
  */
 import React, { Component } from 'react';
 import {
@@ -68,13 +68,6 @@ class OnSite extends Component {
 
         this.map = null;
     }
-    // 左侧菜单栏的Tree型数据
-    options = [
-        {
-            label: '工程影像',
-            value: 'geojsonFeature_projectPic'
-        }
-    ];
 
     // 初始化地图，获取目录树数据
     componentDidMount = async () => {
@@ -84,9 +77,10 @@ class OnSite extends Component {
             }
         } = this.props;
         try {
-            if (document.querySelector('#mapid')) {
-                Scrollbar.init(document.querySelector('#mapid'));
-            };
+            // if (document.querySelector('#mapid')) {
+            //     Scrollbar.init(document.querySelector('#mapid'));
+            // };
+            // Scrollbar.initAll();
             let user = getUser();
             await getCustomViewByUserID({ id: user.ID });
             await this.initMap();
@@ -467,26 +461,41 @@ class OnSite extends Component {
                 >
                     <MenuSwitch {...this.props} {...this.state} map={this.map} />
                     <GetMenuTree {...this.props} {...this.state} />
-                    { // 左侧第二级菜单的树形结构
-                        menuTreeVisible
-                            ? (
-                                this.options.map(option => {
-                                    if (dashboardCompomentMenu === option.value) {
-                                        return (
-                                            <div className='dashboard-menuPanel' key={option.value}>
-                                                <aside className='dashboard-aside' draggable='false'>
-                                                    <div className='dashboard-asideTree'>
-                                                        {this.renderPanel(option)}
-                                                    </div>
-                                                </aside>
-                                            </div>
-                                        );
-                                    } else {
-                                        return '';
-                                    }
-                                })
-                            ) : ''
-                    }
+                    <div className='dashboard-gisTypeBut'>
+                        <div>
+                            <a
+                                onClick={this.toggleTileLayer.bind(this, 1)}
+                                className={
+                                    mapLayerBtnType
+                                        ? 'dashboard-gisTypeButSel'
+                                        : 'dashboard-gisTypeButUnSel'}>
+                                卫星图
+                            </a>
+                            <a
+                                onClick={this.toggleTileLayer.bind(this, 2)}
+                                className={
+                                    mapLayerBtnType
+                                        ? 'dashboard-gisTypeButUnSel'
+                                        : 'dashboard-gisTypeButSel'}>
+                                地图
+                            </a>
+                        </div>
+                    </div>
+                    <div>
+                        <div>
+                            <div
+                                id='mapid'
+                                style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    borderLeft: '1px solid #ccc'
+                                }}
+                            />
+                        </div>
+                    </div>
                     { // 右侧菜单当选择区域地块时，显示区域地块树
                         dashboardRightMenu && dashboardRightMenu === 'area'
                             ? (
@@ -604,35 +613,6 @@ class OnSite extends Component {
                                 />
                             ) : ''
                     }
-                    <div className='dashboard-gisTypeBut'>
-                        <div>
-                            <a
-                                onClick={this.toggleTileLayer.bind(this, 1)}
-                                className={mapLayerBtnType ? 'dashboard-gisTypeButSel' : 'dashboard-gisTypeButUnSel'}>
-                                卫星图
-                            </a>
-                            <a
-                                onClick={this.toggleTileLayer.bind(this, 2)}
-                                className={mapLayerBtnType ? 'dashboard-gisTypeButUnSel' : 'dashboard-gisTypeButSel'}>
-                                地图
-                            </a>
-                        </div>
-                    </div>
-                    <div>
-                        <div>
-                            <div
-                                id='mapid'
-                                style={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    borderLeft: '1px solid #ccc'
-                                }}
-                            />
-                        </div>
-                    </div>
                 </div>
             </div>
         );

@@ -322,11 +322,6 @@ export const genPopUpContent = (geo) => {
                         <h2><span>进场时间：</span>${properties.enterTime}</h2>
                         <h2><span>司机姓名：</span>${properties.contacter}</h2>
                         <h2><span>联系方式：</span>${properties.phone}</h2>
-                        <h2><span>设备照片：</span>
-                            <a href="javascript:;" class="btnViewDevicePic" data-id=${geo.key}>
-                            ${properties.images ? '查看' : ''}
-                            </a>
-                        </h2>
                         <h2><span>设备轨迹：</span>
                             <a href="javascript:;" class="btnViewDeviceTrack" data-id=${properties.carNo}>
                             ${!properties.trackStatus ? '查看' : ''}
@@ -334,6 +329,11 @@ export const genPopUpContent = (geo) => {
                         </h2>
                     </div>
                 </div>`;
+            //     <h2><span>设备照片：</span>
+            //     <a href="javascript:;" class="btnViewDevicePic" data-id=${geo.key}>
+            //     ${properties.images ? '查看' : ''}
+            //     </a>
+            // </h2>
         }
         default: {
             return null;
@@ -353,10 +353,6 @@ export const getIconType = (type) => {
             return 'dashboard-riskOtherIcon';
         case 'tree':
             return 'dashboard-treeIcon';
-        case 'realCuringTask':
-            return 'dashboard-curingTaskIcon';
-        case 'planCuringTask':
-            return 'dashboard-curingTaskIcon';
         case 'survivalRate':
             return 'dashboard-treeIcon';
         case 'adopt':

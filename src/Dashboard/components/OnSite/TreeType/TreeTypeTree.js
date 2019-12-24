@@ -359,7 +359,7 @@ export default class TreeTypeTree extends Component {
                     <img src={searchTopImg} style={{display: 'block'}} />
                     <Input placeholder='请输入树种或苗木编码'
                         id='searchInput'
-                        autocomplete='off'
+                        autoComplete='off'
                         onPressEnter={this.handleSearchTree.bind(this)}
                         className='TreeTypePage-searchInputLayout' />
                     <img src={searchRightImg} className='TreeTypePage-searchInputRightLayout' />

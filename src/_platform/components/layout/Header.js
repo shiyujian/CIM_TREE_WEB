@@ -102,7 +102,6 @@ export default class Header extends Component {
     // 进入全屏
     startFullScreen () {
         try {
-            console.log('aaaaaaaaa');
             var element = document.documentElement;
             // W3C
             if (element.requestFullscreen) {

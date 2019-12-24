@@ -430,7 +430,6 @@ export default class MenuSwitch extends Component {
     // 进入全屏
     startFullScreen () {
         try {
-            console.log('aaaaaaaaa');
             var element = document.documentElement;
             // W3C
             if (element.requestFullscreen) {
@@ -718,7 +717,7 @@ export default class MenuSwitch extends Component {
                             <img src={searchTopImg} style={{display: 'block'}} />
                             <Input placeholder='请输入苗木编码'
                                 id='searchInput'
-                                autocomplete='off'
+                                autoComplete='off'
                                 onPressEnter={this.handleSearchTreeLocation.bind(this)}
                                 className='menuSwitch-searchInputLayout' />
                             <img src={searchRightImg} className='menuSwitch-searchInputRightLayout' />
@@ -745,10 +744,6 @@ export default class MenuSwitch extends Component {
                         id='dataView'
                         title='数据看板'
                         onClick={this.handleDataViewButton.bind(this)} />
-                    {/* <a className={fullScreenState === 'fullScreen' ? 'menuSwitch-rightMenuFullscreenButtonSelLayout' : 'menuSwitch-rightMenuFullscreenButtonUnSelLayout'}
-                        id='fullScreen'
-                        title='全屏展示'
-                        onClick={this.handleFullScreenButton.bind(this)} /> */}
                 </div>
             </div>);
     }

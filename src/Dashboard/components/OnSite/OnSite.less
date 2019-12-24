@@ -2,11 +2,8 @@
     display: flex;
     position: absolute;
     top: 80px;
-    // width: calc(~'100% - 160px');
     width: 100%;
     height: 100%;
-    // height: calc(~'100% - 80px');
-    // left: 160px;
 
     .r-main {
         flex: 1 1 auto;
@@ -29,6 +26,7 @@
     position: absolute;
     width: 100%;
     height: 100%;
+    min-height: 940px;
 
     .r-main {
         flex: 1 1 auto;
@@ -88,34 +86,6 @@
         background: transparent;
         
     }
-
-    .dashboard-menuPanel {
-        position: absolute;
-        left: 330px;
-        top: 40px;
-        height: 80%;
-        width: 260px;
-        transition: all 0.3s;
-        z-index: 980;
-
-        .dashboard-aside {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            top: 0;
-            bottom: 0;
-            background-color: rgba(255,255,255, 0.9);
-            color: #333;
-            z-index: 999;
-            overflow-x: hidden;
-            overflow-y: auto;
-
-            .dashboard-asideTree {
-                margin-top: 20px;
-                margin-left: 20px;
-            }
-        }
-    }
     #mapid {
         cursor: pointer;
     }
@@ -126,7 +96,7 @@
         height: 26px !important;
         top: -5px;
         left: -4px;
-        background-image: url('../ImageIcon/people.png');
+        background-image: url('./OnSiteImg/people.png');
         background-size: 100% 100%;
     }
 
@@ -170,25 +140,6 @@
         background-size: 100% 100%;
     }
 
-    /*养护任务计划任务*/
-    .dashboard-curingPlanTaskIcon {
-        width: 25px !important;
-        height: 25px !important;
-        top: -13px;
-        left: -6px;
-        background-image: url('../ImageIcon/curingTask.png');
-        background-size: 100% 100%;
-    }
-
-    /*养护任务实际任务*/
-    .dashboard-curingTaskIcon {
-        width: 25px !important;
-        height: 25px !important;
-        top: -13px;
-        left: -6px;
-        background-image: url('../ImageIcon/curingTask.png');
-        background-size: 100% 100%;
-    }
     .dashboard-distanceMeasure-icon{
         font-size:15px;
         background-color: #fff0;
@@ -276,7 +227,7 @@
         height: 24px !important;
         top: -6px;
         left: -6px;
-        background-image: url('../ImageIcon/adopt.png');
+        background-image: url('./OnSiteImg/adopt.png');
         background-size: 100% 100%;
     }
     /*机械设备-挖掘机*/
@@ -407,57 +358,26 @@
         }
     }
 
-    .dashboard-editPolygonLayout {
-        position: absolute;
-        z-index: 960;
-        top: 40px;
-        left: 600px;
-    }
-    .dashboard-areaMeasureLayout {
-        position: absolute;
-        z-index: 960;
-        top: 40px;
-        height: 32px;
-        line-height: 32px;
-        left: 835px;
-        font-size: 20px;
-        color: #333333;
-        background-color: #fff;
-    }
-
-    .dashboard-menuSwitchRiskTypeDataLayout {
-        margin-top: 20px;
-    }
-    .dashboard-rightMenuRiskTypeImgLayout {
-        margin-left: 14px;
-        margin-top: -31px;
-    }
-
-    .dashboard-menuSwitchTreePipeBorder {
-        border-bottom: 1px dashed #000;
-        width: 205px;
-    }
-
     .ant-tree li .ant-tree-iconEle {
         width: 16px;
         height: 16px;
     }
 
     .ant-tree-iconEle {
-        // background: url("./ImageIcon/people.png") no-repeat;
+        // background: url("./OnSiteImg/people.png") no-repeat;
         background-size: cover;
     }
 
     .tr-people .ant-tree-iconEle {
-        background-image: url('../ImageIcon/people.png');
+        background-image: url('./OnSiteImg/people.png');
     }
 
     .tr-hazard .ant-tree-iconEle {
-        background-image: url('../ImageIcon/risk.png');
+        background-image: url('./OnSiteImg/risk.png');
     }
 
     .tr-area .ant-tree-iconEle {
-        background-image: url('../ImageIcon/area.png');
+        background-image: url('./OnSiteImg/area.png');
     }
 
     /*弹出框样式*/

@@ -54,11 +54,3 @@
     min-height: 200px;
     max-height: 300px;
 }
-
-.riskDetail .noImg{
-    width: 200px;
-    height: 200px;
-    margin: 20px auto;
-    background-image: url('../../ImageIcon/noImg.png');
-    background-size: cover;
-}
