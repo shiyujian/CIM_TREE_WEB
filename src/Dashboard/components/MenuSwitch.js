@@ -374,7 +374,8 @@ export default class MenuSwitch extends Component {
     handleRightMenuButton = async (e) => {
         const {
             actions: {
-                switchDashboardRightMenu
+                switchDashboardRightMenu,
+                switchDashboardDataView
             },
             dashboardRightMenu
         } = this.props;
@@ -384,13 +385,15 @@ export default class MenuSwitch extends Component {
             await switchDashboardRightMenu('');
         } else {
             await switchDashboardRightMenu(buttonID);
+            await switchDashboardDataView('');
         }
     }
     // 数据看板
     handleDataViewButton = async (e) => {
         const {
             actions: {
-                switchDashboardDataView
+                switchDashboardDataView,
+                switchDashboardRightMenu
             },
             dashboardDataView
         } = this.props;
@@ -400,6 +403,7 @@ export default class MenuSwitch extends Component {
             await switchDashboardDataView('');
         } else {
             await switchDashboardDataView(buttonID);
+            await switchDashboardRightMenu('');
         }
     }
     // 全屏展示
@@ -510,8 +514,12 @@ export default class MenuSwitch extends Component {
         const {
             actions: {
                 getTreeLocation
-            }
+            },
+            map
         } = this.props;
+        const {
+            treeTypeTreeMarkerLayer
+        } = this.state;
         console.log('event', event);
         console.log('event.keyCode', event.keyCode);
 
@@ -530,6 +538,9 @@ export default class MenuSwitch extends Component {
                 searchValue: ''
             });
         } else {
+            if (treeTypeTreeMarkerLayer) {
+                map.removeLayer(treeTypeTreeMarkerLayer);
+            }
             // 如果根据顺序码查到的数据不存在坐标，则树数据为空，同时没有坐标信息
             this.setState({
                 searchValue: value

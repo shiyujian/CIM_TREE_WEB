@@ -193,8 +193,10 @@ export default class TreeTypeTree extends Component {
                     }
                 });
                 console.log('keys', keys);
+                if (keys.length > 0) {
+                    await this.handleTreeTypeCheck(keys);
+                } else {
                 // 如果所搜索的数据非树种名称，则查看是否为顺序码
-                if (keys.length === 0 && value) {
                     let location = {};
                     let treeData = await getTreeLocation({sxm: value});
                     let treeMess = treeData && treeData.content && treeData.content[0];
@@ -203,9 +205,10 @@ export default class TreeTypeTree extends Component {
                         location.X = treeMess.X;
                         location.Y = treeMess.Y;
                         await this.treeTypeTreeLocation(location);
+                    } else {
+                        // 如果搜索的信息为空，则取消定位信息，同时展示所有的树种信息
+                        await this.treeTypeTreeCancelLocation();
                     }
-                } else {
-                    await this.handleTreeTypeCheck(keys);
                 }
             } else {
                 // 如果搜索的信息为空，则取消定位信息，同时展示所有的树种信息
