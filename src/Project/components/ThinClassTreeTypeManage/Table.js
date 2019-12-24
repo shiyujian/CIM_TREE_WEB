@@ -452,7 +452,11 @@ class Tablelevel extends Component {
                     this.onSearch();
                 });
             } else {
-                message.error('操作失败，请联系管理员查找失败原因');
+                if (rep.msg) {
+                    message.error(`${rep.msg}`);
+                } else {
+                    message.error('操作失败，请联系管理员查找失败原因');
+                }
             }
         });
     }
@@ -541,7 +545,11 @@ class Tablelevel extends Component {
                     dataListPlan: []
                 });
             } else {
-                message.error('操作失败，请联系管理员查找失败原因');
+                if (rep.msg) {
+                    message.error(`${rep.msg}`);
+                } else {
+                    message.error('操作失败，请联系管理员查找失败原因');
+                }
             }
         });
     }
@@ -560,7 +568,11 @@ class Tablelevel extends Component {
                     dataListPlan: []
                 });
             } else {
-                message.error('操作失败，请联系管理员查找失败原因');
+                if (rep.msg) {
+                    message.error(`${rep.msg}`);
+                } else {
+                    message.error('操作失败，请联系管理员查找失败原因');
+                }
             }
         });
     }
@@ -577,7 +589,11 @@ class Tablelevel extends Component {
                     dataListPlan: []
                 });
             } else {
-                message.error('操作失败，请联系管理员查找失败原因');
+                if (rep.msg) {
+                    message.error(`${rep.msg}`);
+                } else {
+                    message.error('操作失败，请联系管理员查找失败原因');
+                }
             }
         });
     }
@@ -666,7 +682,11 @@ class Tablelevel extends Component {
             if (rep.code === 1) {
                 message.success('该次上传的数据已全部删除，请刷新网页获取最新数据');
             } else {
-                message.error('删除失败，请联系管理员查找失败原因');
+                if (rep.msg) {
+                    message.error(`${rep.msg}`);
+                } else {
+                    message.error('操作失败，请联系管理员查找失败原因');
+                }
             }
             this.getDataHistory();
             this.onSearch();
