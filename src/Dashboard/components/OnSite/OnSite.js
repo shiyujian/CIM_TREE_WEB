@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-12-24 10:44:45
+ * @Last Modified time: 2019-12-24 20:53:32
  */
 import React, { Component } from 'react';
 import {
@@ -85,7 +85,7 @@ class OnSite extends Component {
             await getCustomViewByUserID({ id: user.ID });
             await this.initMap();
         } catch (e) {
-
+            console.log('componentDidMount', e);
         }
     }
     /* 初始化地图 */
@@ -108,15 +108,15 @@ class OnSite extends Component {
             mapInitialization.attributionControl = false;
             this.map = L.map('mapid', mapInitialization);
             this.tileLayer = L.tileLayer(TILEURLS[1], {
-                subdomains: [1, 2, 3], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
+                subdomains: [3], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
                 minZoom: 1,
                 maxZoom: 17,
                 zoomOffset: 1
             }).addTo(this.map);
             // 地图上边的地点的名称
             L.tileLayer(WMSTILELAYERURL, {
-                subdomains: [1, 2, 3],
-                minZoom: 10,
+                subdomains: [3],
+                minZoom: 1,
                 maxZoom: 17,
                 zoomOffset: 1
             }).addTo(this.map);
@@ -260,22 +260,6 @@ class OnSite extends Component {
         } = this.state;
         for (let i in realThinClassLayerList) {
             this.map.removeLayer(realThinClassLayerList[i]);
-        }
-    }
-    /* 渲染菜单panel */
-    renderPanel (option) {
-        if (option && option.value) {
-            switch (option.value) {
-                // 苗木结缘
-                case 'geojsonFeature_treeAdopt':
-                    return (
-                        <TreeAdoptTree
-                            {...this.props}
-                            {...this.state}
-                            map={this.map}
-                        />
-                    );
-            }
         }
     }
     // 细班选择处理

@@ -41,8 +41,12 @@ class Tablelevel extends Component {
             dataIndex: 'actions',
             key: '4',
             render: (text, record) => {
-                return '/';
-                return <a onClick={this.toDelete.bind(this, record)}>解 除</a>;
+                const user = getUser();
+                if (user && user.username && user.username === 'admin') {
+                    return <a onClick={this.toDelete.bind(this, record)}>解 除</a>;
+                } else {
+                    return '/';
+                }
             }
         }
     ]

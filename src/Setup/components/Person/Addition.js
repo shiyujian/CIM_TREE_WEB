@@ -16,7 +16,7 @@ const { Option, OptGroup } = Select;
 
 const RealName = (addition) => {
     return new Promise((resolve) => {
-        fetch(`http://idcert.market.alicloudapi.com/idcard?idCard=${addition.idNum}&name=${addition.FullName}`, {
+        fetch(`https://idcert.market.alicloudapi.com/idcard?idCard=${addition.idNum}&name=${addition.FullName}`, {
             headers: {
                 'Authorization': 'APPCODE ' + 'c091fa7360bc48ff87a3471f028d5645'
             }

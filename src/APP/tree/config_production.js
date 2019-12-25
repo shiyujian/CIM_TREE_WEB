@@ -23,40 +23,33 @@
 window.config = {
     /** *********************公共资源服务**************************/
     // 基础服务域名
-    DOMAIN: 'http://39.97.163.176',
-    // 测试库接口地址
-    // DOMAIN: 'http://39.97.163.176:6510',
-    // 林总用户接口地址
-    SDOMAIN: 'http://www.xazhyl.com',
+    DOMAIN: 'https://www.xaqnxl.com',
+    // 园林接口地址
+    SDOMAIN: 'https://www.xazhyl.com',
     // 二维展示根据坐标获取树木顺序码端口
-    DASHBOARD_ONSITE: 'http://39.96.47.88:8080',
-    // 灌溉接口
-    PIPE: 'http://39.97.163.176:809',
+    DASHBOARD_ONSITE: 'https://tree.imrforest.com:8082',
     // 林总图片新接口
     ALIIMG: 'https://xatree-1.oss-cn-qingdao.aliyuncs.com',
 
     // 高德地图逆地理编码
     LBSAMAP: 'https://restapi.amap.com',
-    // 腾讯移动分析
-    TENCENTANALYSIS: 'http://39.97.163.176',
     // 地图瓦片地址
     WMSTileLayerUrl:
-        // 'http://t{s}.tianditu.gov.cn/cva_c/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=cva&tileMatrixSet=c&TileMatrix={z}&TileRow={y}&TileCol={x}&style=default&format=tiles&tk=87c942f4f4a2b17270f52f797df4537c',
-        'http://t{s}.tianditu.com/cia_c/wmts?layer=cia&style=default&tilematrixset=c&Service=WMTS&Request=GetTile&Version=1.0.0&Format=tiles&TileMatrix={z}&TileCol={x}&TileRow={y}&tk=87c942f4f4a2b17270f52f797df4537c',
+        // 'https://t{s}.tianditu.gov.cn/cva_c/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=cva&tileMatrixSet=c&TileMatrix={z}&TileRow={y}&TileCol={x}&style=default&format=tiles&tk=87c942f4f4a2b17270f52f797df4537c',
+        'https://t{s}.tianditu.com/cia_c/wmts?layer=cia&style=default&tilematrixset=c&Service=WMTS&Request=GetTile&Version=1.0.0&Format=tiles&TileMatrix={z}&TileCol={x}&TileRow={y}&tk=87c942f4f4a2b17270f52f797df4537c',
     IMG_W:
-        // 'http://t{s}.tianditu.gov.cn/img_c/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=c&TileMatrix={z}&TileRow={y}&TileCol={x}&style=default&format=tiles&tk=87c942f4f4a2b17270f52f797df4537c',
-        'http://t{s}.tianditu.com/img_c/wmts?layer=img&style=default&tilematrixset=c&Service=WMTS&Request=GetTile&Version=1.0.0&Format=tiles&TileMatrix={z}&TileCol={x}&TileRow={y}&tk=87c942f4f4a2b17270f52f797df4537c',
+        // 'https://t{s}.tianditu.gov.cn/img_c/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=c&TileMatrix={z}&TileRow={y}&TileCol={x}&style=default&format=tiles&tk=87c942f4f4a2b17270f52f797df4537c',
+        'https://t{s}.tianditu.com/img_c/wmts?layer=img&style=default&tilematrixset=c&Service=WMTS&Request=GetTile&Version=1.0.0&Format=tiles&TileMatrix={z}&TileCol={x}&TileRow={y}&tk=87c942f4f4a2b17270f52f797df4537c',
     VEC_W:
-        // 'http://t{s}.tianditu.gov.cn/vec_c/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=vec&tileMatrixSet=c&TileMatrix={z}&TileRow={y}&TileCol={x}&style=default&format=tiles&tk=87c942f4f4a2b17270f52f797df4537c',
-        'http://t{s}.tianditu.com/vec_c/wmts?layer=vec&style=default&tilematrixset=c&Service=WMTS&Request=GetTile&Version=1.0.0&Format=tiles&TileMatrix={z}&TileCol={x}&TileRow={y}&tk=87c942f4f4a2b17270f52f797df4537c',
-
-    IMG_1: 'http://39.97.163.176:200/1',
-    IMG_2: 'http://39.97.163.176:200/2',
-    IMG_3: 'http://39.97.163.176:200/3',
-    IMG_4: 'http://39.97.163.176:200/4',
-    IMG_5: 'http://39.97.163.176:200/5',
-    IMG_6: 'http://39.97.163.176:200/6',
-    IMG_7: 'http://39.97.163.176:200/7',
+        // 'https://t{s}.tianditu.gov.cn/vec_c/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=vec&tileMatrixSet=c&TileMatrix={z}&TileRow={y}&TileCol={x}&style=default&format=tiles&tk=87c942f4f4a2b17270f52f797df4537c',
+        'https://t{s}.tianditu.com/vec_c/wmts?layer=vec&style=default&tilematrixset=c&Service=WMTS&Request=GetTile&Version=1.0.0&Format=tiles&TileMatrix={z}&TileCol={x}&TileRow={y}&tk=87c942f4f4a2b17270f52f797df4537c',
+    IMG_1: 'https://www.xaqnxl.com:200/1',
+    IMG_2: 'https://www.xaqnxl.com:200/2',
+    IMG_3: 'https://www.xaqnxl.com:200/3',
+    IMG_4: 'https://www.xaqnxl.com:200/4',
+    IMG_5: 'https://www.xaqnxl.com:200/5',
+    IMG_6: 'https://www.xaqnxl.com:200/6',
+    IMG_7: 'https://www.xaqnxl.com:200/7',
 
     /** *********************单模块资源服务**************************/
     // 智慧森林
@@ -70,7 +63,8 @@ window.config = {
         // center: [30.2528290000, 120.0177300000], // 华东院
         zoomControl: false,
         zoom: 13,
-        minZoom: 10
+        minZoom: 10,
+        editable: true
     },
     XACompanyInitLeaflet: {
         // center: [39.029373914931, 115.893481987848], // 小白楼
@@ -78,7 +72,8 @@ window.config = {
         // center: [39.048904, 115.884522],
         zoomControl: false,
         zoom: 15,
-        minZoom: 10
+        minZoom: 10,
+        editable: true
     },
     // 个人考勤的上下班时间，如果当前的部门未配置的话拿此上下班时间，用[--]分开，此处必须配置
     IN_OFF_DUTY: '08:30:00--18:00:00'

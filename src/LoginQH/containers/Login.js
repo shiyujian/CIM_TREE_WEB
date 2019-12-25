@@ -302,7 +302,7 @@ class Login extends Component {
             setTimeout(() => {
                 window.localStorage.clear();
                 let href = window.location.href;
-                if (href.indexOf('http://www.xaqnxl.com' !== -1)) {
+                if (href.indexOf('www.xaqnxl.com' !== -1)) {
                     history.replace('/login');
                     Notification.warning({
                         message: '验证已过期，请重新登录',

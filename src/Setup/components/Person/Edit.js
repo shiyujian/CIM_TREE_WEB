@@ -18,7 +18,7 @@ const TreeNode = TreeSelect.TreeNode;
 
 const RealName = (value) => {
     return new Promise((resolve) => {
-        fetch(`http://idcert.market.alicloudapi.com/idcard?idCard=${value.idNum}&name=${value.FullName}`, {
+        fetch(`https://idcert.market.alicloudapi.com/idcard?idCard=${value.idNum}&name=${value.FullName}`, {
             headers: {
                 'Authorization': 'APPCODE ' + 'c091fa7360bc48ff87a3471f028d5645'
             }

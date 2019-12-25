@@ -398,7 +398,7 @@ export default class DataView extends Component {
 
                             </div>
                             <div className='DataViewPage-aside-dataView'>
-                                <div>
+                                {/* <div>
                                     <div className='DataViewPage-MenuNameLayout'>
                                         <img src={decoration} />
                                         <span className='DataViewPage-MenuName'>重要检测</span>
@@ -427,7 +427,7 @@ export default class DataView extends Component {
                                             }
                                         </div>
                                     </div>
-                                </div>
+                                </div> */}
 
                                 <div>
                                     <div className='DataViewPage-aside-statisLayout'>

@@ -175,13 +175,15 @@ export default class MenuSwitch extends Component {
             dashboardTreeMess,
             dashboardRightMenu,
             dashboardFocus,
+            dashboardDataView,
             actions: {
                 switchDashboardTreeMess,
                 switchDashboardDataMeasurement,
                 switchAreaDistanceMeasureMenu,
                 switchDashboardAreaTreeLayer,
                 switchDashboardRightMenu,
-                switchDashboardFocus
+                switchDashboardFocus,
+                switchDashboardDataView
             }
         } = this.props;
         // 选择成活率，苗木结缘时，不能够点击树木信息开关
@@ -193,37 +195,50 @@ export default class MenuSwitch extends Component {
                 await switchDashboardTreeMess('');
             }
         }
-        // 选择了数据测量，就需要取消树木信息和区域地块，视图管理
-        if (dashboardDataMeasurement &&
-            dashboardDataMeasurement === 'dataMeasurement' &&
-            dashboardDataMeasurement !== prevProps.dashboardDataMeasurement) {
-            await switchDashboardTreeMess('');
-            await switchDashboardRightMenu('');
-            await switchDashboardFocus('');
-        }
-        // 选择了树木信息，就需要取消数据测量和区域地块，视图管理
-        if (dashboardTreeMess && dashboardTreeMess === 'dashboardTreeMess' &&
-            dashboardTreeMess !== prevProps.dashboardTreeMess) {
-            await switchDashboardDataMeasurement('');
-            await switchAreaDistanceMeasureMenu('');
-            await switchDashboardRightMenu('');
-            await switchDashboardFocus('');
-        }
-        // 选择了树木信息，就需要取消数据测量和区域地块，视图管理
+        // 选择了区域地块，取消数据测量和树木信息，视图管理
         if (dashboardRightMenu && dashboardRightMenu === 'area' &&
             dashboardRightMenu !== prevProps.dashboardRightMenu) {
             await switchDashboardDataMeasurement('');
             await switchAreaDistanceMeasureMenu('');
             await switchDashboardTreeMess('');
             await switchDashboardFocus('');
+            await switchDashboardDataView('');
         }
-        // 选择了视图管理，就需要取消数据测量和区域地块，树木信息
+        // 选择了树木信息，取消数据测量和区域地块，视图管理
+        if (dashboardTreeMess && dashboardTreeMess === 'dashboardTreeMess' &&
+            dashboardTreeMess !== prevProps.dashboardTreeMess) {
+            await switchDashboardDataMeasurement('');
+            await switchAreaDistanceMeasureMenu('');
+            await switchDashboardRightMenu('');
+            await switchDashboardFocus('');
+            await switchDashboardDataView('');
+        }
+        // 选择了树木信息，取消数据测量和区域地块，视图管理
+        if (dashboardDataView && dashboardDataView === 'dataView' &&
+            dashboardDataView !== prevProps.dashboardDataView) {
+            await switchDashboardDataMeasurement('');
+            await switchAreaDistanceMeasureMenu('');
+            await switchDashboardRightMenu('');
+            await switchDashboardFocus('');
+            await switchDashboardTreeMess('');
+        }
+        // 选择了数据测量，取消树木信息和区域地块，视图管理
+        if (dashboardDataMeasurement &&
+            dashboardDataMeasurement === 'dataMeasurement' &&
+            dashboardDataMeasurement !== prevProps.dashboardDataMeasurement) {
+            await switchDashboardTreeMess('');
+            await switchDashboardRightMenu('');
+            await switchDashboardFocus('');
+            await switchDashboardDataView('');
+        }
+        // 选择了视图管理，取消数据测量和区域地块，树木信息
         if (dashboardFocus && dashboardFocus === 'mapFoucs' &&
             dashboardFocus !== prevProps.dashboardFocus) {
             await switchDashboardDataMeasurement('');
             await switchAreaDistanceMeasureMenu('');
             await switchDashboardTreeMess('');
             await switchDashboardRightMenu('');
+            await switchDashboardDataView('');
         }
         // 选择成活率，树种筛选，辅助验收，苗木结缘, 灌溉管网时，不能够点击图层控制开关
         if (dashboardCompomentMenu &&
@@ -374,8 +389,7 @@ export default class MenuSwitch extends Component {
     handleRightMenuButton = async (e) => {
         const {
             actions: {
-                switchDashboardRightMenu,
-                switchDashboardDataView
+                switchDashboardRightMenu
             },
             dashboardRightMenu
         } = this.props;
@@ -385,15 +399,13 @@ export default class MenuSwitch extends Component {
             await switchDashboardRightMenu('');
         } else {
             await switchDashboardRightMenu(buttonID);
-            await switchDashboardDataView('');
         }
     }
     // 数据看板
     handleDataViewButton = async (e) => {
         const {
             actions: {
-                switchDashboardDataView,
-                switchDashboardRightMenu
+                switchDashboardDataView
             },
             dashboardDataView
         } = this.props;
@@ -403,7 +415,6 @@ export default class MenuSwitch extends Component {
             await switchDashboardDataView('');
         } else {
             await switchDashboardDataView(buttonID);
-            await switchDashboardRightMenu('');
         }
     }
     // 全屏展示

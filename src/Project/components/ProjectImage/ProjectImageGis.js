@@ -68,14 +68,14 @@ export default class ProjectImageGis extends Component {
         this.map = L.map('mapid', mapInitialization);
 
         this.imgTileLayer = L.tileLayer(TILEURLS[1], {
-            subdomains: [1, 2, 3], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
+            subdomains: [3], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
             minZoom: 10,
             maxZoom: 17,
             zoomOffset: 1
         }).addTo(this.map);
 
         this.cvaTileLayer = L.tileLayer(`${WMSTILELAYERURL}`, {
-            subdomains: [1, 2, 3],
+            subdomains: [3],
             minZoom: 10,
             maxZoom: 17,
             zoomOffset: 1
@@ -97,14 +97,14 @@ export default class ProjectImageGis extends Component {
         this.map2 = L.map('mapid2', mapInitialization);
 
         this.imgTileLayer = L.tileLayer(TILEURLS[1], {
-            subdomains: [1, 2, 3], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
+            subdomains: [3], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
             minZoom: 10,
             maxZoom: 17,
             zoomOffset: 1
         }).addTo(this.map2);
 
         this.cvaTileLayer = L.tileLayer(`${WMSTILELAYERURL}`, {
-            subdomains: [1, 2, 3],
+            subdomains: [3],
             minZoom: 10,
             maxZoom: 17,
             zoomOffset: 1

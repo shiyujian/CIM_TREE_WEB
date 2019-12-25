@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-12-21 10:41:43
+ * @Last Modified time: 2019-12-24 17:36:23
  */
 /**
  *
@@ -65,15 +65,11 @@ export const IN_OFF_DUTY_API = `${window.config.IN_OFF_DUTY}`;
 export const FOREST_GIS_API = window.config.DASHBOARD_ONSITE;
 export const XACOMPANYINITLEAFLET_API = window.config.XACompanyInitLeaflet;
 export const INITLEAFLET_API = window.config.initLeaflet;
-export const TREEPIPE_API = `${window.config.PIPE}`;
+export const TREEPIPE_API = `${DOMAIN}:809`;
 export const WMSTILELAYERURL = window.config.WMSTileLayerUrl;
 export const TILEURLS = {
     1: window.config.IMG_W,
     2: window.config.VEC_W
-};
-export const AMAPTILEURLS = {
-    1: window.config.AMAP_W,
-    2: window.config.AMAP_R
 };
 // 静态资源文件服务
 export const STATIC_PREVIEW_API = `${DOMAIN}`;
@@ -120,7 +116,7 @@ export const SHAPEUPLOAD_API = `${DOMAIN}/ShapeUploadHandler.ashx`;
 export const LBSAMAP_API = window.config.LBSAMAP;
 export const LBSAMAP_KEY = '8325164e247e15eea68b59e89200988b';
 // 腾讯移动分析
-export const TENCENTANALYSIS_API = window.config.TENCENTANALYSIS;
+export const TENCENTANALYSIS_API = `${DOMAIN}`;
 
 /** *********************静态常量**************************/
 export const ORGTYPE = [
