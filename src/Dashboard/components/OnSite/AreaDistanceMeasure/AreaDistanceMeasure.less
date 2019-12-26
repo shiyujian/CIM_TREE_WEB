@@ -16,31 +16,27 @@
         width: 100%;
         top: 0;
         bottom: 0;
-        background-color: rgba(255,255,255, 0.9);
         color: #333;
         z-index: 999;
         overflow-x: hidden;
         overflow-y: hidden;
+        background: rgba(19,34,36,0.8);
 
         // 未选中  数据测量图片的背景
         .AreaDistanceMeasure-rightDataMeasureMenu-back-Unselect {
-            height: 44px;
-            line-height: 44px;
+            height: 64px;
+            width: 64px;
+            line-height: 64px;
             display: block;
             text-align: center;
-            width: 44px;
-            margin: 5px;
-            background-color: #fff; // 背景的颜色
         }
         // 选中  数据测量图片的背景
         .AreaDistanceMeasure-rightDataMeasureMenu-back-Select {
-            height: 40px;
-            line-height: 40px;
+            height: 64px;
+            width: 64px;
+            line-height: 64px;
             display: block;
             text-align: center;
-            width: 44px;
-            margin: 5px;
-            background-color: #1793ff; // 背景的颜色
         }
         // 数据测量图片的设置
         .AreaDistanceMeasure-rightDataMeasureMenu-clickImg {
@@ -48,6 +44,8 @@
         }
     }
 }
+
+
 .AreaDistanceMeasure-editPolygonLayout {
     position: absolute;
     z-index: 960;
@@ -64,4 +62,27 @@
     font-size: 20px;
     color: #333333;
     background-color: #fff;
+}
+
+.AreaDistanceMeasure-measureNumLayout {
+    position: absolute;
+    z-index: 960;
+    top: 45px;
+    right: calc(~'50% - 200px');;
+    width:400px;
+    height:60px;
+
+    .AreaDistanceMeasure-measureNumText {
+        background-image: url("./MeasureImg/pop-ups.png");
+        width: 100%;
+        height: 100%;
+        font-size:16px;
+        font-family:Source Han Sans CN;
+        font-weight:500;
+        color:rgba(255,255,255,1);
+        line-height:60px;
+        display: block;
+        text-align: center;
+        opacity:0.8;
+    }
 }

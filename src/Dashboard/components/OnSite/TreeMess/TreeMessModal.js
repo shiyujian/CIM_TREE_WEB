@@ -878,14 +878,17 @@ class TreeMessModal extends Component {
                                         {
                                             tabSelect === 'conservation'
                                                 ? <div style={{ width: 450 }}>
-                                                    <div>
-                                                        <span className='TreeMessPage-aside-Mess-title'>
-                                                            顺序码:
-                                                            <span className='TreeMessPage-aside-Mess-text'>
-                                                                {treeMess.sxm ? treeMess.sxm : ''}
-                                                            </span>
-                                                        </span>
-                                                    </div>
+                                                    {
+                                                        curingMess.length > 0
+                                                            ? <div>
+                                                                <span className='TreeMessPage-aside-Mess-title'>
+                                                                    顺序码:
+                                                                    <span className='TreeMessPage-aside-Mess-text'>
+                                                                        {treeMess.sxm ? treeMess.sxm : ''}
+                                                                    </span>
+                                                                </span>
+                                                            </div> : ''
+                                                    }
                                                     {
                                                         curingMess.length > 0
                                                             ? curingMess.map((curing) => {

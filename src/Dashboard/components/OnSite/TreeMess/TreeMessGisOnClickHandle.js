@@ -215,13 +215,14 @@ export default class TreeMessGisOnClickHandle extends Component {
                 getNurserys,
                 getCarpackbysxm,
                 getTreeMess,
+                getTreeLocationCoord,
+                getLocationNameByCoordinate,
                 getCuringTreeInfo,
                 getCuringTypes,
                 getCuringMessage,
                 getUserDetail,
-                getParentOrgTreeByID,
-                getTreeLocationCoord,
-                getLocationNameByCoordinate
+                getParentOrgTreeByID
+                // 园林
             },
             platform: {
                 tree = {}
@@ -238,6 +239,8 @@ export default class TreeMessGisOnClickHandle extends Component {
             let queryTreeData = await getTreeMess(postdata);
             if (!queryTreeData) {
                 queryTreeData = {};
+                await this.getTreeMessDataGarden(data, x, y);
+                return;
             }
             let treeflowDatas = {};
             // 树木审批流程信息
@@ -353,6 +356,163 @@ export default class TreeMessGisOnClickHandle extends Component {
             }
             let flowMess = treeflowData;
             let curingMess = await getCuringMess(curingTaskData, curingTypeArr, getCuringMessage);
+            this.setState({
+                seedlingMess,
+                treeMess,
+                flowMess,
+                curingMess
+            });
+        } catch (e) {
+            console.log('getTreeMessData', e);
+        }
+    }
+
+    // 获取园林树木详情信息
+    getTreeMessDataGarden = async (data, x, y) => {
+        const {
+            actions: {
+                getLocationNameByCoordinate,
+                getTreeflowsGarden,
+                getNurserysGarden,
+                getCarpackbysxmGarden,
+                getTreeMessGarden,
+                getTreeLocationCoordGarden,
+                getCuringTreeInfoGarden,
+                getCuringTypesGarden,
+                getCuringMessageGarden,
+                getUserDetailGarden,
+                getParentOrgTreeByIDGarden
+            },
+            platform: {
+                tree = {}
+            },
+            curingTypes
+        } = this.props;
+        try {
+            let postdata = {
+                sxm: data.features[0].properties.SXM
+                // sxm: 'CQL7857'
+            };
+            let totalThinClass = tree.totalThinClass || [];
+            let bigTreeList = (tree && tree.bigTreeList) || [];
+            let queryTreeData = await getTreeMessGarden(postdata);
+            if (!queryTreeData) {
+                queryTreeData = {};
+            }
+            let treeflowDatas = {};
+            // 树木审批流程信息
+            treeflowDatas = await getTreeflowsGarden({}, postdata);
+            // 苗圃数据
+            let nurserysDatas = await getNurserysGarden({}, postdata);
+            // 车辆打包数据
+            let carData = await getCarpackbysxmGarden(postdata);
+            // 养护树木信息
+            let curingTreeData = await getCuringTreeInfoGarden({}, postdata);
+            // 获取树的地理坐标信息
+            let treeLocationData = await getTreeLocationCoordGarden(postdata);
+
+            let curingTypeArr = [];
+            if (!curingTypes) {
+                let curingTypesData = await getCuringTypesGarden();
+                curingTypeArr = curingTypesData && curingTypesData.content;
+            } else {
+                curingTypeArr = curingTypes;
+            };
+
+            let SmallClassName = queryTreeData.SmallClass
+                ? queryTreeData.SmallClass + '号小班'
+                : '';
+            let ThinClassName = queryTreeData.ThinClass
+                ? queryTreeData.ThinClass + '号细班'
+                : '';
+            // 获取小班细班名称
+            if (queryTreeData && queryTreeData.Section && queryTreeData.SmallClass && queryTreeData.ThinClass) {
+                let sections = queryTreeData.Section.split('-');
+                let No =
+                    sections[0] +
+                    '-' +
+                    sections[1] +
+                    '-' +
+                    queryTreeData.SmallClass +
+                    '-' +
+                    queryTreeData.ThinClass;
+                let regionData = getThinClassName(No, queryTreeData.Section, totalThinClass, bigTreeList);
+                SmallClassName = regionData.SmallName;
+                ThinClassName = regionData.ThinName;
+            }
+
+            let treeflowData = [];
+            let nurserysData = {};
+            let curingTaskData = [];
+            let curingTaskArr = [];
+            if (
+                treeflowDatas && treeflowDatas.content && treeflowDatas.content instanceof Array &&
+                treeflowDatas.content.length > 0
+            ) {
+                treeflowData = treeflowDatas.content;
+            }
+            if (
+                nurserysDatas && nurserysDatas.content && nurserysDatas.content instanceof Array &&
+                nurserysDatas.content.length > 0
+            ) {
+                nurserysData = nurserysDatas.content[0];
+            }
+            if (
+                curingTreeData && curingTreeData.content && curingTreeData.content instanceof Array &&
+                curingTreeData.content.length > 0
+            ) {
+                let content = curingTreeData.content;
+                content.map((task) => {
+                    if (curingTaskArr.indexOf(task.CuringID) === -1) {
+                        curingTaskData.push(task);
+                        curingTaskArr.push(task.CuringID);
+                    }
+                });
+            }
+            // 根据苗圃的起苗坐标获取起苗地址
+            let nurserysAddressData = await handleGetAddressByCoordinate(nurserysData.location, getLocationNameByCoordinate);
+            let nurserysAddressName = (nurserysAddressData && nurserysAddressData.regeocode && nurserysAddressData.regeocode.formatted_address) || '';
+            nurserysData.nurserysAddressName = nurserysAddressName;
+            // 根据树木的定位坐标获取定位地址
+            let location = '';
+            if (treeLocationData && treeLocationData.X && treeLocationData.Y) {
+                location = `${treeLocationData.X},${treeLocationData.Y}`;
+            }
+            queryTreeData.locationCoord = location;
+            // let treeAddressData = await handleGetAddressByCoordinate(location, getLocationNameByCoordinate);
+            // let queryTreeAddressName = (treeAddressData && treeAddressData.regeocode && treeAddressData.regeocode.formatted_address) || '';
+            // queryTreeData.queryTreeAddressName = queryTreeAddressName;
+
+            let seedlingMess = getSeedlingMess(queryTreeData, carData, nurserysData);
+            let treeMess = getTreeMessFun(SmallClassName, ThinClassName, queryTreeData, nurserysData, bigTreeList);
+            let userIDList = [];
+            let userDataList = {};
+            for (let i = 0; i < treeflowData.length; i++) {
+                let userDetail = '';
+                if (userIDList.indexOf(Number(treeflowData[i].FromUser)) === -1) {
+                    userDetail = await getUserDetailGarden({id: treeflowData[i].FromUser});
+                } else {
+                    userDetail = userDataList[Number(treeflowData[i].FromUser)];
+                }
+                if (userDetail && userDetail.ID) {
+                    userIDList.push(userDetail.ID);
+                    userDataList[userDetail.ID] = userDetail;
+                }
+                let orgID = userDetail && userDetail.Org;
+                let parent = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByIDGarden);
+                // 如果该施工人员所在的单位没有公司类型，则保存施工人员所在的组织机构
+                let companyName = '';
+                if (parent && parent.ID) {
+                    companyName = (parent && parent.OrgName) || '';
+                } else {
+                    companyName = (userDetail && userDetail.OrgObj && userDetail.OrgObj.OrgName) || '';
+                    parent = (userDetail && userDetail.OrgObj) || '';
+                }
+                treeflowData[i].companyName = companyName;
+                treeflowData[i].orgData = parent;
+            }
+            let flowMess = treeflowData;
+            let curingMess = await getCuringMess(curingTaskData, curingTypeArr, getCuringMessageGarden);
             this.setState({
                 seedlingMess,
                 treeMess,

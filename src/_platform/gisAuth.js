@@ -220,6 +220,26 @@ export const handlePolygonLatLngs = (polygon) => {
         console.log('handlePolygonLatLngs', e);
     }
 };
+// 处理折线中的坐标数据转化为数组
+export const handlePolylineLatLngs = (polyline) => {
+    try {
+        let coordinates = [];
+
+        if (polyline) {
+            let latLngs = polyline.getLatLngs();
+
+            if (latLngs && latLngs instanceof Array && latLngs.length > 0) {
+                for (let i = 0; i < latLngs.length; i++) {
+                    let latLngJson = [latLngs[i].lat, latLngs[i].lng];
+                    coordinates.push(latLngJson);
+                };
+            }
+        }
+        return coordinates;
+    } catch (e) {
+        console.log('handlePolygonLatLngs', e);
+    }
+};
 // MULTIPOLYGON wkt格式[115, 39] 转换为 leaflet地图格式[39, 115]
 export const handleMULTIPOLYGONLatLngToLngLat = (coordinates) => {
     try {

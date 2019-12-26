@@ -101,14 +101,16 @@ class Tablelevel extends Component {
         this.map = L.map('mapid', mapInitialization);
         // 基础图层
         this.tileLayer = L.tileLayer(TILEURLS[1], {
-            subdomains: [3], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
+            // subdomains: [3],
+            subdomains: [0, 1, 2, 3, 4, 5, 6, 7], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
             minZoom: 10,
             maxZoom: 17,
             zoomOffset: 1
         }).addTo(this.map);
         // 道路图层
         L.tileLayer(WMSTILELAYERURL, {
-            subdomains: [3],
+            // subdomains: [3],
+            subdomains: [0, 1, 2, 3, 4, 5, 6, 7],
             minZoom: 10,
             maxZoom: 17,
             zoomOffset: 1
@@ -150,7 +152,7 @@ class Tablelevel extends Component {
                             } else {
                                 newSelectKey.push(row.key);
                             }
-                        })
+                        });
                     });
                     this.setState({
                         selectKey: newSelectKey
@@ -165,7 +167,7 @@ class Tablelevel extends Component {
                         selectKey.push(record.key);
                         this.setState({
                             selectKey: selectKey
-                        })
+                        });
                         console.log('选中的key', selectKey);
                     } else {
                         message.error('勾选失败，当前用户所属标段与该细班所属标段不符');
@@ -176,7 +178,7 @@ class Tablelevel extends Component {
                     selectKey.splice(index, 1);
                     this.setState({
                         selectKey: selectKey
-                    })
+                    });
                 }
             },
             hideDefaultSelections: true,
@@ -209,12 +211,12 @@ class Tablelevel extends Component {
                                     onClick={this.onAdd.bind(this)}
                                     style={{marginLeft: 50}}
                                 >上传细班</Button>
-                                : <Button
-                                    type='primary'
-                                    onClick={this.onPutStorage.bind(this)}
-                                    style={{marginLeft: 50}}
-                                    loading={spinning}
-                                >细班入库</Button>
+                                    : <Button
+                                        type='primary'
+                                        onClick={this.onPutStorage.bind(this)}
+                                        style={{marginLeft: 50}}
+                                        loading={spinning}
+                                    >细班入库</Button>
                             }
                         </FormItem>
                     </Form>
@@ -223,7 +225,7 @@ class Tablelevel extends Component {
                     <div style={{width: 600, height: 700, float: 'left'}}>
                         <Spin spinning={spinning}>
                             <Table
-                                rowKey="key"
+                                rowKey='key'
                                 rowSelection={rowSelection}
                                 columns={this.columns}
                                 dataSource={newDataList.length === 0 ? dataList : newDataList}

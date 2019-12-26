@@ -118,6 +118,14 @@ export const LBSAMAP_KEY = '8325164e247e15eea68b59e89200988b';
 // 腾讯移动分析
 export const TENCENTANALYSIS_API = `${DOMAIN}`;
 
+/** *********************园林服务接口**************************/
+// 苗木服务
+export const TREE_API_GARDEN = `${SDOMAIN}/tree`;
+// 养护服务
+export const CURING_API_GARDEN = `${SDOMAIN}/curing`;
+// 系统
+export const SYSTEM_API_GARDEN = `${SDOMAIN}/system`;
+
 /** *********************静态常量**************************/
 export const ORGTYPE = [
     '业主单位',

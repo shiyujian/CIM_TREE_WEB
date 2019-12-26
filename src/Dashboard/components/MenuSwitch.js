@@ -748,22 +748,27 @@ export default class MenuSwitch extends Component {
                 <div className='menuSwitch-menuSwitchRightLayout'>
                     <a className={dashboardRightMenu === 'area' ? 'menuSwitch-rightMenuAreaButtonSelLayout' : 'menuSwitch-rightMenuAreaButtonUnSelLayout'}
                         id='area'
+                        key='area'
                         title='区域地块'
                         onClick={this.handleRightMenuButton.bind(this)} />
                     <a className={dashboardTreeMess === 'dashboardTreeMess' ? 'menuSwitch-rightMenuTreeMessButtonSelLayout' : 'menuSwitch-rightMenuTreeMessButtonUnSelLayout'}
                         id='dashboardTreeMess'
+                        key='dashboardTreeMess'
                         title='树木信息'
                         onClick={this.handleTreeMessButton.bind(this)} />
                     <a className={dashboardAreaTreeLayer === 'removeTileTreeLayerBasic' ? 'menuSwitch-rightMenuTileLayer2ButtonSelLayout' : 'menuSwitch-rightMenuTileLayer2ButtonUnSelLayout'}
                         id='removeTileTreeLayerBasic'
+                        key='removeTileTreeLayerBasic'
                         title='图层控制'
                         onClick={this.handleTileTreeLayerBasicButton.bind(this)} />
-                    {/* <a className={dashboardDataMeasurement === 'dataMeasurement' ? 'menuSwitch-rightMenuAreameasureButtonSelLayout' : 'menuSwitch-rightMenuAreameasureButtonUnSelLayout'}
+                    <a className={dashboardDataMeasurement === 'dataMeasurement' ? 'menuSwitch-rightMenuAreameasureButtonSelLayout' : 'menuSwitch-rightMenuAreameasureButtonUnSelLayout'}
                         id='dataMeasurement'
+                        key='dataMeasurement'
                         title='数据测量'
-                        onClick={this.handleAreaMeasureButton.bind(this)} /> */}
+                        onClick={this.handleAreaMeasureButton.bind(this)} />
                     <a className={dashboardDataView === 'dataView' ? 'menuSwitch-rightMenuDataViewButtonSelLayout' : 'menuSwitch-rightMenuDataViewButtonUnSelLayout'}
                         id='dataView'
+                        key='dataView'
                         title='数据看板'
                         onClick={this.handleDataViewButton.bind(this)} />
                 </div>

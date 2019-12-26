@@ -8,7 +8,10 @@ import {
     TREE_API,
     CURING_API,
     GARDEN_API,
-    FOREST_API
+    FOREST_API,
+    TREE_API_GARDEN,
+    CURING_API_GARDEN,
+    SYSTEM_API_GARDEN
 } from '_platform/api';
 const ID = 'dashboard';
 // 获取隐患列表
@@ -110,6 +113,29 @@ export const getNurserytotal = forestFetchAction(`${TREE_API}/nurserytotal`, [],
 export const getLocationStatByDay = forestFetchAction(`${TREE_API}/locationtotalstat`, [], 'GET');
 // 获取今日栽植统计
 export const getTreePlantStatByDay = forestFetchAction(`${TREE_API}/treestat`, [], 'GET');
+
+/** *********************园林获取苗木信息**************************/
+// 获取种植流程
+export const getTreeflowsGarden = forestFetchAction(`${TREE_API_GARDEN}/treeflows`, []);
+// 获取苗圃信息
+export const getNurserysGarden = forestFetchAction(`${TREE_API_GARDEN}/nurserys`, []);
+// 获取打包车辆信息
+export const getCarpackbysxmGarden = forestFetchAction(`${TREE_API_GARDEN}/carpackbysxm/{{sxm}}`, []);
+// 获取树木现场种植的信息
+export const getTreeMessGarden = forestFetchAction(`${TREE_API_GARDEN}/tree/{{sxm}}`, []);
+// 获取树木定位信息
+export const getTreeLocationCoordGarden = forestFetchAction(`${TREE_API_GARDEN}/locationcoord?sxm={{sxm}}`, [], 'GET');
+// 苗木养护记录查询
+export const getCuringTreeInfoGarden = forestFetchAction(`${CURING_API_GARDEN}/curingtrees`, []);
+// 获获取养护类型
+export const getCuringTypesGarden = forestFetchAction(`${CURING_API_GARDEN}/curingtypes`, [], 'GET');
+// 苗木养护计划详情
+export const getCuringMessageGarden = forestFetchAction(`${CURING_API_GARDEN}/curing/{{id}}`, [], 'GET');
+// 获取人员详情
+export const getUserDetailGarden = createFetchAction(`${SYSTEM_API_GARDEN}/user/{{id}}`, []);
+// 反查
+export const getParentOrgTreeByIDGarden = createFetchAction(`${SYSTEM_API_GARDEN}/revertorgtree?id={{id}}`, [], 'GET');
+
 export const actions = {
     getRisk,
     getRiskContactSheet,
@@ -177,7 +203,18 @@ export const actions = {
     getGardentotalstat,
     getNurserytotal,
     getLocationStatByDay,
-    getTreePlantStatByDay
+    getTreePlantStatByDay,
+
+    getTreeflowsGarden,
+    getNurserysGarden,
+    getCarpackbysxmGarden,
+    getTreeMessGarden,
+    getTreeLocationCoordGarden,
+    getCuringTreeInfoGarden,
+    getCuringTypesGarden,
+    getCuringMessageGarden,
+    getUserDetailGarden,
+    getParentOrgTreeByIDGarden
 };
 export default handleActions(
     {

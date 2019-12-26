@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-12-24 20:53:32
+ * @Last Modified time: 2019-12-26 17:01:44
  */
 import React, { Component } from 'react';
 import {
@@ -108,14 +108,16 @@ class OnSite extends Component {
             mapInitialization.attributionControl = false;
             this.map = L.map('mapid', mapInitialization);
             this.tileLayer = L.tileLayer(TILEURLS[1], {
-                subdomains: [3], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
+                // subdomains: [3],
+                subdomains: [0, 1, 2, 3, 4, 5, 6, 7], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
                 minZoom: 1,
                 maxZoom: 17,
                 zoomOffset: 1
             }).addTo(this.map);
             // 地图上边的地点的名称
             L.tileLayer(WMSTILELAYERURL, {
-                subdomains: [3],
+                // subdomains: [3],
+                subdomains: [0, 1, 2, 3, 4, 5, 6, 7],
                 minZoom: 1,
                 maxZoom: 17,
                 zoomOffset: 1
