@@ -161,7 +161,7 @@ export default class TreeTypeTree extends Component {
         // this.tileTreeTypeLayerFilter指的是一下获取多个树种的图层，单个树种的图层直接存在treeLayerList对象中
         this.tileTreeTypeLayerFilter = L.tileLayer.wms(url,
             {
-                layers: 'xatree:treelocation',
+                layers: 'xatree:newtreelocation',
                 crs: L.CRS.EPSG4326,
                 format: 'image/png',
                 maxZoom: 22,
@@ -213,6 +213,7 @@ export default class TreeTypeTree extends Component {
             } else {
                 // 如果搜索的信息为空，则取消定位信息，同时展示所有的树种信息
                 await this.treeTypeTreeCancelLocation();
+                await this.handleTreeTypeKeys();
             }
         } catch (e) {
             console.log('handleSearchTree', e);

@@ -155,11 +155,11 @@ export default class WordView1 extends Component {
                 iconAnchor: [13, 28]
             });
             console.log('beginIcon', beginIcon);
-            let start = L.marker(latlngs[0], {
+            L.marker(latlngs[0], {
                 icon: beginIcon,
                 zIndexOffset: -50
             }).addTo(this.map);
-            let end = L.marker(latlngs[latlngs.length - 1], {
+            L.marker(latlngs[latlngs.length - 1], {
                 icon: endIcon,
                 zIndexOffset: -50
             }).addTo(this.map);

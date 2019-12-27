@@ -61,7 +61,7 @@ export default class WordView1 extends Component {
             // 加载基础图层
             this.tileLayer = L.tileLayer(TILEURLS[1], {
                 // subdomains: [3],
-            subdomains: [0, 1, 2, 3, 4, 5, 6, 7], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
+                subdomains: [0, 1, 2, 3, 4, 5, 6, 7], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
                 minZoom: 10,
                 maxZoom: 17,
                 zoomOffset: 1
@@ -69,7 +69,7 @@ export default class WordView1 extends Component {
             // 地图上边的地点的名称
             L.tileLayer(WMSTILELAYERURL, {
                 // subdomains: [3],
-            subdomains: [0, 1, 2, 3, 4, 5, 6, 7],
+                subdomains: [0, 1, 2, 3, 4, 5, 6, 7],
                 minZoom: 10,
                 maxZoom: 17,
                 zoomOffset: 1
@@ -145,11 +145,11 @@ export default class WordView1 extends Component {
                 iconAnchor: [13, 28]
             });
             console.log('beginIcon', beginIcon);
-            let start = L.marker(latlngs[0], {
+            L.marker(latlngs[0], {
                 icon: beginIcon,
                 zIndexOffset: -50
             }).addTo(this.map);
-            let end = L.marker(latlngs[latlngs.length - 1], {
+            L.marker(latlngs[latlngs.length - 1], {
                 icon: endIcon,
                 zIndexOffset: -50
             }).addTo(this.map);

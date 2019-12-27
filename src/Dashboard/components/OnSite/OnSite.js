@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-12-27 15:31:03
+ * @Last Modified time: 2019-12-27 19:31:10
  */
 import React, { Component } from 'react';
 import {
@@ -190,7 +190,7 @@ class OnSite extends Component {
             } else {
                 this.tileTreeLayerBasic = L.tileLayer(
                     FOREST_GIS_API +
-                    '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                    '/geoserver/gwc/service/wmts?layer=xatree%3Anewtreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
                     {
                         opacity: 1.0,
                         subdomains: [1, 2, 3],
@@ -528,6 +528,7 @@ class OnSite extends Component {
                                     {...this.state}
                                     map={this.map}
                                     removeTileTreeLayerBasic={this.removeTileTreeLayerBasic.bind(this)}
+                                    getTileLayerTreeBasic={this.getTileLayerTreeBasic.bind(this)}
                                 />
                             ) : ''
                     }
