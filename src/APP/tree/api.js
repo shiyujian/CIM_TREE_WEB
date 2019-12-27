@@ -12,7 +12,7 @@ import headLogo from './LOGO.png';
 
 export const tree_headLogo = headLogo;
 
-export const tree_footerYear = '2018';
+export const tree_footerYear = '2019';
 
 export const tree_footerCompany = '华东工程数字技术有限公司';
 

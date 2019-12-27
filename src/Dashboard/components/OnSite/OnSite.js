@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-12-26 17:01:44
+ * @Last Modified time: 2019-12-27 15:31:03
  */
 import React, { Component } from 'react';
 import {
@@ -414,7 +414,7 @@ class OnSite extends Component {
         const {
             dashboardCompomentMenu,
             dashboardTreeMess,
-            menuTreeVisible,
+            areaDistanceMeasureMenu,
             dashboardDataMeasurement,
             dashboardRightMenu,
             dashboardDataView,
@@ -442,7 +442,11 @@ class OnSite extends Component {
             <div className={fullScreenState === 'fullScreen' ? 'map-containerFullScreen' : 'map-container'}>
                 <div
                     ref='appendBody'
-                    className='dashboard-map r-main'
+                    className={
+                        areaDistanceMeasureMenu === 'areaMeasureMenu'
+                            ? 'dashboard-map-area r-main'
+                            : 'dashboard-map r-main'
+                    }
                     id='onSiteDom'
                 >
                     <MenuSwitch {...this.props} {...this.state} map={this.map} />

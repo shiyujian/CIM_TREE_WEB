@@ -947,3 +947,196 @@ export const handleLocationDeviceData = (datas, thinClassTree) => {
     }
     return devices;
 };
+
+/**
+ * 获取园林施工包数据
+ * @param {*} getTreeNodeListGarden 
+ * @param {*} getThinClassListGarden 
+ */
+// 获取施工包数据，并将数据进行整理
+export const getAreaDataGarden = async (getTreeNodeListGarden, getThinClassListGarden) => {
+    let rst = await getTreeNodeListGarden();
+    if (!(rst && rst instanceof Array && rst.length > 0)) {
+        return;
+    }
+    // 项目级
+    let projectList = [];
+    // 单位工程级
+    let sectionList = [];
+    let survivalRateTree = [];
+    if (rst instanceof Array && rst.length > 0) {
+        rst.map(node => {
+            if (node.Type === '项目工程') {
+                projectList.push({
+                    Name: node.Name,
+                    No: node.No
+                });
+                survivalRateTree.push({
+                    Name: node.Name,
+                    No: node.No
+                });
+            } else if (node.Type === '单位工程') {
+                let noArr = node.No.split('-');
+                if (noArr && noArr instanceof Array && noArr.length === 3) {
+                    sectionList.push({
+                        Name: node.Name,
+                        No: node.No,
+                        Parent: noArr[0]
+                    });
+                }
+            }
+        });
+        survivalRateTree.map((survivalRate) => {
+            let sectionTree = [];
+            rst.map(node => {
+                if (node.Type === '单位工程' && node.No.indexOf(survivalRate.No) !== -1) {
+                    sectionTree.push({
+                        Name: node.Name,
+                        No: node.No
+                    });
+                }
+            });
+            survivalRate.children = sectionTree;
+        });
+        for (let i = 0; i < projectList.length; i++) {
+            projectList[i].children = sectionList.filter(node => {
+                return node.Parent === projectList[i].No;
+            });
+        }
+    }
+    let totalThinClass = [];
+    for (let i = 0; i < sectionList.length; i++) {
+        let section = sectionList[i];
+        let sectionNo = section.No;
+        let sectionNoArr = sectionNo.split('-');
+        let parentNo = sectionNoArr[0] + '-' + sectionNoArr[1];
+        let list = await getThinClassListGarden({ no: parentNo }, {section: sectionNoArr[2]});
+        let smallClassList = getSmallClassGarden(list);
+        smallClassList.map(smallClass => {
+            let thinClassList = getThinClassGarden(smallClass, list);
+            smallClass.children = thinClassList;
+        });
+        totalThinClass.push({
+            section: section.No,
+            smallClassList: smallClassList
+        });
+        section.children = smallClassList;
+    }
+    return {
+        totalThinClass: totalThinClass,
+        survivalRateTree: survivalRateTree,
+        projectList: projectList
+    };
+};
+// 获取项目的小班
+export const getSmallClassGarden = (smallClassList) => {
+    // 将小班的code获取到，进行去重
+    let uniqueSmallClass = [];
+    // 进行数组去重的数组
+    let array = [];
+    try {
+        smallClassList.map(list => {
+            let noArr = list.No.split('-');
+            // 如果小于5 说明没有标段  不符合规则
+            if (noArr.length < 5) {
+                return;
+            }
+            // // 项目 + 区块 + 标段 + 区段 + 组团
+            // let No = noArr[0] + '-' + noArr[1] + '-' + noArr[4] + '-' + noArr[2] + '-' + noArr[3];
+            // 项目 + 区块 + 标段 + 区段
+            let No = noArr[0] + '-' + noArr[1] + '-' + noArr[4] + '-' + noArr[2];
+            // 之前没有存入过该小班，则push进数组
+            if (list.SmallClass && array.indexOf(No) === -1) {
+                if (list.SmallClassName) {
+                    if (list.SmallClassName.indexOf('区段') !== -1) {
+                        uniqueSmallClass.push({
+                            Name: list.SmallClassName,
+                            No: No
+                        });
+                    } else {
+                        uniqueSmallClass.push({
+                            Name: list.SmallClassName + '区段',
+                            No: No
+                        });
+                    }
+                } else {
+                    uniqueSmallClass.push({
+                        Name: list.SmallClass + '区段',
+                        No: No
+                    });
+                }
+                // uniqueSmallClass.push({
+                //     Name: list.SmallClassName
+                //         ? list.SmallClassName + '区段'
+                //         : list.SmallClass + '区段',
+                //     No: No
+                // });
+                array.push(No);
+            }
+        });
+    } catch (e) {
+        console.log('getSmallClass', e);
+    }
+    return uniqueSmallClass;
+};
+// 获取项目的细班
+export const getThinClassGarden = (smallClass, list) => {
+    let thinClassList = [];
+    let codeArray = [];
+    let nameArray = [];
+    try {
+        list.map(rst => {
+            let smallClassCode = smallClass.No.split('-');
+            let projectNo = smallClassCode[0];
+            let unitProjectNo = smallClassCode[1];
+            let sectionNo = smallClassCode[2];
+            let smallClassNo = smallClassCode[3];
+
+            let noArr = rst.No.split('-');
+            // 如果小于5 说明没有标段  不符合规则
+            if (noArr.length < 5) {
+                return;
+            }
+            // 暂时去掉重复的节点
+            if (
+                noArr[0] === projectNo && noArr[1] === unitProjectNo && noArr[4] === sectionNo &&
+                noArr[2] === smallClassNo
+            ) {
+                // 项目 + 区块 + 标段 + 区段 + 组团
+                let No = noArr[0] + '-' + noArr[1] + '-' + noArr[4] + '-' + noArr[2] + '-' + noArr[3];
+                if (codeArray.indexOf(No) === -1) {
+                    if (rst.ThinClassName) {
+                        if (rst.ThinClassName.indexOf('组团') !== -1) {
+                            thinClassList.push({
+                                Name: rst.ThinClassName,
+                                No: No
+                            });
+                        } else {
+                            thinClassList.push({
+                                Name: rst.ThinClassName + '组团',
+                                No: No
+                            });
+                        }
+                    } else {
+                        thinClassList.push({
+                            Name: rst.ThinClass + '组团',
+                            No: No
+                        });
+                    }
+                    // thinClassList.push({
+                    //     Name: rst.ThinClassName
+                    //         ? rst.ThinClassName + '组团'
+                    //         : rst.ThinClass + '组团',
+                    //     No: No
+                    // });
+                    codeArray.push(No);
+                    nameArray.push(rst.ThinClassName);
+                }
+            }
+        });
+    } catch (e) {
+        console.log('getThinClass', e);
+    }
+
+    return thinClassList;
+};

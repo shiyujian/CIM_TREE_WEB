@@ -280,8 +280,8 @@ export default class TreeMessGisOnClickHandle extends Component {
                     '-' +
                     queryTreeData.ThinClass;
                 let regionData = getThinClassName(No, queryTreeData.Section, totalThinClass, bigTreeList);
-                SmallClassName = regionData.SmallName;
-                ThinClassName = regionData.ThinName;
+                SmallClassName = (regionData && regionData.SmallName) || '';
+                ThinClassName = (regionData && regionData.ThinName) || '';
             }
 
             let treeflowData = [];
@@ -312,10 +312,14 @@ export default class TreeMessGisOnClickHandle extends Component {
                     }
                 });
             }
-            // 根据苗圃的起苗坐标获取起苗地址
-            let nurserysAddressData = await handleGetAddressByCoordinate(nurserysData.location, getLocationNameByCoordinate);
-            let nurserysAddressName = (nurserysAddressData && nurserysAddressData.regeocode && nurserysAddressData.regeocode.formatted_address) || '';
-            nurserysData.nurserysAddressName = nurserysAddressName;
+            if (nurserysData.location) {
+                // 根据苗圃的起苗坐标获取起苗地址
+                let nurserysAddressData = await handleGetAddressByCoordinate(nurserysData.location, getLocationNameByCoordinate);
+                let nurserysAddressName = (nurserysAddressData && nurserysAddressData.regeocode && nurserysAddressData.regeocode.formatted_address) || '';
+                nurserysData.nurserysAddressName = nurserysAddressName;
+            } else {
+                nurserysData.nurserysAddressName = nurserysData.TreePlace;
+            }
             // 根据树木的定位坐标获取定位地址
             let location = '';
             if (treeLocationData && treeLocationData.X && treeLocationData.Y) {
@@ -386,6 +390,8 @@ export default class TreeMessGisOnClickHandle extends Component {
             platform: {
                 tree = {}
             },
+            totalThinClassTreeGarden,
+            bigTreeListGarden,
             curingTypes
         } = this.props;
         try {
@@ -393,8 +399,8 @@ export default class TreeMessGisOnClickHandle extends Component {
                 sxm: data.features[0].properties.SXM
                 // sxm: 'CQL7857'
             };
-            let totalThinClass = tree.totalThinClass || [];
-            let bigTreeList = (tree && tree.bigTreeList) || [];
+            // let totalThinClassTreeGarden = tree.totalThinClassTreeGarden || [];
+            // let bigTreeListGarden = (tree && tree.bigTreeListGarden) || [];
             let queryTreeData = await getTreeMessGarden(postdata);
             if (!queryTreeData) {
                 queryTreeData = {};
@@ -420,12 +426,12 @@ export default class TreeMessGisOnClickHandle extends Component {
             };
 
             let SmallClassName = queryTreeData.SmallClass
-                ? queryTreeData.SmallClass + '号小班'
+                ? queryTreeData.SmallClass + '号区段'
                 : '';
             let ThinClassName = queryTreeData.ThinClass
-                ? queryTreeData.ThinClass + '号细班'
+                ? queryTreeData.ThinClass + '号组团'
                 : '';
-            // 获取小班细班名称
+            // 获取区段组团名称
             if (queryTreeData && queryTreeData.Section && queryTreeData.SmallClass && queryTreeData.ThinClass) {
                 let sections = queryTreeData.Section.split('-');
                 let No =
@@ -436,9 +442,11 @@ export default class TreeMessGisOnClickHandle extends Component {
                     queryTreeData.SmallClass +
                     '-' +
                     queryTreeData.ThinClass;
-                let regionData = getThinClassName(No, queryTreeData.Section, totalThinClass, bigTreeList);
-                SmallClassName = regionData.SmallName;
-                ThinClassName = regionData.ThinName;
+
+                let regionData = getThinClassName(No, queryTreeData.Section, totalThinClassTreeGarden, bigTreeListGarden);
+
+                SmallClassName = (regionData && regionData.SmallName) || '';
+                ThinClassName = (regionData && regionData.ThinName) || '';
             }
 
             let treeflowData = [];
@@ -469,10 +477,15 @@ export default class TreeMessGisOnClickHandle extends Component {
                     }
                 });
             }
-            // 根据苗圃的起苗坐标获取起苗地址
-            let nurserysAddressData = await handleGetAddressByCoordinate(nurserysData.location, getLocationNameByCoordinate);
-            let nurserysAddressName = (nurserysAddressData && nurserysAddressData.regeocode && nurserysAddressData.regeocode.formatted_address) || '';
-            nurserysData.nurserysAddressName = nurserysAddressName;
+            if (nurserysData.location) {
+                // 根据苗圃的起苗坐标获取起苗地址
+                let nurserysAddressData = await handleGetAddressByCoordinate(nurserysData.location, getLocationNameByCoordinate);
+                let nurserysAddressName = (nurserysAddressData && nurserysAddressData.regeocode && nurserysAddressData.regeocode.formatted_address) || '';
+                nurserysData.nurserysAddressName = nurserysAddressName;
+            } else {
+                nurserysData.nurserysAddressName = nurserysData.TreePlace;
+            }
+
             // 根据树木的定位坐标获取定位地址
             let location = '';
             if (treeLocationData && treeLocationData.X && treeLocationData.Y) {
@@ -484,7 +497,7 @@ export default class TreeMessGisOnClickHandle extends Component {
             // queryTreeData.queryTreeAddressName = queryTreeAddressName;
 
             let seedlingMess = getSeedlingMess(queryTreeData, carData, nurserysData);
-            let treeMess = getTreeMessFun(SmallClassName, ThinClassName, queryTreeData, nurserysData, bigTreeList);
+            let treeMess = getTreeMessFun(SmallClassName, ThinClassName, queryTreeData, nurserysData, bigTreeListGarden);
             let userIDList = [];
             let userDataList = {};
             for (let i = 0; i < treeflowData.length; i++) {

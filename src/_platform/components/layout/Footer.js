@@ -17,17 +17,18 @@ export default class Footer extends Component {
         }
         return (
             <footer className='footer'>
+                <span>Copyright</span>
                 <span>&copy;{loadFooterYear}</span>
                 <span>
                     <a>
-                        {loadFooterCompany}
+                        {loadFooterCompany}&nbsp; |
                     </a>
                 </span>
-                <div>
+                <span>
                     <a href='http://www.beian.miit.gov.cn/' target='_Blank'>
                         浙ICP备18040969号-4
                     </a>
-                </div>
+                </span>
             </footer>
         );
     }

@@ -135,6 +135,13 @@ export const getCuringMessageGarden = forestFetchAction(`${CURING_API_GARDEN}/cu
 export const getUserDetailGarden = createFetchAction(`${SYSTEM_API_GARDEN}/user/{{id}}`, []);
 // 反查
 export const getParentOrgTreeByIDGarden = createFetchAction(`${SYSTEM_API_GARDEN}/revertorgtree?id={{id}}`, [], 'GET');
+export const getTreeNodeListGardenOK = createAction(`${ID}获取森林大数据树节点`);
+// 获取园林项目标段数据
+export const getTreeNodeListGarden = forestFetchAction(`${TREE_API_GARDEN}/wpunittree`, [getTreeNodeListGardenOK], 'GET');
+// 根据标段获取园林小班细班数据
+export const getThinClassListGarden = forestFetchAction(`${TREE_API_GARDEN}/wpunit4apps?parent={{no}}`, []); //
+// 将园林施工包数据上传至redux
+export const getTotalThinClassGarden = createAction(`${ID}获取所有的小班数据`);
 
 export const actions = {
     getRisk,
@@ -214,7 +221,10 @@ export const actions = {
     getCuringTypesGarden,
     getCuringMessageGarden,
     getUserDetailGarden,
-    getParentOrgTreeByIDGarden
+    getParentOrgTreeByIDGarden,
+    getTreeNodeListGarden,
+    getThinClassListGarden,
+    getTotalThinClassGarden
 };
 export default handleActions(
     {
@@ -420,6 +430,44 @@ export default handleActions(
             return {
                 ...state,
                 deviceTreeDataDay: payload
+            };
+        },
+        [getTotalThinClassGarden]: (state, { payload }) => {
+            return {
+                ...state,
+                totalThinClassTreeGarden: payload
+            };
+        },
+        [getTreeNodeListGardenOK]: (state, { payload }) => {
+            let projectList = [];
+            let sectionList = [];
+            if (payload instanceof Array && payload.length > 0) {
+                payload.map(node => {
+                    if (node.Type === '项目工程') {
+                        projectList.push({
+                            Name: node.Name,
+                            No: node.No
+                        });
+                    } else if (node.Type === '单位工程') {
+                        let noArr = node.No.split('-');
+                        if (noArr && noArr instanceof Array && noArr.length === 3) {
+                            sectionList.push({
+                                Name: node.Name,
+                                No: node.No,
+                                Parent: noArr[0]
+                            });
+                        }
+                    }
+                });
+                for (let i = 0; i < projectList.length; i++) {
+                    projectList[i].children = sectionList.filter(node => {
+                        return node.Parent === projectList[i].No;
+                    });
+                }
+            }
+            return {
+                ...state,
+                bigTreeListGarden: projectList
             };
         }
     },

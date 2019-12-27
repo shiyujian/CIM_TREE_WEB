@@ -902,7 +902,19 @@ class Login extends Component {
                     }
                 </div>
                 <div className='login-footer'>
-                    <div>
+                    <span>Copyright&nbsp;</span>
+                    <span>&copy;{loadFooterYear}&nbsp;</span>
+                    <span>
+                        <a style={{color: 'white'}}>
+                            {loadFooterCompany}&nbsp;|&nbsp;
+                        </a>
+                    </span>
+                    <span>
+                        <a href='http://www.beian.miit.gov.cn/' target='_Blank' style={{color: 'white'}}>
+                            浙ICP备18040969号-4
+                        </a>
+                    </span>
+                    {/* <div>
                         <span>&copy;{loadFooterYear}&nbsp;</span>
                         <span>
                             {loadFooterCompany}
@@ -912,7 +924,7 @@ class Login extends Component {
                         <a href='http://www.beian.miit.gov.cn/' target='_Blank' style={{color: 'white'}}>
                             浙ICP备18040969号-4
                         </a>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         );

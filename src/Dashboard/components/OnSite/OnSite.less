@@ -43,8 +43,627 @@
         margin-left: 20px;
     }
 }
+// 为测量面积和距离显示不同的样式，新增‘dashboard-map-area’，修改leaflet-interactive的数据
 .dashboard-map {
     position: relative;
+
+    .leaflet-interactive {
+        stroke: rgb(51, 136, 255);
+        stroke-opacity: 1;
+        stroke-width: 3;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        fill: none;
+    }
+    .leaflet-popup-content-wrapper {
+        background: unset;
+    }
+    .leaflet-popup-content {
+        margin: 0;
+    }
+    .leaflet-popup-content h2 {
+        font-weight: 400 !important;
+        font-size: 12px !important;
+        margin-left: 15px;
+        margin-bottom: 0px;
+        color: rgba(255,255,255,1);
+    }
+    .leaflet-popup.leaflet-zoom-animated {
+        width: 280px;
+        height:420px;
+        background:rgba(19,34,36,1);
+        opacity:0.9;
+        background-image: url("./Device/DeviceImgs//bottom5.png");
+        font-size:14px;
+        font-family:Microsoft YaHei;
+        font-weight:400;
+        color:rgba(255,255,255,1);
+        line-height:40px;
+    }
+    a.leaflet-popup-close-button {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        padding: 4px 4px 0 0;
+        border: none;
+        text-align: center;
+        width: 15px;
+        height: 48px;
+        font: 16px/14px Tahoma, Verdana, sans-serif;
+        color: #c3c3c3;
+        text-decoration: none;
+        font-weight: bold;
+        background: transparent;
+    }
+    #mapid {
+        cursor: pointer;
+    }
+
+    /*现场人员*/
+    .dashboard-peopleIcon {
+        width: 21px !important;
+        height: 26px !important;
+        top: -5px;
+        left: -4px;
+        background-image: url('./OnSiteImg/people.png');
+        background-size: 100% 100%;
+    }
+
+    /*点击地图显示树图表*/
+    .dashboard-treeIcon {
+        width: 28px !important;
+        height: 41px !important;
+        top: -33px;
+        left: -8px;
+        background-image: url('./TreeType/TreeTypeImg/定位.png');
+        background-size: 100% 100%;
+    }
+
+    /*安全隐患质量缺陷*/
+    .dashboard-riskQualityIcon {
+        width: 21px !important;
+        height: 26px !important;
+        top: -5px;
+        left: -4px;
+        background-image: url('./Risk/ProblemImg/defect2.png');
+        background-size: 100% 100%;
+    }
+
+    /*安全隐患安全隐患*/
+    .dashboard-riskDangerIcon {
+        width: 21px !important;
+        height: 26px !important;
+        top: -5px;
+        left: -4px;
+        background-image: url('./Risk/ProblemImg/unsafe2.png');
+        background-size: 100% 100%;
+    }
+
+    /*安全隐患其他*/
+    .dashboard-riskOtherIcon {
+        width: 21px !important;
+        height: 26px !important;
+        top: -5px;
+        left: -4px;
+        background-image: url('./Risk/ProblemImg/unsafe2.png');
+        background-size: 100% 100%;
+    }
+
+    .dashboard-distanceMeasure-icon{
+        // font-size:15px;
+        // background-color: #fff0;
+        // color: #e6f7ff;
+        // width: auto;
+        font-size: 15px;
+        background-color: #26312e;
+        color: #66ffb3;
+        width: auto;
+    }
+
+    /*养护任务施肥*/
+    .dashboard-curingTaskFeedImg {
+        width: 25px !important;
+        height: 25px !important;
+        top: -13px;
+        left: -6px;
+        background-image: url('./Conservation/ConservationImg/icon_fertilize2.png');
+        background-size: 100% 100%;
+    }
+
+    /*养护任务排涝*/
+    .dashboard-curingTaskDrainImg {
+        width: 25px !important;
+        height: 25px !important;
+        top: -13px;
+        left: -6px;
+        background-image: url('./Conservation/ConservationImg/icon_drainage2.png');
+        background-size: 100% 100%;
+    }
+    /*养护任务补植*/
+    .dashboard-curingTaskReplantingImg {
+        width: 25px !important;
+        height: 25px !important;
+        top: -13px;
+        left: -6px;
+        background-image: url('./Conservation/ConservationImg/icon_replanting2.png');
+        background-size: 100% 100%;
+    }
+    /*养护任务病虫害防治*/
+    .dashboard-curingTaskWormImg {
+        width: 25px !important;
+        height: 25px !important;
+        top: -13px;
+        left: -6px;
+        background-image: url('./Conservation/ConservationImg/icon_pest2.png');
+        background-size: 100% 100%;
+    }
+    /*养护任务修剪*/
+    .dashboard-curingTaskTrimImg {
+        width: 25px !important;
+        height: 25px !important;
+        top: -13px;
+        left: -6px;
+        background-image: url('./Conservation/ConservationImg/icon_prune2.png');
+        background-size: 100% 100%;
+    }
+    /*养护任务除草*/
+    .dashboard-curingTaskWeedImg {
+        width: 25px !important;
+        height: 25px !important;
+        top: -13px;
+        left: -6px;
+        background-image: url('./Conservation/ConservationImg/icon_weeding2.png');
+        background-size: 100% 100%;
+    }
+    /*养护任务浇水*/
+    .dashboard-curingTaskWatering {
+        width: 25px !important;
+        height: 25px !important;
+        top: -13px;
+        left: -6px;
+        background-image: url('./Conservation/ConservationImg/icon_watering2.png');
+        background-size: 100% 100%;
+    }
+    /*养护任务其他*/
+    .dashboard-curingTaskOther {
+        width: 25px !important;
+        height: 25px !important;
+        top: -13px;
+        left: -6px;
+        background-image: url('./Conservation/ConservationImg/icon_other2.png');
+        background-size: 100% 100%;
+    }
+
+    /*苗木结缘*/
+    .dashboard-adoptIcon {
+        width: 24px !important;
+        height: 24px !important;
+        top: -6px;
+        left: -6px;
+        background-image: url('./OnSiteImg/adopt.png');
+        background-size: 100% 100%;
+    }
+    /*机械设备-挖掘机*/
+    .dashboard-deviceExcavatorImg {
+        width: 25px !important;
+        height: 25px !important;
+        top: -13px;
+        left: -6px;
+        background-image: url('./Device//DeviceImgs/挖掘机.png');
+        background-size: 100% 100%;
+    }
+    /*机械设备-装载机*/
+    .dashboard-deviceLoaderImg {
+        width: 25px !important;
+        height: 25px !important;
+        top: -13px;
+        left: -6px;
+        background-image: url('./Device//DeviceImgs/装载机.png');
+        background-size: 100% 100%;
+    }
+    /*机械设备-压路机*/
+    .dashboard-deviceRollerImg {
+        width: 25px !important;
+        height: 25px !important;
+        top: -13px;
+        left: -6px;
+        background-image: url('./Device//DeviceImgs/压路机.png');
+        background-size: 100% 100%;
+    }
+    /*机械设备-打夯机*/
+    .dashboard-deviceRammerImg {
+        width: 25px !important;
+        height: 25px !important;
+        top: -13px;
+        left: -6px;
+        background-image: url('./Device//DeviceImgs/打夯机.png');
+        background-size: 100% 100%;
+    }
+    /*机械设备-自卸汽车*/
+    .dashboard-deviceDumpTruckImg {
+        width: 25px !important;
+        height: 25px !important;
+        top: -13px;
+        left: -6px;
+        background-image: url('./Device//DeviceImgs/自卸汽车.png');
+        background-size: 100% 100%;
+    }
+    /*机械设备-吊车*/
+    .dashboard-deviceCraneImg {
+        width: 25px !important;
+        height: 25px !important;
+        top: -13px;
+        left: -6px;
+        background-image: url('./Device//DeviceImgs/吊车.png');
+        background-size: 100% 100%;
+    }
+    /*机械设备-雾炮车*/
+    .dashboard-deviceFogGunTruckImg {
+        width: 25px !important;
+        height: 25px !important;
+        top: -13px;
+        left: -6px;
+        background-image: url('./Device//DeviceImgs/雾炮车.png');
+        background-size: 100% 100%;
+    }
+    /*机械设备-开沟机*/
+    .dashboard-deviceDitchingMachineImg {
+        width: 25px !important;
+        height: 25px !important;
+        top: -13px;
+        left: -6px;
+        background-image: url('./Device//DeviceImgs/开沟机.png');
+        background-size: 100% 100%;
+    }
+    /*机械设备-洒水车*/
+    .dashboard-deviceSprinklerImg {
+        width: 25px !important;
+        height: 25px !important;
+        top: -13px;
+        left: -6px;
+        background-image: url('./Device//DeviceImgs/洒水车.png');
+        background-size: 100% 100%;
+    }
+    /*机械设备-挖坑机*/
+    .dashboard-deviceDiggerImg {
+        width: 25px !important;
+        height: 25px !important;
+        top: -13px;
+        left: -6px;
+        background-image: url('./Device//DeviceImgs/挖坑机.png');
+        background-size: 100% 100%;
+    }
+    .dashboard-gisTypeBut {
+        position: absolute;
+        z-index: 960;
+        bottom: 62px;
+        right: 44px;
+
+        .dashboard-gisTypeButSel {
+            width:123px;
+            height:48px;
+            border:1px solid rgba(97,245,171,1);
+            opacity:0.8;
+            background-image: url("./OnSiteImg/3selected.png");
+            text-align: center;
+            line-height: 48px;
+            display: inline-block;
+            font-size: 16px;
+            font-family: Source Han Sans CN;
+            font-weight: 500;
+            color:rgba(97,245,171,1);
+        }
+
+        .dashboard-gisTypeButUnSel {
+            width:123px;
+            height:48px;
+            opacity:0.3;
+            background-image: url("./OnSiteImg/2levitate.png");
+            width: 123px;
+            text-align: center;
+            opacity: 0.8;
+            line-height: 48px;
+            display: inline-block;
+            font-size: 16px;
+            font-family: Source Han Sans CN;
+            font-weight: 500;
+            color: rgba(60,248,247,1);
+        }
+    }
+
+    .ant-tree li .ant-tree-iconEle {
+        width: 16px;
+        height: 16px;
+    }
+
+    .ant-tree-iconEle {
+        // background: url("./OnSiteImg/people.png") no-repeat;
+        background-size: cover;
+    }
+
+    .tr-people .ant-tree-iconEle {
+        background-image: url('./OnSiteImg/people.png');
+    }
+
+    .tr-hazard .ant-tree-iconEle {
+        background-image: url('./OnSiteImg/risk.png');
+    }
+
+    .tr-area .ant-tree-iconEle {
+        background-image: url('./OnSiteImg/area.png');
+    }
+
+    /*弹出框样式*/
+    .popupBox h2 span {
+        color: #0078a8;
+    }
+
+    .btnRow {
+        text-align: center;
+        margin-top: 5px;
+    }
+
+    .btnViewRisk,
+    .btnViewTrack {
+        display: inline-block;
+        color: #fff !important;
+        border-radius: 4px;
+        background-color: #108ee9;
+        border-color: #108ee9;
+        padding: 0 20px;
+        line-height: 24px;
+        text-decoration: none;
+        margin-left: 12px;
+    }
+    .btnViewAdopt {
+        display: inline-block;
+        color: #fff !important;
+        border-radius: 4px;
+        background-color: #108ee9;
+        border-color: #108ee9;
+        padding: 0 20px;
+        line-height: 24px;
+        text-decoration: none;
+        margin-left: 37px;
+    }
+
+    .btnViewTrack:hover {
+        background-color: #49a9ee;
+        border-color: #49a9ee;
+        text-decoration: none;
+    }
+
+    .ViewPopContentLayout {
+        background: #132224;
+        font-size: 14px;
+        font-family: Microsoft YaHei;
+        font-weight: 400;
+        color: #ffffff;
+        line-height: 40px;
+        width: 280px;
+        height: 440px;
+        width: 280px;
+        height: 405px;
+
+        .ViewPopContentLayout-firstText {
+            margin-top: 10px;
+        }
+
+        .h2 {
+            color: rgba(255,255,255,1);
+        }
+    }
+
+    /*修改菜单边距*/
+    .aside .ant-collapse-content {
+        padding: 0 8px;
+    }
+
+    //视图管理模块
+    // 整体菜单的位置
+    .dashboard-rightInitialPositionMenu {
+        position: absolute;
+        right: 120px;
+        top: 40px;
+        height: 600px;
+        width: 230px;
+        transition: all 0.3s;
+        z-index: 980;
+        // 视图管理模块整体菜单的UI数据设置
+        .dashboard-rightInitialPositionMenu-aside {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            top: 0;
+            bottom: 0;
+            background-color: rgba(255,255,255, 0.9);
+            color: #333;
+            z-index: 999;
+            overflow-x: hidden;
+            overflow-y: auto;
+            // 整体菜单的内部实际数据
+            .dashboard-rightInitialPositionMenu-areaTree {
+                margin-top: 10px;
+                margin-left: 20px;
+                height: calc(~'100% - 10px');
+            }
+            // 视图管理的高度设置
+            .dashboard-rightInitialPositionMenu-viewList {
+                height: calc(~'100% - 60px');
+                display: block;
+                overflow-y: auto;
+                // 区域地块的视图管理标题
+                .dashboard-rightInitialPositionMenu-areaViewTitle {
+                    height: 30px;
+                    font-family: "Microsoft YaHei";
+                    font-weight: bold;
+                    font-size: 16px;
+                }
+                // 区域地块的视图数据
+                .dashboard-rightInitialPositionMenu-areaViewData {
+                    height: 40px;
+                    display: block;
+                    text-align: center;
+                    width: 190px;
+                    margin-bottom: 10px;
+                    font-family: "Microsoft YaHei";
+                    font-size: 14px;
+                }
+                // 区域地块视图按钮名字过长隐藏的设置
+                .dashboard-rightInitialPositionMenu-areaViewData-button {
+                    vertical-align: middle;
+                    white-space: nowrap;
+                    max-width: 190px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    width: 100%;
+                    height: 40px;
+                }
+                // 自定义视图的标题
+                .dashboard-rightInitialPositionMenu-customViewTitle {
+                    height: 30px;
+                    font-family: "Microsoft YaHei";
+                    font-weight: bold;
+                    font-size: 16px;
+                    margin-top: 20px;
+                }
+                // 未选中  自定义视图的每行的设置
+                .dashboard-rightInitialPositionMenu-customViewData-Unselect {
+                    height: 40px;
+                    line-height: 40px;
+                    display: block;
+                    text-align: center;
+                    width: 190px;
+                    margin-bottom: 10px;
+                    font-family: "Microsoft YaHei";
+                    font-size: 14px;
+                    background-color: #fff; // 背景的颜色
+                }
+                // 未选中 自定义视图的a标签的设置
+                .dashboard-rightInitialPositionMenu-customViewData-ALabel-Unselect {
+                    width: calc(~'100% - 50px');
+                    height: 40px;
+                    line-height: 40px;
+                    display: inline-block;
+                    color: #333333; // 文字的颜色
+                    vertical-align: middle;
+                    white-space: nowrap;
+                    max-width: 158px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    margin-left: 15px;
+                    margin-right: 15px;
+                }
+                // 选中  自定义视图的每行的设置
+                .dashboard-rightInitialPositionMenu-customViewData-Select {
+                    height: 40px;
+                    line-height: 40px;
+                    display: block;
+                    text-align: center;
+                    width: 190px;
+                    margin-bottom: 10px;
+                    font-family: "Microsoft YaHei";
+                    font-size: 14px;
+                    background-color: #1793ff; // 背景的颜色
+                }
+                // 选中 自定义视图的a标签的设置
+                .dashboard-rightInitialPositionMenu-customViewData-ALabel-Select {
+                    width: calc(~"100% - 50px");
+                    height: 40px;
+                    line-height: 40px;
+                    display: inline-block;
+                    color: #ffffff; // 文字的颜色
+                    vertical-align: middle;
+                    white-space: nowrap;
+                    max-width: 158px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    margin-left: 15px;
+                    margin-right: 15px;
+                }
+                // 自定义视图的删除图片的设置
+                .dashboard-rightInitialPositionMenu-customViewData-deleteImg {
+                    margin-right: 12px; 
+                    cursor: pointer;
+                }
+            }
+            // 保存当前视图的按钮设置
+            .dashboard-rightInitialPositionMenu-footerButton {
+                height: 40px;
+                display: block;
+                text-align: center;
+                width: 190px;
+                // margin-left: 20px;
+                // margin-right: 20px;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+        }
+    }
+
+    // 数据测量模块模块
+    // 数据测量菜单的位置
+    .dashboard-rightDataMeasureMenu {
+        position: absolute;
+        right: 120px;
+        top: 192px;
+        height: 104px;
+        width: 54px;
+        transition: all 0.3s;
+        z-index: 980;
+        // 数据测量模块整体菜单的UI数据设置
+        .dashboard-rightDataMeasureMenu-aside {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            top: 0;
+            bottom: 0;
+            background-color: rgba(255,255,255, 0.9);
+            color: #333;
+            z-index: 999;
+            overflow-x: hidden;
+            overflow-y: hidden;
+
+            // 未选中  数据测量图片的背景
+            .dashboard-rightDataMeasureMenu-back-Unselect {
+                height: 44px;
+                line-height: 44px;
+                display: block;
+                text-align: center;
+                width: 44px;
+                margin: 5px;
+                background-color: #fff; // 背景的颜色
+            }
+            // 选中  数据测量图片的背景
+            .dashboard-rightDataMeasureMenu-back-Select {
+                height: 40px;
+                line-height: 40px;
+                display: block;
+                text-align: center;
+                width: 44px;
+                margin: 5px;
+                background-color: #1793ff; // 背景的颜色
+            }
+            // 数据测量图片的设置
+            .dashboard-rightDataMeasureMenu-clickImg {
+                cursor: pointer;
+            }
+        }
+    }
+}
+// 为测量面积和距离显示不同的样式，修改leaflet-interactive的数据
+.dashboard-map-area {
+    position: relative;
+    .leaflet-interactive {
+        stroke: rgba(102, 255, 179, 1);
+        stroke-opacity: 1;
+        stroke-width: 3;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        fill: rgba(102, 255, 179, 1);
+        fill-opacity: 0.3;
+        fill-rule: evenodd;
+    }
     .leaflet-popup-content-wrapper {
         background: unset;
     }

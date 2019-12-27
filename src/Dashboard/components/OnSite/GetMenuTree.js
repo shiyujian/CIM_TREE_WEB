@@ -5,7 +5,8 @@ import {
     handleRiskData,
     handleTrackData,
     handleCuringTaskData,
-    handleLocationDeviceData
+    handleLocationDeviceData,
+    getAreaDataGarden
 } from '../auth';
 import {
     TREETYPENO
@@ -28,6 +29,7 @@ export default class GetMenuTree extends Component {
             treetypesTree,
             curingTaskTree,
             deviceTreeDataDay,
+            totalThinClassTreeGarden,
             // survivalRateTree,
             platform: {
                 tree = {}
@@ -58,30 +60,39 @@ export default class GetMenuTree extends Component {
         } else {
             await this.loadAreaData();
         }
+        // 获取树种
         if (treetypesTree && treetypesTree instanceof Array && treetypesTree.length > 0) {
             await getTreetypesTreeLoading(false);
         } else {
             await this.getTreeType();
         }
+        // 获取问题上报数据
         if (riskTree && riskTree instanceof Array && riskTree.length > 0) {
             await getRiskTreeLoading(false);
         } else {
             await this.getRiskTreeData();
         }
+        // 获取巡检路线数据
         if (trackTree && trackTree instanceof Array && trackTree.length > 0) {
             await getTrackTreeLoading(false);
         } else {
             await this.getTrackData();
         }
+        // 获取养护数据
         if (curingTaskTree && curingTaskTree instanceof Array && curingTaskTree.length > 0) {
             await getCuringTaskTreeLoading(false);
         } else {
             await this.getCuringTasks();
         }
+        // 获取机械数据
         if (deviceTreeDataDay && deviceTreeDataDay instanceof Array && deviceTreeDataDay.length > 0) {
             await getDeviceTreeLoading(false);
         } else {
             await this.getLocationDevices();
+        }
+        // 获取园林施工包树
+        if (!(totalThinClassTreeGarden && totalThinClassTreeGarden instanceof Array && totalThinClassTreeGarden.length > 0)) {
+            await this.loadAreaDataGarden();
         }
     }
     // 获取地块树数据
@@ -337,6 +348,24 @@ export default class GetMenuTree extends Component {
             await getDeviceTreeLoading(false);
         } catch (e) {
             console.log('getLocationDevices', e);
+        }
+    }
+    // 获取园林施工包数据
+    loadAreaDataGarden = async () => {
+        const {
+            actions: {
+                getTreeNodeListGarden,
+                getThinClassListGarden,
+                getTotalThinClassGarden
+            }
+        } = this.props;
+        try {
+            let data = await getAreaDataGarden(getTreeNodeListGarden, getThinClassListGarden);
+            let totalThinClass = data.totalThinClass || [];
+            // 获取所有的小班数据，用来计算养护任务的位置
+            await getTotalThinClassGarden(totalThinClass);
+        } catch (e) {
+            console.log('获取园林施工包数据', e);
         }
     }
 

@@ -215,22 +215,6 @@ export default class AreaDistanceMeasure extends Component {
                         </div>
                     </aside>
                 </div>
-                { // 框选面积的画图按钮
-                    areaDistanceMeasureMenu === 'areaMeasureMenu' ? (
-                        <div className='AreaDistanceMeasure-editPolygonLayout'>
-                            <div>
-                                {/* <Button type='primary' style={{marginRight: 10}}
-                                    onClick={this._handleCreateMeasureOk.bind(this)}>
-                                    确定
-                                </Button> */}
-                                {/* <Button type='danger'
-                                    onClick={this.handleCloseMeasureMenu.bind(this)}>
-                                    撤销
-                                </Button> */}
-                            </div>
-                        </div>
-                    ) : ''
-                }
                 <div className='AreaDistanceMeasure-measureNumLayout'>
                     <span className='AreaDistanceMeasure-measureNumText'>
                         {

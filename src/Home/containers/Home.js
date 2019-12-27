@@ -350,10 +350,8 @@ export default class Home extends Component {
                         {sectionList}
                     </TreeSelect>
                 </div>
-                <Row gutter={12}
-                    style={{paddingTop: 10, paddingBottom: 10, height: '50%'}}
-                >
-                    <Col span={15}>
+                <Row style={{paddingTop: 10, paddingBottom: 10, height: '50%'}}>
+                    <Col span={15} style={{paddingRight: 5}}>
                         {/* <img style={{width: '100%', height: '100%'}}src={bannerUrl} /> */}
                         <div className='HomeLeftTop'>
                             <div className='LeftTopBox' style={{width: '51%'}}>
@@ -468,23 +466,23 @@ export default class Home extends Component {
                             </div>
                         </div>
                     </Col>
-                    <Col span={9}>
+                    <Col span={9} style={{paddingLeft: 5}}>
                         {Notice && <Notice {...props} style={{height: '100%'}} />}
                     </Col>
                 </Row>
-                <Row gutter={12}>
-                    <Col span={12}>
+                <Row>
+                    <Col span={12} style={{paddingRight: 5}}>
                         {News && <News {...props} />}
                     </Col>
-                    <Col span={12}>
+                    <Col span={12} style={{paddingLeft: 5}}>
                         {Datum && <Datum {...props} />}
                     </Col>
                 </Row>
-                <Row gutter={12} style={{paddingTop: 10}}>
-                    <Col span={12}>
+                <Row style={{paddingTop: 10}}>
+                    <Col span={12} style={{paddingRight: 5}}>
                         {Person && <Person {...props} section={this.state.section} />}
                     </Col>
-                    <Col span={12}>
+                    <Col span={12} style={{paddingLeft: 5}}>
                         {Machine && <Machine {...props} section={this.state.section} />}
                     </Col>
                 </Row>
