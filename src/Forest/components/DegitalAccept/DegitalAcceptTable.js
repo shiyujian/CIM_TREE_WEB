@@ -59,8 +59,10 @@ export default class DegitalAcceptTable extends Component {
             loading: false,
             size: 11,
             exportsize: 100,
-            stime1: moment().format('YYYY-MM-DD 00:00:00'),
-            etime1: moment().format('YYYY-MM-DD 23:59:59'),
+            stime1: '',
+            etime1: '',
+            // stime1: moment().format('YYYY-MM-DD 00:00:00'),
+            // etime1: moment().format('YYYY-MM-DD 23:59:59'),
             ystype: '', // 验收类型
             zt: '', // 状态
             treetypename: '',
@@ -1181,8 +1183,6 @@ export default class DegitalAcceptTable extends Component {
                 <div className='forest-mrg20' >
                     <span className='forest-search-span6' > 申请验收时间： </span>
                     <RangePicker style={{verticalAlign: 'middle'}}
-                        defaultValue={[moment(this.state.stime1, 'YYYY-MM-DD HH:mm:ss'),
-                            moment(this.state.etime1, 'YYYY-MM-DD HH:mm:ss')]}
                         className='forest-forestcalcw6'
                         showTime={{format: 'HH:mm:ss'}}
                         format={'YYYY/MM/DD HH:mm:ss'}
@@ -1199,7 +1199,7 @@ export default class DegitalAcceptTable extends Component {
                     </Button>
                 </Col>
                 <Col span={18} className='forest-quryrstcnt' >
-                    <span > 此次查询共有苗木： {this.state.totalNum}棵 </span>
+                    <span > 此次查询共有数据： {this.state.totalNum}条 </span>
                 </Col>
                 <Col span={2} />
                 <Col span={2} >

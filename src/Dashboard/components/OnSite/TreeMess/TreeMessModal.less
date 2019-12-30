@@ -12,80 +12,80 @@
         flex:1 1 auto;
         position: relative;
         overflow: hidden;
-        }
+    }
     
-        .TreeMessPage-menuPanel {
+    .TreeMessPage-menuPanel {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 552px;
+        transition: all 0.8s;
+        z-index: 980;
+
+        .TreeMessPage-menuBackground {
+            background-image: url("./TreeMessImg/bottom5.png");
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+            width: 100%;
+            height: 100%;
             position: absolute;
             bottom: 0;
+            // background: rgba(19,34,36,1);
+            opacity: 0.7;
+        }
+        .TreeMessPage-aside {
+            position: absolute;
+            // left: 24px;
             width: 100%;
-            height: 552px;
-            transition: all 0.8s;
-            z-index: 980;
+            height: calc(~'100% - 50px');
+            color: #333;
+            z-index: 999;
+            overflow-x: hidden;
+            overflow-y: auto;
+            display: flex;
+            margin-top: 25px;
 
-            .TreeMessPage-menuBackground {
-                background-image: url("./TreeMessImg/bottom5.png");
-                background-repeat: no-repeat;
-                background-size: 100% 100%;
+
+            .TreeMessPage-aside-MessLayout {
                 width: 100%;
                 height: 100%;
-                position: absolute;
-                bottom: 0;
-                // background: rgba(19,34,36,1);
-                opacity: 0.7;
-            }
-            .TreeMessPage-aside {
-                position: absolute;
-                // left: 24px;
-                width: 100%;
-                height: calc(~'100% - 50px');
-                color: #333;
-                z-index: 999;
-                overflow-x: hidden;
-                overflow-y: auto;
-                display: flex;
-                margin-top: 25px;
+                display: block;
+                margin-left: 25px;
 
+                .TreeMessPage-closeImg{
+                    cursor: pointer;
+                    position: absolute;
+                    top: 5px;
+                    right: 0px;
+                    z-index: 9999;
+                }
 
-                .TreeMessPage-aside-MessLayout {
-                    width: 100%;
-                    height: 100%;
-                    display: block;
-                    margin-left: 25px;
+                .TreeMessPage-aside-Mess-title {
+                    font-size:14px;
+                    font-family:Microsoft YaHei;
+                    font-weight:400;
+                    color:rgba(161,182,194,1);
+                    line-height:40px;
+                }
 
-                    .TreeMessPage-closeImg{
-                        cursor: pointer;
-                        position: absolute;
-                        top: 5px;
-                        right: 0px;
-                        z-index: 9999;
-                    }
-
-                    .TreeMessPage-aside-Mess-title {
-                        font-size:14px;
-                        font-family:Microsoft YaHei;
-                        font-weight:400;
-                        color:rgba(161,182,194,1);
-                        line-height:40px;
-                    }
-
-                    .TreeMessPage-aside-Mess-text {
-                        font-size:14px;
-                        font-family:Microsoft YaHei;
-                        font-weight:400;
-                        color:rgba(255,255,255,1);
-                        line-height:40px;
-                        margin-left: 10px;
-                    }
-                    .TreeMessPage-aside-Mess-flowtext {
-                        font-size:14px;
-                        font-family:Microsoft YaHei;
-                        font-weight:400;
-                        color:rgba(255,255,255,1);
-                        line-height:40px;
-                    }
+                .TreeMessPage-aside-Mess-text {
+                    font-size:14px;
+                    font-family:Microsoft YaHei;
+                    font-weight:400;
+                    color:rgba(255,255,255,1);
+                    line-height:40px;
+                    margin-left: 10px;
+                }
+                .TreeMessPage-aside-Mess-flowtext {
+                    font-size:14px;
+                    font-family:Microsoft YaHei;
+                    font-weight:400;
+                    color:rgba(255,255,255,1);
+                    line-height:40px;
                 }
             }
         }
+    }
 }
 .TreeMessPage-Tab-Layout {
     display: block;

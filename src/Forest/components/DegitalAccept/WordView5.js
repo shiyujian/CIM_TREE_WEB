@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Spin, Modal, Tabs } from 'antd';
+import { Spin, Modal, Tabs, Row, Col } from 'antd';
 import './index.less';
 import moment from 'moment';
+import {getForestImgUrl} from '_platform/auth';
 const { TabPane } = Tabs;
 export default class WordView1 extends Component {
     static propTypes = {};
@@ -120,6 +121,19 @@ export default class WordView1 extends Component {
             unitName
         });
     }
+    onImgClick (data) {
+        let srcs = [];
+        try {
+            let arr = data.split(',');
+            arr.map(rst => {
+                let src = getForestImgUrl(rst);
+                srcs.push(src);
+            });
+        } catch (e) {
+            console.log('处理图片', e);
+        }
+        return srcs;
+    }
     handleDetailData = (detail) => {
         let handleDetail = {};
         handleDetail.unit = (detail && detail.AcceptanceObj && detail.AcceptanceObj.Land) || '';
@@ -143,6 +157,10 @@ export default class WordView1 extends Component {
             qulityok = hgl / handleDetail.checkNum;
         }
         handleDetail.qulityok = qulityok;
+        handleDetail.LocalPic = detail.LocalPic ? this.onImgClick(detail.LocalPic) : '';
+        handleDetail.LocalDescribe = (detail && detail.LocalDescribe) || '';
+        handleDetail.AllViewPic = detail.AllViewPic ? this.onImgClick(detail.AllViewPic) : '';
+        handleDetail.AllViewDescribe = (detail && detail.AllViewDescribe) || '';
         return handleDetail;
     }
     render () {
@@ -180,6 +198,7 @@ export default class WordView1 extends Component {
                                     <TabPane
                                         tab={(item && item.TreeTypeObj && item.TreeTypeObj.TreeTypeName) || '树种'}
                                         key={index}>
+                                        <div>
                                         <div className='trrdd'>
                                             <table style={{ border: 1 }}>
                                                 <tbody>
@@ -271,6 +290,88 @@ export default class WordView1 extends Component {
                                                 <p>注：1.土球质量验收不合格记录可另附表。2.附验收过程照片及说明。</p>
                                             </div>
                                         </div>
+                                        {
+                                            handleDetail.AllViewPic || handleDetail.LocalPic
+                                                ? (
+                                                    <h1>附件：</h1>
+                                                ) : ''
+                                        }
+                                        {
+                                            handleDetail.AllViewPic
+                                                ? (
+                                                    <Row gutter={10}>
+                                                        <h2 style={{marginLeft: 5}}>全景照片</h2>
+                                                        <div style={{marginLeft: 5, marginBottom: 5}}>
+                                                            <span style={{fontSize: 15, fontWeight: 'bold'}}>
+                                                                验收说明：
+                                                            </span>
+                                                            <span>
+                                                                {handleDetail.AllViewDescribe || '无'}
+                                                            </span>
+                                                        </div>
+                                                        {
+                                                            handleDetail.AllViewPic.map((src) => {
+                                                                if (handleDetail.AllViewPic.length === 1) {
+                                                                    return (
+                                                                        <Row>
+                                                                            <Col span={6} />
+                                                                            <Col span={12}>
+                                                                                <img style={{ width: '100%' }} src={src} alt='图片' />
+                                                                            </Col>
+                                                                            <Col span={6} />
+                                                                        </Row>
+                                                                    );
+                                                                } else {
+                                                                    return (
+                                                                        <Col span={12}>
+                                                                            <img style={{ width: '100%' }} src={src} alt='图片' />
+                                                                        </Col>
+                                                                    );
+                                                                }
+                                                            })
+                                                        }
+                                                    </Row>
+                                                ) : ''
+                                        }
+                                        {
+                                            handleDetail.LocalPic
+                                                ? (
+                                                    <Row gutter={10}>
+                                                        <h2 style={{marginLeft: 5}}>局部照片</h2>
+                                                        <div style={{marginLeft: 5, marginBottom: 5}}>
+                                                            <span style={{fontSize: 15, fontWeight: 'bold'}}>
+                                                                验收说明：
+                                                            </span>
+                                                            <span>
+                                                                {handleDetail.LocalDescribe || '无'}
+                                                            </span>
+                                                        </div>
+                                                        {
+                                                            handleDetail.LocalPic.map((src) => {
+                                                                if (handleDetail.LocalPic.length === 1) {
+                                                                    return (
+                                                                        <Row>
+                                                                            <Col span={6} />
+                                                                            <Col span={12}>
+                                                                                <img style={{ width: '100%' }} src={src} alt='图片' />
+                                                                            </Col>
+                                                                            <Col span={6} />
+                                                                        </Row>
+                                                                    );
+                                                                } else {
+                                                                    return (
+                                                                        <Col span={12}>
+                                                                            <img style={{ width: '100%' }} src={src} alt='图片' />
+                                                                        </Col>
+                                                                    );
+                                                                }
+                                                            })
+                                                        }
+                                                    </Row>
+                                                ) : ''
+                                        }
+                                        </div>
+                                        
                                     </TabPane>
                                 );
                             })

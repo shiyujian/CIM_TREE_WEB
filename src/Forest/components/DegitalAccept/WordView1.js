@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Spin, Modal } from 'antd';
+import { Spin, Modal, Row, Col } from 'antd';
 import L from 'leaflet';
 import './index.less';
 import {
@@ -7,6 +7,7 @@ import {
     TILEURLS,
     INITLEAFLET_API
 } from '_platform/api';
+import {getForestImgUrl} from '_platform/auth';
 import {
     fillAreaColor,
     handleAreaLayerData,
@@ -188,6 +189,19 @@ export default class WordView1 extends Component {
             unitName
         });
     }
+    onImgClick (data) {
+        let srcs = [];
+        try {
+            let arr = data.split(',');
+            arr.map(rst => {
+                let src = getForestImgUrl(rst);
+                srcs.push(src);
+            });
+        } catch (e) {
+            console.log('处理图片', e);
+        }
+        return srcs;
+    }
     handleDetailData = (detail) => {
         let handleDetail = {};
         handleDetail.unit = (detail && detail.AcceptanceObj && detail.AcceptanceObj.Land) || '';
@@ -200,6 +214,10 @@ export default class WordView1 extends Component {
         handleDetail.applyTime = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplyTime && moment(detail.AcceptanceObj.ApplyTime).format('YYYY年MM月DD日')) || '';
         handleDetail.createTime = (detail && detail.CreateTime && moment(detail.CreateTime).format('YYYY年MM月DD日')) || '';
         handleDetail.score = (detail && detail.Score && (detail.Score).toFixed(2)) || 0;
+        handleDetail.LocalPic = detail.LocalPic ? this.onImgClick(detail.LocalPic) : '';
+        handleDetail.LocalDescribe = (detail && detail.LocalDescribe) || '';
+        handleDetail.AllViewPic = detail.AllViewPic ? this.onImgClick(detail.AllViewPic) : '';
+        handleDetail.AllViewDescribe = (detail && detail.AllViewDescribe) || '';
         return handleDetail;
     }
     render () {
@@ -227,86 +245,168 @@ export default class WordView1 extends Component {
                     onCancel={this.onOk.bind(this)}
                     footer={null}
                 >
-                    <div className='trrdd'>
-                        <table style={{ border: 1 }}>
-                            <tbody>
-                                <tr>
-                                    <td style={{ height: 60, width: 118 }}>单位工程名称</td>
-                                    <td colSpan='3'>{handleDetail.unit}</td>
-                                    <td style={{ width: 118 }}>细班（小班）</td>
-                                    <td colSpan='1'>{`${array[2]}小班${array[3]}细班`}</td>
-                                </tr>
-                                <tr>
-                                    <td style={{ height: 60, align: 'center' }} >施工单位</td>
-                                    <td colSpan='3'>{unitName}</td>
-                                    <td >项目经理</td>
-                                    <td >{leader}</td>
-                                </tr>
-                                <tr>
-                                    <td style={{ height: 60, align: 'center' }} colSpan='1'>施工员</td>
-                                    <td colSpan='1'>{handleDetail.shigong}</td>
-                                    <td colSpan='1'>设计面积</td>
-                                    <td colSpan='1'>{`${handleDetail.sjmj} (亩)`}</td>
-                                    <td colSpan='1'>实际面积</td>
-                                    <td colSpan='1'>{`${handleDetail.shijmj} (亩)`}</td>
-                                </tr>
-                                <tr>
-                                    <td style={{ height: 60 }} >施工执行标准名称及编号</td>
-                                    <td colSpan='5'> 《雄安新区造林工作手册》</td>
-                                </tr>
-                                <tr>
-                                    <td style={{height: 150}} colSpan='6' >
-                                        <div style={{textAlign: 'left'}}>
-                                            <span style={{display: 'block'}}>验收要点：以细班或小班为单位，对土地整理进行验收。按照不低于5%的设计面积随机布设5m宽样带，对样带的微地形处理、垃圾和碎石处理情况进行打分。</span>
-                                            <span style={{display: 'block'}}>①微地形按照设计要求精准完成，垃圾碎石清除干净，计90分以上，通过检验；</span>
-                                            <span style={{display: 'block'}}>②微地形处理或垃圾碎石处理总体较好，但仍有不足，需整改。</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style={{ height: 300 }} colSpan='6'>
-                                        <div
-                                            id='mapid'
-                                            style={{
-                                                height: 300,
-                                                borderLeft: '1px solid #ccc'
-                                            }}
-                                        />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style={{ width: 118, height: 60 }} colSpan='1'>样带面积</td>
-                                    <td colSpan='2'>{`${handleDetail.sampleTapeArea}(亩)`}</td>
-                                    <td style={{ width: 118 }}>得分</td>
-                                    <td colSpan='2'>{handleDetail.score}</td>
-                                </tr>
-                                <tr>
-                                    <td style={{ height: 110 }} >施工单位质量专检结果</td>
-                                    <td colSpan='5'>
-                                        <div>
-                                            <div style={{ float: 'left', marginLeft: 10 }}>
-                                                <p >项目专业质量检查员：</p><p>{handleDetail.checker}</p>
+                    <div>
+                        <div className='trrdd'>
+                            <table style={{ border: 1 }}>
+                                <tbody>
+                                    <tr>
+                                        <td style={{ height: 60, width: 118 }}>单位工程名称</td>
+                                        <td colSpan='3'>{handleDetail.unit}</td>
+                                        <td style={{ width: 118 }}>细班（小班）</td>
+                                        <td colSpan='1'>{`${array[2]}小班${array[3]}细班`}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style={{ height: 60, align: 'center' }} >施工单位</td>
+                                        <td colSpan='3'>{unitName}</td>
+                                        <td >项目经理</td>
+                                        <td >{leader}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style={{ height: 60, align: 'center' }} colSpan='1'>施工员</td>
+                                        <td colSpan='1'>{handleDetail.shigong}</td>
+                                        <td colSpan='1'>设计面积</td>
+                                        <td colSpan='1'>{`${handleDetail.sjmj} (亩)`}</td>
+                                        <td colSpan='1'>实际面积</td>
+                                        <td colSpan='1'>{`${handleDetail.shijmj} (亩)`}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style={{ height: 60 }} >施工执行标准名称及编号</td>
+                                        <td colSpan='5'> 《雄安新区造林工作手册》</td>
+                                    </tr>
+                                    <tr>
+                                        <td style={{height: 150}} colSpan='6' >
+                                            <div style={{textAlign: 'left'}}>
+                                                <span style={{display: 'block'}}>验收要点：以细班或小班为单位，对土地整理进行验收。按照不低于5%的设计面积随机布设5m宽样带，对样带的微地形处理、垃圾和碎石处理情况进行打分。</span>
+                                                <span style={{display: 'block'}}>①微地形按照设计要求精准完成，垃圾碎石清除干净，计90分以上，通过检验；</span>
+                                                <span style={{display: 'block'}}>②微地形处理或垃圾碎石处理总体较好，但仍有不足，需整改。</span>
                                             </div>
-                                            <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.applyTime}</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style={{ height: 110 }} >监理（建设）单位验收记录</td>
-                                    <td colSpan='5'>
-                                        <div>
-                                            <div style={{ float: 'left', marginLeft: 10 }}>
-                                                <p>监理工程师：</p><p>{handleDetail.jianli}</p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style={{ height: 300 }} colSpan='6'>
+                                            <div
+                                                id='mapid'
+                                                style={{
+                                                    height: 300,
+                                                    borderLeft: '1px solid #ccc'
+                                                }}
+                                            />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style={{ width: 118, height: 60 }} colSpan='1'>样带面积</td>
+                                        <td colSpan='2'>{`${handleDetail.sampleTapeArea}(亩)`}</td>
+                                        <td style={{ width: 118 }}>得分</td>
+                                        <td colSpan='2'>{handleDetail.score}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style={{ height: 110 }} >施工单位质量专检结果</td>
+                                        <td colSpan='5'>
+                                            <div>
+                                                <div style={{ float: 'left', marginLeft: 10 }}>
+                                                    <p >项目专业质量检查员：</p><p>{handleDetail.checker}</p>
+                                                </div>
+                                                <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.applyTime}</p>
                                             </div>
-                                            <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.createTime}</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div>
-                            <p>注：附验收过程照片及说明。 </p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style={{ height: 110 }} >监理（建设）单位验收记录</td>
+                                        <td colSpan='5'>
+                                            <div>
+                                                <div style={{ float: 'left', marginLeft: 10 }}>
+                                                    <p>监理工程师：</p><p>{handleDetail.jianli}</p>
+                                                </div>
+                                                <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.createTime}</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div>
+                                <p>注：附验收过程照片及说明。 </p>
+                            </div>
                         </div>
+                        {
+                            handleDetail.AllViewPic || handleDetail.LocalPic
+                                ? (
+                                    <h1>附件：</h1>
+                                ) : ''
+                        }
+                        {
+                            handleDetail.AllViewPic
+                                ? (
+                                    <Row gutter={10}>
+                                        <h2 style={{marginLeft: 5}}>全景照片</h2>
+                                        <div style={{marginLeft: 5, marginBottom: 5}}>
+                                            <span style={{fontSize: 15, fontWeight: 'bold'}}>
+                                                验收说明：
+                                            </span>
+                                            <span>
+                                                {handleDetail.AllViewDescribe || '无'}
+                                            </span>
+                                        </div>
+                                        {
+                                            handleDetail.AllViewPic.map((src) => {
+                                                if (handleDetail.AllViewPic.length === 1) {
+                                                    return (
+                                                        <Row>
+                                                            <Col span={6} />
+                                                            <Col span={12}>
+                                                                <img style={{ width: '100%' }} src={src} alt='图片' />
+                                                            </Col>
+                                                            <Col span={6} />
+                                                        </Row>
+                                                    );
+                                                } else {
+                                                    return (
+                                                        <Col span={12}>
+                                                            <img style={{ width: '100%' }} src={src} alt='图片' />
+                                                        </Col>
+                                                    );
+                                                }
+                                            })
+                                        }
+                                    </Row>
+                                ) : ''
+                        }
+                        {
+                            handleDetail.LocalPic
+                                ? (
+                                    <Row gutter={10}>
+                                        <h2 style={{marginLeft: 5}}>局部照片</h2>
+                                        <div style={{marginLeft: 5, marginBottom: 5}}>
+                                            <span style={{fontSize: 15, fontWeight: 'bold'}}>
+                                                验收说明：
+                                            </span>
+                                            <span>
+                                                {handleDetail.LocalDescribe || '无'}
+                                            </span>
+                                        </div>
+                                        {
+                                            handleDetail.LocalPic.map((src) => {
+                                                if (handleDetail.LocalPic.length === 1) {
+                                                    return (
+                                                        <Row>
+                                                            <Col span={6} />
+                                                            <Col span={12}>
+                                                                <img style={{ width: '100%' }} src={src} alt='图片' />
+                                                            </Col>
+                                                            <Col span={6} />
+                                                        </Row>
+                                                    );
+                                                } else {
+                                                    return (
+                                                        <Col span={12}>
+                                                            <img style={{ width: '100%' }} src={src} alt='图片' />
+                                                        </Col>
+                                                    );
+                                                }
+                                            })
+                                        }
+                                    </Row>
+                                ) : ''
+                        }
                     </div>
                 </Modal>
             </Spin>

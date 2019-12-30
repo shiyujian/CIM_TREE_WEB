@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { Button, Modal, Form, Row, Input, Tabs, Spin } from 'antd';
+import { Button, Modal, Form, Row, Input, Tabs, Spin, Carousel } from 'antd';
 import Scrollbar from 'smooth-scrollbar';
 import './TreeMessModal.less';
 import closeImg from './TreeMessImg/close.png';
 const TabPane = Tabs.TabPane;
 
 class TreeMessModal extends Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {
             tabSelect: 'nursery',
@@ -21,24 +21,38 @@ class TreeMessModal extends Component {
             console.log('TreeMessAsideDom', TreeMessAsideDom);
         }
     };
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate (prevProps, prevState) {
     }
 
     handleTreeModalCancel = async () => {
         await this.props.onCancel();
     }
     //  切换标签页
-    tabChange(key) {
+    tabChange (key) {
     }
 
-    handleImgView(src) {
+    handleImgView (type) {
+        const {
+            seedlingMess,
+            treeMess
+        } = this.props;
+        let imgList = [];
+        if (type === 'seedlingMess') {
+            for (let key in seedlingMess) {
+                if (key.indexOf('FJ') !== -1) {
+                    if (seedlingMess[key]) {
+                        imgList.push(seedlingMess[key]);
+                    }
+                }
+            }
+        }
         this.setState({
-            imgViewSrc: src,
+            imgList,
             // imgViewModalVisible: true
         });
     }
 
-    handleImgViewModalCancel() {
+    handleImgViewModalCancel () {
         this.setState({
             imgViewSrc: '',
             imgViewModalVisible: false
@@ -53,7 +67,7 @@ class TreeMessModal extends Component {
         });
     }
 
-    render() {
+    render () {
         const {
             seedlingMess,
             treeMess,
@@ -64,7 +78,8 @@ class TreeMessModal extends Component {
         const {
             imgViewSrc = '',
             imgViewModalVisible = false,
-            tabSelect
+            tabSelect,
+            imgList = []
         } = this.state;
 
         let arr = [
@@ -73,12 +88,6 @@ class TreeMessModal extends Component {
             </Button>
         ];
         let footer = arr;
-        let imgViewBut = [
-            <Button key='back' size='large' onClick={this.handleImgViewModalCancel.bind(this)}>
-                关闭
-            </Button>
-        ];
-        let imgViewFooter = imgViewBut;
         return (
             <div>
                 <div className='TreeMessPage-container'>
@@ -198,7 +207,7 @@ class TreeMessModal extends Component {
                                                                                         display: 'block',
                                                                                         marginTop: '10px'
                                                                                     }}
-                                                                                    onClick={this.handleImgView.bind(this, src)}
+                                                                                    onClick={this.handleImgView.bind(this, 'seedlingMess')}
                                                                                     src={
                                                                                         src
                                                                                     }
@@ -232,7 +241,7 @@ class TreeMessModal extends Component {
                                                                                         display: 'block',
                                                                                         marginTop: '10px'
                                                                                     }}
-                                                                                    onClick={this.handleImgView.bind(this, src)}
+                                                                                    onClick={this.handleImgView.bind(this, 'seedlingMess')}
                                                                                     src={
                                                                                         src
                                                                                     }
@@ -266,7 +275,7 @@ class TreeMessModal extends Component {
                                                                                         display: 'block',
                                                                                         marginTop: '10px'
                                                                                     }}
-                                                                                    onClick={this.handleImgView.bind(this, src)}
+                                                                                    onClick={this.handleImgView.bind(this, 'seedlingMess')}
                                                                                     src={
                                                                                         src
                                                                                     }
@@ -300,7 +309,7 @@ class TreeMessModal extends Component {
                                                                                         display: 'block',
                                                                                         marginTop: '10px'
                                                                                     }}
-                                                                                    onClick={this.handleImgView.bind(this, src)}
+                                                                                    onClick={this.handleImgView.bind(this, 'seedlingMess')}
                                                                                     src={
                                                                                         src
                                                                                     }
@@ -334,7 +343,7 @@ class TreeMessModal extends Component {
                                                                                         display: 'block',
                                                                                         marginTop: '10px'
                                                                                     }}
-                                                                                    onClick={this.handleImgView.bind(this, src)}
+                                                                                    onClick={this.handleImgView.bind(this, 'seedlingMess')}
                                                                                     src={
                                                                                         src
                                                                                     }
@@ -368,7 +377,7 @@ class TreeMessModal extends Component {
                                                                                         display: 'block',
                                                                                         marginTop: '10px'
                                                                                     }}
-                                                                                    onClick={this.handleImgView.bind(this, src)}
+                                                                                    onClick={this.handleImgView.bind(this, 'seedlingMess')}
                                                                                     src={
                                                                                         src
                                                                                     }
@@ -966,7 +975,7 @@ class TreeMessModal extends Component {
                         className={tabSelect === 'nursery'
                             ? 'TreeMessPage-Tab-tablabelSel'
                             : 'TreeMessPage-Tab-tablabel'}>
-                        苗木信息
+                        苗圃信息
                     </a>
                     <a id='tree'
                         onClick={this.handleTabChange.bind(this)}
@@ -991,14 +1000,24 @@ class TreeMessModal extends Component {
                     </a>
                 </div>
                 <Modal
-                    title='图片详情'
+                    title={null}
                     visible={imgViewModalVisible}
-                    footer={imgViewFooter}
+                    footer={null}
                     width={495}
                     onOk={this.handleImgViewModalCancel.bind(this)}
                     onCancel={this.handleImgViewModalCancel.bind(this)}
                 >
-                    <img src={imgViewSrc} style={{ width: '450px', height: '650px' }} alt='图片' />
+                    <Carousel autoplay>
+                        {
+                            imgList.map((img) => {
+                                return (
+                                    <div key={img}>
+                                        <img src={img} style={{ width: 400, height: 400 }} alt='图片' />
+                                    </div>
+                                );
+                            })
+                        }
+                    </Carousel>
                 </Modal>
                 <Modal
                     title='树木详情'
