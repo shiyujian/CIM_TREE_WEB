@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { toggleAside } from '_platform/store/global/aside';
+import Scrollbar from 'smooth-scrollbar';
 
 @connect(
     state => {
@@ -20,6 +21,23 @@ export default class Sidebar extends Component {
 
     static propTypes = {};
 
+    componentWillMount () {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        let minHeight = height - 188;
+        if (width > 1200) {
+            minHeight = height - 170;
+        }
+        this.setState({ minHeight });
+    }
+
+    componentDidMount = async () => {
+        if (document.querySelector('#SideBarAsideDom')) {
+            let SideBarAsideDom = Scrollbar.init(document.querySelector('#SideBarAsideDom'));
+            console.log('SideBarAsideDom', SideBarAsideDom);
+        }
+    }
+
     render () {
         const width = this.props.width;
         return (
@@ -30,6 +48,7 @@ export default class Sidebar extends Component {
                     position: 'relative',
                     minHeight: this.state.minHeight
                 }}
+                id='SideBarAsideDom'
             >
                 <div
                     style={{
@@ -44,26 +63,16 @@ export default class Sidebar extends Component {
                 <div
                     style={{
                         width: 220,
-                        overflowX: 'hidden',
+                        // overflowX: 'hidden',
                         zIndex: '1',
                         position: 'relative',
                         padding: '20px 10px',
-                        maxHeight: document.documentElement.clientHeight
+                        maxHeight: document.documentElement.clientHeight - 40 - 80 - 40
                     }}
                 >
                     {this.props.children}
                 </div>
             </div>
         );
-    }
-
-    componentWillMount () {
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        let minHeight = height - 188;
-        if (width > 1200) {
-            minHeight = height - 170;
-        }
-        this.setState({ minHeight });
     }
 }

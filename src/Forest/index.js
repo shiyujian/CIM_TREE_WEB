@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2019-07-18 09:44:12
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-10-21 15:20:18
+ * @Last Modified time: 2020-01-03 15:18:06
  */
 /**
  *
@@ -92,7 +92,8 @@ export default class ForestContainer extends Component {
             PlantStrengthAnalysi = null,
             DegitalAccept = null,
             TreeDataClear = null,
-            DieTrees = null
+            DieTrees = null,
+            CompletionPlan = null
         } = this.state || {};
         return (
             <Body>
@@ -248,6 +249,14 @@ export default class ForestContainer extends Component {
                             component={DieTrees}
                         />
                     )}
+                    {
+                        CompletionPlan && (
+                            <Route
+                                path='/forest/completionplan'
+                                component={CompletionPlan}
+                            />
+                        )
+                    }
                 </Main>
             </Body>
         );

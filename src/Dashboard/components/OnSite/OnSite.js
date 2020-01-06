@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-12-27 19:31:10
+ * @Last Modified time: 2020-01-03 16:03:18
  */
 import React, { Component } from 'react';
 import {
@@ -337,51 +337,42 @@ class OnSite extends Component {
     // 选中细班，则在地图上加载细班图层
     _addAreaLayer = async (eventKey) => {
         const {
-            areaLayerList,
-            areaDataList
+            areaLayerList
         } = this.state;
         const {
             actions: { getTreearea }
         } = this.props;
         try {
-            let coords = await handleAreaLayerData(eventKey, getTreearea);
-            if (!areaDataList[eventKey]) {
-                let handleKey = eventKey.split('-');
-                let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
-                let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
-                let rst = await getTreearea({}, { no: no });
-                if (rst && rst.content && rst.content instanceof Array && rst.content.length > 0) {
-                    let data = rst.content.find(content => content.Section === section);
-                    areaDataList[eventKey] = data;
-                }
-            }
-            console.log('coords', coords);
-
-            if (coords && coords instanceof Array && coords.length > 0) {
-                for (let i = 0; i < coords.length; i++) {
-                    let str = coords[i];
-                    let treearea = handleCoordinates(str);
-                    let message = {
-                        key: 3,
-                        type: 'Feature',
-                        properties: { name: '', type: 'area' },
-                        geometry: { type: 'Polygon', coordinates: treearea }
+            let coordsList = await handleAreaLayerData(eventKey, getTreearea);
+            if (coordsList && coordsList instanceof Array && coordsList.length > 0) {
+                for (let t = 0; t < coordsList.length; t++) {
+                    let coords = coordsList[t];
+                    if (coords && coords instanceof Array && coords.length > 0) {
+                        for (let i = 0; i < coords.length; i++) {
+                            let str = coords[i];
+                            let treearea = this.handleCoordinates(str);
+                            let message = {
+                                key: 3,
+                                type: 'Feature',
+                                properties: {name: '', type: 'area'},
+                                geometry: { type: 'Polygon', coordinates: treearea }
+                            };
+                            let layer = this._createMarker(message);
+                            if (i === coords.length - 1) {
+                                this.map.fitBounds(layer.getBounds());
+                            }
+                            if (areaLayerList[eventKey]) {
+                                areaLayerList[eventKey].push(layer);
+                            } else {
+                                areaLayerList[eventKey] = [layer];
+                            }
+                        }
                     };
-                    let layer = this._createMarker(message);
-                    if (i === coords.length - 1) {
-                        this.map.fitBounds(layer.getBounds());
-                    }
-                    if (areaLayerList[eventKey]) {
-                        areaLayerList[eventKey].push(layer);
-                    } else {
-                        areaLayerList[eventKey] = [layer];
-                    }
                 }
                 this.setState({
-                    areaLayerList,
-                    areaDataList
+                    areaLayerList
                 });
-            };
+            }
         } catch (e) {
             console.log('加载细班图层', e);
         }

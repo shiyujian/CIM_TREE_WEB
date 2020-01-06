@@ -452,6 +452,9 @@ export const getExportDieTree = forestFetchAction(
 // 车辆包新增
 export const postAddCarPack = forestFetchAction(`${TREE_API}/carpack`, [], 'POST', []);
 
+// 竣工图导出
+export const getExportPipeDrawing = forestFetchAction(`${DOCEXPORT_API}/?action=pipedrawing`, []);
+
 export const actions = {
     exportEcporttreestatuss,
     getTotalSat,
@@ -565,7 +568,8 @@ export const actions = {
     getSupervisorUsersOK,
     getSupervisorUsers,
     postAreaAccept,
-    postAddCarPack
+    postAddCarPack,
+    getExportPipeDrawing
 };
 export default handleActions({
     [getTreeOK]: (state, {

@@ -223,6 +223,12 @@ export const ForestMenu = [
         id: 'FOREST.DEGITALACCEPT',
         path: '/forest/degitalaccept',
         name: '数字化验收'
+    },
+    {
+        key: 'completionplan',
+        id: 'FOREST.COMPLETIONPLAN',
+        path: '/forest/completionplan',
+        name: '灌溉竣工图导出'
     }
 ];
 export const ConservationMenu = [

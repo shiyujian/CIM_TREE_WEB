@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-12-24 17:36:23
+ * @Last Modified time: 2020-01-06 15:51:42
  */
 /**
  *
@@ -65,7 +65,7 @@ export const IN_OFF_DUTY_API = `${window.config.IN_OFF_DUTY}`;
 export const FOREST_GIS_API = window.config.DASHBOARD_ONSITE;
 export const XACOMPANYINITLEAFLET_API = window.config.XACompanyInitLeaflet;
 export const INITLEAFLET_API = window.config.initLeaflet;
-export const TREEPIPE_API = `${DOMAIN}:809`;
+export const TREEPIPE_API = `${DOMAIN}:810`;
 export const WMSTILELAYERURL = window.config.WMSTileLayerUrl;
 export const TILEURLS = {
     1: window.config.IMG_W,
@@ -563,6 +563,10 @@ export const MODULES = [
             {
                 id: 'FOREST.DEGITALACCEPT',
                 name: '数字化验收'
+            },
+            {
+                id: 'FOREST.COMPLETIONPLAN',
+                name: '灌溉竣工图导出'
             }
         ]
     },
