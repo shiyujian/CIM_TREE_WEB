@@ -195,7 +195,7 @@ class Tablelevel extends Component {
             render: (text, rec, index) => {
                 return (
                     <InputNumber
-                        min={1}
+                        min={0}
                         max={record.Area}
                         value={text}
                         onChange={this.handleArea.bind(this, index)} />
