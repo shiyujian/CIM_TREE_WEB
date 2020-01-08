@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
-import { Button, Modal, Form, Row, Input, Tabs, Spin, Carousel } from 'antd';
+import { Button, Modal, Form, Row, Input, Tabs, Spin, Carousel, Col } from 'antd';
 import Scrollbar from 'smooth-scrollbar';
 import './TreeMessModal.less';
+import nextImg from './TreeMessImg/next2.png';
+import previousImg from './TreeMessImg/previous2.png';
+import closeViewImg from './TreeMessImg/icon_close2.png';
 import closeImg from './TreeMessImg/close.png';
+
 const TabPane = Tabs.TabPane;
 
 class TreeMessModal extends Component {
@@ -11,7 +15,9 @@ class TreeMessModal extends Component {
         this.state = {
             tabSelect: 'nursery',
             imgViewSrc: '',
-            imgViewModalVisible: false
+            imgViewModalVisible: false,
+            selectImg: '',
+            selectImgIndex: ''
         };
     }
 
@@ -31,31 +37,96 @@ class TreeMessModal extends Component {
     tabChange (key) {
     }
 
-    handleImgView (type) {
+    handleImgView = async (type, src) => {
         const {
             seedlingMess,
-            treeMess
+            treeMess,
+            curingMess
         } = this.props;
         let imgList = [];
-        if (type === 'seedlingMess') {
-            for (let key in seedlingMess) {
-                if (key.indexOf('FJ') !== -1) {
-                    if (seedlingMess[key]) {
-                        imgList.push(seedlingMess[key]);
-                    }
+        for (let key in seedlingMess) {
+            if (key.indexOf('FJ') !== -1) {
+                if (seedlingMess[key]) {
+                    seedlingMess[key].map((imgsrc) => {
+                        imgList.push(imgsrc);
+                    });
                 }
             }
         }
+        for (let key in treeMess) {
+            if (key.indexOf('FJ') !== -1) {
+                if (treeMess[key]) {
+                    treeMess[key].map((imgsrc) => {
+                        imgList.push(imgsrc);
+                    });
+                }
+            }
+        }
+        curingMess.map((curing) => {
+            if (curing.Pics && curing.Pics.length > 0) {
+                curing.Pics.map(
+                    src => {
+                        imgList.push(src);
+                    }
+                );
+            }
+        });
+        let selectImgIndex = 0;
+        imgList.map((img, index) => {
+            if (img === src) {
+                selectImgIndex = index;
+            }
+        });
         this.setState({
             imgList,
-            // imgViewModalVisible: true
+            selectImg: src,
+            imgViewModalVisible: true,
+            selectImgIndex: selectImgIndex
         });
+    }
+
+    handleViewPrevImg = () => {
+        const {
+            imgList,
+            selectImgIndex
+        } = this.state;
+        if (selectImgIndex > 0) {
+            this.setState({
+                selectImgIndex: selectImgIndex - 1,
+                selectImg: imgList[selectImgIndex - 1]
+            });
+        } else {
+            this.setState({
+                selectImgIndex: imgList.length - 1,
+                selectImg: imgList[imgList.length - 1]
+            });
+        }
+    }
+
+    handleViewNextImg = () => {
+        const {
+            imgList,
+            selectImgIndex
+        } = this.state;
+        if (selectImgIndex === imgList.length - 1) {
+            this.setState({
+                selectImgIndex: 0,
+                selectImg: imgList[0]
+            });
+        } else {
+            this.setState({
+                selectImgIndex: selectImgIndex + 1,
+                selectImg: imgList[selectImgIndex + 1]
+            });
+        }
     }
 
     handleImgViewModalCancel () {
         this.setState({
             imgViewSrc: '',
-            imgViewModalVisible: false
+            imgViewModalVisible: false,
+            selectImgIndex: '',
+            selectImg: ''
         });
     }
     // 切换标签页
@@ -79,7 +150,8 @@ class TreeMessModal extends Component {
             imgViewSrc = '',
             imgViewModalVisible = false,
             tabSelect,
-            imgList = []
+            imgList = [],
+            selectImg
         } = this.state;
 
         let arr = [
@@ -207,7 +279,7 @@ class TreeMessModal extends Component {
                                                                                         display: 'block',
                                                                                         marginTop: '10px'
                                                                                     }}
-                                                                                    onClick={this.handleImgView.bind(this, 'seedlingMess')}
+                                                                                    onClick={this.handleImgView.bind(this, 'seedlingMess', src)}
                                                                                     src={
                                                                                         src
                                                                                     }
@@ -241,7 +313,7 @@ class TreeMessModal extends Component {
                                                                                         display: 'block',
                                                                                         marginTop: '10px'
                                                                                     }}
-                                                                                    onClick={this.handleImgView.bind(this, 'seedlingMess')}
+                                                                                    onClick={this.handleImgView.bind(this, 'seedlingMess', src)}
                                                                                     src={
                                                                                         src
                                                                                     }
@@ -275,7 +347,7 @@ class TreeMessModal extends Component {
                                                                                         display: 'block',
                                                                                         marginTop: '10px'
                                                                                     }}
-                                                                                    onClick={this.handleImgView.bind(this, 'seedlingMess')}
+                                                                                    onClick={this.handleImgView.bind(this, 'seedlingMess', src)}
                                                                                     src={
                                                                                         src
                                                                                     }
@@ -309,7 +381,7 @@ class TreeMessModal extends Component {
                                                                                         display: 'block',
                                                                                         marginTop: '10px'
                                                                                     }}
-                                                                                    onClick={this.handleImgView.bind(this, 'seedlingMess')}
+                                                                                    onClick={this.handleImgView.bind(this, 'seedlingMess', src)}
                                                                                     src={
                                                                                         src
                                                                                     }
@@ -343,7 +415,7 @@ class TreeMessModal extends Component {
                                                                                         display: 'block',
                                                                                         marginTop: '10px'
                                                                                     }}
-                                                                                    onClick={this.handleImgView.bind(this, 'seedlingMess')}
+                                                                                    onClick={this.handleImgView.bind(this, 'seedlingMess', src)}
                                                                                     src={
                                                                                         src
                                                                                     }
@@ -377,7 +449,7 @@ class TreeMessModal extends Component {
                                                                                         display: 'block',
                                                                                         marginTop: '10px'
                                                                                     }}
-                                                                                    onClick={this.handleImgView.bind(this, 'seedlingMess')}
+                                                                                    onClick={this.handleImgView.bind(this, 'seedlingMess', src)}
                                                                                     src={
                                                                                         src
                                                                                     }
@@ -448,7 +520,7 @@ class TreeMessModal extends Component {
                                                             <span className='TreeMessPage-aside-Mess-text'>
                                                                 {treeMess.Location
                                                                     ? `${treeMess.LocationX},${
-                                                                    treeMess.LocationY
+                                                                        treeMess.LocationY
                                                                     }`
                                                                     : (
                                                                         treeMess.locationCoord
@@ -480,7 +552,7 @@ class TreeMessModal extends Component {
                                                                                         display: 'block',
                                                                                         marginTop: '10px'
                                                                                     }}
-                                                                                    onClick={this.handleImgView.bind(this, src)}
+                                                                                    onClick={this.handleImgView.bind(this, 'treeMess', src)}
                                                                                     src={
                                                                                         src
                                                                                     }
@@ -514,7 +586,7 @@ class TreeMessModal extends Component {
                                                                                         display: 'block',
                                                                                         marginTop: '10px'
                                                                                     }}
-                                                                                    onClick={this.handleImgView.bind(this, src)}
+                                                                                    onClick={this.handleImgView.bind(this, 'treeMess', src)}
                                                                                     src={
                                                                                         src
                                                                                     }
@@ -548,7 +620,7 @@ class TreeMessModal extends Component {
                                                                                         display: 'block',
                                                                                         marginTop: '10px'
                                                                                     }}
-                                                                                    onClick={this.handleImgView.bind(this, src)}
+                                                                                    onClick={this.handleImgView.bind(this, 'treeMess', src)}
                                                                                     src={
                                                                                         src
                                                                                     }
@@ -582,7 +654,7 @@ class TreeMessModal extends Component {
                                                                                         display: 'block',
                                                                                         marginTop: '10px'
                                                                                     }}
-                                                                                    onClick={this.handleImgView.bind(this, src)}
+                                                                                    onClick={this.handleImgView.bind(this, 'treeMess', src)}
                                                                                     src={
                                                                                         src
                                                                                     }
@@ -616,7 +688,7 @@ class TreeMessModal extends Component {
                                                                                         display: 'block',
                                                                                         marginTop: '10px'
                                                                                     }}
-                                                                                    onClick={this.handleImgView.bind(this, src)}
+                                                                                    onClick={this.handleImgView.bind(this, 'treeMess', src)}
                                                                                     src={
                                                                                         src
                                                                                     }
@@ -650,7 +722,7 @@ class TreeMessModal extends Component {
                                                                                         display: 'block',
                                                                                         marginTop: '10px'
                                                                                     }}
-                                                                                    onClick={this.handleImgView.bind(this, src)}
+                                                                                    onClick={this.handleImgView.bind(this, 'treeMess', src)}
                                                                                     src={
                                                                                         src
                                                                                     }
@@ -684,7 +756,7 @@ class TreeMessModal extends Component {
                                                                                         display: 'block',
                                                                                         marginTop: '10px'
                                                                                     }}
-                                                                                    onClick={this.handleImgView.bind(this, src)}
+                                                                                    onClick={this.handleImgView.bind(this, 'treeMess', src)}
                                                                                     src={
                                                                                         src
                                                                                     }
@@ -718,7 +790,7 @@ class TreeMessModal extends Component {
                                                                                         display: 'block',
                                                                                         marginTop: '10px'
                                                                                     }}
-                                                                                    onClick={this.handleImgView.bind(this, src)}
+                                                                                    onClick={this.handleImgView.bind(this, 'treeMess', src)}
                                                                                     src={
                                                                                         src
                                                                                     }
@@ -939,7 +1011,7 @@ class TreeMessModal extends Component {
                                                                                                     display: 'block',
                                                                                                     marginTop: '10px'
                                                                                                 }}
-                                                                                                onClick={this.handleImgView.bind(this, src)}
+                                                                                                onClick={this.handleImgView.bind(this, 'curing', src)}
                                                                                                 src={
                                                                                                     src
                                                                                                 }
@@ -1001,13 +1073,42 @@ class TreeMessModal extends Component {
                 </div>
                 <Modal
                     title={null}
-                    visible={imgViewModalVisible}
                     footer={null}
-                    width={495}
+                    width={900}
+                    closable={false}
+                    wrapClassName={'Carousel'}
+                    maskClosable={false}
+                    visible={imgViewModalVisible}
                     onOk={this.handleImgViewModalCancel.bind(this)}
                     onCancel={this.handleImgViewModalCancel.bind(this)}
                 >
-                    <Carousel autoplay>
+                    <div>
+                        <img src={closeViewImg}
+                            onClick={this.handleImgViewModalCancel.bind(this)}
+                            className='TreeMessPage-modal-closeImg' />
+                        <Row className='TreeMessPage-modal-top-layout'>
+                            <div style={{ paddingTop: 152 }}>
+                                <img
+                                    onClick={this.handleViewPrevImg.bind(this)}
+                                    src={previousImg}
+                                    style={{width: 96, height: 96}} />
+                            </div>
+                            <div className='TreeMessPage-modal-top-adopt' >
+                                <div className='TreeMessPage-modal-top-time'>
+                                    <img src={selectImg}
+                                        style={{ width: 400, height: 400 }}
+                                        alt='图片' />
+                                </div>
+                            </div>
+                            <div style={{ paddingTop: 152 }}>
+                                <img
+                                    onClick={this.handleViewNextImg.bind(this)}
+                                    src={nextImg}
+                                    style={{width: 96, height: 96}} />
+                            </div>
+                        </Row>
+                    </div>
+                    {/* <Carousel autoplay>
                         {
                             imgList.map((img) => {
                                 return (
@@ -1017,923 +1118,7 @@ class TreeMessModal extends Component {
                                 );
                             })
                         }
-                    </Carousel>
-                </Modal>
-                <Modal
-                    title='树木详情'
-                    visible={false}
-                    footer={footer}
-                    width={570}
-                    onOk={this.handleTreeModalCancel.bind(this)}
-                    onCancel={this.handleTreeModalCancel.bind(this)}
-                >
-                    <Spin spinning={treeMessModalLoading}>
-                        <Tabs
-                            defaultActiveKey='1'
-                            onChange={this.tabChange.bind(this)}
-                            size='large'
-                        >
-                            <TabPane tab='苗木信息' key='1'>
-                                <Input
-                                    readOnly
-                                    style={{ marginTop: '10px' }}
-                                    size='large'
-                                    addonBefore='顺序码'
-                                    value={
-                                        seedlingMess.sxm
-                                            ? seedlingMess.sxm
-                                            : ''
-                                    }
-                                />
-                                <Input
-                                    readOnly
-                                    style={{ marginTop: '10px' }}
-                                    size='large'
-                                    addonBefore='打包车牌'
-                                    value={
-                                        seedlingMess.car
-                                            ? seedlingMess.car
-                                            : ''
-                                    }
-                                />
-                                <Input
-                                    readOnly
-                                    style={{ marginTop: '10px' }}
-                                    size='large'
-                                    addonBefore='树种'
-                                    value={
-                                        seedlingMess.TreeTypeName
-                                            ? seedlingMess.TreeTypeName
-                                            : ''
-                                    }
-                                />
-                                <Input
-                                    readOnly
-                                    style={{ marginTop: '10px' }}
-                                    size='large'
-                                    addonBefore='产地'
-                                    value={
-                                        seedlingMess.TreePlace
-                                            ? seedlingMess.TreePlace
-                                            : ''
-                                    }
-                                />
-                                <Input
-                                    readOnly
-                                    style={{ marginTop: '10px' }}
-                                    size='large'
-                                    addonBefore='供应商'
-                                    value={
-                                        seedlingMess.Factory
-                                            ? seedlingMess.Factory
-                                            : ''
-                                    }
-                                />
-                                <Input
-                                    readOnly
-                                    style={{ marginTop: '10px' }}
-                                    size='large'
-                                    addonBefore='苗圃名称'
-                                    value={
-                                        seedlingMess.NurseryName
-                                            ? seedlingMess.NurseryName
-                                            : ''
-                                    }
-                                />
-                                <Input
-                                    readOnly
-                                    style={{ marginTop: '10px' }}
-                                    size='large'
-                                    addonBefore='起苗时间'
-                                    value={
-                                        seedlingMess.LifterTime
-                                            ? seedlingMess.LifterTime
-                                            : ''
-                                    }
-                                />
-                                <Input
-                                    readOnly
-                                    style={{ marginTop: '10px' }}
-                                    size='large'
-                                    addonBefore='起苗地点'
-                                    value={
-                                        seedlingMess.nurserysAddressName
-                                            ? (seedlingMess.location
-                                                ? `${seedlingMess.nurserysAddressName}(${seedlingMess.location})`
-                                                : seedlingMess.nurserysAddressName)
-                                            : (seedlingMess.location
-                                                ? seedlingMess.location
-                                                : '')
-                                    }
-                                />
-                                {seedlingMess.GD ? (
-                                    <div>
-                                        <Input
-                                            readOnly
-                                            style={{
-                                                marginTop: '10px'
-                                            }}
-                                            size='large'
-                                            addonBefore='高度(cm)'
-                                            value={seedlingMess.GD}
-                                        />
-                                        {seedlingMess.GDFJ
-                                            ? seedlingMess.GDFJ.map(
-                                                src => {
-                                                    return (
-                                                        <div key={src}>
-                                                            <img
-                                                                style={{
-                                                                    width: '150px',
-                                                                    height: '150px',
-                                                                    display: 'block',
-                                                                    marginTop: '10px'
-                                                                }}
-                                                                onClick={this.handleImgView.bind(this, src)}
-                                                                src={
-                                                                    src
-                                                                }
-                                                                alt='图片'
-                                                            />
-                                                        </div>
-                                                    );
-                                                }
-                                            )
-                                            : ''}
-                                    </div>
-                                ) : (
-                                        ''
-                                    )}
-                                {seedlingMess.GF ? (
-                                    <div>
-                                        <Input
-                                            readOnly
-                                            style={{
-                                                marginTop: '10px'
-                                            }}
-                                            size='large'
-                                            addonBefore='冠幅(cm)'
-                                            value={seedlingMess.GF}
-                                        />
-                                        {seedlingMess.GFFJ
-                                            ? seedlingMess.GFFJ.map(
-                                                src => {
-                                                    return (
-                                                        <div key={src}>
-                                                            <img
-                                                                style={{
-                                                                    width: '150px',
-                                                                    height: '150px',
-                                                                    display: 'block',
-                                                                    marginTop: '10px'
-                                                                }}
-                                                                src={
-                                                                    src
-                                                                }
-                                                                alt='图片'
-                                                            />
-                                                        </div>
-                                                    );
-                                                }
-                                            )
-                                            : ''}
-                                    </div>
-                                ) : (
-                                        ''
-                                    )}
-                                {seedlingMess.XJ ? (
-                                    <div>
-                                        <Input
-                                            readOnly
-                                            style={{
-                                                marginTop: '10px'
-                                            }}
-                                            size='large'
-                                            addonBefore='胸径(cm)'
-                                            value={seedlingMess.XJ}
-                                        />
-                                        {seedlingMess.XJFJ
-                                            ? seedlingMess.XJFJ.map(
-                                                src => {
-                                                    return (
-                                                        <div key={src}>
-                                                            <img
-                                                                style={{
-                                                                    width: '150px',
-                                                                    height: '150px',
-                                                                    display: 'block',
-                                                                    marginTop: '10px'
-                                                                }}
-                                                                onClick={this.handleImgView.bind(this, src)}
-                                                                src={
-                                                                    src
-                                                                }
-                                                                alt='图片'
-                                                            />
-                                                        </div>
-                                                    );
-                                                }
-                                            )
-                                            : ''}
-                                    </div>
-                                ) : (
-                                        ''
-                                    )}
-                                {seedlingMess.DJ ? (
-                                    <div>
-                                        <Input
-                                            readOnly
-                                            style={{
-                                                marginTop: '10px'
-                                            }}
-                                            size='large'
-                                            addonBefore='地径(cm)'
-                                            value={seedlingMess.DJ}
-                                        />
-                                        {seedlingMess.DJFJ
-                                            ? seedlingMess.DJFJ.map(
-                                                src => {
-                                                    return (
-                                                        <div key={src}>
-                                                            <img
-                                                                style={{
-                                                                    width: '150px',
-                                                                    height: '150px',
-                                                                    display: 'block',
-                                                                    marginTop: '10px'
-                                                                }}
-                                                                onClick={this.handleImgView.bind(this, src)}
-                                                                src={
-                                                                    src
-                                                                }
-                                                                alt='图片'
-                                                            />
-                                                        </div>
-                                                    );
-                                                }
-                                            )
-                                            : ''}
-                                    </div>
-                                ) : (
-                                        ''
-                                    )}
-                                {seedlingMess.TQHD ? (
-                                    <div>
-                                        <Input
-                                            readOnly
-                                            style={{
-                                                marginTop: '10px'
-                                            }}
-                                            size='large'
-                                            addonBefore='土球厚度(cm)'
-                                            value={seedlingMess.TQHD}
-                                        />
-                                        {seedlingMess.TQHDFJ
-                                            ? seedlingMess.TQHDFJ.map(
-                                                src => {
-                                                    return (
-                                                        <div key={src}>
-                                                            <img
-                                                                style={{
-                                                                    width: '150px',
-                                                                    height: '150px',
-                                                                    display: 'block',
-                                                                    marginTop: '10px'
-                                                                }}
-                                                                onClick={this.handleImgView.bind(this, src)}
-                                                                src={
-                                                                    src
-                                                                }
-                                                                alt='图片'
-                                                            />
-                                                        </div>
-                                                    );
-                                                }
-                                            )
-                                            : ''}
-                                    </div>
-                                ) : (
-                                        ''
-                                    )}
-                                {seedlingMess.TQZJ ? (
-                                    <div>
-                                        <Input
-                                            readOnly
-                                            style={{
-                                                marginTop: '10px'
-                                            }}
-                                            size='large'
-                                            addonBefore='土球直径(cm)'
-                                            value={seedlingMess.TQZJ}
-                                        />
-                                        {seedlingMess.TQZJFJ
-                                            ? seedlingMess.TQZJFJ.map(
-                                                src => {
-                                                    return (
-                                                        <div key={src}>
-                                                            <img
-                                                                style={{
-                                                                    width: '150px',
-                                                                    height: '150px',
-                                                                    display: 'block',
-                                                                    marginTop: '10px'
-                                                                }}
-                                                                onClick={this.handleImgView.bind(this, src)}
-                                                                src={
-                                                                    src
-                                                                }
-                                                                alt='图片'
-                                                            />
-                                                        </div>
-                                                    );
-                                                }
-                                            )
-                                            : ''}
-                                    </div>
-                                ) : (
-                                        ''
-                                    )}
-                            </TabPane>
-                            <TabPane tab='树木信息' key='2'>
-                                <Input
-                                    readOnly
-                                    style={{ marginTop: '10px' }}
-                                    size='large'
-                                    addonBefore='顺序码'
-                                    value={
-                                        treeMess.sxm ? treeMess.sxm : ''
-                                    }
-                                />
-                                <Input
-                                    readOnly
-                                    style={{ marginTop: '10px' }}
-                                    size='large'
-                                    addonBefore='地块'
-                                    value={
-                                        treeMess.landName
-                                            ? treeMess.landName
-                                            : ''
-                                    }
-                                />
-                                <Input
-                                    readOnly
-                                    style={{ marginTop: '10px' }}
-                                    size='large'
-                                    addonBefore='标段'
-                                    value={
-                                        treeMess.sectionName
-                                            ? treeMess.sectionName
-                                            : ''
-                                    }
-                                />
-                                <Input
-                                    readOnly
-                                    style={{ marginTop: '10px' }}
-                                    size='large'
-                                    addonBefore='小班'
-                                    value={
-                                        treeMess.SmallClass
-                                            ? treeMess.SmallClass
-                                            : ''
-                                    }
-                                />
-                                <Input
-                                    readOnly
-                                    style={{ marginTop: '10px' }}
-                                    size='large'
-                                    addonBefore='细班'
-                                    value={
-                                        treeMess.ThinClass
-                                            ? treeMess.ThinClass
-                                            : ''
-                                    }
-                                />
-                                <Input
-                                    readOnly
-                                    style={{ marginTop: '10px' }}
-                                    size='large'
-                                    addonBefore='树种'
-                                    value={
-                                        treeMess.TreeTypeName
-                                            ? treeMess.TreeTypeName
-                                            : ''
-                                    }
-                                />
-                                <Input
-                                    readOnly
-                                    style={{ marginTop: '10px' }}
-                                    size='large'
-                                    addonBefore='位置'
-                                    value={
-                                        // treeMess.queryTreeAddressName
-                                        //     ? treeMess.queryTreeAddressName
-                                        //     : (treeMess.Location
-                                        //         ? `${treeMess.LocationX},${
-                                        //             treeMess.LocationY
-                                        //         }`
-                                        //         : '')
-                                        treeMess.Location
-                                            ? `${treeMess.LocationX},${
-                                            treeMess.LocationY
-                                            }`
-                                            : (
-                                                treeMess.locationCoord
-                                                    ? treeMess.locationCoord
-                                                    : ''
-                                            )
-                                    }
-                                />
-                                {treeMess.GD ? (
-                                    <div>
-                                        <Input
-                                            readOnly
-                                            style={{
-                                                marginTop: '10px'
-                                            }}
-                                            size='large'
-                                            addonBefore='高度(cm)'
-                                            value={treeMess.GD}
-                                        />
-                                        {treeMess.GDFJ
-                                            ? treeMess.GDFJ.map(src => {
-                                                return (
-                                                    <div key={src}>
-                                                        <img
-                                                            style={{
-                                                                width: '150px',
-                                                                height: '150px',
-                                                                display: 'block',
-                                                                marginTop: '10px'
-                                                            }}
-                                                            onClick={this.handleImgView.bind(this, src)}
-                                                            src={src}
-                                                            alt='图片'
-                                                        />
-                                                    </div>
-                                                );
-                                            })
-                                            : ''}
-                                    </div>
-                                ) : (
-                                        ''
-                                    )}
-                                {treeMess.GF ? (
-                                    <div>
-                                        <Input
-                                            readOnly
-                                            style={{
-                                                marginTop: '10px'
-                                            }}
-                                            size='large'
-                                            addonBefore='冠幅(cm)'
-                                            value={treeMess.GF}
-                                        />
-                                        {treeMess.GFFJ
-                                            ? treeMess.GFFJ.map(src => {
-                                                return (
-                                                    <div key={src}>
-                                                        <img
-                                                            style={{
-                                                                width: '150px',
-                                                                height: '150px',
-                                                                display: 'block',
-                                                                marginTop: '10px'
-                                                            }}
-                                                            onClick={this.handleImgView.bind(this, src)}
-                                                            src={src}
-                                                            alt='图片'
-                                                        />
-                                                    </div>
-                                                );
-                                            })
-                                            : ''}
-                                    </div>
-                                ) : (
-                                        ''
-                                    )}
-                                {treeMess.XJ ? (
-                                    <div>
-                                        <Input
-                                            readOnly
-                                            style={{
-                                                marginTop: '10px'
-                                            }}
-                                            size='large'
-                                            addonBefore='胸径(cm)'
-                                            value={treeMess.XJ}
-                                        />
-                                        {treeMess.XJFJ
-                                            ? treeMess.XJFJ.map(src => {
-                                                return (
-                                                    <div key={src}>
-                                                        <img
-                                                            style={{
-                                                                width: '150px',
-                                                                height: '150px',
-                                                                display: 'block',
-                                                                marginTop: '10px'
-                                                            }}
-                                                            onClick={this.handleImgView.bind(this, src)}
-                                                            src={src}
-                                                            alt='图片'
-                                                        />
-                                                    </div>
-                                                );
-                                            })
-                                            : ''}
-                                    </div>
-                                ) : (
-                                        ''
-                                    )}
-                                {treeMess.DJ ? (
-                                    <div>
-                                        <Input
-                                            readOnly
-                                            style={{
-                                                marginTop: '10px'
-                                            }}
-                                            size='large'
-                                            addonBefore='地径(cm)'
-                                            value={treeMess.DJ}
-                                        />
-                                        {treeMess.DJFJ
-                                            ? treeMess.DJFJ.map(src => {
-                                                return (
-                                                    <div key={src}>
-                                                        <img
-                                                            style={{
-                                                                width: '150px',
-                                                                height: '150px',
-                                                                display: 'block',
-                                                                marginTop: '10px'
-                                                            }}
-                                                            onClick={this.handleImgView.bind(this, src)}
-                                                            src={src}
-                                                            alt='图片'
-                                                        />
-                                                    </div>
-                                                );
-                                            })
-                                            : ''}
-                                    </div>
-                                ) : (
-                                        ''
-                                    )}
-                                {treeMess.MD ? (
-                                    <div>
-                                        <Input
-                                            readOnly
-                                            style={{
-                                                marginTop: '10px'
-                                            }}
-                                            size='large'
-                                            addonBefore='密度(棵/m^3)'
-                                            value={treeMess.MD}
-                                        />
-                                        {treeMess.MDFJ
-                                            ? treeMess.MDFJ.map(src => {
-                                                return (
-                                                    <div key={src}>
-                                                        <img
-                                                            style={{
-                                                                width: '150px',
-                                                                height: '150px',
-                                                                display: 'block',
-                                                                marginTop: '10px'
-                                                            }}
-                                                            onClick={this.handleImgView.bind(this, src)}
-                                                            src={src}
-                                                            alt='图片'
-                                                        />
-                                                    </div>
-                                                );
-                                            })
-                                            : ''}
-                                    </div>
-                                ) : (
-                                        ''
-                                    )}
-                                {treeMess.MJ ? (
-                                    <div>
-                                        <Input
-                                            readOnly
-                                            style={{
-                                                marginTop: '10px'
-                                            }}
-                                            size='large'
-                                            addonBefore='面积(m^2)'
-                                            value={treeMess.MJ}
-                                        />
-                                        {treeMess.MJFJ
-                                            ? treeMess.MJFJ.map(src => {
-                                                return (
-                                                    <div key={src}>
-                                                        <img
-                                                            style={{
-                                                                width: '150px',
-                                                                height: '150px',
-                                                                display: 'block',
-                                                                marginTop: '10px'
-                                                            }}
-                                                            onClick={this.handleImgView.bind(this, src)}
-                                                            src={src}
-                                                            alt='图片'
-                                                        />
-                                                    </div>
-                                                );
-                                            })
-                                            : ''}
-                                    </div>
-                                ) : (
-                                        ''
-                                    )}
-                                {treeMess.TQHD ? (
-                                    <div>
-                                        <Input
-                                            readOnly
-                                            style={{
-                                                marginTop: '10px'
-                                            }}
-                                            size='large'
-                                            addonBefore='土球厚度(cm)'
-                                            value={treeMess.TQHD}
-                                        />
-                                        {treeMess.TQHDFJ
-                                            ? treeMess.TQHDFJ.map(
-                                                src => {
-                                                    return (
-                                                        <div key={src}>
-                                                            <img
-                                                                style={{
-                                                                    width: '150px',
-                                                                    height: '150px',
-                                                                    display: 'block',
-                                                                    marginTop: '10px'
-                                                                }}
-                                                                onClick={this.handleImgView.bind(this, src)}
-                                                                src={
-                                                                    src
-                                                                }
-                                                                alt='图片'
-                                                            />
-                                                        </div>
-                                                    );
-                                                }
-                                            )
-                                            : ''}
-                                    </div>
-                                ) : (
-                                        ''
-                                    )}
-                                {treeMess.TQZJ ? (
-                                    <div>
-                                        <Input
-                                            readOnly
-                                            style={{
-                                                marginTop: '10px'
-                                            }}
-                                            size='large'
-                                            addonBefore='土球直径(cm)'
-                                            value={treeMess.TQZJ}
-                                        />
-                                        {treeMess.TQZJFJ
-                                            ? treeMess.TQZJFJ.map(
-                                                src => {
-                                                    return (
-                                                        <div key={src}>
-                                                            <img
-                                                                style={{
-                                                                    width: '150px',
-                                                                    height: '150px',
-                                                                    display: 'block',
-                                                                    marginTop: '10px'
-                                                                }}
-                                                                onClick={this.handleImgView.bind(this, src)}
-                                                                src={
-                                                                    src
-                                                                }
-                                                                alt='图片'
-                                                            />
-                                                        </div>
-                                                    );
-                                                }
-                                            )
-                                            : ''}
-                                    </div>
-                                ) : (
-                                        ''
-                                    )}
-                            </TabPane>
-                            <TabPane tab='审批流程' key='3'>
-                                <div>
-                                    {flowMess.length > 0
-                                        ? flowMess.map(flow => {
-                                            let flowName = '';
-                                            if (flow.Status) {
-                                                if (flow.Status === -1) {
-                                                    flowName = '施工提交';
-                                                } else if (flow.Status === 0) {
-                                                    flowName = '监理大数据未通过';
-                                                } else if (flow.Status === 1) {
-                                                    flowName = '监理大数据合格';
-                                                } else if (flow.Status === 2) {
-                                                    flowName = '业主合格';
-                                                } else if (flow.Status === 3) {
-                                                    flowName = '业主不合格';
-                                                } else if (flow.Status === 4) {
-                                                    flowName = '施工结缘入库';
-                                                } else if (flow.Status === 5) {
-                                                    flowName = '监理质量不合格';
-                                                } else if (flow.Status === 6) {
-                                                    flowName = '监理质量合格';
-                                                } else if (flow.Status === 100) {
-                                                    flowName = '苗圃提交';
-                                                } else if (flow.Node === '补种') {
-                                                    flowName = '施工补录扫码';
-                                                }
-                                            }
-                                            return (
-                                                <div key={flow.ID}>
-                                                    <Row
-                                                        style={{
-                                                            marginTop: '10px'
-                                                        }}
-                                                    >
-                                                        <h3
-                                                            style={{
-                                                                float: 'left'
-                                                            }}
-                                                        >
-                                                            {`${flowName}:`}
-                                                        </h3>
-                                                        <div
-                                                            style={{
-                                                                float: 'right'
-                                                            }}
-                                                        >
-                                                            {flow.CreateTime
-                                                                ? flow.CreateTime
-                                                                : ''}
-                                                        </div>
-                                                    </Row>
-                                                    <Row
-                                                        style={{
-                                                            marginTop: '10px'
-                                                        }}
-                                                    >
-                                                        <div style={{
-                                                            float: 'left'
-                                                        }}>
-                                                            {`${
-                                                                flow.FromUserObj
-                                                                    ? flow
-                                                                        .FromUserObj
-                                                                        .Full_Name
-                                                                    : ''
-                                                                } : ${
-                                                                flow.Info
-                                                                    ? flow.Info
-                                                                    : ''
-                                                                }`}
-                                                        </div>
-                                                        <div style={{
-                                                            float: 'right'
-                                                        }}>
-                                                            {`【${flow.companyName}】`}
-                                                        </div>
-                                                    </Row>
-                                                    <hr
-                                                        className='hrstyle'
-                                                        style={{
-                                                            marginTop: '10px'
-                                                        }}
-                                                    />
-                                                </div>
-                                            );
-                                        })
-                                        : ''}
-                                    <div>
-                                        <Row
-                                            style={{
-                                                marginTop: '10px'
-                                            }}
-                                        >
-                                            <h3 style={{ float: 'left' }}>{'苗圃提交'}</h3>
-                                            <div
-                                                style={{
-                                                    float: 'right'
-                                                }}
-                                            >
-                                                {seedlingMess.CreateTime
-                                                    ? seedlingMess.CreateTime
-                                                    : ''}
-                                            </div>
-                                        </Row>
-                                        <Row
-                                            style={{
-                                                marginTop: '10px'
-                                            }}
-                                        >
-                                            {/* {`${
-                                            seedlingMess.InputerObj
-                                                ? seedlingMess
-                                                    .InputerObj
-                                                    .Full_Name
-                                                : ''
-                                        }:${
-                                            seedlingMess.Factory
-                                                ? seedlingMess.Factory
-                                                : ''
-                                        }`} */}
-                                            <div style={{
-                                                float: 'left'
-                                            }}>
-                                                {`${
-                                                    seedlingMess.InputerObj
-                                                        ? seedlingMess
-                                                            .InputerObj
-                                                            .Full_Name
-                                                        : ''
-                                                    } : `}
-                                            </div>
-                                            <div style={{
-                                                float: 'right'
-                                            }}>
-                                                {`【${seedlingMess.Factory
-                                                    ? seedlingMess.Factory
-                                                    : ''}】`}
-                                            </div>
-                                        </Row>
-                                    </div>
-                                </div>
-                            </TabPane>
-                            <TabPane tab='养护任务' key='4'>
-                                {
-                                    curingMess.length > 0
-                                        ? curingMess.map((curing) => {
-                                            return (
-                                                <div key={curing.ID}>
-                                                    <Input
-                                                        readOnly
-                                                        style={{
-                                                            marginTop: '10px'
-                                                        }}
-                                                        size='large'
-                                                        addonBefore='养护类型'
-                                                        value={curing.typeName}
-                                                    />
-                                                    <Input
-                                                        readOnly
-                                                        style={{
-                                                            marginTop: '10px'
-                                                        }}
-                                                        size='large'
-                                                        addonBefore='起止时间'
-                                                        value={`${curing.StartTime} ~ ${curing.EndTime}`}
-                                                    />
-                                                    <Input
-                                                        readOnly
-                                                        style={{
-                                                            marginTop: '10px'
-                                                        }}
-                                                        size='large'
-                                                        addonBefore='养护人员'
-                                                        value={curing.CuringMans}
-                                                        title={curing.CuringMans}
-                                                    />
-                                                    {curing.Pics && curing.Pics.length > 0
-                                                        ? curing.Pics.map(
-                                                            src => {
-                                                                return (
-                                                                    <div key={src}>
-                                                                        <img
-                                                                            style={{
-                                                                                width: '150px',
-                                                                                height: '150px',
-                                                                                display: 'block',
-                                                                                marginTop: '10px'
-                                                                            }}
-                                                                            onClick={this.handleImgView.bind(this, src)}
-                                                                            src={
-                                                                                src
-                                                                            }
-                                                                            alt='图片'
-                                                                        />
-                                                                    </div>
-                                                                );
-                                                            }
-                                                        )
-                                                        : ''}
-                                                    {/* 为每一个养护任务底部添加虚线作为分隔 */}
-                                                    <div style={{ marginTop: '10px', borderBottom: '1px dashed #8c8383' }} />
-                                                </div>
-                                            );
-                                        }) : ''
-                                }
-
-                            </TabPane>
-                        </Tabs>
-                    </Spin>
+                    </Carousel> */}
                 </Modal>
             </div>
         );
