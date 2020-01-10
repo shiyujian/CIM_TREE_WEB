@@ -1,16 +1,7 @@
 import React, { Component } from 'react';
 import {
-    Input,
     Button,
-    Select,
-    Table,
-    Pagination,
-    Modal,
-    Form,
-    message,
-    List,
-    InputNumber,
-    Spin
+    Notification
 } from 'antd';
 import L from 'leaflet';
 import 'leaflet-editable';
@@ -57,15 +48,19 @@ export default class CompletionPlanTable extends Component {
             this.setState({
                 isSuperAdmin: true,
                 section: ''
+            }, () => {
+                // 初始化地图
+                this.initMap();
             });
         } else {
             this.setState({
                 isSuperAdmin: false,
                 section: this.userSection || ''
+            }, () => {
+                // 初始化地图
+                this.initMap();
             });
         }
-        // 初始化地图
-        this.initMap();
     }
     componentDidUpdate = async (prevProps, prevState) => {
         const {
@@ -87,6 +82,10 @@ export default class CompletionPlanTable extends Component {
         }
     }
     initMap = async () => {
+        const {
+            section,
+            isSuperAdmin
+        } = this.state;
         // 基础设置
         let mapInitialization = INITLEAFLET_API;
         mapInitialization.crs = L.CRS.EPSG4326;
@@ -111,14 +110,20 @@ export default class CompletionPlanTable extends Component {
         // 加载苗木图层
         // await this.getTileLayerTreeBasic();
         // 灌溉管网下的树木图层
-        await this.getTileLayerTreeFilter();
-        // getTileLayerTreeThinClass
+        // await this.getTileLayerTreeFilter();
+        // 树种区域图层
         await this.getTileLayerTreeThinClass();
         // 加载灌溉管网图层
         await this.getTreePipeLayer();
         // 加载灌溉管网图层
         await this.getTreePipeNodeLayer();
-        this.editPolygon = this.map.editTools.startPolygon();
+        if (section || isSuperAdmin) {
+            this.editPolygon = this.map.editTools.startPolygon();
+        } else {
+            Notification.error({
+                message: '当前用户未关联标段，请重新切换用户'
+            });
+        }
         await this.map.on('mouseup', this.handleMapMeasureClickFunction);
         await this.map.on('click', this.handleMapMeasureClickFunction);
     }
@@ -184,16 +189,28 @@ export default class CompletionPlanTable extends Component {
     // 加载灌溉管网图层
     getTreePipeLayer = async () => {
         try {
-            this.tileTreePipeBasic = L.tileLayer(
+            // this.tileTreePipeBasic = L.tileLayer(
+            //     FOREST_GIS_API +
+            //     '/geoserver/gwc/service/wmts?layer=xatree%3Apipe&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+            //     {
+            //         opacity: 1.0,
+            //         subdomains: [1, 2, 3],
+            //         minZoom: 10,
+            //         maxZoom: 21,
+            //         storagetype: 0,
+            //         tiletype: 'wtms'
+            //     }
+            // ).addTo(this.map);
+            this.tileTreePipeBasic = L.tileLayer.wms(
                 FOREST_GIS_API +
-                '/geoserver/gwc/service/wmts?layer=xatree%3Apipe&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                '/geoserver/xatree/wms?style=',
                 {
-                    opacity: 1.0,
-                    subdomains: [1, 2, 3],
-                    minZoom: 10,
+                    layers: 'xatree:pipe',
+                    crs: L.CRS.EPSG4326,
+                    format: 'image/png',
+                    minZoom: 11,
                     maxZoom: 21,
-                    storagetype: 0,
-                    tiletype: 'wtms'
+                    transparent: true
                 }
             ).addTo(this.map);
         } catch (e) {
@@ -203,16 +220,28 @@ export default class CompletionPlanTable extends Component {
     // 加载灌溉管网图层
     getTreePipeNodeLayer = async () => {
         try {
-            this.tileTreePipeNodeBasic = L.tileLayer(
+            // this.tileTreePipeNodeBasic = L.tileLayer(
+            //     FOREST_GIS_API +
+            //     '/geoserver/gwc/service/wmts?layer=xatree%3Apipenode&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+            //     {
+            //         opacity: 1.0,
+            //         subdomains: [1, 2, 3],
+            //         minZoom: 10,
+            //         maxZoom: 21,
+            //         storagetype: 0,
+            //         tiletype: 'wtms'
+            //     }
+            // ).addTo(this.map);
+            this.tileTreePipeNodeBasic = L.tileLayer.wms(
                 FOREST_GIS_API +
-                '/geoserver/gwc/service/wmts?layer=xatree%3Apipenode&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                '/geoserver/xatree/wms?style=',
                 {
-                    opacity: 1.0,
-                    subdomains: [1, 2, 3],
-                    minZoom: 10,
+                    layers: 'xatree:pipenode',
+                    crs: L.CRS.EPSG4326,
+                    format: 'image/png',
+                    minZoom: 11,
                     maxZoom: 21,
-                    storagetype: 0,
-                    tiletype: 'wtms'
+                    transparent: true
                 }
             ).addTo(this.map);
         } catch (e) {
@@ -331,7 +360,10 @@ export default class CompletionPlanTable extends Component {
                 getExportPipeDrawing
             }
         } = this.props;
-        if (this.editPolygon) {
+        const {
+            section
+        } = this.state;
+        if (this.editPolygon && section) {
             let coordinates = handlePolygonLatLngs(this.editPolygon);
             console.log('coordinates', coordinates);
             let wkt = 'POLYGON(';
@@ -343,8 +375,12 @@ export default class CompletionPlanTable extends Component {
             //     bbox: wkt
             // };
             // await getExportPipeDrawing({}, postData);
-            let downloadUrl = `${DOCEXPORT_API}?action=pipedrawing&bbox=${wkt}`;
+            let downloadUrl = `${DOCEXPORT_API}?action=pipedrawing&bbox=${wkt}&section=${section}`;
             await this.createLink(this, downloadUrl);
+        } else {
+            Notification.error({
+                message: '当前用户未关联标段，请重新切换用户'
+            });
         }
     }
     createLink = async (name, url) => {

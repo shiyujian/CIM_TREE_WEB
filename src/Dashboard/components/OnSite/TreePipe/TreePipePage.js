@@ -227,16 +227,28 @@ export default class TreePipePage extends Component {
             map
         } = this.props;
         try {
-            this.tileTreePipeBasic = L.tileLayer(
+            // this.tileTreePipeBasic = L.tileLayer(
+            //     FOREST_GIS_API +
+            //     '/geoserver/gwc/service/wmts?layer=xatree%3Apipe&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+            //     {
+            //         opacity: 1.0,
+            //         subdomains: [1, 2, 3],
+            //         minZoom: 10,
+            //         maxZoom: 21,
+            //         storagetype: 0,
+            //         tiletype: 'wtms'
+            //     }
+            // ).addTo(map);
+            this.tileTreePipeBasic = L.tileLayer.wms(
                 FOREST_GIS_API +
-                '/geoserver/gwc/service/wmts?layer=xatree%3Apipe&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                '/geoserver/xatree/wms?style=',
                 {
-                    opacity: 1.0,
-                    subdomains: [1, 2, 3],
-                    minZoom: 10,
+                    layers: 'xatree:pipe',
+                    crs: L.CRS.EPSG4326,
+                    format: 'image/png',
+                    minZoom: 11,
                     maxZoom: 21,
-                    storagetype: 0,
-                    tiletype: 'wtms'
+                    transparent: true
                 }
             ).addTo(map);
         } catch (e) {
@@ -249,16 +261,28 @@ export default class TreePipePage extends Component {
             map
         } = this.props;
         try {
-            this.tileTreePipeNodeBasic = L.tileLayer(
+            // this.tileTreePipeNodeBasic = L.tileLayer(
+            //     FOREST_GIS_API +
+            //     '/geoserver/gwc/service/wmts?layer=xatree%3Apipenode&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+            //     {
+            //         opacity: 1.0,
+            //         subdomains: [1, 2, 3],
+            //         minZoom: 10,
+            //         maxZoom: 21,
+            //         storagetype: 0,
+            //         tiletype: 'wtms'
+            //     }
+            // ).addTo(map);
+            this.tileTreePipeNodeBasic = L.tileLayer.wms(
                 FOREST_GIS_API +
-                '/geoserver/gwc/service/wmts?layer=xatree%3Apipenode&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                '/geoserver/xatree/wms?style=',
                 {
-                    opacity: 1.0,
-                    subdomains: [1, 2, 3],
-                    minZoom: 10,
+                    layers: 'xatree:pipenode',
+                    crs: L.CRS.EPSG4326,
+                    format: 'image/png',
+                    minZoom: 11,
                     maxZoom: 21,
-                    storagetype: 0,
-                    tiletype: 'wtms'
+                    transparent: true
                 }
             ).addTo(map);
         } catch (e) {
