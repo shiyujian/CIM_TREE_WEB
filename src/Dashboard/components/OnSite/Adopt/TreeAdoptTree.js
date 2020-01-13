@@ -69,7 +69,7 @@ export default class TreeAdoptTree extends Component {
             adoptTreeMarkerLayerList
         } = this.state;
         // 关闭地图点击事件
-        map.off('click', this.handleAdoptTreeGisClickFunction);
+        await map.off('click', this.handleAdoptTreeGisClickFunction);
         // 去除苗木结缘图层
         this.removeTileTreeAdoptLayer();
         for (let t in adoptTreeMarkerLayerList) {
@@ -95,9 +95,11 @@ export default class TreeAdoptTree extends Component {
         const {
             map
         } = this.props;
+        console.log('nbbbbbb');
         if (this.tileTreeAdoptLayerBasic) {
             this.tileTreeAdoptLayerBasic.addTo(map);
         } else {
+            console.log('aaaaaaaaaaaa');
             this.tileTreeAdoptLayerBasic = L.tileLayer(
                 FOREST_GIS_API +
                 '/geoserver/gwc/service/wmts?layer=xatree%3Aadopttree&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
@@ -134,7 +136,7 @@ export default class TreeAdoptTree extends Component {
         }
         return (
             <div>
-                <Search
+                {/* <Search
                     placeholder='请输入结缘人姓名'
                     onSearch={this.searchTreeData.bind(this)}
                     style={{ width: '100%', marginBotton: 10, paddingRight: 5 }}
@@ -147,7 +149,7 @@ export default class TreeAdoptTree extends Component {
                     {contents.map(p => {
                         return this.loop(p);
                     })}
-                </Tree>
+                </Tree> */}
                 { // 苗木结缘弹窗展示树木信息
                     adoptTreeModalVisible
                         ? (

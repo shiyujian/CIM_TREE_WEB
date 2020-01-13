@@ -361,9 +361,10 @@ export default class CompletionPlanTable extends Component {
             }
         } = this.props;
         const {
-            section
+            section,
+            isSuperAdmin
         } = this.state;
-        if (this.editPolygon && section) {
+        if (this.editPolygon && (section || isSuperAdmin)) {
             let coordinates = handlePolygonLatLngs(this.editPolygon);
             console.log('coordinates', coordinates);
             let wkt = 'POLYGON(';
@@ -375,8 +376,13 @@ export default class CompletionPlanTable extends Component {
             //     bbox: wkt
             // };
             // await getExportPipeDrawing({}, postData);
-            let downloadUrl = `${DOCEXPORT_API}?action=pipedrawing&bbox=${wkt}&section=${section}`;
-            await this.createLink(this, downloadUrl);
+            if (isSuperAdmin) {
+                let downloadUrl = `${DOCEXPORT_API}?action=pipedrawing&bbox=${wkt}`;
+                await this.createLink(this, downloadUrl);
+            } else {
+                let downloadUrl = `${DOCEXPORT_API}?action=pipedrawing&bbox=${wkt}&section=${section}`;
+                await this.createLink(this, downloadUrl);
+            }
         } else {
             Notification.error({
                 message: '当前用户未关联标段，请重新切换用户'

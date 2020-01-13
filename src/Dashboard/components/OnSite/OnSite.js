@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2020-01-03 16:03:18
+ * @Last Modified time: 2020-01-13 10:54:03
  */
 import React, { Component } from 'react';
 import {
@@ -589,6 +589,17 @@ class OnSite extends Component {
                         dashboardTreeMess && dashboardTreeMess === 'dashboardTreeMess'
                             ? (
                                 <TreeMessGisOnClickHandle
+                                    {...this.props}
+                                    {...this.state}
+                                    map={this.map}
+                                />
+                            ) : ''
+                    }
+                    {
+                        // 树木信息
+                        dashboardCompomentMenu && dashboardCompomentMenu === 'geojsonFeature_treeAdopt'
+                            ? (
+                                <TreeAdoptTree
                                     {...this.props}
                                     {...this.state}
                                     map={this.map}

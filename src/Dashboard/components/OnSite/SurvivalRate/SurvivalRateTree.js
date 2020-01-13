@@ -43,36 +43,50 @@ export default class SurvivalRateTree extends Component {
         {
             id: 'survivalRateHundred',
             label: '90%~100%',
+            data: '0.9~1',
+            num: '90~100',
             color: '#42645b'
         },
         {
             id: 'survivalRateNinety',
             label: '80%~90%',
+            data: '0.8~0.9',
+            num: '80~90',
             color: '#16e07f'
         },
         {
             id: 'survivalRateEighty',
             label: '70%~80%',
+            data: '0.7~0.8',
+            num: '70~80',
             color: '#007bff'
         },
         {
             id: 'survivalRateSeventy',
             label: '60%~70%',
+            data: '0.6~0.7',
+            num: '60~70',
             color: '#00ffff'
         },
         {
             id: 'survivalRateSixty',
             label: '50%~60%',
+            data: '0.5~0.6',
+            num: '50~60',
             color: '#ffff00'
         },
         {
             id: 'survivalRateFifty',
             label: '40%~50%',
+            data: '0.4~0.5',
+            num: '40~50',
             color: '#ff9900'
         },
         {
             id: 'survivalRateFourty',
             label: '0%~40%',
+            data: '0~0.4',
+            num: '0~40',
             color: '#ff3633'
         }
     ]
@@ -229,14 +243,19 @@ export default class SurvivalRateTree extends Component {
         let survivalRateRateData = '';
         this.survivalRateOptions.map((option) => {
             if (this.state[option.id]) {
-                let data = option.label;
+                let data = option.num;
                 let arr = data.split('~');
                 let arr1 = arr[0];
                 let arr2 = arr[1];
+                // if (survivalRateRateData) {
+                //     survivalRateRateData += ` or ( SurvivalRate > ${arr1} and SurvivalRate < ${arr2} )`;
+                // } else {
+                //     survivalRateRateData += `( SurvivalRate > ${arr1} and SurvivalRate < ${arr2} )`;
+                // }
                 if (survivalRateRateData) {
-                    survivalRateRateData += `%20or%20SurvivalRate%20%3E%20${arr1}%20and%20SurvivalRate%20%3C%20${arr2}`;
+                    survivalRateRateData += ` or ( SurvivalRate BETWEEN ${arr1} AND ${arr2} )`;
                 } else {
-                    survivalRateRateData += `SurvivalRate%20%3E%20${arr1}%20and%20SurvivalRate%20%3C%20${arr2}`;
+                    survivalRateRateData += `( SurvivalRate BETWEEN ${arr1} AND ${arr2} )`;
                 }
             }
         });
@@ -264,8 +283,9 @@ export default class SurvivalRateTree extends Component {
                 url = FOREST_GIS_API +
                     `/geoserver/xatree/wms?cql_filter=Section%20IN%20(${survivalRateSectionData})%20and%20${survivalRateRateData}`;
             }
+            let encodedUrl = encodeURI(url);
             if (url) {
-                this.tileSurvivalRateLayerFilter = L.tileLayer.wms(url,
+                this.tileSurvivalRateLayerFilter = L.tileLayer.wms(encodedUrl,
                     {
                         layers: 'xatree:survivalrate',
                         crs: L.CRS.EPSG4326,
