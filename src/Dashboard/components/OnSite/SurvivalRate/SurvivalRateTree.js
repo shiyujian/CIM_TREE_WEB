@@ -247,11 +247,13 @@ export default class SurvivalRateTree extends Component {
                 let arr = data.split('~');
                 let arr1 = arr[0];
                 let arr2 = arr[1];
+                // sql用or和and连接 可以正常使用
                 // if (survivalRateRateData) {
                 //     survivalRateRateData += ` or ( SurvivalRate > ${arr1} and SurvivalRate < ${arr2} )`;
                 // } else {
                 //     survivalRateRateData += `( SurvivalRate > ${arr1} and SurvivalRate < ${arr2} )`;
                 // }
+                // sql用or和between连接 也可以正常使用
                 if (survivalRateRateData) {
                     survivalRateRateData += ` or ( SurvivalRate BETWEEN ${arr1} AND ${arr2} )`;
                 } else {

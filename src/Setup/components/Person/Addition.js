@@ -94,6 +94,14 @@ class Addition extends Component {
                         });
                     }
                 });
+                parentRoleType.map((type) => {
+                    if (type.RoleName === '养护') {
+                        systemRoles.push({
+                            name: type && type.RoleName,
+                            value: roles.filter(role => role.ParentID === type.ID)
+                        });
+                    }
+                });
             }
         }
         const objs = systemRoles.map(roless => {
