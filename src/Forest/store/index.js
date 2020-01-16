@@ -15,7 +15,8 @@ import {
     TREES_API,
     ROUTE_API,
     DB_API,
-    DOCEXPORT_API
+    DOCEXPORT_API,
+    TREEPIPE_API
 } from '_platform/api';
 import {
     forestFetchAction
@@ -454,7 +455,8 @@ export const postAddCarPack = forestFetchAction(`${TREE_API}/carpack`, [], 'POST
 
 // 竣工图导出
 export const getExportPipeDrawing = forestFetchAction(`${DOCEXPORT_API}/?action=pipedrawing`, []);
-
+// 竣工图坐标数据查看
+export const postPipeCoordinate = createFetchAction(`${TREEPIPE_API}/pipe/query`, [], 'POST', []);
 export const actions = {
     exportEcporttreestatuss,
     getTotalSat,
@@ -569,7 +571,8 @@ export const actions = {
     getSupervisorUsers,
     postAreaAccept,
     postAddCarPack,
-    getExportPipeDrawing
+    getExportPipeDrawing,
+    postPipeCoordinate
 };
 export default handleActions({
     [getTreeOK]: (state, {

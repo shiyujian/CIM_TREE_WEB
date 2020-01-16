@@ -3,6 +3,7 @@ import {
     Button,
     Notification
 } from 'antd';
+import XLSX from 'xlsx';
 import L from 'leaflet';
 import 'leaflet-editable';
 import { getUser } from '_platform/auth';
@@ -354,7 +355,7 @@ export default class CompletionPlanTable extends Component {
             }
         }
     }
-    handleCreateTaskOk = async () => {
+    handleExportPipeDrawingOk = async () => {
         const {
             actions: {
                 getExportPipeDrawing
@@ -401,6 +402,159 @@ export default class CompletionPlanTable extends Component {
         await document.body.removeChild(link);
     };
 
+    handleExportPipeCoordinateOk = async () => {
+        const {
+            actions: {
+                postPipeCoordinate
+            }
+        } = this.props;
+        const {
+            section,
+            isSuperAdmin
+        } = this.state;
+        if (this.editPolygon && (section || isSuperAdmin)) {
+            let coordinates = handlePolygonLatLngs(this.editPolygon);
+            console.log('coordinates', coordinates);
+            let wkt = 'POLYGON(';
+            // 获取手动框选坐标wkt
+            wkt = wkt + getHandleWktData(coordinates);
+            wkt = wkt + ')';
+            console.log('wkt', wkt);
+            let postData = {
+                Sql: ` and  Section = "${section}"`,
+                Bbox: wkt
+            };
+            let data = await postPipeCoordinate({}, postData);
+            console.log('data', data);
+            if (data && data.Pipes && data.PipeNodes) {
+                let pipeNodes = data.PipeNodes;
+                let pipes = data.Pipes;
+                let PipeNodesName = [`管点`];
+                let PipeNodesNameData = PipeNodesName.map((data, i) =>
+                    Object.assign(
+                        {},
+                        {
+                            v: data, position: String.fromCharCode(65 + i) + 1
+                        })).reduce((prev, next) =>
+                    Object.assign(
+                        {}, prev, {
+                            [next.position]: { v: next.v }
+                        }), {});
+                let _pipeNodesHeader = ['名称', '类型', '创建时间', '标段', '坐标'];
+                let pipeNodesHeader = _pipeNodesHeader.map((data, i) =>
+                    Object.assign(
+                        {},
+                        {
+                            v: data, position: String.fromCharCode(65 + i) + 2
+                        })).reduce((prev, next) =>
+                    Object.assign(
+                        {}, prev, {
+                            [next.position]: { v: next.v }
+                        }), {});
+                let pipeNodesData = [];
+                let pipeNodesTableData = [];
+                if (pipeNodes instanceof Array && pipeNodes.length > 0) {
+                    pipeNodes.map(item => {
+                        let obj = {};
+                        obj['名称'] = item.Name;
+                        obj['类型'] = item.PipeType;
+                        obj['创建时间'] = item.CreateTime;
+                        obj['标段'] = item.Section;
+                        obj['坐标'] = item.Geom;
+                        pipeNodesData.push(obj);
+                    });
+                    pipeNodesTableData = pipeNodesData.map((data, i) =>
+                        _pipeNodesHeader.map((k, j) =>
+                            Object.assign(
+                                {},
+                                {
+                                    v: data[k],
+                                    position: String.fromCharCode(65 + j) + (i + 3)
+                                }))).reduce((prev, next) =>
+                        prev.concat(next)).reduce((prev, next) =>
+                        Object.assign(
+                            {}, prev, {
+                                [next.position]: { v: next.v }
+                            }),
+                    {});
+                }
+
+                let length = pipeNodes.length;
+                let pipesName = [`管线`];
+                let pipesNameData = pipesName.map((data, i) =>
+                    Object.assign(
+                        {},
+                        {
+                            v: data, position: String.fromCharCode(65 + i) + (length + 5)
+                        })).reduce((prev, next) =>
+                    Object.assign(
+                        {}, prev, {
+                            [next.position]: { v: next.v }
+                        }), {});
+                let _pipesHeader = ['材质', '创建时间', '长度', '标段', '坐标'];
+                let pipesHeader = _pipesHeader.map((data, i) =>
+                    Object.assign(
+                        {},
+                        {
+                            v: data, position: String.fromCharCode(65 + i) + (length + 6)
+                        })).reduce((prev, next) =>
+                    Object.assign(
+                        {}, prev, {
+                            [next.position]: { v: next.v }
+                        }), {});
+                let pipesData = [];
+                let pipesTableData = [];
+                if (pipes instanceof Array && pipes.length > 0) {
+                    pipes.map(item => {
+                        let obj = {};
+                        obj['材质'] = item.Material;
+                        obj['创建时间'] = item.CreateTime;
+                        obj['长度'] = item.Length;
+                        obj['标段'] = item.Section;
+                        obj['坐标'] = item.Geom;
+                        pipesData.push(obj);
+                    });
+                    pipesTableData = pipesData.map((data, i) =>
+                        _pipesHeader.map((k, j) =>
+                            Object.assign(
+                                {},
+                                {
+                                    v: data[k],
+                                    position: String.fromCharCode(65 + j) + (i + length + 7)
+                                }))).reduce((prev, next) =>
+                        prev.concat(next)).reduce((prev, next) =>
+                        Object.assign(
+                            {}, prev, {
+                                [next.position]: { v: next.v }
+                            }),
+                    {});
+                }
+
+                let output = Object.assign(
+                    {},
+                    PipeNodesNameData,
+                    pipeNodesHeader,
+                    pipeNodesTableData,
+                    pipesNameData,
+                    pipesHeader,
+                    pipesTableData
+                );
+                // 获取所有单元格的位置
+                let outputPos = Object.keys(output);
+                // 计算出范围
+                let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
+                // 构建 workbook 对象
+                let wb = {
+                    SheetNames: ['mySheet'],
+                    Sheets: {
+                        'mySheet': Object.assign({}, output, { '!ref': ref })
+                    }
+                };
+                XLSX.writeFile(wb, `灌溉坐标表.xlsx`);
+            }
+        }
+    }
+
     handleCreateTaskCancel = async () => {
         if (this.editPolygon) {
             this.map.removeLayer(this.editPolygon);
@@ -435,7 +589,8 @@ export default class CompletionPlanTable extends Component {
                         createBtnVisible ? (
                             <div className='CompletionPlanTable-button-layout'>
                                 <div>
-                                    <Button type='primary' style={{marginRight: 10}} onClick={this.handleCreateTaskOk.bind(this)}>确定</Button>
+                                    <Button type='primary' style={{marginRight: 10}} onClick={this.handleExportPipeDrawingOk.bind(this)}>竣工图</Button>
+                                    <Button style={{marginRight: 10}} onClick={this.handleExportPipeCoordinateOk.bind(this)}>坐标表格</Button>
                                     <Button type='danger' onClick={this.handleCreateTaskCancel.bind(this)}>撤销</Button>
                                 </div>
                             </div>
