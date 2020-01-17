@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import {
     Button,
-    Notification
+    Notification,
+    Spin
 } from 'antd';
 import XLSX from 'xlsx';
 import L from 'leaflet';
@@ -32,7 +33,8 @@ export default class CompletionPlanTable extends Component {
             isSuperAdmin: false,
             section: '',
             areaLayerList: {},
-            createBtnVisible: false
+            createBtnVisible: false,
+            loading: false
         };
         this.tileTreeLayerBasic = null;
         this.tileLayerTreeFilter = null;
@@ -366,6 +368,9 @@ export default class CompletionPlanTable extends Component {
             isSuperAdmin
         } = this.state;
         if (this.editPolygon && (section || isSuperAdmin)) {
+            this.setState({
+                loading: true
+            });
             let coordinates = handlePolygonLatLngs(this.editPolygon);
             console.log('coordinates', coordinates);
             let wkt = 'POLYGON(';
@@ -380,9 +385,15 @@ export default class CompletionPlanTable extends Component {
             if (isSuperAdmin) {
                 let downloadUrl = `${DOCEXPORT_API}?action=pipedrawing&bbox=${wkt}`;
                 await this.createLink(this, downloadUrl);
+                this.setState({
+                    loading: false
+                });
             } else {
                 let downloadUrl = `${DOCEXPORT_API}?action=pipedrawing&bbox=${wkt}&section=${section}`;
                 await this.createLink(this, downloadUrl);
+                this.setState({
+                    loading: false
+                });
             }
         } else {
             Notification.error({
@@ -412,7 +423,10 @@ export default class CompletionPlanTable extends Component {
             section,
             isSuperAdmin
         } = this.state;
-        if (this.editPolygon && (section || isSuperAdmin)) {
+        if (this.editPolygon && section) {
+            this.setState({
+                loading: true
+            });
             let coordinates = handlePolygonLatLngs(this.editPolygon);
             console.log('coordinates', coordinates);
             let wkt = 'POLYGON(';
@@ -551,7 +565,21 @@ export default class CompletionPlanTable extends Component {
                     }
                 };
                 XLSX.writeFile(wb, `灌溉坐标表.xlsx`);
+                this.setState({
+                    loading: false
+                });
+            } else {
+                Notification.error({
+                    message: '获取数据为空，请重新框选范围'
+                });
+                this.setState({
+                    loading: false
+                });
             }
+        } else {
+            Notification.error({
+                message: '当前用户未关联标段，请重新切换用户'
+            });
         }
     }
 
@@ -567,13 +595,17 @@ export default class CompletionPlanTable extends Component {
     }
     render () {
         const {
-            createBtnVisible
+            createBtnVisible,
+            isSuperAdmin,
+            loading
         } = this.state;
         console.log('createBtnVisible', createBtnVisible);
 
         return (
             <div style={{height: '100%', width: '100%'}}>
+
                 <div className='CompletionPlanTable-container'>
+
                     <div
                         style={{
                             height: '100%',
@@ -581,23 +613,43 @@ export default class CompletionPlanTable extends Component {
                             overflow: 'hidden',
                             border: '3px solid #ccc'
                         }}>
-                        <div
-                            id='mapid'
-                            style={{height: 700, width: '100%'}} />
+                        <Spin spinning={loading}>
+                            <div
+                                id='mapid'
+                                style={{height: 700, width: '100%'}} />
+                        </Spin>
                     </div>
                     {
                         createBtnVisible ? (
                             <div className='CompletionPlanTable-button-layout'>
                                 <div>
-                                    <Button type='primary' style={{marginRight: 10}} onClick={this.handleExportPipeDrawingOk.bind(this)}>竣工图</Button>
-                                    <Button style={{marginRight: 10}} onClick={this.handleExportPipeCoordinateOk.bind(this)}>坐标表格</Button>
-                                    <Button type='danger' onClick={this.handleCreateTaskCancel.bind(this)}>撤销</Button>
+                                    {
+                                        isSuperAdmin
+                                            ? <Button
+                                                disabled={loading}
+                                                type='primary'
+                                                style={{marginRight: 10}}
+                                                onClick={this.handleExportPipeDrawingOk.bind(this)}>
+                                                竣工图
+                                            </Button> : ''
+                                    }
+                                    <Button
+                                        disabled={loading}
+                                        style={{marginRight: 10}}
+                                        onClick={this.handleExportPipeCoordinateOk.bind(this)}>
+                                                坐标表格
+                                    </Button>
+                                    <Button
+                                        disabled={loading}
+                                        type='danger'
+                                        onClick={this.handleCreateTaskCancel.bind(this)}>
+                                                撤销
+                                    </Button>
                                 </div>
                             </div>
                         ) : ''
                     }
                 </div>
-
             </div>
         );
     }
