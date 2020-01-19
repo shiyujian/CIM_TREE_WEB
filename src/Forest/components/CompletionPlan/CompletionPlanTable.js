@@ -69,8 +69,14 @@ export default class CompletionPlanTable extends Component {
         const {
             areaEventKey
         } = this.props;
+        const {
+            isSuperAdmin,
+            section
+        } = this.state;
         if (areaEventKey && areaEventKey !== prevProps.areaEventKey) {
-            this.handleSelectThinClass(areaEventKey);
+            if (isSuperAdmin || section) {
+                this.handleSelectThinClass(areaEventKey);
+            }
         }
     }
     componentWillUnmount = async () => {
@@ -597,15 +603,14 @@ export default class CompletionPlanTable extends Component {
         const {
             createBtnVisible,
             isSuperAdmin,
-            loading
+            loading,
+            section
         } = this.state;
         console.log('createBtnVisible', createBtnVisible);
 
         return (
             <div style={{height: '100%', width: '100%'}}>
-
                 <div className='CompletionPlanTable-container'>
-
                     <div
                         style={{
                             height: '100%',
