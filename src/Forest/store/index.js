@@ -8,6 +8,7 @@ import {
     createFetchActionWithHeaders as myFetch
 } from './fetchAction';
 import {
+    base,
     UPLOAD_API,
     TENCENTANALYSIS_API,
     SYSTEM_API,
@@ -386,6 +387,11 @@ export const getDigitalAcceptList = forestFetchAction(
     `${TREE_API}/acceptances`,
     []
 );
+// 获取数字化验收重新发起申请流程列表
+export const getWfreacceptanceList = forestFetchAction(
+    `${TREE_API}/wfreacceptances`,
+    []
+);
 
 // 获取数字化验收详情
 export const getDigitalAcceptDetail = forestFetchAction(
@@ -439,6 +445,12 @@ export const getSupervisorUsers = createFetchAction(`${SYSTEM_API}/users`, [getS
 // 面积验收施工提交
 export const postAreaAccept = forestFetchAction(`${ROUTE_API}/acceptancethinclass`, [], 'POST', []);
 
+// 数字化验收重新发起验收流程申请
+export const postWfreAcceptance = forestFetchAction(
+    `${TREE_API}/wfreacceptance`,
+    [], 'POST'
+);
+
 // 死亡苗木信息
 // 获取死亡苗木信息
 export const getDieTreesData = forestFetchAction(
@@ -457,6 +469,8 @@ export const postAddCarPack = forestFetchAction(`${TREE_API}/carpack`, [], 'POST
 export const getExportPipeDrawing = forestFetchAction(`${DOCEXPORT_API}/?action=pipedrawing`, []);
 // 竣工图坐标数据查看
 export const postPipeCoordinate = createFetchAction(`${TREEPIPE_API}/pipe/query`, [], 'POST', []);
+// 上传附件
+export const uploadFileHandler = myFetch(`${base}/OSSUploadHandler.ashx?filetype=news`, [], 'POST');
 export const actions = {
     exportEcporttreestatuss,
     getTotalSat,
@@ -533,6 +547,9 @@ export const actions = {
     getNurseryFromData,
     getTreeEntrance,
     getDigitalAcceptList,
+    getWfreacceptanceList,
+    postWfreAcceptance,
+
     getDigitalAcceptDetail,
     getUserStat,
     getNewUserStat,

@@ -1,0 +1,1 @@
+export AgainAcceptTable from './AgainAcceptTable';

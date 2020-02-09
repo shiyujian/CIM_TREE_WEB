@@ -53,7 +53,7 @@ const {
 } = DatePicker;
 const Option = Select.Option;
 const { confirm } = Modal;
-export default class DegitalAcceptTable extends Component {
+export default class AgainAcceptTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -83,6 +83,7 @@ export default class DegitalAcceptTable extends Component {
             sgy: '', // 施工员
             cly: '', // 测量员
             jl: '', // 监理
+            yz: '', // 业主
             shigongOptions: [],
             jianliOptions: [],
             visible1: false,
@@ -131,8 +132,16 @@ export default class DegitalAcceptTable extends Component {
                 dataIndex: 'thinclass'
             },
             {
+                title: '涉及细班数',
+                dataIndex: 'thinclassNum'
+            },
+            {
                 title: '验收类型',
                 dataIndex: 'ystype'
+            },
+            {
+                title: '验收类型数量',
+                dataIndex: 'ystypeNum'
             },
             {
                 title: '树种',
@@ -146,11 +155,7 @@ export default class DegitalAcceptTable extends Component {
                 dataIndex: 'status'
             },
             {
-                title: '施工员',
-                dataIndex: 'constructerName'
-            },
-            {
-                title: '测量员',
+                title: '申请人',
                 dataIndex: 'surveyorName'
             },
             {
@@ -158,7 +163,11 @@ export default class DegitalAcceptTable extends Component {
                 dataIndex: 'supervisorName'
             },
             {
-                title: '申请时间',
+                title: '业主',
+                dataIndex: 'ownerName'
+            },
+            {
+                title: '申请验收时间',
                 render: (text, record) => {
                     const {
                         ApplyTime = ''
@@ -481,6 +490,10 @@ export default class DegitalAcceptTable extends Component {
             this.setState({
                 jl: value || ''
             });
+        } else if (type === 'yz') {
+            this.setState({
+                yz: value || ''
+            });
         }
     }
     // 标段选择
@@ -678,6 +691,9 @@ export default class DegitalAcceptTable extends Component {
             leftkeycode
         } = this.props;
         resetinput(leftkeycode);
+    }
+    onAgainCheck () {
+
     }
     // 查看详情
     viewWord = async (record) => {
@@ -898,9 +914,8 @@ export default class DegitalAcceptTable extends Component {
             stime1 = '',
             etime1 = '',
             size,
-            sgy = '',
-            cly = '',
             jl = '',
+            yz = '',
             thinclass = '',
             thinclassData = '',
             smallclassData = '',
@@ -915,7 +930,7 @@ export default class DegitalAcceptTable extends Component {
 
         const {
             actions: {
-                getDigitalAcceptList
+                getWfreacceptanceList
             },
             platform: {
                 tree = {}
@@ -929,22 +944,30 @@ export default class DegitalAcceptTable extends Component {
                 array1.push(item);
             }
         });
+        let user = getUser();
+        let applier = '';
+        // 施工文书可以查看本标段，非施工文书只能查看自己
+        if (user.duty === '施工文书') {
+
+        } else {
+            applier = user.ID;
+        }
         let postdata = {
             section,
-            // section: 'P191-03-04',
-            treetype: treetypename,
-            stime: stime1 && moment(stime1).format('YYYY-MM-DD HH:mm:ss'),
-            etime: etime1 && moment(etime1).format('YYYY-MM-DD HH:mm:ss'),
-            thinclass: array1.join('-'),
-            // thinclass: 'P191-03-209-001',
-            page,
-            size: size,
-            status: zt,
+            thinClass: array1.join('-'),
             checktype: ystype,
             supervisor: jl,
-            surveyor: cly,
-            constructer: sgy
+            treetype: treetypename,
+            status: zt,
+            applier, // 申请人
+            owner: yz, // 业主
+            stime: stime1 && moment(stime1).format('YYYY-MM-DD HH:mm:ss'),
+            etime: etime1 && moment(etime1).format('YYYY-MM-DD HH:mm:ss'),
+            page,
+            size: size
         };
+        console.log('查询条件', postdata);
+        console.log('用户信息', getUser());
         let filterPostData = {
             section,
             thinclass: array1.join('-'),
@@ -956,8 +979,9 @@ export default class DegitalAcceptTable extends Component {
             percent: 0
         });
         try {
-            let rst = await getDigitalAcceptList({}, postdata);
-            let filterRst = await getDigitalAcceptList({}, filterPostData);
+            let rst = await getWfreacceptanceList({}, postdata);
+            console.log('请求列表', rst);
+            let filterRst = await getWfreacceptanceList({}, filterPostData);
             if (!(rst && rst.content)) {
                 this.setState({
                     loading: false,
@@ -1177,8 +1201,10 @@ export default class DegitalAcceptTable extends Component {
             sgy,
             cly,
             jl,
+            yz,
             shigongOptions,
             jianliOptions,
+            yezhuOptions,
             treetypeoption
         } = this.state;
         let header = '';
@@ -1276,42 +1302,6 @@ export default class DegitalAcceptTable extends Component {
                     </Select>
                 </div>
                 <div className='forest-mrg10' >
-                    <span className='forest-search-span' > 施工员： </span>
-                    <Select
-                        allowClear
-                        showSearch
-                        className='forest-forestcalcw4'
-                        defaultValue=''
-                        filterOption={
-                            (input, option) =>
-                                option.props.children
-                                    .toLowerCase()
-                                    .indexOf(input.toLowerCase()) >= 0
-                        }
-                        value={sgy}
-                        onChange={this.ysTypeChange.bind(this, 'sgy')} >
-                        {shigongOptions}
-                    </Select>
-                </div>
-                <div className='forest-mrg10' >
-                    <span className='forest-search-span' > 测量员： </span>
-                    <Select
-                        allowClear
-                        showSearch
-                        className='forest-forestcalcw4'
-                        defaultValue=''
-                        value={cly}
-                        filterOption={
-                            (input, option) =>
-                                option.props.children
-                                    .toLowerCase()
-                                    .indexOf(input.toLowerCase()) >= 0
-                        }
-                        onChange={this.ysTypeChange.bind(this, 'cly')} >
-                        {shigongOptions}
-                    </Select>
-                </div>
-                <div className='forest-mrg10' >
                     <span className='forest-search-span' > 监理： </span>
                     <Select
                         allowClear
@@ -1327,6 +1317,24 @@ export default class DegitalAcceptTable extends Component {
                         }
                         onChange={this.ysTypeChange.bind(this, 'jl')} >
                         {jianliOptions}
+                    </Select>
+                </div>
+                <div className='forest-mrg10' >
+                    <span className='forest-search-span' > 业主： </span>
+                    <Select
+                        allowClear
+                        showSearch
+                        className='forest-forestcalcw4'
+                        defaultValue=''
+                        value={yz}
+                        filterOption={
+                            (input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                        }
+                        onChange={this.ysTypeChange.bind(this, 'yz')} >
+                        {yezhuOptions}
                     </Select>
                 </div>
             </Row>
@@ -1349,10 +1357,15 @@ export default class DegitalAcceptTable extends Component {
                         查询
                     </Button>
                 </Col>
-                <Col span={18} className='forest-quryrstcnt' >
+                <Col span={17} className='forest-quryrstcnt' >
                     <span > 此次查询共有数据： {this.state.totalNum}条 </span>
                 </Col>
-                <Col span={2} />
+                <Col span={2}>
+                    <Button type='primary' onClick={this.onAgainCheck.bind(this)} >
+                        重新验收
+                    </Button>
+                </Col>
+                <Col span={1} />
                 <Col span={2} >
                     <Button type='primary' onClick={this.resetinput.bind(this)} >
                         重置
