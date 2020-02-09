@@ -225,6 +225,12 @@ export const ForestMenu = [
         name: '数字化验收'
     },
     {
+        key: 'againaccept',
+        id: 'FOREST.AGAINACCEPT',
+        path: '/forest/againaccept',
+        name: '重新验收'
+    },
+    {
         key: 'completionplan',
         id: 'FOREST.COMPLETIONPLAN',
         path: '/forest/completionplan',

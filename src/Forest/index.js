@@ -91,6 +91,7 @@ export default class ForestContainer extends Component {
             EnterStrengthAnalysi = null,
             PlantStrengthAnalysi = null,
             DegitalAccept = null,
+            AgainAccept = null,
             TreeDataClear = null,
             DieTrees = null,
             CompletionPlan = null
@@ -235,6 +236,12 @@ export default class ForestContainer extends Component {
                         <Route
                             path='/forest/degitalaccept'
                             component={DegitalAccept}
+                        />
+                    )}
+                    {AgainAccept && (
+                        <Route
+                            path='/forest/againaccept'
+                            component={AgainAccept}
                         />
                     )}
                     {TreeDataClear && (

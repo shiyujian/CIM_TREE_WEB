@@ -565,6 +565,10 @@ export const MODULES = [
                 name: '数字化验收'
             },
             {
+                id: 'FOREST.AGAINACCEPT',
+                name: '重新验收'
+            },
+            {
                 id: 'FOREST.COMPLETIONPLAN',
                 name: '灌溉竣工图导出'
             }

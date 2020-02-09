@@ -17,6 +17,7 @@ export NurserySourseAnalysi from './NurserySourseAnalysi';
 export EnterStrengthAnalysi from './EnterStrengthAnalysi';
 export PlantStrengthAnalysi from './PlantStrengthAnalysi';
 export DegitalAccept from './DegitalAccept';
+export AgainAccept from './AgainAccept';
 export TreeDataClear from './TreeDataClear';
 export DieTrees from './DieTrees';
 export CompletionPlan from './CompletionPlan';
