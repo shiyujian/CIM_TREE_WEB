@@ -34,7 +34,8 @@ export default class CompletionPlanTable extends Component {
             section: '',
             areaLayerList: {},
             createBtnVisible: false,
-            loading: false
+            loading: false,
+            permission: false
         };
         this.tileTreeLayerBasic = null;
         this.tileLayerTreeFilter = null;
@@ -43,9 +44,28 @@ export default class CompletionPlanTable extends Component {
         this.tileTreePipeNodeBasic = null;
         this.editPolygon = null;
     }
+    componentWillMount () {
+        let userData = getUser();
+        let userSection = userData.section;
+        let permission = false;
+        if (userData.username === 'admin') {
+            permission = true;
+        } else if (userSection) {
+            permission = true;
+            // // 需要判断用户当前标段有无签约，是否有权限
+            // if (userSection.indexOf(userSection) !== -1) {
+            //     permission = true;
+            // }
+        }
+        console.log('userData', userData);
+
+        this.setState({
+            permission: permission
+        });
+    }
     componentDidMount () {
         let userData = getUser();
-        this.userSection = userData.section;
+        let userSection = userData.section;
         console.log('用户的标段', this.userSection);
         if (userData.username === 'admin') {
             this.setState({
@@ -55,10 +75,10 @@ export default class CompletionPlanTable extends Component {
                 // 初始化地图
                 this.initMap();
             });
-        } else {
+        } else if (userSection) {
             this.setState({
                 isSuperAdmin: false,
-                section: this.userSection || ''
+                section: userSection || ''
             }, () => {
                 // 初始化地图
                 this.initMap();
@@ -604,10 +624,9 @@ export default class CompletionPlanTable extends Component {
             createBtnVisible,
             isSuperAdmin,
             loading,
-            section
+            section,
+            permission
         } = this.state;
-        console.log('createBtnVisible', createBtnVisible);
-
         return (
             <div style={{height: '100%', width: '100%'}}>
                 <div className='CompletionPlanTable-container'>
@@ -618,11 +637,15 @@ export default class CompletionPlanTable extends Component {
                             overflow: 'hidden',
                             border: '3px solid #ccc'
                         }}>
-                        <Spin spinning={loading}>
-                            <div
-                                id='mapid'
-                                style={{height: 700, width: '100%'}} />
-                        </Spin>
+                        {
+                            permission
+                                ? <Spin spinning={loading}>
+                                    <div
+                                        id='mapid'
+                                        style={{height: 700, width: '100%'}} />
+                                </Spin> : '暂无权限'
+                        }
+
                     </div>
                     {
                         createBtnVisible ? (

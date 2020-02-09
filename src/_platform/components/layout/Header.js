@@ -221,11 +221,16 @@ export default class Header extends Component {
         if (ignore) {
             return null;
         }
-        const { username = '', name = '' } = getUser();
+        const { username = '', name = '', roles } = getUser();
         let permissions = getPermissions() || [];
         if (fullScreenState === 'fullScreen') {
             return null;
         }
+        let roleName = '';
+        if (roles && roles.RoleName) {
+            roleName = roles.RoleName;
+        }
+
         return (
             <header className='header'>
                 <a className='head-logo' href='/'>
@@ -317,6 +322,7 @@ export default class Header extends Component {
                         />
                     </div>
                     <div className='head-fn'>
+                        <a style={{marginRight: 5}}>{roleName}</a>
                         <Badge count={this.state.tasks}>
                             <Link to='/selfcare/task'>
                                 <Icon
