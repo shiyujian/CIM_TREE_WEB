@@ -4,15 +4,15 @@ import {handlePOLYGONWktData} from '_platform/gisAuth';
 export const getStatusByID = (ID) => {
     switch (ID) {
         case 0:
-            return '未申请';
+            return '施工提交';
         case 1:
-            return '待验收';
+            return '监理审核通过';
         case 2:
-            return '完成';
+            return '监理审核不通过';
         case 3:
-            return '退回';
+            return '业主审核通过';
         case 4:
-            return '暂存';
+            return '业主审核不通过';
         default:
             return '';
     }

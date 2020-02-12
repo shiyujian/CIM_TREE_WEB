@@ -37,6 +37,7 @@ export default class AgainAccept extends Component {
         super(props);
         this.state = {
             treeLists: [],
+            smallClassList: [], // 小班列表
             sectionoption: [],
             smallclassoption: [],
             thinclassoption: [],
@@ -96,23 +97,20 @@ export default class AgainAccept extends Component {
         ];
         // 状态
         let zttypeoption = [
-            <Option key={'全部'} value={''} title={'全部'}>
-                全部
+            <Option key={'施工提交'} value={'0'} title={'施工提交'}>
+                施工提交
             </Option>,
-            <Option key={'待监理审核'} value={'0'} title={'待监理审核'}>
-                待监理审核
+            <Option key={'监理审核通过'} value={'1'} title={'监理审核通过'}>
+                监理审核通过
             </Option>,
-            <Option key={'监理审核未通过'} value={'1'} title={'监理审核未通过'}>
-                监理审核未通过
+            <Option key={'监理审核不通过'} value={'2'} title={'监理审核不通过'}>
+                监理审核不通过
             </Option>,
-            <Option key={'待业主审核'} value={'2'} title={'待业主审核'}>
-                待业主审核
+            <Option key={'业主审核通过'} value={'3'} title={'业主审核通过'}>
+                业主审核通过
             </Option>,
-            <Option key={'业主审核未通过'} value={'3'} title={'业主审核未通过'}>
-                业主审核未通过
-            </Option>,
-            <Option key={'业主通过'} value={'4'} title={'业主通过'}>
-                业主通过
+            <Option key={'业主审核不通过'} value={'4'} title={'业主审核不通过'}>
+                业主审核不通过
             </Option>
         ];
         // 验收类型
@@ -271,9 +269,9 @@ export default class AgainAccept extends Component {
             // 是admin或者业主
             this.setSectionOption(sectionsData);
         } else {
-            sectionsData.map((sectionData) => {
-                if (section && section === sectionData.No) {
-                    this.setSectionOption(sectionData);
+            sectionsData.map((item) => {
+                if (section && section === item.No) {
+                    this.setSectionOption(item);
                 }
             });
         }
@@ -290,14 +288,20 @@ export default class AgainAccept extends Component {
                         </Option>
                     );
                 });
-                this.setState({ sectionoption: sectionOptions });
+                this.setState({
+                    smallClassList: rst.children,
+                    sectionoption: sectionOptions
+                });
             } else {
                 sectionOptions.push(
                     <Option key={rst.No} value={rst.No} title={rst.Name}>
                         {rst.Name}
                     </Option>
                 );
-                this.setState({ sectionoption: sectionOptions });
+                this.setState({
+                    smallClassList: rst.children,
+                    sectionoption: sectionOptions
+                });
             }
         } catch (e) {
             console.log('e', e);

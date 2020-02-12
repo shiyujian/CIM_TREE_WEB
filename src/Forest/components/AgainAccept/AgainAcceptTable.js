@@ -18,23 +18,10 @@ import {
     DOCEXPORT_API
 } from '_platform/api';
 import moment from 'moment';
-import WordView1 from './WordView1';
-import WordView2 from './WordView2';
-import WordView3 from './WordView3';
-import WordView4 from './WordView4';
-import WordView5 from './WordView5';
-import WordView6 from './WordView6';
-import WordView7 from './WordView7';
-import WordView8 from './WordView8';
-import WordView9 from './WordView9';
-import WordView10 from './WordView10';
-import WordView11 from './WordView11';
-import ExportView1 from './ExportView1';
-import ExportView2 from './ExportView2';
-import ExportView3 from './ExportView3';
-import ExportView10 from './ExportView10';
 import DrawAreaAcceptModal from './DrawAreaAcceptModal';
 import AgainCheckModal from './AgainCheckModal';
+import DetailsModal from './DetailsModal';
+import CheckModal from './CheckModal';
 
 import '../index.less';
 import {
@@ -57,7 +44,7 @@ export default class AgainAcceptTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            curingTreeData: [],
+            curingTreeData: [], // 表格信息
             pagination: {},
             loading: false,
             size: 11,
@@ -67,7 +54,7 @@ export default class AgainAcceptTable extends Component {
             // stime1: moment().format('YYYY-MM-DD 00:00:00'),
             // etime1: moment().format('YYYY-MM-DD 23:59:59'),
             ystype: '', // 验收类型
-            zt: '', // 状态
+            status: '', // 状态
             treetypename: '',
             section: '',
             smallclass: '',
@@ -81,36 +68,21 @@ export default class AgainAcceptTable extends Component {
             smallclassData: '',
             thinclassData: '',
             sgy: '', // 施工员
-            cly: '', // 测量员
             jl: '', // 监理
             yz: '', // 业主
             shigongOptions: [],
             jianliOptions: [],
-            visible1: false,
-            visible2: false,
-            visible3: false,
-            visible4: false,
-            visible5: false,
-            visible6: false,
-            visible7: false,
-            visible8: false,
-            visible9: false,
-            visible10: false,
-            visible11: false,
             itemDetailList: {}, // 数字化验收详情
             treetypeoption: [], // 根据小班动态获取的树种列表
             treeTyepList: [], // 树种列表
             unQualifiedList: [], // 不合格记录列表
             unitMessage: [],
-            exportModalVisible1: false,
-            exportModalVisible2: false,
-            exportModalVisible3: false,
-            exportModalVisible10: false,
-            record: '',
+            record: {},
             itemDetail: '',
-            drawAreaVisible: false,
-            reDrawAreaVisible: false,
             againCheckModalVisible: false, // 重新验收
+            detailsModalVisible: false, // 查看详情
+            checkModalVisible: false, // 审核
+            DetailsInfo: '', // 详情信息
             thinClassDesignData: [],
             filterList: []
         };
@@ -124,11 +96,7 @@ export default class AgainAcceptTable extends Component {
                 dataIndex: 'sectionName'
             },
             {
-                title: '小班',
-                dataIndex: 'smallclass'
-            },
-            {
-                title: '细班',
+                title: '细班号',
                 dataIndex: 'thinclass'
             },
             {
@@ -145,10 +113,7 @@ export default class AgainAcceptTable extends Component {
             },
             {
                 title: '树种',
-                dataIndex: 'treetype',
-                render: () => {
-                    return '/';
-                }
+                dataIndex: 'TreeType'
             },
             {
                 title: '状态',
@@ -156,15 +121,24 @@ export default class AgainAcceptTable extends Component {
             },
             {
                 title: '申请人',
-                dataIndex: 'surveyorName'
+                dataIndex: 'ApplierName',
+                render: (text, record) => {
+                    return (record.ApplierObj && record.ApplierObj.Full_Name) || '';
+                }
             },
             {
                 title: '监理',
-                dataIndex: 'supervisorName'
+                dataIndex: 'supervisorName',
+                render: (text, record) => {
+                    return (record.SupervisorObj && record.SupervisorObj.Full_Name) || '';
+                }
             },
             {
                 title: '业主',
-                dataIndex: 'ownerName'
+                dataIndex: 'ownerName',
+                render: (text, record) => {
+                    return (record.OwnerObj && record.OwnerObj.Full_Name) || '';
+                }
             },
             {
                 title: '申请验收时间',
@@ -180,141 +154,90 @@ export default class AgainAcceptTable extends Component {
             {
                 title: '操作',
                 render: (text, record) => {
-                    const {
-                        curingTreeData,
-                        filterList
-                    } = this.state;
-                    const user = getUser();
-                    let duty = user.duty || '';
-                    let permission = false;
-                    console.log('用户', duty, record);
-                    if (duty && duty === '施工整改人') {
-                        permission = true;
-                    } else if (user.username === 'admin') {
-                        permission = true;
+                    let arr = [
+                        <a onClick={this.onSeeDetails.bind(this, record)} >
+                            查看
+                        </a>
+                    ];
+                    let user = getUser();
+                    if (record.Status === 0 && user.roles.ID === 11) {
+                        // 监理且状态为施工提交
+                        arr.push(
+                            <Divider type='vertical' />,
+                            <a onClick={this.onCheck.bind(this, record)}>审核</a>
+                        );
+                    } else if (record.Status === 1 && user.roles.ID === 9) {
+                        // 业主且监理通过
+                        arr.push(
+                            <Divider type='vertical' />,
+                            <a onClick={this.onCheck.bind(this, record)}>审核</a>
+                        );
                     }
-                    if (record.CheckType && record.CheckType === 10) {
-                        if (record.status === '未申请' || record.status === '退回') {
-                            let textData = '申请验收';
-                            if (record.status === '退回') {
-                                textData = '重新申请';
-                            }
-                            let status = true;
-                            filterList.map((data, index) => {
-                                if (index < 3) {
-                                    if (data.status !== '完成') {
-                                        status = false;
-                                    }
-                                }
-                            });
-                            if (permission && status) {
-                                if (record.status === '未申请') {
-                                    return (<div >
-                                        <a onClick={this.handleDrawAreaAccept.bind(this, record)} >
-                                            {textData}
-                                        </a>
-                                        <Divider type='vertical' />
-                                        <a style={{color: '#ccc', cursor: 'auto'}} >重新验收</a>
-                                    </div>
-                                    );
-                                } else {
-                                    return (<div >
-                                        <a onClick={this.handleDrawAreaAccept.bind(this, record)} >
-                                            {textData}
-                                        </a>
-                                        <Divider type='vertical' />
-                                        <a onClick={this.againCheck.bind(this, record)}>重新验收</a>
-                                    </div>
-                                    );
-                                }
-                            } else {
-                                return '/';
-                            }
-                        } else if (record.status === '完成') {
-                            return (<div >
-                                <a onClick={this.viewWord.bind(this, record)} >
-                                    查看
-                                </a>
-                                <Divider type='vertical' />
-                                <a onClick={this.exportFile.bind(this, record)}>导出</a>
-                                <Divider type='vertical' />
-                                <a onClick={this.againCheck.bind(this, record)}>重新验收</a>
-                            </div>
-                            );
+                    return (<div>
+                        {
+                            arr
                         }
-                    } else if (record.CheckType && record.CheckType === 11) {
-                        let status = true;
-                        filterList.map((data, index) => {
-                            if (index < 9) {
-                                if (data.status !== '完成') {
-                                    status = false;
-                                }
-                            }
-                        });
-                        if (status) {
-                            if (record.status === '未申请') {
-                                return (<div >
-                                    <a onClick={this.viewWord.bind(this, record)} >
-                                        查看
-                                    </a>
-                                    <Divider type='vertical' />
-                                    <a onClick={this.exportFile.bind(this, record)}>导出</a>
-                                    <Divider type='vertical' />
-                                    <a style={{color: '#ccc', cursor: 'auto'}} >重新验收</a>
-                                </div>
-                                );
-                            } else {
-                                return (<div >
-                                    <a onClick={this.viewWord.bind(this, record)} >
-                                        查看
-                                    </a>
-                                    <Divider type='vertical' />
-                                    <a onClick={this.exportFile.bind(this, record)}>导出</a>
-                                    <Divider type='vertical' />
-                                    <a onClick={this.againCheck.bind(this, record)}>重新验收</a>
-                                </div>
-                                );
-                            }
-                        } else {
-                            return '/';
-                        }
-                    } else { // 验收类型除10，11
-                        if (record.status === '未申请') {
-                            return (<div >
-                                <a style={{color: '#ccc'}} >
-                                    重新验收
-                                </a>
-                            </div>);
-                        } else if (record.status === '待验收') {
-                            return (<div >
-                                <a onClick={this.againCheck.bind(this, record)} >
-                                    重新验收
-                                </a>
-                            </div>);
-                        } else if (record.status === '完成') {
-                            return (<div >
-                                <a onClick={this.viewWord.bind(this, record)} >
-                                    查看
-                                </a>
-                                <Divider type='vertical' />
-                                <a onClick={this.exportFile.bind(this, record)}>导出</a>
-                                <Divider type='vertical' />
-                                <a onClick={this.againCheck.bind(this, record)}>重新验收</a>
-                            </div>
-                            );
-                        } else {
-                            return (<div >
-                                <a onClick={this.viewWord.bind(this, record)} >
-                                    查看
-                                </a>
-                                <Divider type='vertical' />
-                                <a onClick={this.againCheck.bind(this, record)}>重新验收</a>
-                            </div>);
-                        }
-                    }
+                    </div>);
                 }
             }
         ];
+    }
+    // 审核
+    onCheck (record) {
+        this.setState({
+            record,
+            checkModalVisible: true
+        });
+    }
+    async handleOkCheck (param) {
+        const { postCheckWfreAcceptance } = this.props.actions;
+        const { record } = this.state;
+        let user = getUser();
+        let Node = '';
+        if (record.Status === 1) {
+            Node = '业主审核';
+        } else if (record.Status === 0) {
+            Node = '监理审核';
+        }
+        let pro = {
+            FileInfo: '', // 审核意见附件
+            Info: param.checkRemark, // 审核意见
+            Node: Node, // 节点名称
+            RAID: record.ID, // 重新发起流程申请ID
+            Status: param.checkStatus, // 0未通过 1通过
+            User: user.ID // 审核用户
+        };
+        let checkInfoRep = await postCheckWfreAcceptance({}, pro);
+        if (checkInfoRep && checkInfoRep.code === 1) {
+            this.setState({
+                checkModalVisible: false
+            });
+            Notification.success({
+                message: '提示',
+                description: '审核操作已生效'
+            });
+            // 刷新列表
+            this.query(1);
+        }
+    }
+    handleCancelCheck () {
+        this.setState({
+            checkModalVisible: false
+        });
+    }
+    // 查看详情
+    async onSeeDetails (record) {
+        const { getWfreacceptanceByID } = this.props.actions;
+        let DetailsInfo = await getWfreacceptanceByID({id: record.ID}, {});
+        this.setState({
+            DetailsInfo,
+            detailsModalVisible: true
+        });
+    }
+    handleCancelDeatail () {
+        this.setState({
+            detailsModalVisible: false
+        });
     }
     // 获取各个标段对应的公司和项目经理
     componentDidMount = async () => {
@@ -324,180 +247,19 @@ export default class AgainAcceptTable extends Component {
             }
         } = this.props;
         let unitMessage = await getUnitMessageBySection();
-        console.log('unitMessage', unitMessage);
-        console.log('用户信息', getUser());
+        // 获取监理和业主
+        this.getOwnerInfo();
         this.setState({
             unitMessage
         });
     }
-    // 重新验收
-    againCheck = (record) => {
-        console.log('行信息', record);
-        this.setState({
-            record: record,
-            againCheckModalVisible: true
-        });
-    }
-    // 重新验收提交
-    handleOkAgainCheck = async (param) => {
-        console.log('树种', param, param.treeType);
-        console.log(this.state.treeTyepList);
-        let treeTypeNameArr = [];
-        this.state.treeTyepList.map(item => {
-            param.treeType.map(row => {
-                if (item.TreeType === row) {
-                    treeTypeNameArr.push(item.TreeTypeObj.TreeTypeName);
-                }
-            });
-        });
-        console.log('树种名称Arr', treeTypeNameArr);
-        confirm({
-            title: '提示',
-            content: '点击确认并经监理、业主审核通过后，所选原有验收数据将被删除,所选验收状态将被退回，是否继续？',
-            onOk: async () => {
-                const { postWfreAcceptance } = this.props.actions;
-                const { section, record } = this.state;
-                console.log('提交信息', section, record);
-                console.log(getUser());
-                console.log('树种', param.treeType.toString());
-                let user = getUser();
-                let pro = {
-                    Applier: user.ID, // 申请人
-                    CheckType: record.ystype, // 验收类型名称，多个逗号隔开
-                    CheckTypeNum: 1, // 验收类型数量
-                    Details: [{
-                        CheckType: record.CheckType,
-                        Section: record.Section,
-                        ThinClass: record.ThinClass,
-                        TreeType: 0
-                    }], // 重新验收项详情
-                    Owner: param.owner, // 业主
-                    Reason: param.opinion, // 原因
-                    ReasonFile: param.fileUrl, // 原因附件
-                    Section: record.Section, // 标段
-                    Supervisur: param.supervisor, // 监理
-                    ThinClass: record.ThinClass, // 细班，多个逗号隔开
-                    ThinClassNum: 1, // 细班数量
-                    TreeType: treeTypeNameArr.toString() // 树种名称，多个逗号隔开
-                };
-                console.log(pro);
-                let rep = await postWfreAcceptance({}, pro);
-                console.log('请求结果', rep);
-                if (rep.code === 1) {
-                    Notification.success({
-                        message: '提示',
-                        description: '您的重新发起已提交'
-                    });
-                }
-            },
-            onCancel: () => {
-                this.setState({
-                    againCheckModalVisible: true
-                });
-            }
-        });
-        this.setState({
-            againCheckModalVisible: false
-        });
-    }
-    // 重新验收取消
-    handleCancelAgainCheck () {
-        this.setState({
-            againCheckModalVisible: false
-        });
-    }
-    // 关闭详情弹窗
-    pressOK (which) {
-        switch (which) {
-            case 1:
-                this.setState({
-                    visible1: false
-                });
-                break;
-            case 2:
-                this.setState({
-                    visible2: false
-                });
-                break;
-            case 3:
-                this.setState({
-                    visible3: false
-                });
-                break;
-            case 4:
-                this.setState({
-                    visible4: false
-                });
-                break;
-            case 5:
-                this.setState({
-                    visible5: false
-                });
-                break;
-            case 6:
-                this.setState({
-                    visible6: false
-                });
-                break;
-            case 7:
-                this.setState({
-                    visible7: false
-                });
-                break;
-            case 8:
-                this.setState({
-                    visible8: false
-                });
-                break;
-            case 9:
-                this.setState({
-                    visible9: false
-                });
-                break;
-            case 10:
-                this.setState({
-                    visible10: false
-                });
-                break;
-            case 11:
-                this.setState({
-                    visible11: false
-                });
-                break;
-            default:
-                return '';
+    async getOwnerInfo (section = '') {
+        let user = getUser();
+        if (section) {
+            // 业主的时候
+        } else {
+            section = user.section;
         }
-    }
-    // 验收类型  状态 施工员 测量员 监理的选择
-    ysTypeChange (type, value) { // 清空select会调用此函数
-        if (type === 'yslx') {
-            this.setState({
-                ystype: value || ''
-            });
-        } else if (type === 'zt') {
-            this.setState({
-                zt: value || ''
-            });
-        } else if (type === 'sgy') {
-            this.setState({
-                sgy: value || ''
-            });
-        } else if (type === 'cly') {
-            this.setState({
-                cly: value || ''
-            });
-        } else if (type === 'jl') {
-            this.setState({
-                jl: value || ''
-            });
-        } else if (type === 'yz') {
-            this.setState({
-                yz: value || ''
-            });
-        }
-    }
-    // 标段选择
-    async onSectionChange (value) {
         const {
             actions: {
                 getUsers,
@@ -505,20 +267,8 @@ export default class AgainAcceptTable extends Component {
             },
             platform: {
                 roles = []
-            },
-            sectionSelect
+            }
         } = this.props;
-        if (!value) {
-            return;
-        }
-        sectionSelect(value || '');
-        this.setState({
-            section: value || '',
-            smallclass: '',
-            thinclass: '',
-            smallclassData: '',
-            thinclassData: ''
-        });
         let rolesData = [];
         if (!(roles && roles instanceof Array && roles.length > 0)) {
             rolesData = await getRoles();
@@ -528,7 +278,6 @@ export default class AgainAcceptTable extends Component {
         let shigongRole = '';
         let jianliRole = '';
         let yezhuRole = '';
-        console.log('用户数据', rolesData);
         rolesData.map((role) => {
             if (role && role.ID && !role.ParentID) {
                 if (role.RoleName === '施工') {
@@ -540,17 +289,16 @@ export default class AgainAcceptTable extends Component {
                 }
             }
         });
-        console.log(666, shigongRole);
-        console.log(6661, yezhuRole);
+        
         // only choose the section, you can search the people
         let shigong = await getUsers({}, {
             status: 1,
-            section: value,
+            section: section,
             role: shigongRole
         });
         let jianli = await getUsers({}, {
             status: 1,
-            section: value,
+            section: section,
             role: jianliRole
         });
         let yezhu = await getUsers({}, {
@@ -558,7 +306,7 @@ export default class AgainAcceptTable extends Component {
             section: '',
             role: yezhuRole
         });
-        console.log('yezhu', yezhu);
+        
         let shigongOptions = [];
         let jianliOptions = [];
         let yezhuOptions = [];
@@ -583,13 +331,133 @@ export default class AgainAcceptTable extends Component {
                 </Option>);
             });
         }
-        console.log('yezhuOptions', yezhuOptions);
-
         this.setState({
             shigongOptions,
             jianliOptions,
             yezhuOptions
         });
+    }
+    // 标段选择
+    async onSectionChange (value) {
+        const {
+            sectionSelect
+        } = this.props;
+        if (!value) {
+            return;
+        }
+        sectionSelect(value || '');
+        this.getOwnerInfo(value);
+        this.setState({
+            section: value || '',
+            smallclass: '',
+            thinclass: '',
+            smallclassData: '',
+            thinclassData: ''
+        });
+    }
+    // 批量重新验收
+    onAgainCheck () {
+        this.setState({
+            againCheckModalVisible: true
+        });
+    }
+    // 重新验收提交
+    handleOkAgainCheck = async (param) => {
+        confirm({
+            title: '提示',
+            content: '点击确认并经监理、业主审核通过后，所选原有验收数据将被删除，所选验收状态将被退回，是否继续？',
+            onOk: async () => {
+                const { postWfreAcceptance } = this.props.actions;
+                let user = getUser();
+                let Details = [];
+                let CheckTypeIDArr = [];
+                let CheckTypeArr = [];
+                let ThinClassArr = [];
+                param.checkItem.map(item => {
+                    if (!CheckTypeIDArr.includes(item.CheckType)) {
+                        CheckTypeIDArr.push(item.CheckType);
+                    }
+                    // 所有细班验收项
+                    item.ThinClass.map(row => {
+                        let rowArr = row.split('-');
+                        let newRow = `${rowArr[0]}-${rowArr[2]}-${rowArr[3]}-${rowArr[4]}`;
+                        ThinClassArr.push(newRow);
+                        Details.push({
+                            CheckType: parseInt(item.CheckType),
+                            Section: user.section,
+                            ThinClass: newRow,
+                            TreeType: 0
+                        });
+                    });
+                });
+                // 得到验收类型数组
+                CheckTypeIDArr.map(item => {
+                    CheckTypeArr.push(getYsTypeByID(parseInt(item)));
+                });
+                let pro = {
+                    Applier: user.ID, // 申请人
+                    CheckType: CheckTypeArr.toString(), // 验收类型名称，多个逗号隔开
+                    CheckTypeNum: CheckTypeArr.length, // 验收类型数量
+                    Details, // 重新验收项详情
+                    Owner: param.owner, // 业主
+                    Reason: param.opinion, // 原因
+                    ReasonFile: param.fileUrl, // 原因附件
+                    Section: user.section, // 标段
+                    Supervisor: param.supervisor, // 监理
+                    ThinClass: ThinClassArr.toString(), // 细班，多个逗号隔开
+                    ThinClassNum: ThinClassArr.length, // 细班数量
+                    TreeType: '' // 树种名称，多个逗号隔开
+                };
+                let rep = await postWfreAcceptance({}, pro);
+                if (rep.code === 1) {
+                    Notification.success({
+                        message: '提示',
+                        description: '您发起的批量重新验收已提交'
+                    });
+                }
+            },
+            onCancel: () => {
+                this.setState({
+                    againCheckModalVisible: true
+                });
+            }
+        });
+        this.setState({
+            againCheckModalVisible: false
+        });
+    }
+    handleCancelAgainCheck () {
+        this.setState({
+            againCheckModalVisible: false
+        });
+    }
+    // 验收类型  状态 施工员 测量员 监理的选择
+    ysTypeChange (type, value) { // 清空select会调用此函数
+        if (type === 'yslx') {
+            this.setState({
+                ystype: value || ''
+            });
+        } else if (type === 'status') {
+            this.setState({
+                status: value || ''
+            });
+        } else if (type === 'sgy') {
+            this.setState({
+                sgy: value || ''
+            });
+        } else if (type === 'cly') {
+            this.setState({
+                cly: value || ''
+            });
+        } else if (type === 'jl') {
+            this.setState({
+                jl: value || ''
+            });
+        } else if (type === 'yz') {
+            this.setState({
+                yz: value || ''
+            });
+        }
     }
     // 小班选择
     onSmallClassChange (value) {
@@ -639,7 +507,7 @@ export default class AgainAcceptTable extends Component {
             if (rst && rst.content && rst.content instanceof Array) {
                 rst.content.map(item => {
                     treetypeoption.push(<Option value={
-                        item.TreeType
+                        item.TreeTypeObj.TreeTypeName
                     } > {
                             item.TreeTypeObj.TreeTypeName
                         } </Option>);
@@ -692,210 +560,6 @@ export default class AgainAcceptTable extends Component {
         } = this.props;
         resetinput(leftkeycode);
     }
-    onAgainCheck () {
-
-    }
-    // 查看详情
-    viewWord = async (record) => {
-        const {
-            actions: {
-                getDigitalAcceptDetail,
-                getAcceptanceThinclasses,
-                getLastAcceptanceResult
-            }
-        } = this.props;
-        const {
-            stime1 = '',
-            etime1 = '',
-            thinclass,
-            section
-        } = this.state;
-        let checktype = record.CheckType;
-        if (checktype === 10) {
-            let array = thinclass.split('-');
-            let array1 = [];
-            array.map((item, i) => {
-                if (i !== 2) {
-                    array1.push(item);
-                }
-            });
-            const postdata = {
-                section: section,
-                thinclass: array1.join('-')
-            };
-            let rst = await getAcceptanceThinclasses({}, postdata);
-            if (rst && rst.content && rst.content instanceof Array && rst.content.length > 0) {
-                this.setState({
-                    visible10: true,
-                    itemDetail: rst.content[0],
-                    record
-                });
-            } else {
-                message.info('移动端详情尚未提交');
-                return;
-            }
-        } else if (checktype === 11) {
-            let array = thinclass.split('-');
-            let array1 = [];
-            array.map((item, i) => {
-                if (i !== 2) {
-                    array1.push(item);
-                }
-            });
-            const postdata = {
-                section: section,
-                thinclass: array1.join('-')
-            };
-            let rst = await getLastAcceptanceResult({}, postdata);
-            if (rst && rst.score && rst.score) {
-                this.setState({
-                    visible11: true,
-                    itemDetail: rst,
-                    record
-                });
-            } else {
-                message.info('移动端详情尚未提交');
-                return;
-            }
-        } else {
-            const postdata = {
-                acceptanceid: record.ID,
-                status: record.Status, // 用当前条目的状态去查询
-                stime: stime1,
-                etime: etime1
-            };
-            let rst = await getDigitalAcceptDetail({}, postdata);
-            // if (!(rst instanceof Array) || rst.length === 0) {
-            //     message.info('移动端详情尚未提交');
-            //     return;
-            // }
-            this.setState({
-                itemDetailList: rst
-            });
-        }
-        switch (checktype) {
-            case 1:
-                this.setState({
-                    visible1: true
-                });
-                break;
-            case 2:
-                this.setState({
-                    visible2: true
-                });
-                break;
-            case 3:
-                this.setState({
-                    visible3: true
-                });
-                break;
-            case 4:
-                this.setState({
-                    visible4: true
-                });
-                break;
-            case 5:
-                this.setState({
-                    visible5: true
-                });
-                break;
-            case 6: // 栽植
-                this.setState({
-                    visible6: true
-                });
-                break;
-            case 7: // 支架
-                this.setState({
-                    visible7: true
-                });
-                break;
-            case 8: // 浇水
-                this.setState({
-                    visible8: true
-                });
-                break;
-            case 9:
-                this.setState({
-                    visible9: true
-                });
-                break;
-            case 10:
-                this.setState({
-                    visible10: true
-                });
-                break;
-            case 11:
-                this.setState({
-                    visible11: true
-                });
-                break;
-            default:
-                return '';
-        }
-    }
-    // 面积验收施工提交
-    handleDrawAreaAccept = async (record) => {
-        const {
-            thinclass,
-            section
-        } = this.state;
-        const {
-            actions: {
-                getAcceptanceThinclasses,
-                getTreearea
-            }
-        } = this.props;
-        let thinClassDesignData = [];
-        let handleKey = thinclass.split('-');
-        let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
-        let rst = await getTreearea({}, { no: no });
-        if (!(rst && rst.content && rst.content instanceof Array && rst.content.length > 0)) {
-            Notification.error({
-                message: '该细班不存在设计数据，请施工设计提交设计数据'
-            });
-            return;
-        } else {
-            rst.content.map((content) => {
-                if (content.Section && content.Section === section) {
-                    thinClassDesignData.push(content);
-                }
-            });
-        }
-        if (record.status === '退回') {
-            let array = thinclass.split('-');
-            let array1 = [];
-            array.map((item, i) => {
-                if (i !== 2) {
-                    array1.push(item);
-                }
-            });
-            const postdata = {
-                section: section,
-                thinclass: array1.join('-')
-            };
-            let rst = await getAcceptanceThinclasses({}, postdata);
-            if (rst && rst.content && rst.content instanceof Array && rst.content.length > 0) {
-                this.setState({
-                    itemDetail: rst.content[0],
-                    record
-                });
-            }
-        }
-        this.setState({
-            drawAreaVisible: true,
-            thinClassDesignData
-        });
-    }
-    handleCloseDrawAreaModal = async (type) => {
-        this.setState({
-            drawAreaVisible: false,
-            itemDetail: '',
-            record: ''
-        });
-        if (type && type === 1) {
-            this.handleTableChange({current: 1});
-        }
-    }
     // 翻页
     handleTableChange (pagination) {
         const pager = {
@@ -909,17 +573,17 @@ export default class AgainAcceptTable extends Component {
     }
     // 查询
     query = async (page) => {
-        const {
+        let {
             section = '',
             stime1 = '',
             etime1 = '',
             size,
+            sgy = '',
             jl = '',
             yz = '',
             thinclass = '',
-            thinclassData = '',
             smallclassData = '',
-            zt = '',
+            status = '',
             ystype = '',
             treetypename = ''
         } = this.state;
@@ -945,32 +609,32 @@ export default class AgainAcceptTable extends Component {
             }
         });
         let user = getUser();
-        let applier = '';
         // 施工文书可以查看本标段，非施工文书只能查看自己
+        let applier = '', supervisor = '', owner = '';
         if (user.duty === '施工文书') {
-
-        } else {
             applier = user.ID;
+            supervisor = jl;
+            owner = yz;
+        } else if (user.duty === '监理文书') {
+            applier = sgy;
+            supervisor = user.ID;
+            owner = yz;
+        } else {
+            applier = sgy;
+            supervisor = jl;
+            owner = user.ID;
         }
         let postdata = {
             section,
             thinClass: array1.join('-'),
             checktype: ystype,
-            supervisor: jl,
+            supervisor: supervisor,
             treetype: treetypename,
-            status: zt,
-            applier, // 申请人
-            owner: yz, // 业主
+            status: status,
+            applier: applier, // 申请人
+            owner: owner, // 业主
             stime: stime1 && moment(stime1).format('YYYY-MM-DD HH:mm:ss'),
             etime: etime1 && moment(etime1).format('YYYY-MM-DD HH:mm:ss'),
-            page,
-            size: size
-        };
-        console.log('查询条件', postdata);
-        console.log('用户信息', getUser());
-        let filterPostData = {
-            section,
-            thinclass: array1.join('-'),
             page,
             size: size
         };
@@ -980,8 +644,6 @@ export default class AgainAcceptTable extends Component {
         });
         try {
             let rst = await getWfreacceptanceList({}, postdata);
-            console.log('请求列表', rst);
-            let filterRst = await getWfreacceptanceList({}, filterPostData);
             if (!(rst && rst.content)) {
                 this.setState({
                     loading: false,
@@ -989,40 +651,20 @@ export default class AgainAcceptTable extends Component {
                 });
                 return;
             };
-            let filterDatas = filterRst && filterRst.content;
-            if (filterDatas instanceof Array) {
-                let result = [];
-                filterDatas.map((data, i) => {
-                    data.order = (page - 1) * size + i + 1;
-                    data.ystype = getYsTypeByID(data.CheckType);
-                    data.status = getStatusByID(data.Status);
-                    data.sectionName = getSectionNameBySection(data.Section, thinClassTree);
-                    data.Project = getProjectNameBySection(data.Section, thinClassTree);
-                    data.smallclass = `${smallclassData}号小班`;
-                    data.thinclass = `${thinclassData}号细班`;
-                    data.constructerName = (data.ConstructerObj && data.ConstructerObj.Full_Name) || '';
-                    data.surveyorName = (data.SurveyorObj && data.SurveyorObj.Full_Name) || '';
-                    data.supervisorName = (data.SupervisorObj && data.SupervisorObj.Full_Name) || '';
-                    result.push(data);
-                });
-                this.setState({
-                    filterList: result
-                });
-            }
             let curingTreeData = rst && rst.content;
             if (curingTreeData instanceof Array) {
                 let result = [];
                 curingTreeData.map((curingTree, i) => {
                     curingTree.order = (page - 1) * size + i + 1;
-                    curingTree.ystype = getYsTypeByID(curingTree.CheckType);
+                    curingTree.ystype = curingTree.CheckType;
+                    curingTree.ystypeNum = curingTree.CheckTypeNum;
                     curingTree.status = getStatusByID(curingTree.Status);
                     curingTree.sectionName = getSectionNameBySection(curingTree.Section, thinClassTree);
                     curingTree.Project = getProjectNameBySection(curingTree.Section, thinClassTree);
                     curingTree.smallclass = `${smallclassData}号小班`;
-                    curingTree.thinclass = `${thinclassData}号细班`;
-                    curingTree.constructerName = (curingTree.ConstructerObj && curingTree.ConstructerObj.Full_Name) || '';
-                    curingTree.surveyorName = (curingTree.SurveyorObj && curingTree.SurveyorObj.Full_Name) || '';
-                    curingTree.supervisorName = (curingTree.SupervisorObj && curingTree.SupervisorObj.Full_Name) || '';
+                    let thinClass = curingTree.ThinClass.split(',')[0];
+                    curingTree.thinclass = `${thinClass.substr(-7, 7)}等`;
+                    curingTree.thinclassNum = curingTree.ThinClassNum;
                     result.push(curingTree);
                 });
                 let totalNum = rst.pageinfo.total;
@@ -1043,145 +685,7 @@ export default class AgainAcceptTable extends Component {
             console.log(e);
         }
     }
-    // 导出文件
-    exportFile = async (record) => {
-        const {
-            actions: {
-                getDigitalAcceptDetail,
-                getAcceptanceThinclasses
-            },
-            platform: {
-                tree = {}
-            }
-        } = this.props;
-        try {
-            const {
-                stime1 = '',
-                etime1 = '',
-                section = '',
-                thinclass = ''
-            } = this.state;
-            let array = thinclass.split('-');
-            let array1 = [];
-            array.map((item, i) => {
-                if (i !== 2) {
-                    array1.push(item);
-                }
-            });
-            let thinClassData = array1.join('-');
-            console.log('record', record);
-            let checktype = record.CheckType;
-            if (record && record.ystype) {
-                if (record.ystype === '土地整理' || record.ystype === '放样点穴' || record.ystype === '挖穴') {
-                    const {
-                        stime1 = '',
-                        etime1 = ''
-                    } = this.state;
 
-                    const postdata = {
-                        acceptanceid: record.ID,
-                        status: record.Status, // 用当前条目的状态去查询
-                        stime: stime1,
-                        etime: etime1
-                    };
-                    let rst = await getDigitalAcceptDetail({}, postdata);
-                    if (!(rst instanceof Array) || rst.length === 0) {
-                        message.info('移动端详情尚未提交');
-                        return;
-                    }
-                    this.setState({
-                        itemDetailList: rst
-                    });
-                    console.log('ystype', record.ystype);
-                    if (record.ystype === '土地整理') {
-                        this.setState({
-                            exportModalVisible1: true
-                        });
-                    } else if (record.ystype === '放样点穴') {
-                        this.setState({
-                            exportModalVisible2: true
-                        });
-                    } else if (record.ystype === '挖穴') {
-                        console.log('aaaaaaaaaaa');
-                        this.setState({
-                            exportModalVisible3: true
-                        });
-                    }
-                } else if (checktype === 10) {
-                    const postdata = {
-                        section: section,
-                        thinclass: thinClassData
-                    };
-                    let rst = await getAcceptanceThinclasses({}, postdata);
-                    if (rst && rst.content && rst.content instanceof Array && rst.content.length > 0) {
-                        this.setState({
-                            exportModalVisible10: true,
-                            itemDetail: rst.content[0],
-                            record
-                        });
-                    } else {
-                        message.info('移动端详情尚未提交');
-                        return;
-                    }
-                    return;
-                    let ID = record.ID;
-                    let downloadUrl = `${DOCEXPORT_API}?action=areaacceptance&id=${ID}`;
-                    await this.createLink(this, downloadUrl);
-                } else if (checktype === 11) {
-                    let ID = record.ID;
-                    let downloadUrl = `${DOCEXPORT_API}?action=lastacceptance&section=${section}&thinclass=${thinClassData}`;
-                    await this.createLink(this, downloadUrl);
-                } else {
-                    const postdata = {
-                        acceptanceid: record.ID,
-                        status: record.Status, // 用当前条目的状态去查询
-                        stime: stime1,
-                        etime: etime1
-                    };
-                    let detailList = await getDigitalAcceptDetail({}, postdata);
-                    if (detailList && detailList instanceof Array) {
-                        if (detailList.length > 0) {
-                            console.log('detailList', detailList);
-                            for (let i = 0; i < detailList.length; i++) {
-                                let detail = detailList[i];
-                                let downloadUrl = `${DOCEXPORT_API}?action=acceptance&acceptancedetailid=${detail.ID}`;
-                                await this.createLink(this, downloadUrl);
-                            }
-                        } else {
-                            message.info('移动端详情尚未提交,无法导出');
-                            return;
-                        }
-                    } else {
-                        message.error('获取数据出错，请重新获取');
-                        return;
-                    }
-                }
-            }
-        } catch (e) {
-            console.log('single', e);
-        }
-    }
-    handleExportModalClose = async () => {
-        this.setState({
-            exportModalVisible1: false,
-            exportModalVisible2: false,
-            exportModalVisible3: false,
-            exportModalVisible10: false,
-            itemDetailList: '',
-            itemDetail: ''
-        });
-    }
-    createLink = async (name, url) => {
-        // 下载
-        let link = document.createElement('a');
-        link.download = name;
-        link.href = url;
-        await link.setAttribute('download', this);
-        await link.setAttribute('target', '_blank');
-        await document.body.appendChild(link);
-        await link.click();
-        await document.body.removeChild(link);
-    };
     // 搜索栏
     treeTable (details) {
         const {
@@ -1196,10 +700,9 @@ export default class AgainAcceptTable extends Component {
             smallclass,
             thinclass,
             ystype,
-            zt,
+            status,
             treetypename,
             sgy,
-            cly,
             jl,
             yz,
             shigongOptions,
@@ -1208,6 +711,72 @@ export default class AgainAcceptTable extends Component {
             treetypeoption
         } = this.state;
         let header = '';
+        const user = getUser();
+        let queryArr = [];
+        let applier = <div className='forest-mrg10' >
+            <span className='forest-search-span' > 申请人： </span>
+            <Select
+                allowClear
+                showSearch
+                className='forest-forestcalcw4'
+                defaultValue='全部'
+                value={sgy}
+                filterOption={
+                    (input, option) =>
+                        option.props.children
+                            .toLowerCase()
+                            .indexOf(input.toLowerCase()) >= 0
+                }
+                onChange={this.ysTypeChange.bind(this, 'sgy')} >
+                {shigongOptions}
+            </Select>
+        </div>;
+        let owner = <div className='forest-mrg10' >
+            <span className='forest-search-span' > 业主： </span>
+            <Select
+                allowClear
+                showSearch
+                className='forest-forestcalcw4'
+                defaultValue=''
+                value={yz}
+                filterOption={
+                    (input, option) =>
+                        option.props.children
+                            .toLowerCase()
+                            .indexOf(input.toLowerCase()) >= 0
+                }
+                onChange={this.ysTypeChange.bind(this, 'yz')} >
+                {yezhuOptions}
+            </Select>
+        </div>;
+        let supervisor = <div className='forest-mrg10' >
+            <span className='forest-search-span' > 监理： </span>
+            <Select
+                allowClear
+                showSearch
+                className='forest-forestcalcw4'
+                defaultValue='全部'
+                value={jl}
+                filterOption={
+                    (input, option) =>
+                        option.props.children
+                            .toLowerCase()
+                            .indexOf(input.toLowerCase()) >= 0
+                }
+                onChange={this.ysTypeChange.bind(this, 'jl')} >
+                {jianliOptions}
+            </Select>
+        </div>;
+        if (user.roles.ID === 9) {
+            // 业主身份
+            queryArr.push(applier, supervisor);
+        } else if (user.roles.ID === 11) {
+            // 施工身份
+            queryArr.push(supervisor, owner);
+        } else if (user.roles.ID === 10) {
+            // 监理身份
+            queryArr.push(applier, owner);
+        }
         header = (<div >
             <Row className='forest-search-layout' >
                 <div className='forest-mrg10' >
@@ -1295,48 +864,15 @@ export default class AgainAcceptTable extends Component {
                 <div className='forest-mrg10' >
                     <span className='forest-search-span' > 状态： </span>
                     <Select allowClear className='forest-forestcalcw4'
-                        defaultValue='全部'
-                        value={zt}
-                        onChange={this.ysTypeChange.bind(this, 'zt')} >
+                        defaultValue={0}
+                        value={status}
+                        onChange={this.ysTypeChange.bind(this, 'status')} >
                         {zttypeoption}
                     </Select>
                 </div>
-                <div className='forest-mrg10' >
-                    <span className='forest-search-span' > 监理： </span>
-                    <Select
-                        allowClear
-                        showSearch
-                        className='forest-forestcalcw4'
-                        defaultValue='全部'
-                        value={jl}
-                        filterOption={
-                            (input, option) =>
-                                option.props.children
-                                    .toLowerCase()
-                                    .indexOf(input.toLowerCase()) >= 0
-                        }
-                        onChange={this.ysTypeChange.bind(this, 'jl')} >
-                        {jianliOptions}
-                    </Select>
-                </div>
-                <div className='forest-mrg10' >
-                    <span className='forest-search-span' > 业主： </span>
-                    <Select
-                        allowClear
-                        showSearch
-                        className='forest-forestcalcw4'
-                        defaultValue=''
-                        value={yz}
-                        filterOption={
-                            (input, option) =>
-                                option.props.children
-                                    .toLowerCase()
-                                    .indexOf(input.toLowerCase()) >= 0
-                        }
-                        onChange={this.ysTypeChange.bind(this, 'yz')} >
-                        {yezhuOptions}
-                    </Select>
-                </div>
+                {
+                    queryArr
+                }
             </Row>
             <Row className='forest-search-layout' >
                 <div className='forest-mrg20' >
@@ -1361,9 +897,11 @@ export default class AgainAcceptTable extends Component {
                     <span > 此次查询共有数据： {this.state.totalNum}条 </span>
                 </Col>
                 <Col span={2}>
-                    <Button type='primary' onClick={this.onAgainCheck.bind(this)} >
-                        重新验收
-                    </Button>
+                    {
+                        user.ID === 11 ? '' : <Button type='primary' onClick={this.onAgainCheck.bind(this)} >
+                            重新验收
+                        </Button>
+                    }
                 </Col>
                 <Col span={1} />
                 <Col span={2} >
@@ -1405,163 +943,37 @@ export default class AgainAcceptTable extends Component {
     render () {
         const {
             curingTreeData,
-            visible1,
-            visible2,
-            visible3,
-            visible4,
-            visible5,
-            visible6,
-            visible7,
-            visible8,
-            visible9,
-            visible10,
-            visible11,
-            exportModalVisible1,
-            exportModalVisible2,
-            exportModalVisible3,
-            exportModalVisible10,
-            drawAreaVisible,
-            againCheckModalVisible
+            againCheckModalVisible,
+            detailsModalVisible,
+            checkModalVisible
         } = this.state;
-        console.log(999, curingTreeData);
         return (
             <div>
                 {
                     this.treeTable(curingTreeData)
                 }
                 {
-                    visible1 && <WordView1
-                        onPressOk={this.pressOK.bind(this, 1)}
-                        visible={visible1}
-                        {...this.props}
-                        {...this.state}
-                    />
-                }
-                {
-                    visible2 && <WordView2
-                        onPressOk={this.pressOK.bind(this, 2)}
-                        visible={visible2}
-                        {...this.props}
-                        {...this.state}
-                    />
-                }
-                {
-                    visible3 && <WordView3
-                        onPressOk={this.pressOK.bind(this, 3)}
-                        visible={visible3}
-                        {...this.props}
-                        {...this.state}
-                    />
-                }
-                {
-                    visible4 && <WordView4
-                        onPressOk={this.pressOK.bind(this, 4)}
-                        visible={visible4}
-                        {...this.props}
-                        {...this.state}
-                    />
-                }
-                {
-                    visible5 && <WordView5
-                        onPressOk={this.pressOK.bind(this, 5)}
-                        visible={visible5}
-                        {...this.props}
-                        {...this.state}
-                    />
-                }
-                {
-                    visible6 && <WordView6
-                        onPressOk={this.pressOK.bind(this, 6)}
-                        visible={visible6}
-                        {...this.props}
-                        {...this.state}
-                    />
-                }
-                {
-                    visible7 && <WordView7
-                        onPressOk={this.pressOK.bind(this, 7)}
-                        visible={visible7}
-                        {...this.props}
-                        {...this.state}
-                    />
-                }
-                {
-                    visible8 && <WordView8
-                        onPressOk={this.pressOK.bind(this, 8)}
-                        visible={visible8}
-                        {...this.props}
-                        {...this.state}
-                    />
-                }
-                {
-                    visible9 && <WordView9
-                        onPressOk={this.pressOK.bind(this, 9)}
-                        visible={visible9}
-                        {...this.props}
-                        {...this.state}
-                    />
-                }
-                {
-                    visible10 && <WordView10
-                        onPressOk={this.pressOK.bind(this, 10)}
-                        visible={visible10}
-                        {...this.props}
-                        {...this.state}
-                    />
-                }
-                {
-                    visible11 && <WordView11
-                        onPressOk={this.pressOK.bind(this, 11)}
-                        visible={visible11}
-                        {...this.props}
-                        {...this.state}
-                    />
-                }
-                {
-                    exportModalVisible1
-                        ? <ExportView1
-                            onPressOk={this.handleExportModalClose.bind(this)}
-                            {...this.props}
-                            {...this.state}
-                        /> : ''
-                }
-                {
-                    exportModalVisible2
-                        ? <ExportView2
-                            onPressOk={this.handleExportModalClose.bind(this)}
-                            {...this.props}
-                            {...this.state}
-                        /> : ''
-                }
-                {
-                    exportModalVisible3
-                        ? <ExportView3
-                            onPressOk={this.handleExportModalClose.bind(this)}
-                            {...this.props}
-                            {...this.state}
-                        /> : ''
-                }
-                {
-                    exportModalVisible10
-                        ? <ExportView10
-                            onPressOk={this.handleExportModalClose.bind(this)}
-                            {...this.props}
-                            {...this.state}
-                        /> : ''
-                }
-                {
-                    drawAreaVisible
-                        ? <DrawAreaAcceptModal
-                            handleCloseDrawAreaModal={this.handleCloseDrawAreaModal.bind(this)}
-                            {...this.props}
-                            {...this.state}
-                        /> : ''
-                }
-                {
                     againCheckModalVisible
                         ? <AgainCheckModal
                             handleOk={this.handleOkAgainCheck.bind(this)}
                             handleCancel={this.handleCancelAgainCheck.bind(this)}
+                            {...this.props}
+                            {...this.state}
+                        /> : ''
+                }
+                {
+                    detailsModalVisible
+                        ? <DetailsModal
+                            handleCancel={this.handleCancelDeatail.bind(this)}
+                            {...this.props}
+                            {...this.state}
+                        /> : ''
+                }
+                {
+                    checkModalVisible
+                        ? <CheckModal
+                            handleOk={this.handleOkCheck.bind(this)}
+                            handleCancel={this.handleCancelCheck.bind(this)}
                             {...this.props}
                             {...this.state}
                         /> : ''
