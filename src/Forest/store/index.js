@@ -392,7 +392,11 @@ export const getWfreacceptanceList = forestFetchAction(
     `${TREE_API}/wfreacceptances`,
     []
 );
-
+// 获取数字化验收重新发起申请流程详情
+export const getWfreacceptanceByID = forestFetchAction(
+    `${TREE_API}/wfreacceptance/{{id}}`,
+    []
+);
 // 获取数字化验收详情
 export const getDigitalAcceptDetail = forestFetchAction(
     `${TREE_API}/acceptancedetails`,
@@ -448,6 +452,11 @@ export const postAreaAccept = forestFetchAction(`${ROUTE_API}/acceptancethinclas
 // 数字化验收重新发起验收流程申请
 export const postWfreAcceptance = forestFetchAction(
     `${TREE_API}/wfreacceptance`,
+    [], 'POST'
+);
+// 数字化验收重新发起验收流程监理、业主审核
+export const postCheckWfreAcceptance = forestFetchAction(
+    `${TREE_API}/checkwfreacceptance`,
     [], 'POST'
 );
 
@@ -548,7 +557,9 @@ export const actions = {
     getTreeEntrance,
     getDigitalAcceptList,
     getWfreacceptanceList,
+    getWfreacceptanceByID,
     postWfreAcceptance,
+    postCheckWfreAcceptance,
 
     getDigitalAcceptDetail,
     getUserStat,

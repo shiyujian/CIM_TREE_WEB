@@ -178,7 +178,6 @@ export default class DegitalAcceptTable extends Component {
                     const user = getUser();
                     let duty = user.duty || '';
                     let permission = false;
-                    console.log('用户', duty, record);
                     if (duty && duty === '施工整改人') {
                         permission = true;
                     } else if (user.username === 'admin') {
@@ -315,15 +314,12 @@ export default class DegitalAcceptTable extends Component {
             }
         } = this.props;
         let unitMessage = await getUnitMessageBySection();
-        console.log('unitMessage', unitMessage);
-        console.log('用户信息', getUser());
         this.setState({
             unitMessage
         });
     }
     // 重新验收
     againCheck = (record) => {
-        console.log('行信息', record);
         this.setState({
             record: record,
             againCheckModalVisible: true
@@ -331,8 +327,6 @@ export default class DegitalAcceptTable extends Component {
     }
     // 重新验收提交
     handleOkAgainCheck = async (param) => {
-        console.log('树种', param, param.treeType);
-        console.log(this.state.treeTyepList);
         let treeTypeNameArr = [];
         this.state.treeTyepList.map(item => {
             param.treeType.map(row => {
@@ -341,39 +335,37 @@ export default class DegitalAcceptTable extends Component {
                 }
             });
         });
-        console.log('树种名称Arr', treeTypeNameArr);
         confirm({
             title: '提示',
-            content: '点击确认并经监理、业主审核通过后，所选原有验收数据将被删除,所选验收状态将被退回，是否继续？',
+            content: '点击确认并经监理、业主审核通过后，所选原有验收数据将被删除，所选验收状态将被退回，是否继续？',
             onOk: async () => {
                 const { postWfreAcceptance } = this.props.actions;
                 const { section, record } = this.state;
-                console.log('提交信息', section, record);
-                console.log(getUser());
-                console.log('树种', param.treeType.toString());
                 let user = getUser();
+                let Details = [];
+                param.treeType.map(item => {
+                    Details.push({
+                        CheckType: record.CheckType,
+                        Section: record.Section,
+                        ThinClass: record.ThinClass,
+                        TreeType: item
+                    });
+                });
                 let pro = {
                     Applier: user.ID, // 申请人
                     CheckType: record.ystype, // 验收类型名称，多个逗号隔开
                     CheckTypeNum: 1, // 验收类型数量
-                    Details: [{
-                        CheckType: record.CheckType,
-                        Section: record.Section,
-                        ThinClass: record.ThinClass,
-                        TreeType: 0
-                    }], // 重新验收项详情
+                    Details: Details, // 重新验收项详情
                     Owner: param.owner, // 业主
                     Reason: param.opinion, // 原因
                     ReasonFile: param.fileUrl, // 原因附件
                     Section: record.Section, // 标段
-                    Supervisur: param.supervisor, // 监理
+                    Supervisor: param.supervisor, // 监理
                     ThinClass: record.ThinClass, // 细班，多个逗号隔开
                     ThinClassNum: 1, // 细班数量
                     TreeType: treeTypeNameArr.toString() // 树种名称，多个逗号隔开
                 };
-                console.log(pro);
                 let rep = await postWfreAcceptance({}, pro);
-                console.log('请求结果', rep);
                 if (rep.code === 1) {
                     Notification.success({
                         message: '提示',
@@ -515,7 +507,6 @@ export default class DegitalAcceptTable extends Component {
         let shigongRole = '';
         let jianliRole = '';
         let yezhuRole = '';
-        console.log('用户数据', rolesData);
         rolesData.map((role) => {
             if (role && role.ID && !role.ParentID) {
                 if (role.RoleName === '施工') {
@@ -527,8 +518,6 @@ export default class DegitalAcceptTable extends Component {
                 }
             }
         });
-        console.log(666, shigongRole);
-        console.log(6661, yezhuRole);
         // only choose the section, you can search the people
         let shigong = await getUsers({}, {
             status: 1,
@@ -545,7 +534,6 @@ export default class DegitalAcceptTable extends Component {
             section: '',
             role: yezhuRole
         });
-        console.log('yezhu', yezhu);
         let shigongOptions = [];
         let jianliOptions = [];
         let yezhuOptions = [];
@@ -570,7 +558,6 @@ export default class DegitalAcceptTable extends Component {
                 </Option>);
             });
         }
-        console.log('yezhuOptions', yezhuOptions);
 
         this.setState({
             shigongOptions,
@@ -1045,7 +1032,6 @@ export default class DegitalAcceptTable extends Component {
                 }
             });
             let thinClassData = array1.join('-');
-            console.log('record', record);
             let checktype = record.CheckType;
             if (record && record.ystype) {
                 if (record.ystype === '土地整理' || record.ystype === '放样点穴' || record.ystype === '挖穴') {
@@ -1068,7 +1054,6 @@ export default class DegitalAcceptTable extends Component {
                     this.setState({
                         itemDetailList: rst
                     });
-                    console.log('ystype', record.ystype);
                     if (record.ystype === '土地整理') {
                         this.setState({
                             exportModalVisible1: true
@@ -1078,7 +1063,6 @@ export default class DegitalAcceptTable extends Component {
                             exportModalVisible2: true
                         });
                     } else if (record.ystype === '挖穴') {
-                        console.log('aaaaaaaaaaa');
                         this.setState({
                             exportModalVisible3: true
                         });
@@ -1117,7 +1101,6 @@ export default class DegitalAcceptTable extends Component {
                     let detailList = await getDigitalAcceptDetail({}, postdata);
                     if (detailList && detailList instanceof Array) {
                         if (detailList.length > 0) {
-                            console.log('detailList', detailList);
                             for (let i = 0; i < detailList.length; i++) {
                                 let detail = detailList[i];
                                 let downloadUrl = `${DOCEXPORT_API}?action=acceptance&acceptancedetailid=${detail.ID}`;
@@ -1410,7 +1393,6 @@ export default class DegitalAcceptTable extends Component {
             drawAreaVisible,
             againCheckModalVisible
         } = this.state;
-        console.log(999, curingTreeData);
         return (
             <div>
                 {
