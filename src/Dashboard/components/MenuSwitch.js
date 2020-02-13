@@ -95,13 +95,13 @@ export default class MenuSwitch extends Component {
             value: 'geojsonFeature_treeAdopt',
             img: adopt,
             imgSel: adoptSel
+        },
+        {
+            label: '苗木迁移',
+            value: 'geojsonFeature_treeTransfer',
+            img: migrate,
+            imgSel: migrateSel
         }
-        // {
-        //     label: '苗木迁移',
-        //     value: 'geojsonFeature_treeTransfer',
-        //     img: migrate,
-        //     imgSel: migrateSel
-        // }
     ]
 
     async componentDidMount () {

@@ -19,3 +19,5 @@ export ManMachineGroup from './ManMachine/ManMachineGroup';
 export MachineQRCodePrint from './ManMachine/MachineQRCodePrint';
 export FaceRecognitionList from './ManMachine/FaceRecognitionList';
 export FaceRecognitionRecord from './ManMachine/FaceRecognitionRecord';
+// 施工包管理
+export ConstructionPackage from './ConstructionPackage';

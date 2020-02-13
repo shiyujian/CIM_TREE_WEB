@@ -485,6 +485,12 @@ export const ProjectMenu = [
                 id: 'PROJECT.QRCODEDISTRIBUTE',
                 name: '二维码派发信息',
                 path: '/project/qrcodedistribute'
+            },
+            {
+                key: 'ConstructionPackage',
+                id: 'PROJECT.CONSTRUCTIONPACKAGE',
+                name: '施工包管理',
+                path: '/project/constructionpackage'
             }
         ]
     }

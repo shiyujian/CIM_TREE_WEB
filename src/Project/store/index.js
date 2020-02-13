@@ -11,6 +11,8 @@ import manMachineGroupReducer, { actions as manMachineGroupActions } from './Man
 import machineQRCodePrintReducer, { actions as machineQRCodePrintActions } from './ManMachine/machineQRCodePrint';
 import faceRecognitionListReducer, { actions as faceRecognitionListActions } from './ManMachine/faceRecognitionList';
 import faceRecognitionRecordReducer, { actions as faceRecognitionRecordActions } from './ManMachine/faceRecognitionRecord';
+// 施工包管理
+import constructionPackageReducer, { actions as constructionPackageActions } from './constructionPackage';
 
 export default handleActions({
     [combineActions(...actionsMap(treeManageActions))]: (state = {}, action) => ({
@@ -53,5 +55,9 @@ export default handleActions({
     [combineActions(...actionsMap(faceRecognitionRecordActions))]: (state = {}, action) => ({
         ...state,
         faceRecognitionRecord: faceRecognitionRecordReducer(state.faceRecognitionRecord, action)
+    }),
+    [combineActions(...actionsMap(constructionPackageActions))]: (state = {}, action) => ({
+        ...state,
+        constructionPackage: constructionPackageReducer(state.constructionPackage, action)
     })
 }, {});

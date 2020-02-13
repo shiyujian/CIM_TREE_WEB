@@ -30,6 +30,7 @@ export default class GetMenuTree extends Component {
             curingTaskTree,
             deviceTreeDataDay,
             totalThinClassTreeGarden,
+            treeTransferTreeDay,
             // survivalRateTree,
             platform: {
                 tree = {}
@@ -41,7 +42,8 @@ export default class GetMenuTree extends Component {
                 getTreetypesTreeLoading,
                 getCuringTaskTreeLoading,
                 getSurvivalRateTreeLoading,
-                getDeviceTreeLoading
+                getDeviceTreeLoading,
+                getTreeTransferTreeLoading
             }
         } = this.props;
         await getAreaTreeLoading(true);
@@ -50,6 +52,7 @@ export default class GetMenuTree extends Component {
         await getTreetypesTreeLoading(true);
         await getCuringTaskTreeLoading(true);
         await getSurvivalRateTreeLoading(true);
+        await getTreeTransferTreeLoading(true);
         await getDeviceTreeLoading(true);
         if (tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 1) {
             await getAreaTreeLoading(false);
@@ -93,6 +96,12 @@ export default class GetMenuTree extends Component {
         // 获取园林施工包树
         if (!(totalThinClassTreeGarden && totalThinClassTreeGarden instanceof Array && totalThinClassTreeGarden.length > 0)) {
             await this.loadAreaDataGarden();
+        }
+        // 获取苗木迁移数据
+        if (treeTransferTreeDay && treeTransferTreeDay instanceof Array && treeTransferTreeDay.length > 0) {
+            await getTreeTransferTreeLoading(false);
+        } else {
+            await this.getTreeTransferTree();
         }
     }
     // 获取地块树数据
@@ -366,6 +375,35 @@ export default class GetMenuTree extends Component {
             await getTotalThinClassGarden(totalThinClass);
         } catch (e) {
             console.log('获取园林施工包数据', e);
+        }
+    }
+    // 获取苗木迁移树数据
+    getTreeTransferTree = async () => {
+        const {
+            actions: {
+                getTreeTransferStat,
+                getTreeTransferTreeDay,
+                getTreeTransferTreeLoading
+            }
+        } = this.props;
+        try {
+            // loading开始
+            await getTreeTransferTreeLoading(true);
+            let stime = moment().format('YYYY-MM-DD 00:00:00');
+            let etime = moment().format('YYYY-MM-DD 23:59:59');
+            // 根据时间，标段查询苗木迁移的数据
+            let postdata1 = {
+                stime,
+                etime
+            };
+            let treeTransferTreeDay = await getTreeTransferStat({}, postdata1);
+            console.log('treeTransferTreeDay', treeTransferTreeDay);
+
+            await getTreeTransferTreeDay(treeTransferTreeDay);
+            // loading结束
+            await getTreeTransferTreeLoading(false);
+        } catch (e) {
+            console.log('getTreeTransferTree', e);
         }
     }
 

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2020-01-13 10:54:03
+ * @Last Modified time: 2020-02-12 09:59:48
  */
 import React, { Component } from 'react';
 import {
@@ -27,6 +27,7 @@ import TreeMessGisOnClickHandle from './TreeMess/TreeMessGisOnClickHandle';
 import CuringTaskTree from './Conservation/CuringTaskTree';
 import SurvivalRateTree from './SurvivalRate/SurvivalRateTree';
 import TreeAdoptTree from './Adopt/TreeAdoptTree';
+import TreeTransferTree from './TreeTransfer/TreeTransferTree';
 import GetMenuTree from './GetMenuTree';
 import TreePipePage from './TreePipe/TreePipePage';
 import AreaDistanceMeasure from './AreaDistanceMeasure/AreaDistanceMeasure';
@@ -534,7 +535,7 @@ class OnSite extends Component {
                             ) : ''
                     }
                     { // 成活率
-                        dashboardCompomentMenu === 'geojsonFeature_survivalRate'
+                        dashboardCompomentMenu && dashboardCompomentMenu === 'geojsonFeature_survivalRate'
                             ? (
                                 <SurvivalRateTree
                                     {...this.props}
@@ -544,7 +545,7 @@ class OnSite extends Component {
                             ) : ''
                     }
                     { // 安全隐患
-                        dashboardCompomentMenu === 'geojsonFeature_risk'
+                        dashboardCompomentMenu && dashboardCompomentMenu === 'geojsonFeature_risk'
                             ? (
                                 <RiskTree
                                     {...this.props}
@@ -554,7 +555,7 @@ class OnSite extends Component {
                             ) : ''
                     }
                     { // 养护任务
-                        dashboardCompomentMenu === 'geojsonFeature_curingTask'
+                        dashboardCompomentMenu && dashboardCompomentMenu === 'geojsonFeature_curingTask'
                             ? (
                                 <CuringTaskTree
                                     {...this.props}
@@ -564,7 +565,7 @@ class OnSite extends Component {
                             ) : ''
                     }
                     { // 灌溉管网
-                        dashboardCompomentMenu === 'geojsonFeature_treePipe'
+                        dashboardCompomentMenu && dashboardCompomentMenu === 'geojsonFeature_treePipe'
                             ? (
                                 <TreePipePage
                                     map={this.map}
@@ -575,7 +576,7 @@ class OnSite extends Component {
                             ) : ''
                     }
                     { // 机械
-                        dashboardCompomentMenu === 'geojsonFeature_device'
+                        dashboardCompomentMenu && dashboardCompomentMenu === 'geojsonFeature_device'
                             ? (
                                 <DeviceTree
                                     map={this.map}
@@ -600,6 +601,17 @@ class OnSite extends Component {
                         dashboardCompomentMenu && dashboardCompomentMenu === 'geojsonFeature_treeAdopt'
                             ? (
                                 <TreeAdoptTree
+                                    {...this.props}
+                                    {...this.state}
+                                    map={this.map}
+                                />
+                            ) : ''
+                    }
+                    {
+                        // 苗木迁移
+                        dashboardCompomentMenu && dashboardCompomentMenu === 'geojsonFeature_treeTransfer'
+                            ? (
+                                <TreeTransferTree
                                     {...this.props}
                                     {...this.state}
                                     map={this.map}

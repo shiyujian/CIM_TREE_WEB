@@ -269,15 +269,15 @@ export default class CuringTaskTree extends Component {
                     let curingTasks = [];
                     // 状态为有效
                     let postdata1 = {
-                        stime: moment(stime).format('YYYY-MM-DD 00:00:01'),
-                        etime: moment(etime).format('YYYY-MM-DD 23:59:59'),
+                        stime: stime ? moment(stime).format('YYYY-MM-DD 00:00:01') : '',
+                        etime: etime ? moment(etime).format('YYYY-MM-DD 23:59:59') : '',
                         status: 0
                     };
                     let data1 = await getCuring({}, postdata1);
                     // 状态为退回
                     let postdata2 = {
-                        stime: moment(stime).format('YYYY-MM-DD 00:00:01'),
-                        etime: moment(etime).format('YYYY-MM-DD 23:59:59'),
+                        stime: stime ? moment(stime).format('YYYY-MM-DD 00:00:01') : '',
+                        etime: etime ? moment(etime).format('YYYY-MM-DD 23:59:59') : '',
                         status: 1
                     };
                     let data2 = await getCuring({}, postdata2);
@@ -296,8 +296,8 @@ export default class CuringTaskTree extends Component {
                 } else {
                     // 状态为已上报
                     let postdata = {
-                        stime: moment(stime).format('YYYY-MM-DD 00:00:01'),
-                        etime: moment(etime).format('YYYY-MM-DD 23:59:59'),
+                        stime: stime ? moment(stime).format('YYYY-MM-DD 00:00:01') : '',
+                        etime: etime ? moment(etime).format('YYYY-MM-DD 23:59:59') : '',
                         status: 2
                     };
                     let curingTaskData = await getCuring({}, postdata);
@@ -729,133 +729,135 @@ export default class CuringTaskTree extends Component {
                                     className='CuringTreePage-MenuHideButton' />
                             </div>
                             <div className='CuringTreePage-asideTree'>
-                                <div className='CuringTreePage-StatusButton'>
-                                    <a key='未完成'
-                                        title='未完成'
-                                        className={curingTaskUnComplete ? 'CuringTreePage-button-statusSel' : 'CuringTreePage-button-status'}
-                                        onClick={this.handleCuringTaskUnComplete.bind(this)}
-                                        style={{
-                                            marginRight: 8
-                                            // marginTop: 8
-                                        }}
-                                    >
-                                        <span className={curingTaskUnComplete ? 'CuringTreePage-button-status-textSel' : 'CuringTreePage-button-status-text'}>
-                                            未完成
-                                        </span>
-                                    </a>
-                                    <a key='已完成'
-                                        title='已完成'
-                                        className={curingTaskComplete ? 'CuringTreePage-button-statusSel' : 'CuringTreePage-button-status'}
-                                        onClick={this.handleCuringTaskComplete.bind(this)}
-                                        style={{
-                                            marginRight: 8
-                                            // marginTop: 8
-                                        }}
-                                    >
-                                        <span className={curingTaskComplete ? 'CuringTreePage-button-status-textSel' : 'CuringTreePage-button-status-text'}>
-                                            已完成
-                                        </span>
-                                    </a>
-                                </div>
-                                <div className='CuringTreePage-TimeButton'>
-                                    <a key='今天'
-                                        title='今天'
-                                        id='today'
-                                        className={timeType === 'today' ? 'CuringTreePage-button-timeSel' : 'CuringTreePage-button-time'}
-                                        onClick={this.handleTimeChange.bind(this, 'today')}
-                                        style={{
-                                            marginRight: 8
-                                            // marginTop: 8
-                                        }}
-                                    >
-                                        <span className={timeType === 'today' ? 'CuringTreePage-button-time-textSel' : 'CuringTreePage-button-time-text'}>
-                                            今天
-                                        </span>
-                                    </a>
-                                    <a key='一周内'
-                                        title='一周内'
-                                        id='week'
-                                        className={timeType === 'week' ? 'CuringTreePage-button-timeSel' : 'CuringTreePage-button-time'}
-                                        onClick={this.handleTimeChange.bind(this, 'week')}
-                                        style={{
-                                            marginRight: 8
-                                            // marginTop: 8
-                                        }}
-                                    >
-                                        <span className={timeType === 'week' ? 'CuringTreePage-button-time-textSel' : 'CuringTreePage-button-time-text'}>
-                                            一周内
-                                        </span>
-                                    </a>
-                                    <a key='全部'
-                                        title='全部'
-                                        id='all'
-                                        className={timeType === 'all' ? 'CuringTreePage-button-timeSel' : 'CuringTreePage-button-time'}
-                                        onClick={this.handleTimeChange.bind(this, 'all')}
-                                        style={{
-                                            marginRight: 8
-                                            // marginTop: 8
-                                        }}
-                                    >
-                                        <span className={timeType === 'all' ? 'CuringTreePage-button-time-textSel' : 'CuringTreePage-button-time-text'}>
-                                            全部
-                                        </span>
-                                    </a>
-                                    <a key='custom'
-                                        title='custom'
-                                        id='custom'
-                                        className={timeType === 'custom' ? 'CuringTreePage-button-customTimeSel' : 'CuringTreePage-button-customTime'}
-                                        style={{
-                                            marginRight: 8
-                                            // marginTop: 8
-                                        }}
-                                    >
-                                        <RangePicker
-                                            allowClear={false}
-                                            style={{ width: '100%', height: '100%' }}
-                                            value={
-                                                dateStime && dateEtime
-                                                    ? [
-                                                        moment(dateStime, 'YYYY-MM-DD'),
-                                                        moment(dateEtime, 'YYYY-MM-DD')
-                                                    ] : null
-                                            }
-                                            format='YYYY-MM-DD'
-                                            placeholder={['开始时间', '结束时间']}
-                                            onChange={this.handleDateChange.bind(this)}
-                                        />
-                                    </a>
-                                </div>
-                                <div className='CuringTreePage-button'>
-                                    {
-                                        this.curingTaskTypeOptions.map((option) => {
-                                            let imgurl = option.img;
-                                            if (this.state[option.id]) {
-                                                imgurl = option.selImg;
-                                            }
-                                            let num = 0;
-                                            contents.map((typeData) => {
-                                                if (typeData && typeData.Name === option.label) {
-                                                    num = (typeData.children && typeData.children.length) || 0;
+                                <Spin spinning={curingTaskTreeLoading}>
+                                    <div className='CuringTreePage-StatusButton'>
+                                        <a key='未完成'
+                                            title='未完成'
+                                            className={curingTaskUnComplete ? 'CuringTreePage-button-statusSel' : 'CuringTreePage-button-status'}
+                                            onClick={this.handleCuringTaskUnComplete.bind(this)}
+                                            style={{
+                                                marginRight: 8
+                                                // marginTop: 8
+                                            }}
+                                        >
+                                            <span className={curingTaskUnComplete ? 'CuringTreePage-button-status-textSel' : 'CuringTreePage-button-status-text'}>
+                                                未完成
+                                            </span>
+                                        </a>
+                                        <a key='已完成'
+                                            title='已完成'
+                                            className={curingTaskComplete ? 'CuringTreePage-button-statusSel' : 'CuringTreePage-button-status'}
+                                            onClick={this.handleCuringTaskComplete.bind(this)}
+                                            style={{
+                                                marginRight: 8
+                                                // marginTop: 8
+                                            }}
+                                        >
+                                            <span className={curingTaskComplete ? 'CuringTreePage-button-status-textSel' : 'CuringTreePage-button-status-text'}>
+                                                已完成
+                                            </span>
+                                        </a>
+                                    </div>
+                                    <div className='CuringTreePage-TimeButton'>
+                                        <a key='今天'
+                                            title='今天'
+                                            id='today'
+                                            className={timeType === 'today' ? 'CuringTreePage-button-timeSel' : 'CuringTreePage-button-time'}
+                                            onClick={this.handleTimeChange.bind(this, 'today')}
+                                            style={{
+                                                marginRight: 8
+                                                // marginTop: 8
+                                            }}
+                                        >
+                                            <span className={timeType === 'today' ? 'CuringTreePage-button-time-textSel' : 'CuringTreePage-button-time-text'}>
+                                                今天
+                                            </span>
+                                        </a>
+                                        <a key='一周内'
+                                            title='一周内'
+                                            id='week'
+                                            className={timeType === 'week' ? 'CuringTreePage-button-timeSel' : 'CuringTreePage-button-time'}
+                                            onClick={this.handleTimeChange.bind(this, 'week')}
+                                            style={{
+                                                marginRight: 8
+                                                // marginTop: 8
+                                            }}
+                                        >
+                                            <span className={timeType === 'week' ? 'CuringTreePage-button-time-textSel' : 'CuringTreePage-button-time-text'}>
+                                                一周内
+                                            </span>
+                                        </a>
+                                        <a key='全部'
+                                            title='全部'
+                                            id='all'
+                                            className={timeType === 'all' ? 'CuringTreePage-button-timeSel' : 'CuringTreePage-button-time'}
+                                            onClick={this.handleTimeChange.bind(this, 'all')}
+                                            style={{
+                                                marginRight: 8
+                                                // marginTop: 8
+                                            }}
+                                        >
+                                            <span className={timeType === 'all' ? 'CuringTreePage-button-time-textSel' : 'CuringTreePage-button-time-text'}>
+                                                全部
+                                            </span>
+                                        </a>
+                                        <a key='custom'
+                                            title='custom'
+                                            id='custom'
+                                            className={timeType === 'custom' ? 'CuringTreePage-button-customTimeSel' : 'CuringTreePage-button-customTime'}
+                                            style={{
+                                                marginRight: 8
+                                                // marginTop: 8
+                                            }}
+                                        >
+                                            <RangePicker
+                                                allowClear={false}
+                                                style={{ width: '100%', height: '100%' }}
+                                                value={
+                                                    dateStime && dateEtime
+                                                        ? [
+                                                            moment(dateStime, 'YYYY-MM-DD'),
+                                                            moment(dateEtime, 'YYYY-MM-DD')
+                                                        ] : null
                                                 }
-                                            });
-                                            return (<a key={option.label}
-                                                title={option.label}
-                                                className={this.state[option.id] ? 'CuringTreePage-button-layoutSel' : 'CuringTreePage-button-layout'}
-                                                onClick={this.handleCuringTaskTypeButton.bind(this, option)}
-                                                style={{
-                                                    marginRight: 8,
-                                                    marginTop: 8
-                                                }}
-                                            >
-                                                <span className='CuringTreePage-button-layout-text'>{option.label}</span>
-                                                <img src={imgurl} className='CuringTreePage-button-layout-img' />
-                                                <span className={this.state[option.id] ? 'CuringTreePage-button-layout-numSel' : 'CuringTreePage-button-layout-num'}>
-                                                    {num}
-                                                </span>
-                                            </a>);
-                                        })
-                                    }
-                                </div>
+                                                format='YYYY-MM-DD'
+                                                placeholder={['开始时间', '结束时间']}
+                                                onChange={this.handleDateChange.bind(this)}
+                                            />
+                                        </a>
+                                    </div>
+                                    <div className='CuringTreePage-button'>
+                                        {
+                                            this.curingTaskTypeOptions.map((option) => {
+                                                let imgurl = option.img;
+                                                if (this.state[option.id]) {
+                                                    imgurl = option.selImg;
+                                                }
+                                                let num = 0;
+                                                contents.map((typeData) => {
+                                                    if (typeData && typeData.Name === option.label) {
+                                                        num = (typeData.children && typeData.children.length) || 0;
+                                                    }
+                                                });
+                                                return (<a key={option.label}
+                                                    title={option.label}
+                                                    className={this.state[option.id] ? 'CuringTreePage-button-layoutSel' : 'CuringTreePage-button-layout'}
+                                                    onClick={this.handleCuringTaskTypeButton.bind(this, option)}
+                                                    style={{
+                                                        marginRight: 8,
+                                                        marginTop: 8
+                                                    }}
+                                                >
+                                                    <span className='CuringTreePage-button-layout-text'>{option.label}</span>
+                                                    <img src={imgurl} className='CuringTreePage-button-layout-img' />
+                                                    <span className={this.state[option.id] ? 'CuringTreePage-button-layout-numSel' : 'CuringTreePage-button-layout-num'}>
+                                                        {num}
+                                                    </span>
+                                                </a>);
+                                            })
+                                        }
+                                    </div>
+                                </Spin>
                             </div>
                         </aside>
                     </div>

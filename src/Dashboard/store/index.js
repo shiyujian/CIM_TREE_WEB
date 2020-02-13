@@ -69,6 +69,8 @@ export const getTrackTreeDay = createAction(`${ID}巡检路线树天`);
 export const getTreetypesTree = createAction(`${ID}树种筛选树`);
 export const getCuringTaskTree = createAction(`${ID}养护任务树`);
 export const getCuringTaskTreeDay = createAction(`${ID}养护任务树天`);
+export const getTreeTransferTree = createAction(`${ID}苗木迁移树`);
+export const getTreeTransferTreeDay = createAction(`${ID}苗木迁移树天`);
 export const getSurvivalRateTree = createAction(`${ID}成活率树`);
 export const getCuringTypeData = createAction(`${ID}养护类型`);
 export const getMenuTreeVisible = createAction(`${ID}是否显示树`);
@@ -85,6 +87,7 @@ export const getRiskTreeLoading = createAction(`${ID}安全隐患树加载loadin
 export const getTrackTreeLoading = createAction(`${ID}巡检路线树加载loading`);
 export const getTreetypesTreeLoading = createAction(`${ID}树种筛选树加载loading`);
 export const getCuringTaskTreeLoading = createAction(`${ID}养护任务树加载loading`);
+export const getTreeTransferTreeLoading = createAction(`${ID}苗木迁移树加载loading`);
 export const getSurvivalRateTreeLoading = createAction(`${ID}成活率树加载loading`);
 export const getAdoptTreeLoading = createAction(`${ID}苗木结缘树加载loading`);
 export const setUserMapPositionName = createAction(`${ID}设置用户定位的视图名称`);
@@ -113,6 +116,8 @@ export const getNurserytotal = forestFetchAction(`${TREE_API}/nurserytotal`, [],
 export const getLocationStatByDay = forestFetchAction(`${TREE_API}/locationtotalstat`, [], 'GET');
 // 获取今日栽植统计
 export const getTreePlantStatByDay = forestFetchAction(`${TREE_API}/treestat`, [], 'GET');
+// 获取苗木迁移统计
+export const getTreeTransferStat = forestFetchAction(`${TREE_API}/stattreetransplant`, [], 'GET');
 
 /** *********************园林获取苗木信息**************************/
 // 获取种植流程
@@ -177,6 +182,8 @@ export const actions = {
     getTreetypesTree,
     getCuringTaskTree,
     getCuringTaskTreeDay,
+    getTreeTransferTree,
+    getTreeTransferTreeDay,
     getSurvivalRateTree,
     getCuringTypeData,
     getMenuTreeVisible,
@@ -193,6 +200,7 @@ export const actions = {
     getTrackTreeLoading,
     getTreetypesTreeLoading,
     getCuringTaskTreeLoading,
+    getTreeTransferTreeLoading,
     getSurvivalRateTreeLoading,
     getAdoptTreeLoading,
     setUserMapPositionName,
@@ -211,6 +219,7 @@ export const actions = {
     getNurserytotal,
     getLocationStatByDay,
     getTreePlantStatByDay,
+    getTreeTransferStat,
 
     getTreeflowsGarden,
     getNurserysGarden,
@@ -280,6 +289,18 @@ export default handleActions(
             return {
                 ...state,
                 curingTaskTreeDay: payload
+            };
+        },
+        [getTreeTransferTree]: (state, { payload }) => {
+            return {
+                ...state,
+                treeTransferTree: payload
+            };
+        },
+        [getTreeTransferTreeDay]: (state, { payload }) => {
+            return {
+                ...state,
+                treeTransferTreeDay: payload
             };
         },
         [getSurvivalRateTree]: (state, { payload }) => {
@@ -382,6 +403,12 @@ export default handleActions(
             return {
                 ...state,
                 curingTaskTreeLoading: payload
+            };
+        },
+        [getTreeTransferTreeLoading]: (state, { payload }) => {
+            return {
+                ...state,
+                treeTransferTreeLoading: payload
             };
         },
         [getSurvivalRateTreeLoading]: (state, { payload }) => {
