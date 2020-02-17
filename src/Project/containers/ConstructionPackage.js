@@ -163,7 +163,9 @@ export default class ConstructionPackage extends Component {
                         全部
                 </Option>
             );
-            this.setState({ smallclassoption: smallclassOptions });
+            this.setState({
+                smallclassoption: smallclassOptions
+            });
         }
     }
     // 小班选择, 重新获取: 细班
@@ -227,7 +229,7 @@ export default class ConstructionPackage extends Component {
         return (
             <Body>
                 <Main>
-                    <DynamicTitle title='人脸识别列表' {...this.props} />
+                    <DynamicTitle title='施工包管理' {...this.props} />
                     <Sidebar>
                         <PkCodeTree
                             treeData={treeList}
