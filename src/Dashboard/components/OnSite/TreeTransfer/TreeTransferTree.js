@@ -49,7 +49,7 @@ export default class TreeTransferTree extends Component {
     }
 
     componentWillUnmount = async () => {
-        await this.handleRemoveAllCuringTaskLayer();
+        // await this.handleRemoveAllCuringTaskLayer();
     }
 
     /* 菜单展开收起 */

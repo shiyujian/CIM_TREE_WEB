@@ -41,7 +41,8 @@ class TreeMessModal extends Component {
         const {
             seedlingMess,
             treeMess,
-            curingMess
+            curingMess,
+            treeTransPlantTreeMess
         } = this.props;
         let imgList = [];
         for (let key in seedlingMess) {
@@ -71,6 +72,15 @@ class TreeMessModal extends Component {
                 );
             }
         });
+        for (let key in treeTransPlantTreeMess) {
+            if (key.indexOf('FJ') !== -1) {
+                if (treeTransPlantTreeMess[key]) {
+                    treeTransPlantTreeMess[key].map((imgsrc) => {
+                        imgList.push(imgsrc);
+                    });
+                }
+            }
+        }
         let selectImgIndex = 0;
         imgList.map((img, index) => {
             if (img === src) {
@@ -144,7 +154,9 @@ class TreeMessModal extends Component {
             treeMess,
             flowMess,
             curingMess,
-            treeMessModalLoading
+            treeMessModalLoading,
+            dashboardCompomentMenu,
+            treeTransPlantTreeMess
         } = this.props;
         const {
             imgViewSrc = '',
@@ -153,6 +165,7 @@ class TreeMessModal extends Component {
             imgList = [],
             selectImg
         } = this.state;
+        console.log('treeTransPlantTreeMess', treeTransPlantTreeMess);
 
         let arr = [
             <Button key='back' size='large' onClick={this.handleTreeModalCancel.bind(this)}>
@@ -1035,6 +1048,347 @@ class TreeMessModal extends Component {
                                                     }
                                                 </div> : ''
                                         }
+                                        {
+                                            tabSelect === 'treeTransfer'
+                                                ? <div style={{ width: 450 }}>
+                                                    <div>
+                                                        <span className='TreeMessPage-aside-Mess-title'>
+                                                            顺序码:
+                                                            <span className='TreeMessPage-aside-Mess-text'>
+                                                                {treeTransPlantTreeMess.sxm ? treeTransPlantTreeMess.sxm : ''}
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <span className='TreeMessPage-aside-Mess-title'>
+                                                            地块:
+                                                            <span className='TreeMessPage-aside-Mess-text'>
+                                                                {treeTransPlantTreeMess.landName ? treeTransPlantTreeMess.landName : ''}
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <span className='TreeMessPage-aside-Mess-title'>
+                                                            标段:
+                                                            <span className='TreeMessPage-aside-Mess-text'>
+                                                                {treeTransPlantTreeMess.sectionName ? treeTransPlantTreeMess.sectionName : ''}
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <span className='TreeMessPage-aside-Mess-title'>
+                                                            小班:
+                                                            <span className='TreeMessPage-aside-Mess-text'>
+                                                                {treeTransPlantTreeMess.SmallClass ? treeTransPlantTreeMess.SmallClass : ''}
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <span className='TreeMessPage-aside-Mess-title'>
+                                                            细班:
+                                                            <span className='TreeMessPage-aside-Mess-text'>
+                                                                {treeTransPlantTreeMess.ThinClass ? treeTransPlantTreeMess.ThinClass : ''}
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <span className='TreeMessPage-aside-Mess-title'>
+                                                            树种:
+                                                            <span className='TreeMessPage-aside-Mess-text'>
+                                                                {treeTransPlantTreeMess.TreeTypeName ? treeTransPlantTreeMess.TreeTypeName : ''}
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <span className='TreeMessPage-aside-Mess-title'>
+                                                            位置:
+                                                            <span className='TreeMessPage-aside-Mess-text'>
+                                                                {treeTransPlantTreeMess.Location
+                                                                    ? `${treeTransPlantTreeMess.LocationX},${
+                                                                        treeTransPlantTreeMess.LocationY
+                                                                    }`
+                                                                    : (
+                                                                        treeTransPlantTreeMess.locationCoord
+                                                                            ? treeTransPlantTreeMess.locationCoord
+                                                                            : ''
+                                                                    )}
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                    {treeTransPlantTreeMess.GD ? (
+                                                        <div>
+                                                            <div>
+                                                                <span className='TreeMessPage-aside-Mess-title'>
+                                                                    高度(cm):
+                                                                    <span className='TreeMessPage-aside-Mess-text'>
+                                                                        {treeTransPlantTreeMess.GD}
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                            {treeTransPlantTreeMess.GDFJ
+                                                                ? treeTransPlantTreeMess.GDFJ.map(
+                                                                    src => {
+                                                                        return (
+                                                                            <div key={src}>
+                                                                                <img
+                                                                                    style={{
+                                                                                        width: '150px',
+                                                                                        height: '150px',
+                                                                                        display: 'block',
+                                                                                        marginTop: '10px'
+                                                                                    }}
+                                                                                    onClick={this.handleImgView.bind(this, 'treeTransPlantTreeMess', src)}
+                                                                                    src={
+                                                                                        src
+                                                                                    }
+                                                                                    alt='图片'
+                                                                                />
+                                                                            </div>
+                                                                        );
+                                                                    }
+                                                                )
+                                                                : ''}
+                                                        </div>) : ''}
+                                                    {treeTransPlantTreeMess.GF ? (
+                                                        <div>
+                                                            <div>
+                                                                <span className='TreeMessPage-aside-Mess-title'>
+                                                                    冠幅(cm):
+                                                                    <span className='TreeMessPage-aside-Mess-text'>
+                                                                        {treeTransPlantTreeMess.GF}
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                            {treeTransPlantTreeMess.GFFJ
+                                                                ? treeTransPlantTreeMess.GFFJ.map(
+                                                                    src => {
+                                                                        return (
+                                                                            <div key={src}>
+                                                                                <img
+                                                                                    style={{
+                                                                                        width: '150px',
+                                                                                        height: '150px',
+                                                                                        display: 'block',
+                                                                                        marginTop: '10px'
+                                                                                    }}
+                                                                                    onClick={this.handleImgView.bind(this, 'treeTransPlantTreeMess', src)}
+                                                                                    src={
+                                                                                        src
+                                                                                    }
+                                                                                    alt='图片'
+                                                                                />
+                                                                            </div>
+                                                                        );
+                                                                    }
+                                                                )
+                                                                : ''}
+                                                        </div>) : ''}
+                                                    {treeTransPlantTreeMess.XJ ? (
+                                                        <div>
+                                                            <div>
+                                                                <span className='TreeMessPage-aside-Mess-title'>
+                                                                    胸径(cm):
+                                                                    <span className='TreeMessPage-aside-Mess-text'>
+                                                                        {treeTransPlantTreeMess.XJ}
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                            {treeTransPlantTreeMess.XJFJ
+                                                                ? treeTransPlantTreeMess.XJFJ.map(
+                                                                    src => {
+                                                                        return (
+                                                                            <div key={src}>
+                                                                                <img
+                                                                                    style={{
+                                                                                        width: '150px',
+                                                                                        height: '150px',
+                                                                                        display: 'block',
+                                                                                        marginTop: '10px'
+                                                                                    }}
+                                                                                    onClick={this.handleImgView.bind(this, 'treeTransPlantTreeMess', src)}
+                                                                                    src={
+                                                                                        src
+                                                                                    }
+                                                                                    alt='图片'
+                                                                                />
+                                                                            </div>
+                                                                        );
+                                                                    }
+                                                                )
+                                                                : ''}
+                                                        </div>) : ''}
+                                                    {treeTransPlantTreeMess.DJ ? (
+                                                        <div>
+                                                            <div>
+                                                                <span className='TreeMessPage-aside-Mess-title'>
+                                                                    地径(cm):
+                                                                    <span className='TreeMessPage-aside-Mess-text'>
+                                                                        {treeTransPlantTreeMess.DJ}
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                            {treeTransPlantTreeMess.DJFJ
+                                                                ? treeTransPlantTreeMess.DJFJ.map(
+                                                                    src => {
+                                                                        return (
+                                                                            <div key={src}>
+                                                                                <img
+                                                                                    style={{
+                                                                                        width: '150px',
+                                                                                        height: '150px',
+                                                                                        display: 'block',
+                                                                                        marginTop: '10px'
+                                                                                    }}
+                                                                                    onClick={this.handleImgView.bind(this, 'treeTransPlantTreeMess', src)}
+                                                                                    src={
+                                                                                        src
+                                                                                    }
+                                                                                    alt='图片'
+                                                                                />
+                                                                            </div>
+                                                                        );
+                                                                    }
+                                                                )
+                                                                : ''}
+                                                        </div>) : ''}
+                                                    {treeTransPlantTreeMess.MD ? (
+                                                        <div>
+                                                            <div>
+                                                                <span className='TreeMessPage-aside-Mess-title'>
+                                                                    密度(棵/m^3):
+                                                                    <span className='TreeMessPage-aside-Mess-text'>
+                                                                        {treeTransPlantTreeMess.MD}
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                            {treeTransPlantTreeMess.MDFJ
+                                                                ? treeTransPlantTreeMess.MDFJ.map(
+                                                                    src => {
+                                                                        return (
+                                                                            <div key={src}>
+                                                                                <img
+                                                                                    style={{
+                                                                                        width: '150px',
+                                                                                        height: '150px',
+                                                                                        display: 'block',
+                                                                                        marginTop: '10px'
+                                                                                    }}
+                                                                                    onClick={this.handleImgView.bind(this, 'treeTransPlantTreeMess', src)}
+                                                                                    src={
+                                                                                        src
+                                                                                    }
+                                                                                    alt='图片'
+                                                                                />
+                                                                            </div>
+                                                                        );
+                                                                    }
+                                                                )
+                                                                : ''}
+                                                        </div>) : ''}
+                                                    {treeTransPlantTreeMess.MJ ? (
+                                                        <div>
+                                                            <div>
+                                                                <span className='TreeMessPage-aside-Mess-title'>
+                                                                    面积(m^2):
+                                                                    <span className='TreeMessPage-aside-Mess-text'>
+                                                                        {treeTransPlantTreeMess.MJ}
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                            {treeTransPlantTreeMess.MJFJ
+                                                                ? treeTransPlantTreeMess.MJFJ.map(
+                                                                    src => {
+                                                                        return (
+                                                                            <div key={src}>
+                                                                                <img
+                                                                                    style={{
+                                                                                        width: '150px',
+                                                                                        height: '150px',
+                                                                                        display: 'block',
+                                                                                        marginTop: '10px'
+                                                                                    }}
+                                                                                    onClick={this.handleImgView.bind(this, 'treeTransPlantTreeMess', src)}
+                                                                                    src={
+                                                                                        src
+                                                                                    }
+                                                                                    alt='图片'
+                                                                                />
+                                                                            </div>
+                                                                        );
+                                                                    }
+                                                                )
+                                                                : ''}
+                                                        </div>) : ''}
+                                                    {treeTransPlantTreeMess.TQHD ? (
+                                                        <div>
+                                                            <div>
+                                                                <span className='TreeMessPage-aside-Mess-title'>
+                                                                    土球厚度(cm):
+                                                                    <span className='TreeMessPage-aside-Mess-text'>
+                                                                        {treeTransPlantTreeMess.TQHD}
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                            {treeTransPlantTreeMess.TQHDFJ
+                                                                ? treeTransPlantTreeMess.TQHDFJ.map(
+                                                                    src => {
+                                                                        return (
+                                                                            <div key={src}>
+                                                                                <img
+                                                                                    style={{
+                                                                                        width: '150px',
+                                                                                        height: '150px',
+                                                                                        display: 'block',
+                                                                                        marginTop: '10px'
+                                                                                    }}
+                                                                                    onClick={this.handleImgView.bind(this, 'treeTransPlantTreeMess', src)}
+                                                                                    src={
+                                                                                        src
+                                                                                    }
+                                                                                    alt='图片'
+                                                                                />
+                                                                            </div>
+                                                                        );
+                                                                    }
+                                                                )
+                                                                : ''}
+                                                        </div>) : ''}
+                                                    {treeTransPlantTreeMess.TQZJ ? (
+                                                        <div>
+                                                            <div>
+                                                                <span className='TreeMessPage-aside-Mess-title'>
+                                                                    土球直径(cm):
+                                                                    <span className='TreeMessPage-aside-Mess-text'>
+                                                                        {treeTransPlantTreeMess.TQZJ}
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                            {treeTransPlantTreeMess.TQZJFJ
+                                                                ? treeTransPlantTreeMess.TQZJFJ.map(
+                                                                    src => {
+                                                                        return (
+                                                                            <div key={src}>
+                                                                                <img
+                                                                                    style={{
+                                                                                        width: '150px',
+                                                                                        height: '150px',
+                                                                                        display: 'block',
+                                                                                        marginTop: '10px'
+                                                                                    }}
+                                                                                    onClick={this.handleImgView.bind(this, 'treeTransPlantTreeMess', src)}
+                                                                                    src={
+                                                                                        src
+                                                                                    }
+                                                                                    alt='图片'
+                                                                                />
+                                                                            </div>
+                                                                        );
+                                                                    }
+                                                                )
+                                                                : ''}
+                                                        </div>) : ''}
+                                                </div> : '未迁移'
+                                        }
                                     </Spin>
                                 </div>
                             </aside>
@@ -1070,6 +1424,16 @@ class TreeMessModal extends Component {
                             : 'TreeMessPage-Tab-tablabel'}>
                         养护任务
                     </a>
+                    {
+                        dashboardCompomentMenu && dashboardCompomentMenu === 'geojsonFeature_treeTransfer'
+                            ? <a id='treeTransfer'
+                                onClick={this.handleTabChange.bind(this)}
+                                className={tabSelect === 'treeTransfer'
+                                    ? 'TreeMessPage-Tab-tablabelSel'
+                                    : 'TreeMessPage-Tab-tablabel'}>
+                            苗木迁移
+                            </a> : ''
+                    }
                 </div>
                 <Modal
                     title={null}

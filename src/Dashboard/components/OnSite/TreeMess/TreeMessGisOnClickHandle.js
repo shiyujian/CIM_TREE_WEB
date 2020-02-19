@@ -29,7 +29,10 @@ export default class TreeMessGisOnClickHandle extends Component {
             treeMess: '',
             flowMess: '',
             curingMess: '',
-            treeMarkerLayer: ''
+            treeMarkerLayer: '',
+            transPolyLine: '',
+            beginMarker: '',
+            endMarker: ''
         };
     }
 
@@ -47,13 +50,25 @@ export default class TreeMessGisOnClickHandle extends Component {
             map
         } = this.props;
         const {
-            treeMarkerLayer
+            treeMarkerLayer,
+            transPolyLine,
+            beginMarker,
+            endMarker
         } = this.state;
         // 关闭地图点击事件
         map.off('click', this.handleTreeMessGisClickFunction);
         // 去除点击地图坐标
         if (treeMarkerLayer) {
             map.removeLayer(treeMarkerLayer);
+        }
+        if (transPolyLine) {
+            map.removeLayer(transPolyLine);
+        }
+        if (beginMarker) {
+            map.removeLayer(beginMarker);
+        }
+        if (endMarker) {
+            map.removeLayer(endMarker);
         }
     }
 
@@ -221,18 +236,36 @@ export default class TreeMessGisOnClickHandle extends Component {
                 getCuringTypes,
                 getCuringMessage,
                 getUserDetail,
-                getParentOrgTreeByID
+                getParentOrgTreeByID,
+                getTreetransplant
                 // 园林
             },
             platform: {
                 tree = {}
             },
-            curingTypes
+            curingTypes,
+            map,
+            dashboardCompomentMenu
         } = this.props;
+        const {
+            transPolyLine,
+            beginMarker,
+            endMarker,
+            treeMarkerLayer
+        } = this.state;
         try {
+            if (transPolyLine) {
+                map.removeLayer(transPolyLine);
+            }
+            if (beginMarker) {
+                map.removeLayer(beginMarker);
+            }
+            if (endMarker) {
+                map.removeLayer(endMarker);
+            }
             let postdata = {
                 sxm: data.features[0].properties.SXM
-                // sxm: 'CQL7857'
+                // sxm: 'BHY9325'
             };
             let totalThinClass = tree.totalThinClass || [];
             let bigTreeList = (tree && tree.bigTreeList) || [];
@@ -253,6 +286,11 @@ export default class TreeMessGisOnClickHandle extends Component {
             let curingTreeData = await getCuringTreeInfo({}, postdata);
             // 获取树的地理坐标信息
             let treeLocationData = await getTreeLocationCoord(postdata);
+            // 获取苗木迁移前的信息
+            let treeTransPlantData = '';
+            if (dashboardCompomentMenu && dashboardCompomentMenu === 'geojsonFeature_treeTransfer') {
+                treeTransPlantData = await getTreetransplant(postdata);
+            }
 
             let curingTypeArr = [];
             if (!curingTypes) {
@@ -261,7 +299,7 @@ export default class TreeMessGisOnClickHandle extends Component {
             } else {
                 curingTypeArr = curingTypes;
             };
-
+            // 当前苗木信息
             let SmallClassName = queryTreeData.SmallClass
                 ? queryTreeData.SmallClass + '号小班'
                 : '';
@@ -283,7 +321,6 @@ export default class TreeMessGisOnClickHandle extends Component {
                 SmallClassName = (regionData && regionData.SmallName) || '';
                 ThinClassName = (regionData && regionData.ThinName) || '';
             }
-
             let treeflowData = [];
             let nurserysData = {};
             let curingTaskData = [];
@@ -332,6 +369,83 @@ export default class TreeMessGisOnClickHandle extends Component {
 
             let seedlingMess = getSeedlingMess(queryTreeData, carData, nurserysData);
             let treeMess = getTreeMessFun(SmallClassName, ThinClassName, queryTreeData, nurserysData, bigTreeList);
+            // 迁移前的苗木信息
+            let treeTransPlantTreeMess = '';
+            if (treeTransPlantData && treeTransPlantData.ZZBM) {
+                // 当前苗木信息
+                let treeTransPlantSmallClassName = treeTransPlantData.SmallClass
+                    ? queryTreeData.SmallClass + '号小班'
+                    : '';
+                let treeTransPlantThinClassName = treeTransPlantData.ThinClass
+                    ? treeTransPlantData.ThinClass + '号细班'
+                    : '';
+                let treeTransPlantNo = '';
+                if (treeTransPlantData.No) {
+                    let treeTransPlantSections = treeTransPlantData.No.split('-');
+                    treeTransPlantData.Land = treeTransPlantSections[0];
+                    treeTransPlantNo =
+                    treeTransPlantSections[0] +
+                    '-' +
+                    treeTransPlantSections[1] +
+                    '-' +
+                    treeTransPlantSections[2] +
+                    '-' +
+                    treeTransPlantSections[3];
+                }
+                console.log('treeTransPlantNo', treeTransPlantNo);
+
+                let treeTransPlantDataLocation = '';
+                if (treeTransPlantData && treeTransPlantData.WKT) {
+                    let locationArr = treeTransPlantData.WKT.split('POINT(');
+                    let X = '';
+                    let Y = '';
+                    if (locationArr && locationArr instanceof Array && locationArr.length === 2) {
+                        let wktData = locationArr[1].split(' ');
+                        X = wktData[0];
+                        Y = wktData[1].split(')')[0];
+                        treeTransPlantData.LocationX = X;
+                        treeTransPlantData.LocationY = Y;
+                    }
+                    treeTransPlantDataLocation = `${X},${Y}`;
+                    let latlngs = [[Y, X], [treeLocationData.Y, treeLocationData.X]];
+                    console.log('latlngs', latlngs);
+                    let polyline = L.polyline(latlngs, { color: 'red' }).addTo(
+                        map
+                    );
+                    let beginIcon = L.icon({
+                        iconUrl: require('./TreeMessImg/start.png'),
+                        iconSize: [26, 28],
+                        iconAnchor: [13, 28]
+                    });
+                    let endIcon = L.icon({
+                        iconUrl: require('./TreeMessImg/end.png'),
+                        iconSize: [26, 28],
+                        iconAnchor: [13, 28]
+                    });
+                    console.log('beginIcon', beginIcon);
+                    if (treeMarkerLayer) {
+                        map.removeLayer(treeMarkerLayer);
+                    }
+                    let beginMarker = L.marker([Y, X], {
+                        icon: beginIcon,
+                        zIndexOffset: -50
+                    }).addTo(map);
+                    let endMarker = L.marker([treeLocationData.Y, treeLocationData.X], {
+                        icon: endIcon,
+                        zIndexOffset: -50
+                    }).addTo(map);
+                    this.setState({
+                        transPolyLine: polyline,
+                        beginMarker,
+                        endMarker
+                    });
+                }
+                treeTransPlantData.locationCoord = treeTransPlantDataLocation;
+                let regionData = getThinClassName(treeTransPlantNo, treeTransPlantData.Section, totalThinClass, bigTreeList);
+                treeTransPlantSmallClassName = (regionData && regionData.SmallName) || '';
+                treeTransPlantThinClassName = (regionData && regionData.ThinName) || '';
+                treeTransPlantTreeMess = getTreeMessFun(treeTransPlantSmallClassName, treeTransPlantThinClassName, treeTransPlantData, nurserysData, bigTreeList);
+            }
             let userIDList = [];
             let userDataList = {};
             for (let i = 0; i < treeflowData.length; i++) {
@@ -360,11 +474,14 @@ export default class TreeMessGisOnClickHandle extends Component {
             }
             let flowMess = treeflowData;
             let curingMess = await getCuringMess(curingTaskData, curingTypeArr, getCuringMessage);
+            console.log('treeTransPlantTreeMess', treeTransPlantTreeMess);
+
             this.setState({
                 seedlingMess,
                 treeMess,
                 flowMess,
-                curingMess
+                curingMess,
+                treeTransPlantTreeMess
             });
         } catch (e) {
             console.log('getTreeMessData', e);
