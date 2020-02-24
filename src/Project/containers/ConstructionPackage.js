@@ -13,9 +13,12 @@ import {
 } from '_platform/components/layout';
 import {
     getUser,
-    getAreaTreeData,
-    getUserIsManager
+    getUserIsManager,
+    getAreaTreeData
 } from '_platform/auth';
+import {
+    getConstructionPackageBySection
+} from '../components/ConstructionPackage/auth';
 import { actions } from '../store/constructionPackage';
 import {
     ConstructionPackageTable,
@@ -46,7 +49,8 @@ export default class ConstructionPackage extends Component {
             leftkeycode: '',
             resetkey: 0,
             sectionsData: [],
-            smallClassesData: []
+            smallCalssPackageList: [],
+            packageDatas: []
         };
     }
     componentDidMount = async () => {
@@ -68,6 +72,43 @@ export default class ConstructionPackage extends Component {
             // 区域地块树
             await getThinClassTree(projectList);
         }
+        let rst = await getTreeNodeList();
+        if (rst instanceof Array && rst.length > 0) {
+            rst.forEach((item, index) => {
+                rst[index].children = [];
+            });
+        }
+        // 项目级
+        let projectList = [];
+        // 子项目工程级
+        let regionList = [];
+        if (rst instanceof Array && rst.length > 0) {
+            rst.map(node => {
+                if (node.Type === '项目工程') {
+                    projectList.push({
+                        Name: node.Name,
+                        No: node.No
+                    });
+                } else if (node.Type === '子项目工程') {
+                    let noArr = node.No.split('-');
+                    if (noArr && noArr instanceof Array && noArr.length === 2) {
+                        regionList.push({
+                            Name: node.Name,
+                            No: node.No,
+                            Parent: noArr[0]
+                        });
+                    }
+                }
+            });
+            for (let i = 0; i < projectList.length; i++) {
+                projectList[i].children = regionList.filter(node => {
+                    return node.Parent === projectList[i].No;
+                });
+            }
+        }
+        this.setState({
+            packageDatas: projectList
+        });
     }
     // 树选择, 重新获取: 标段、小班、细班、树种并置空
     onSelect (keys = [], info) {
@@ -133,19 +174,22 @@ export default class ConstructionPackage extends Component {
             console.log('e', e);
         }
     }
-    sectionSelect (value) {
+    sectionSelect = async (value) => {
         const {
-            sectionsData
-        } = this.state;
-        sectionsData.map((sectionData) => {
-            if (value === sectionData.No) {
-                let smallClassesData = sectionData.children;
-                this.setState({
-                    smallClassesData
-                });
-                this.setSmallClassOption(smallClassesData);
+            actions: {
+                getThinClassList,
+                setConstructionPackageLoading
             }
+        } = this.props;
+        await setConstructionPackageLoading(true);
+        let smallCalssPackageList = await getConstructionPackageBySection(value, getThinClassList);
+        console.log('smallCalssPackageList', smallCalssPackageList);
+
+        this.setSmallClassOption(smallCalssPackageList);
+        this.setState({
+            smallCalssPackageList
         });
+        await setConstructionPackageLoading(false);
     }
     // 设置小班选项
     setSmallClassOption (rst) {
@@ -171,9 +215,9 @@ export default class ConstructionPackage extends Component {
     // 小班选择, 重新获取: 细班
     smallClassSelect (value) {
         const {
-            smallClassesData
+            smallCalssPackageList
         } = this.state;
-        smallClassesData.map((smallClassData) => {
+        smallCalssPackageList.map((smallClassData) => {
             if (value === smallClassData.No) {
                 let thinClassesData = smallClassData.children;
                 this.setState({

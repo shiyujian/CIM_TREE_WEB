@@ -10,6 +10,7 @@ import {
     Button,
     Input,
     Progress,
+    Spin,
     message
 } from 'antd';
 import moment from 'moment';
@@ -35,7 +36,6 @@ export default class ConstructionPackageTable extends Component {
         this.state = {
             tblData: [],
             pagination: {},
-            loading: false,
             size: 10,
             section: '',
             smallclass: '',
@@ -50,15 +50,33 @@ export default class ConstructionPackageTable extends Component {
         this.columns = [
             {
                 title: '序号',
-                dataIndex: 'order'
+                dataIndex: 'order',
+                render: (text, record, index) => {
+                    return <span>{index + 1}</span>;
+                }
             },
             {
                 title: '小班号',
-                dataIndex: 'smallCalss'
+                dataIndex: 'smallCalss',
+                render: (text, record) => {
+                    const {
+                        smallCalssPackageList
+                    } = this.props;
+                    const {
+                        smallclass
+                    } = this.state;
+                    let smallClassNo = '/';
+                    smallCalssPackageList.map((smallClassData) => {
+                        if (smallclass === smallClassData.No) {
+                            smallClassNo = smallClassData.No;
+                        }
+                    });
+                    return <span>{smallClassNo}</span>;
+                }
             },
             {
                 title: '细班号',
-                dataIndex: 'thinClass'
+                dataIndex: 'No'
             },
             {
                 title: '操作',
@@ -124,15 +142,38 @@ export default class ConstructionPackageTable extends Component {
         const { resetinput, leftkeycode } = this.props;
         resetinput(leftkeycode);
     }
-    handleTableChange (pagination) {
-        const pager = { ...this.state.pagination };
-        pager.current = pagination.current;
-        this.setState({
-            pagination: pager
-        });
-        this.query(pagination.current);
-    }
     query = async (page) => {
+        const {
+            smallCalssPackageList
+        } = this.props;
+        const {
+            smallclass,
+            thinclass
+        } = this.state;
+        console.log('query', smallclass);
+
+        if (!smallclass) {
+            message.info('请选择项目，标段，小班');
+        }
+        smallCalssPackageList.map((smallClassData) => {
+            if (smallclass === smallClassData.No) {
+                if (thinclass) {
+                    smallClassData.children.map((thinClassData) => {
+                        if (thinclass === thinClassData.No) {
+                            let tblData = [thinClassData];
+                            this.setState({
+                                tblData
+                            });
+                        }
+                    });
+                } else {
+                    let tblData = smallClassData.children;
+                    this.setState({
+                        tblData
+                    });
+                }
+            }
+        });
     }
     handleAddSmallClassOK = () => {
         this.setState({
@@ -160,7 +201,7 @@ export default class ConstructionPackageTable extends Component {
             sectionoption,
             smallclassoption,
             thinclassoption,
-            smallClassesData
+            constructionPackageLoading = false
         } = this.props;
         const {
             section,
@@ -171,130 +212,121 @@ export default class ConstructionPackageTable extends Component {
         } = this.state;
         return (
             <div>
-                <Row>
-                    <div>
-                        <Row>
-                            <Col span={16} className='ConstructionPackageTable-search-layout'>
-                                <div className='ConstructionPackageTable-mrg10'>
-                                    <span className='ConstructionPackageTable-search-span'>标段：</span>
-                                    <Select
-                                        allowClear
-                                        showSearch
-                                        filterOption={(input, option) =>
-                                            option.props.children
-                                                .toLowerCase()
-                                                .indexOf(input.toLowerCase()) >= 0
-                                        }
-                                        className='ConstructionPackageTable-forestcalcw4'
-                                        defaultValue='全部'
-                                        value={section}
-                                        onChange={this.onSectionChange.bind(this)}
-                                    >
-                                        {sectionoption}
-                                    </Select>
-                                </div>
-                                <div className='ConstructionPackageTable-mrg10'>
-                                    <span className='ConstructionPackageTable-search-span'>小班：</span>
-                                    <Select
-                                        allowClear
-                                        showSearch
-                                        filterOption={(input, option) =>
-                                            option.props.children
-                                                .toLowerCase()
-                                                .indexOf(input.toLowerCase()) >= 0
-                                        }
-                                        className='ConstructionPackageTable-forestcalcw4'
-                                        defaultValue='全部'
-                                        value={smallclass}
-                                        onChange={this.onSmallClassChange.bind(this)}
-                                    >
-                                        {smallclassoption}
-                                    </Select>
-                                </div>
-                                <div className='ConstructionPackageTable-mrg10'>
-                                    <span className='ConstructionPackageTable-search-span'>细班：</span>
-                                    <Select
-                                        allowClear
-                                        showSearch
-                                        filterOption={(input, option) =>
-                                            option.props.children
-                                                .toLowerCase()
-                                                .indexOf(input.toLowerCase()) >= 0
-                                        }
-                                        className='ConstructionPackageTable-forestcalcw4'
-                                        defaultValue='全部'
-                                        value={thinclass}
-                                        onChange={this.onThinClassChange.bind(this)}
-                                    >
-                                        {thinclassoption}
-                                    </Select>
-                                </div>
-                            </Col>
-                            <Col span={8}>
-                                <div className='ConstructionPackageTable-mrg10-button'>
-                                    <Button
-                                        type='primary'
-                                        onClick={this.handleAddThinClassOK.bind(this)}
-                                        className='ConstructionPackageTable-search-button'>新增细班</Button>
-                                </div>
-                                <div className='ConstructionPackageTable-mrg10-button'>
-                                    <Button
-                                        type='primary'
-                                        style={{marginRight: 30}}
-                                        onClick={this.handleAddSmallClassOK.bind(this)}
-                                        className='ConstructionPackageTable-search-button'>新增小班</Button>
-                                </div>
-                                <div className='ConstructionPackageTable-mrg10-button'>
-                                    <Button
-                                        type='primary'
-                                        style={{marginRight: 30}}
-                                        className='ConstructionPackageTable-search-button'>查询</Button>
-                                </div>
-                            </Col>
+                <Spin spinning={constructionPackageLoading}>
+                    <Row>
+                        <div>
+                            <Row>
+                                <Col span={16} className='ConstructionPackageTable-search-layout'>
+                                    <div className='ConstructionPackageTable-mrg10'>
+                                        <span className='ConstructionPackageTable-search-span'>标段：</span>
+                                        <Select
+                                            allowClear
+                                            showSearch
+                                            filterOption={(input, option) =>
+                                                option.props.children
+                                                    .toLowerCase()
+                                                    .indexOf(input.toLowerCase()) >= 0
+                                            }
+                                            className='ConstructionPackageTable-forestcalcw4'
+                                            defaultValue='全部'
+                                            value={section}
+                                            onChange={this.onSectionChange.bind(this)}
+                                        >
+                                            {sectionoption}
+                                        </Select>
+                                    </div>
+                                    <div className='ConstructionPackageTable-mrg10'>
+                                        <span className='ConstructionPackageTable-search-span'>小班：</span>
+                                        <Select
+                                            allowClear
+                                            showSearch
+                                            filterOption={(input, option) =>
+                                                option.props.children
+                                                    .toLowerCase()
+                                                    .indexOf(input.toLowerCase()) >= 0
+                                            }
+                                            className='ConstructionPackageTable-forestcalcw4'
+                                            defaultValue='全部'
+                                            value={smallclass}
+                                            onChange={this.onSmallClassChange.bind(this)}
+                                        >
+                                            {smallclassoption}
+                                        </Select>
+                                    </div>
+                                    <div className='ConstructionPackageTable-mrg10'>
+                                        <span className='ConstructionPackageTable-search-span'>细班：</span>
+                                        <Select
+                                            allowClear
+                                            showSearch
+                                            filterOption={(input, option) =>
+                                                option.props.children
+                                                    .toLowerCase()
+                                                    .indexOf(input.toLowerCase()) >= 0
+                                            }
+                                            className='ConstructionPackageTable-forestcalcw4'
+                                            defaultValue='全部'
+                                            value={thinclass}
+                                            onChange={this.onThinClassChange.bind(this)}
+                                        >
+                                            {thinclassoption}
+                                        </Select>
+                                    </div>
+                                </Col>
+                                <Col span={8}>
+                                    <div className='ConstructionPackageTable-mrg10-button'>
+                                        <Button
+                                            type='primary'
+                                            disabled={!section}
+                                            onClick={this.handleAddThinClassOK.bind(this)}
+                                            className='ConstructionPackageTable-search-button'>新增细班</Button>
+                                    </div>
+                                    {/* <div className='ConstructionPackageTable-mrg10-button'>
+                                        <Button
+                                            type='primary'
+                                            style={{marginRight: 30}}
+                                            onClick={this.handleAddSmallClassOK.bind(this)}
+                                            className='ConstructionPackageTable-search-button'>新增小班</Button>
+                                    </div> */}
+                                    <div className='ConstructionPackageTable-mrg10-button'>
+                                        <Button
+                                            type='primary'
+                                            style={{marginRight: 30}}
+                                            onClick={this.query.bind(this)}
+                                            className='ConstructionPackageTable-search-button'>查询</Button>
+                                    </div>
+                                </Col>
 
-                        </Row>
-                    </div>
-                </Row>
-                <Row>
-                    <Table
-                        bordered
-                        className='foresttable'
-                        columns={this.columns}
-                        rowKey='ZZBM'
-                        loading={{
-                            tip: (
-                                <Progress
-                                    style={{ width: 200 }}
-                                    percent={this.state.percent}
-                                    status='active'
-                                    strokeWidth={5}
-                                />
-                            ),
-                            spinning: this.state.loading
-                        }}
-                        locale={{ emptyText: '无信息' }}
-                        dataSource={tblData}
-                        onChange={this.handleTableChange.bind(this)}
-                        pagination={this.state.pagination}
-                    />
-                </Row>
-                {
-                    addSmallClassVisible
-                        ? <AddSmallClassModal
-                            {...this.props}
-                            {...this.state}
-                            handleAddSmallClassCancel={this.handleAddSmallClassCancel.bind(this)}
-                        /> : ''
-                }
-                {
-                    addThinClassVisible
-                        ? <AddThinClassModal
-                            {...this.props}
-                            {...this.state}
-                            handleAddThinClassCancel={this.handleAddThinClassCancel.bind(this)}
-                        /> : ''
-                }
-
+                            </Row>
+                        </div>
+                    </Row>
+                    <Row>
+                        <Table
+                            bordered
+                            className='foresttable'
+                            columns={this.columns}
+                            rowKey='ZZBM'
+                            locale={{ emptyText: '无信息' }}
+                            dataSource={tblData}
+                            pagination
+                        />
+                    </Row>
+                    {
+                        addSmallClassVisible
+                            ? <AddSmallClassModal
+                                {...this.props}
+                                {...this.state}
+                                handleAddSmallClassCancel={this.handleAddSmallClassCancel.bind(this)}
+                            /> : ''
+                    }
+                    {
+                        addThinClassVisible
+                            ? <AddThinClassModal
+                                {...this.props}
+                                {...this.state}
+                                handleAddThinClassCancel={this.handleAddThinClassCancel.bind(this)}
+                            /> : ''
+                    }
+                </Spin>
             </div>
         );
     }

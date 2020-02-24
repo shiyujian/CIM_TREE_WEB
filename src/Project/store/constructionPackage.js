@@ -1,37 +1,28 @@
 import { handleActions, combineActions, createAction } from 'redux-actions';
 import {
-    GARDEN_API
+    TREE_API
 } from '_platform/api';
 import {forestFetchAction} from '_platform/store/fetchAction';
 export const ID = 'PROJECT_CONSTRUCTIONPACKAGE';
-// 获取人脸识别设备列表
-const getFaceRecognitionList = forestFetchAction(`${GARDEN_API}/facedevices`, []);
-// 获取人脸识别人员列表
-export const getFaceworkmans = forestFetchAction(`${GARDEN_API}/faceworkmans?sn={{sn}}`, [], 'GET');
-// 重新下发人员到人脸识别机
-export const postReSendManToFaceDevice = forestFetchAction(`${GARDEN_API}/resendman2facedevice?id={{id}}`, [], 'GET');
-// 获取班组
-export const getWorkGroupOK = createAction(`${ID}_getCheckGroup`);
+// 批量导入施工包
+const postAddWpunits = forestFetchAction(`${TREE_API}/wpunits`, [], 'POST');
+// 删除施工包
+export const deleteWpunit = forestFetchAction(`${TREE_API}/wpunit`, [], 'DELETE');
+// 设置页面loading
+export const setConstructionPackageLoading = createAction(`${ID}_setConstructionPackageLoading`);
 export const actions = {
-    getWorkGroupOK,
-    getFaceRecognitionList,
-    getFaceworkmans,
-    postReSendManToFaceDevice
+    setConstructionPackageLoading,
+    postAddWpunits,
+    deleteWpunit
 };
 
 export default handleActions(
     {
-        [getWorkGroupOK]: (state, {payload}) => {
-            if (payload && payload.content && payload.content instanceof Array) {
-                let data = {
-                    workGroupsData: payload.content
-                };
-                return data;
-            } else {
-                return {
-                    workGroupsData: []
-                };
-            }
+        [setConstructionPackageLoading]: (state, {payload}) => {
+            return {
+                ...state,
+                constructionPackageLoading: payload
+            };
         }
     },
     {}

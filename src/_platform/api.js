@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2020-01-06 15:51:42
+ * @Last Modified time: 2020-02-24 09:23:49
  */
 /**
  *
@@ -758,6 +758,10 @@ export const MODULES = [
                     {
                         id: 'PROJECT.QRCODEDISTRIBUTE',
                         name: '二维码派发信息'
+                    },
+                    {
+                        id: 'PROJECT.CONSTRUCTIONPACKAGE',
+                        name: '施工包管理'
                     }
                 ]
             }

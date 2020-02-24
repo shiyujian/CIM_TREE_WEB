@@ -23,7 +23,8 @@ class AddSmallClassModal extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            loading: false
+            loading: false,
+            addSmallClassType: 'multiple'
         };
     }
     static layout = {
@@ -53,6 +54,11 @@ class AddSmallClassModal extends Component {
         // });
         await this.props.handleAddSmallClassCancel();
     }
+    changeAddSmallClassType = async (value) => {
+        this.setState({
+            addSmallClassType: value
+        });
+    }
     firsrNumChange = async (value) => {
 
     }
@@ -63,11 +69,14 @@ class AddSmallClassModal extends Component {
         const {
             form: { getFieldDecorator }
         } = this.props;
+        const {
+            addSmallClassType
+        } = this.state;
         return (
             <div>
                 <Modal
                     title='新增小班'
-                    width={920}
+                    width={600}
                     visible
                     maskClosable={false}
                     onOk={this.save.bind(this)}
@@ -79,26 +88,31 @@ class AddSmallClassModal extends Component {
                                 <Row>
                                     <Col span={24}>
                                         <Row>
-                                            <Col span={8} />
-                                            <Col span={8}>
-                                                <RadioGroup>
+                                            <Col span={6} />
+                                            <Col span={12}>
+                                                <RadioGroup
+                                                    value={addSmallClassType}
+                                                    onChange={this.changeAddSmallClassType.bind(this)} >
                                                     <Radio value={'multiple'} key={'multiple'}>新增多个小班</Radio>
                                                     <Radio value={'one'} key={'one'}>新增一个小班</Radio>
                                                 </RadioGroup>
                                             </Col>
-                                            <Col span={8} />
+                                            <Col span={6} />
                                         </Row>
 
                                     </Col>
                                     <Col span={24} style={{marginTop: 20}}>
                                         <Row>
-                                            <Col span={8}>
+                                            <Col span={6}>
                                                 <span>编码选择</span>
                                             </Col>
-                                            <Col span={8}>
+                                            <Col span={7}>
                                                 <InputNumber onChange={this.firsrNumChange.bind(this)} />
                                             </Col>
-                                            <Col span={8}>
+                                            <Col span={4}>
+                                                ~
+                                            </Col>
+                                            <Col span={7}>
                                                 <InputNumber onChange={this.secondNumChange.bind(this)} />
                                             </Col>
                                         </Row>
