@@ -13,7 +13,9 @@ import {
     WMSTILELAYERURL,
     TILEURLS,
     INITLEAFLET_API,
-    DOCEXPORT_API
+    DOCEXPORT_API,
+    TREEPIPEEXPORTSECTIONS,
+    TREEPIPEEXPORTPERSONS
 } from '_platform/api';
 import {
     handleAreaLayerData,
@@ -51,11 +53,17 @@ export default class CompletionPlanTable extends Component {
         if (userData.username === 'admin') {
             permission = true;
         } else if (userSection) {
-            permission = true;
-            // // 需要判断用户当前标段有无签约，是否有权限
-            // if (userSection.indexOf(userSection) !== -1) {
-            //     permission = true;
-            // }
+            // permission = true;
+            // 需要判断用户当前标段有无签约，是否有权限
+            TREEPIPEEXPORTSECTIONS.map((companyData) => {
+                if (companyData && companyData.section && companyData.section === userSection) {
+                    TREEPIPEEXPORTPERSONS.map((person) => {
+                        if (person.username === userData.username) {
+                            permission = true;
+                        }
+                    });
+                }
+            });
         }
         console.log('userData', userData);
 
@@ -651,7 +659,7 @@ export default class CompletionPlanTable extends Component {
                         createBtnVisible ? (
                             <div className='CompletionPlanTable-button-layout'>
                                 <div>
-                                    {
+                                    {/* {
                                         isSuperAdmin
                                             ? <Button
                                                 disabled={loading}
@@ -660,13 +668,20 @@ export default class CompletionPlanTable extends Component {
                                                 onClick={this.handleExportPipeDrawingOk.bind(this)}>
                                                 竣工图
                                             </Button> : ''
-                                    }
+                                    } */}
                                     <Button
+                                        disabled={loading}
+                                        type='primary'
+                                        style={{marginRight: 10}}
+                                        onClick={this.handleExportPipeDrawingOk.bind(this)}>
+                                                竣工图
+                                    </Button>
+                                    {/* <Button
                                         disabled={loading}
                                         style={{marginRight: 10}}
                                         onClick={this.handleExportPipeCoordinateOk.bind(this)}>
                                                 坐标表格
-                                    </Button>
+                                    </Button> */}
                                     <Button
                                         disabled={loading}
                                         type='danger'

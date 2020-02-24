@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2020-02-24 09:23:49
+ * @Last Modified time: 2020-02-24 11:36:26
  */
 /**
  *
@@ -390,6 +390,21 @@ export const NURSERYPARAM = [
 // 项目管理  树种管理 现场测量
 export const TREEPARAM = [
     '地径', '高度', '胸径', '密度', '面积', '分枝数量', '分枝点', '条长', '地径超过0.5厘米分支数量', '地径超过1cm分枝数量', '地径超过3厘米分支数量'
+];
+
+// 灌溉竣工图可导出标段
+export const TREEPIPEEXPORTSECTIONS = [
+    {
+        section: 'P193-01-02',
+        name: '中铁一局大千生态联合体'
+    }
+];
+// 灌溉竣工图可导出个人
+export const TREEPIPEEXPORTPERSONS = [
+    {
+        username: 'lw2019',
+        name: '柳旺'
+    }
 ];
 
 export const MODULES = [
