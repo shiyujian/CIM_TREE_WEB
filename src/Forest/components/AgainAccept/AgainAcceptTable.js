@@ -312,22 +312,23 @@ export default class AgainAcceptTable extends Component {
         let yezhuOptions = [];
         if (shigong && shigong.content && shigong.content instanceof Array) {
             shigong.content.map(item => {
-                shigongOptions.push(<Option value={item.ID} key={item.ID} title={item.Full_Name}>
-                    {item.Full_Name}
+                shigongOptions.push(<Option value={item.ID} key={item.ID} title={item.User_Name}>
+                    {item.Full_Name}（{item.User_Name}）
                 </Option>);
             });
         }
+        console.log('监理账号', jianli.content);
         if (jianli && jianli.content && jianli.content instanceof Array) {
             jianli.content.map(item => {
-                jianliOptions.push(<Option value={item.ID} key={item.ID} title={item.Full_Name}>
-                    {item.Full_Name}
+                jianliOptions.push(<Option value={item.ID} key={item.ID} title={item.User_Name}>
+                    {item.Full_Name}（{item.User_Name}）
                 </Option>);
             });
         }
         if (yezhu && yezhu.content && yezhu.content instanceof Array) {
             yezhu.content.map(item => {
-                yezhuOptions.push(<Option value={item.ID} key={item.ID} title={item.Full_Name}>
-                    {item.Full_Name}
+                yezhuOptions.push(<Option value={item.ID} key={item.ID} title={item.User_Name}>
+                    {item.Full_Name}（{item.User_Name}）
                 </Option>);
             });
         }
@@ -413,6 +414,16 @@ export default class AgainAcceptTable extends Component {
                     Notification.success({
                         message: '提示',
                         description: '您发起的批量重新验收已提交'
+                    });
+                } else if (rep.code === 2) {
+                    Notification.error({
+                        message: '提示',
+                        description: '同细班，同一验收项已提交验收'
+                    });
+                } else {
+                    Notification.error({
+                        message: '提示',
+                        description: '提交失败，请联系管理员查找失败原因'
                     });
                 }
             },
@@ -609,17 +620,18 @@ export default class AgainAcceptTable extends Component {
             }
         });
         let user = getUser();
+        console.log('当前用户', user);
         // 施工文书可以查看本标段，非施工文书只能查看自己
         let applier = '', supervisor = '', owner = '';
-        if (user.duty === '施工文书') {
-            applier = user.ID;
+        if (user.roles.ID === 10) {
+            applier = '';
             supervisor = jl;
             owner = yz;
-        } else if (user.duty === '监理文书') {
+        } else if (user.roles.ID === 11) {
             applier = sgy;
             supervisor = user.ID;
             owner = yz;
-        } else {
+        } else if (user.roles.ID === 9) {
             applier = sgy;
             supervisor = jl;
             owner = user.ID;
@@ -722,10 +734,13 @@ export default class AgainAcceptTable extends Component {
                 defaultValue='全部'
                 value={sgy}
                 filterOption={
-                    (input, option) =>
-                        option.props.children
-                            .toLowerCase()
-                            .indexOf(input.toLowerCase()) >= 0
+                    (input, option) => {
+                        return option.props.children[0]
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0;
+                    }
                 }
                 onChange={this.ysTypeChange.bind(this, 'sgy')} >
                 {shigongOptions}
@@ -740,10 +755,13 @@ export default class AgainAcceptTable extends Component {
                 defaultValue=''
                 value={yz}
                 filterOption={
-                    (input, option) =>
-                        option.props.children
-                            .toLowerCase()
-                            .indexOf(input.toLowerCase()) >= 0
+                    (input, option) => {
+                        return option.props.children[0]
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0;
+                    }
                 }
                 onChange={this.ysTypeChange.bind(this, 'yz')} >
                 {yezhuOptions}
@@ -758,10 +776,13 @@ export default class AgainAcceptTable extends Component {
                 defaultValue='全部'
                 value={jl}
                 filterOption={
-                    (input, option) =>
-                        option.props.children
-                            .toLowerCase()
-                            .indexOf(input.toLowerCase()) >= 0
+                    (input, option) => {
+                        return option.props.children[0]
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0;
+                    }
                 }
                 onChange={this.ysTypeChange.bind(this, 'jl')} >
                 {jianliOptions}
@@ -771,12 +792,13 @@ export default class AgainAcceptTable extends Component {
             // 业主身份
             queryArr.push(applier, supervisor);
         } else if (user.roles.ID === 11) {
-            // 施工身份
-            queryArr.push(supervisor, owner);
-        } else if (user.roles.ID === 10) {
             // 监理身份
             queryArr.push(applier, owner);
+        } else if (user.roles.ID === 10) {
+            // 施工身份
+            queryArr.push(supervisor, owner);
         }
+        console.log('用户身份', user, user.roles.ID);
         header = (<div >
             <Row className='forest-search-layout' >
                 <div className='forest-mrg10' >
