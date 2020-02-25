@@ -288,6 +288,12 @@ export default class AgainAccept extends Component {
                         </Option>
                     );
                 });
+                rst.children.map(item => {
+                    item.children.map(row => {
+                        row.name = row.No.substr(-7, 7);
+                    });
+                });
+                console.log('设置标段选项', rst.children);
                 this.setState({
                     smallClassList: rst.children,
                     sectionoption: sectionOptions
@@ -298,6 +304,12 @@ export default class AgainAccept extends Component {
                         {rst.Name}
                     </Option>
                 );
+                rst.children.map(item => {
+                    item.children.map(row => {
+                        row.name = row.No.substr(-7, 7);
+                    });
+                });
+                console.log('设置标段选项', rst.children);
                 this.setState({
                     smallClassList: rst.children,
                     sectionoption: sectionOptions
