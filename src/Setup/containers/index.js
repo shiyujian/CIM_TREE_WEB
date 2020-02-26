@@ -6,3 +6,4 @@ export Person from './Person';
 export PersonBlacklist from './PersonBlacklist';
 export NurseryBlacklist from './NurseryBlacklist';
 export SupplierBlacklist from './SupplierBlacklist';
+export FlowNode from './FlowNode';

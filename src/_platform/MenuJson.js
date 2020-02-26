@@ -24,6 +24,29 @@ export const OverallMenu = [
         // icon: <Icon name='newspaper-o' />
     },
     {
+        key: 'form',
+        id: 'OVERALL.FORM',
+        name: '表单管理',
+        children: [
+            {
+                key: 'DesignChange',
+                id: 'OVERALL.DESIGNCHANGE',
+                path: '/overall/designchange',
+                name: '设计变更'
+            }, {
+                key: 'VisaManagement',
+                id: 'OVERALL.VISAMANAGEMENT',
+                path: '/overall/visamanagement',
+                name: '签证管理'
+            }, {
+                key: 'NegotiationManagement',
+                id: 'OVERALL.NEGOTIATIONMANAGEMENT',
+                path: '/overall/negotiationmanagement',
+                name: '洽商管理'
+            }
+        ]
+    },
+    {
         key: 'datum',
         id: 'OVERALL.DATUM',
         name: '资料文档',
@@ -338,6 +361,13 @@ export const SetupMenu = [
         id: 'SETUP.WORKFLOW',
         name: '流程设置',
         path: '/setup/workflow',
+        icon: <Icon name='object-group' />
+    },
+    {
+        key: 'FlowNode',
+        id: 'SETUP.FLOWNODE',
+        name: '流程节点',
+        path: '/setup/flownode',
         icon: <Icon name='object-group' />
     },
     {
