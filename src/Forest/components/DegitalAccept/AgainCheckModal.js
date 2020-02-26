@@ -145,10 +145,13 @@ class AgainCheckModal extends Component {
                         <Select
                             allowClear showSearch
                             filterOption={
-                                (input, option) => 
-                                    option.props.children
-                                        .toLowerCase()
-                                        .indexOf(input.toLowerCase()) >= 0
+                                (input, option) => {
+                                    return option.props.children[0]
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0;
+                                }
                             }
                             defaultValue=''
                             onChange={this.handleSupervisorChange.bind(this)}
@@ -160,10 +163,13 @@ class AgainCheckModal extends Component {
                         <Select
                             allowClear showSearch
                             filterOption={
-                                (input, option) =>
-                                    option.props.children
-                                        .toLowerCase()
-                                        .indexOf(input.toLowerCase()) >= 0
+                                (input, option) => {
+                                    return option.props.children[0]
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0;
+                                }
                             }
                             defaultValue=''
                             onChange={this.handleOwnerChange.bind(this)}

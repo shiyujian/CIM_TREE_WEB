@@ -119,8 +119,10 @@ class AgainCheckModal extends Component {
             checkItem: newCheckItem
         });
     }
+    // 小班改变
     handleSmallClassChange (key, value) {
         const { checkItem } = this.state;
+        console.log(999, value, checkItem, this.props.smallClassList);
         if (key === -1) {
             let thinClassList = [];
             this.props.smallClassList.map(item => {
@@ -143,6 +145,7 @@ class AgainCheckModal extends Component {
                     item.thinClassList = thinClassList;
                 }
             });
+            console.log('小班改变', checkItem);
             this.setState({
                 checkItem
             });
@@ -153,25 +156,45 @@ class AgainCheckModal extends Component {
         let ThinClassLength = 0;
         let ThinClass = [];
         if (key === -1) {
+            console.log('细班号', value);
             ThinClassLength = value.length;
-            ThinClass = value;
+            value.map(item => {
+                this.state.thinClassList.map(row => {
+                    if (row.name === item) {
+                        ThinClass.push(row.No);
+                    }
+                });
+            });
+            console.log('细班号', ThinClass);
             this.setState({
                 ThinClassLength,
                 ThinClass
             });
         } else {
+            console.log('细班号', value, checkItem);
             ThinClassLength = value.length;
             checkItem.map((item, index) => {
                 if (index === key) {
                     item.thinClassLength = ThinClassLength;
-                    item.ThinClass = value;
+                    let ThinClassArr = [];
+                    value.map(record => {
+                        item.thinClassList.map(row => {
+                            if (row.name === record) {
+                                ThinClassArr.push(row.No);
+                            }
+                        });
+                    });
+                    item.ThinClass = ThinClassArr;
                 }
             });
+            console.log('细班号', value, checkItem);
+
             this.setState({
                 checkItem
             });
         }
     }
+    // 验收类型
     handleYsTypeChange (key, value) {
         const { checkItem } = this.state;
         if (key === -1) {
@@ -291,10 +314,11 @@ class AgainCheckModal extends Component {
                                             .toLowerCase()
                                             .indexOf(input.toLowerCase()) >= 0
                                 }
+                                optionLabelProp='value'
                                 onChange={this.handleThinClassChange.bind(this, -1)}
                             >
                                 {this.state.thinClassList.map(item => {
-                                    return (<Option key={item.No} value={item.No}>{item.Name}</Option>);
+                                    return (<Option key={item.No} value={item.name}>{item.Name}</Option>);
                                 })}
                             </Select>
                         </Col>
@@ -347,10 +371,11 @@ class AgainCheckModal extends Component {
                                                         .toLowerCase()
                                                         .indexOf(input.toLowerCase()) >= 0
                                             }
+                                            optionLabelProp='value'
                                             onChange={this.handleThinClassChange.bind(this, index)}
                                         >
                                             {item.thinClassList.map(item => {
-                                                return (<Option key={item.No} value={item.No}>{item.Name}</Option>);
+                                                return (<Option key={item.No} value={item.name}>{item.Name}</Option>);
                                             })}
                                         </Select>
                                     </Col>
@@ -368,10 +393,13 @@ class AgainCheckModal extends Component {
                                 <Select
                                     allowClear showSearch
                                     filterOption={
-                                        (input, option) => 
-                                            option.props.children
-                                                .toLowerCase()
-                                                .indexOf(input.toLowerCase()) >= 0
+                                        (input, option) => {
+                                            return option.props.children[0]
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0;
+                                        }
                                     }
                                     defaultValue=''
                                     onChange={this.handleSupervisorChange.bind(this)}
@@ -388,10 +416,13 @@ class AgainCheckModal extends Component {
                                 <Select
                                     allowClear showSearch
                                     filterOption={
-                                        (input, option) =>
-                                            option.props.children
-                                                .toLowerCase()
-                                                .indexOf(input.toLowerCase()) >= 0
+                                        (input, option) => {
+                                            return option.props.children[0]
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0;
+                                        }
                                     }
                                     defaultValue=''
                                     onChange={this.handleOwnerChange.bind(this)}

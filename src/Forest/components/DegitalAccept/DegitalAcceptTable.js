@@ -371,6 +371,16 @@ export default class DegitalAcceptTable extends Component {
                         message: '提示',
                         description: '您的重新发起已提交'
                     });
+                } else if (rep.code === 2) {
+                    Notification.error({
+                        message: '提示',
+                        description: '同细班，同一验收项已提交验收'
+                    });
+                } else {
+                    Notification.error({
+                        message: '提示',
+                        description: '提交失败，请联系管理员查找失败原因'
+                    });
                 }
             },
             onCancel: () => {
@@ -539,22 +549,22 @@ export default class DegitalAcceptTable extends Component {
         let yezhuOptions = [];
         if (shigong && shigong.content && shigong.content instanceof Array) {
             shigong.content.map(item => {
-                shigongOptions.push(<Option value={item.ID} key={item.ID} title={item.Full_Name}>
-                    {item.Full_Name}
+                shigongOptions.push(<Option value={item.ID} key={item.ID} title={item.User_Name}>
+                    {item.Full_Name}（{item.User_Name}）
                 </Option>);
             });
         }
         if (jianli && jianli.content && jianli.content instanceof Array) {
             jianli.content.map(item => {
-                jianliOptions.push(<Option value={item.ID} key={item.ID} title={item.Full_Name}>
-                    {item.Full_Name}
+                jianliOptions.push(<Option value={item.ID} key={item.ID} title={item.User_Name}>
+                    {item.Full_Name}（{item.User_Name}）
                 </Option>);
             });
         }
         if (yezhu && yezhu.content && yezhu.content instanceof Array) {
             yezhu.content.map(item => {
-                yezhuOptions.push(<Option value={item.ID} key={item.ID} title={item.Full_Name}>
-                    {item.Full_Name}
+                yezhuOptions.push(<Option value={item.ID} key={item.ID} title={item.User_Name}>
+                    {item.Full_Name}（{item.User_Name}）
                 </Option>);
             });
         }
@@ -1266,10 +1276,13 @@ export default class DegitalAcceptTable extends Component {
                         className='forest-forestcalcw4'
                         defaultValue=''
                         filterOption={
-                            (input, option) =>
-                                option.props.children
-                                    .toLowerCase()
-                                    .indexOf(input.toLowerCase()) >= 0
+                            (input, option) => {
+                                return option.props.children[0]
+                                .toLowerCase()
+                                .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
+                                .toLowerCase()
+                                .indexOf(input.toLowerCase()) >= 0;
+                            }
                         }
                         value={sgy}
                         onChange={this.ysTypeChange.bind(this, 'sgy')} >
@@ -1285,10 +1298,13 @@ export default class DegitalAcceptTable extends Component {
                         defaultValue=''
                         value={cly}
                         filterOption={
-                            (input, option) =>
-                                option.props.children
-                                    .toLowerCase()
-                                    .indexOf(input.toLowerCase()) >= 0
+                            (input, option) => {
+                                return option.props.children[0]
+                                .toLowerCase()
+                                .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
+                                .toLowerCase()
+                                .indexOf(input.toLowerCase()) >= 0;
+                            }
                         }
                         onChange={this.ysTypeChange.bind(this, 'cly')} >
                         {shigongOptions}
@@ -1303,10 +1319,13 @@ export default class DegitalAcceptTable extends Component {
                         defaultValue='全部'
                         value={jl}
                         filterOption={
-                            (input, option) =>
-                                option.props.children
-                                    .toLowerCase()
-                                    .indexOf(input.toLowerCase()) >= 0
+                            (input, option) => {
+                                return option.props.children[0]
+                                .toLowerCase()
+                                .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
+                                .toLowerCase()
+                                .indexOf(input.toLowerCase()) >= 0;
+                            }
                         }
                         onChange={this.ysTypeChange.bind(this, 'jl')} >
                         {jianliOptions}
