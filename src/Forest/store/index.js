@@ -480,6 +480,10 @@ export const getExportPipeDrawing = forestFetchAction(`${DOCEXPORT_API}/?action=
 export const postPipeCoordinate = createFetchAction(`${TREEPIPE_API}/pipe/query`, [], 'POST', []);
 // 上传附件
 export const uploadFileHandler = myFetch(`${base}/OSSUploadHandler.ashx?filetype=news`, [], 'POST');
+// 移植信息查看移植后信息
+export const getTransplantLocMess = forestFetchAction(`${TREE_API}/trees`, []);
+// 移植信息查看移植前信息
+export const getTransplantTransMess = forestFetchAction(`${TREE_API}/treetransplants`, []);
 export const actions = {
     exportEcporttreestatuss,
     getTotalSat,
@@ -600,7 +604,9 @@ export const actions = {
     postAreaAccept,
     postAddCarPack,
     getExportPipeDrawing,
-    postPipeCoordinate
+    postPipeCoordinate,
+    getTransplantLocMess,
+    getTransplantTransMess
 };
 export default handleActions({
     [getTreeOK]: (state, {

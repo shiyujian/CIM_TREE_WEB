@@ -159,6 +159,12 @@ export const ForestMenu = [
                 id: 'FOREST.OWNERINFO',
                 path: '/forest/checkerinfo',
                 name: '业主抽查信息'
+            },
+            {
+                key: 'transplantinfo',
+                id: 'FOREST.TRANSPLANTINFO',
+                path: '/forest/transplantinfo',
+                name: '移植信息'
             }
         ]
     },
@@ -376,12 +382,7 @@ export const ProjectMenu = [
         name: '苗木管理',
         id: 'PROJECT.NURSERY',
         children: [
-            {
-                key: 'TreeManage',
-                id: 'PROJECT.TREEMANAGE',
-                name: '树种管理',
-                path: '/project/treeManage'
-            },
+
             {
                 key: 'NurseryManagement',
                 id: 'PROJECT.NURSERYMANAGEMENT',
@@ -399,6 +400,12 @@ export const ProjectMenu = [
                 id: 'PROJECT.RELEVANCEMANAGEMENT',
                 name: '绑定管理',
                 path: '/project/relevanceManagement'
+            },
+            {
+                key: 'TreeManage',
+                id: 'PROJECT.TREEMANAGE',
+                name: '树种管理',
+                path: '/project/treeManage'
             }
         ]
     },
