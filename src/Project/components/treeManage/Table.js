@@ -622,16 +622,19 @@ export default class Tablelevel extends Component {
                             >
                                 清空
                             </Button>
-                            <Button
-                                onClick={this.handleExport.bind(this)}
-                                type='danger'
-                                style={{
-                                    minWidth: 30,
-                                    display: 'inline-block'
-                                }}
-                            >
-                                导出
-                            </Button>
+                            {
+                                superUser
+                                    ? <Button
+                                        onClick={this.handleExport.bind(this)}
+                                        type='danger'
+                                        style={{
+                                            minWidth: 30,
+                                            display: 'inline-block'
+                                        }}
+                                    >
+                                    导出
+                                    </Button> : ''
+                            }
                         </Col>
                         <Col span={6}>
 

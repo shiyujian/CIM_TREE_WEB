@@ -1,4 +1,7 @@
 .platform-aside {
+  .ant-menu {
+    color: rgba(157,162,194,1);
+  }
   .ant-menu-root {
     width: 100%;
     display: block;
@@ -15,7 +18,12 @@
       font-size: 14px;
       border-bottom: solid 1px #bdbbbb;
       box-shadow: none;
+
+      &:hover {
+        color: #2AC9C0;
+      }
     }
+
 
     .ant-menu-sub {
       background-color: #e5e6e6;
@@ -23,14 +31,14 @@
         width: 100%;
         display: block;
         padding: 0 0 0 20px;
-        border-left: solid 1px #bdbbbb;
+        border-left: solid 1px rgba(157,162,194,1) !important;
       }
       & > .ant-menu-item {
         padding-left: 20px !important;
         font-size: 14px;
         &.ant-menu-item-selected {
           a {
-            border-left: solid 1px #108ee9;
+            border-left: solid 1px #2AC9C0 !important;
           }
         }
         &:after{
@@ -46,8 +54,18 @@
     border-bottom: solid 1px #bdbbbb;
     -webkit-box-shadow: none;
     box-shadow: none;
+    color: rgba(157,162,194,1);
+  }
+  .ant-menu-item-selected > a, .ant-menu-item-selected > a:hover {
+    color: #2AC9C0;
+  }
+  li.ant-menu-item.ant-menu-item-selected {
+    background: rgba(137,211,205,0.2);
   }
 
+  .ant-menu-submenu-selected {
+    color: #2AC9C0;
+  }
 
   .fa {
     font-size: 16px;

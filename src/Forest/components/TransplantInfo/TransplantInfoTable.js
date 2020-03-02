@@ -646,14 +646,21 @@ export default class TransplantInfoTable extends Component {
         } = this.state;
         if (transplantThinClass === '' && locationThinClass === '' && sxm === '') {
             message.info('请选择项目，标段，小班及细班信息或输入顺序码');
-        } else if (transplantThinClass && locationThinClass === '') {
-            this.queryTransplant(page);
-        } else if (transplantThinClass === '' && locationThinClass) {
-            this.queryLocation(page);
-        } else if (transplantThinClass && locationThinClass) {
+        } else if (sxm) {
+            // 如果sxm存在，则用迁移前后细班同时搜索的接口，对数据进行处理
             this.queryBoth(page);
-        } else if (transplantThinClass === '' && locationThinClass === '' && sxm) {
-            this.queryTransplant(page);
+        } else {
+            if (transplantThinClass && locationThinClass === '') {
+                // 只搜索迁移前的细班
+                this.queryTransplant(page);
+            } else if (transplantThinClass === '' && locationThinClass) {
+                // 只搜索迁移后的细班
+                this.queryLocation(page);
+            } else if (transplantThinClass && locationThinClass) {
+                // 迁移前后的细班同时搜索
+                console.log('aaaaaaaaaaaa');
+                this.queryBoth(page);
+            }
         }
     }
     queryTransplant = async (page) => {
@@ -667,8 +674,8 @@ export default class TransplantInfoTable extends Component {
             transplantETime = '',
             searchType
         } = this.state;
-        if (transplantThinClass === '' && sxm === '') {
-            message.info('请选择移栽前项目，标段，小班及细班信息或输入顺序码');
+        if (transplantThinClass === '') {
+            message.info('请选择移栽前项目，标段，小班及细班信息');
             return;
         }
         const {
@@ -692,20 +699,37 @@ export default class TransplantInfoTable extends Component {
             loading: true,
             percent: 0
         });
-        if (searchType === 'location' && sxm) {
-            let tblData = [];
+        let rst = await getTransplantTransMess({}, postData);
+        if (!(rst && rst.content)) {
+            this.setState({
+                loading: false,
+                percent: 100
+            });
+            return;
+        }
+        let content = rst.content;
+        let tblData = [];
+        if (content instanceof Array) {
             let userIDList = [];
             let userDataList = {};
-            let locationData = await getTreeMess({sxm: sxm});
-            if (locationData && locationData.ZZBM) {
-                let transplantPlan = await this.handleLocationDataToTable(locationData, userIDList, userDataList);
-                transplantPlan.order = 1;
-                tblData.push(transplantPlan);
+            for (let i = 0; i < content.length; i++) {
+                let plan = content[i];
+                plan.order = (page - 1) * size + i + 1;
+                plan = await this.handleTransplantDataToTable(plan, userIDList, userDataList);
+                tblData.push(plan);
+                if (searchType === 'both') {
+                    let locationData = await getTreeMess({sxm: plan.ZZBM});
+                    if (locationData && locationData.ZZBM) {
+                        let transplantPlan = await this.handleLocationDataToTable(locationData, userIDList, userDataList);
+                        tblData.push(transplantPlan);
+                    }
+                };
             }
-            let messageTotalNum = 1;
-            let treeTotalNum = 1;
+
+            let messageTotalNum = rst.pageinfo.total;
+            let treeTotalNum = rst.total;
             const pagination = { ...this.state.pagination };
-            pagination.total = 1;
+            pagination.total = rst.pageinfo.total;
             pagination.pageSize = 20;
 
             this.setState({
@@ -716,49 +740,6 @@ export default class TransplantInfoTable extends Component {
                 loading: false,
                 percent: 100
             });
-        } else {
-            let rst = await getTransplantTransMess({}, postData);
-            if (!(rst && rst.content)) {
-                this.setState({
-                    loading: false,
-                    percent: 100
-                });
-                return;
-            }
-            let content = rst.content;
-            let tblData = [];
-            if (content instanceof Array) {
-                let userIDList = [];
-                let userDataList = {};
-                for (let i = 0; i < content.length; i++) {
-                    let plan = content[i];
-                    plan.order = (page - 1) * size + i + 1;
-                    plan = await this.handleTransplantDataToTable(plan, userIDList, userDataList);
-                    tblData.push(plan);
-                    if (searchType === 'both') {
-                        let locationData = await getTreeMess({sxm: plan.ZZBM});
-                        if (locationData && locationData.ZZBM) {
-                            let transplantPlan = await this.handleLocationDataToTable(locationData, userIDList, userDataList);
-                            tblData.push(transplantPlan);
-                        }
-                    };
-                }
-
-                let messageTotalNum = rst.pageinfo.total;
-                let treeTotalNum = rst.total;
-                const pagination = { ...this.state.pagination };
-                pagination.total = rst.pageinfo.total;
-                pagination.pageSize = 20;
-
-                this.setState({
-                    tblData,
-                    pagination: pagination,
-                    messageTotalNum: messageTotalNum,
-                    treeTotalNum,
-                    loading: false,
-                    percent: 100
-                });
-            }
         }
     }
     handleTransplantDataToTable = async (plan, userIDList, userDataList) => {
@@ -830,8 +811,8 @@ export default class TransplantInfoTable extends Component {
             locationETime = '',
             searchType
         } = this.state;
-        if (locationThinClass === '' && sxm === '') {
-            message.info('请选择移栽后项目，标段，小班及细班信息或输入顺序码');
+        if (locationThinClass === '') {
+            message.info('请选择移栽后项目，标段，小班及细班信息');
             return;
         }
         const {
@@ -963,13 +944,91 @@ export default class TransplantInfoTable extends Component {
             locationSection = '',
             locationThinClass = '',
             locationSTime = '',
-            locationETime = ''
+            locationETime = '',
+            searchType
         } = this.state;
-        if (transplantThinClass === '' && locationThinClass === '') {
-            message.info('请选择移栽前后项目，标段，小班及细班信息');
+        const {
+            actions: {
+                getTreeMess,
+                getTransplantTransMess
+            }
+        } = this.props;
+        if (transplantThinClass === '' && locationThinClass === '' && sxm === '') {
+            message.info('请选择移栽前后项目，标段，小班及细班信息或输入顺序码');
             return;
         }
         console.log('transplantSection', transplantSection);
+        let postData = {
+            no: this.handleThinClassNo(transplantThinClass),
+            sxm,
+            treetype,
+            section: transplantSection,
+            stime: transplantSTime && moment(transplantSTime).format('YYYY-MM-DD HH:mm:ss'),
+            etime: transplantETime && moment(transplantETime).format('YYYY-MM-DD HH:mm:ss'),
+            newno: this.handleThinClassNo(locationThinClass),
+            newsection: locationSection,
+            tsitme: locationSTime && moment(locationSTime).format('YYYY-MM-DD HH:mm:ss'),
+            tetime: locationETime && moment(locationETime).format('YYYY-MM-DD HH:mm:ss'),
+            page,
+            size: size
+        };
+        this.setState({
+            loading: true,
+            percent: 0
+        });
+        let rst = await getTransplantTransMess({}, postData);
+        if (!(rst && rst.content)) {
+            this.setState({
+                loading: false,
+                percent: 100
+            });
+            return;
+        }
+        let content = rst.content;
+        let tblData = [];
+        if (content instanceof Array) {
+            let userIDList = [];
+            let userDataList = {};
+            for (let i = 0; i < content.length; i++) {
+                let plan = content[i];
+                if (searchType === 'location') {
+                    let locationData = await getTreeMess({sxm: plan.ZZBM});
+                    if (locationData && locationData.ZZBM) {
+                        let transplantPlan = await this.handleLocationDataToTable(locationData, userIDList, userDataList);
+                        transplantPlan.order = (page - 1) * size + i + 1;
+                        tblData.push(transplantPlan);
+                    }
+                } else if (searchType === 'transplant') {
+                    plan.order = (page - 1) * size + i + 1;
+                    plan = await this.handleTransplantDataToTable(plan, userIDList, userDataList);
+                    tblData.push(plan);
+                } else if (searchType === 'both') {
+                    plan.order = (page - 1) * size + i + 1;
+                    plan = await this.handleTransplantDataToTable(plan, userIDList, userDataList);
+                    tblData.push(plan);
+                    let locationData = await getTreeMess({sxm: plan.ZZBM});
+                    if (locationData && locationData.ZZBM) {
+                        let transplantPlan = await this.handleLocationDataToTable(locationData, userIDList, userDataList);
+                        tblData.push(transplantPlan);
+                    }
+                }
+            }
+
+            let messageTotalNum = rst.pageinfo.total;
+            let treeTotalNum = rst.total;
+            const pagination = { ...this.state.pagination };
+            pagination.total = rst.pageinfo.total;
+            pagination.pageSize = 20;
+
+            this.setState({
+                tblData,
+                pagination: pagination,
+                messageTotalNum: messageTotalNum,
+                treeTotalNum,
+                loading: false,
+                percent: 100
+            });
+        }
     }
 
     treeTable (details) {

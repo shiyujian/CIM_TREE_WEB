@@ -43,7 +43,7 @@ export default class Aside extends Component {
                         position: 'absolute',
                         left: 0,
                         top: 0,
-                        backgroundColor: '#d7d5d5'
+                        backgroundColor: '#082422'
                     }}
                 />
                 {this.props.children}

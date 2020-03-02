@@ -20,7 +20,7 @@ import {
 } from '_platform/auth';
 import './Login.less';
 import APPImg from './images/senlin.png';
-
+import returnIcon from './loginImages/arrow1.png';
 const FormItem = Form.Item;
 
 @connect(
@@ -544,48 +544,26 @@ class Login extends Component {
             appDownloadVisible,
             APKUpdateInfo
         } = this.state;
-        const loginTitle = require('./images/logo1.png');
-        const docDescibe = require('./images/doc.png');
-        const hello = require('./images/hello.png');
 
         return (
             <div className='login-wrap'>
                 <div className='main-center'>
-                    <div className='main-logo'>
-                        <img className='main-logos' src={docDescibe} />
-                        <div className='main-on' />
-                        <a className='login-title1'>
-                            <img src={loginTitle} />
-                        </a>
-                    </div>
                     {
                         !forgectState ? (
                             <div className='main-box'>
-                                <div className='main-at' />
-                                <a className='login-title'>
-                                    <img src={hello} />
-                                </a>
                                 <div className='main-img'>
                                     <Form
+                                        autocomplete='off'
                                         onSubmit={this.handleSubmit.bind(this)}
                                         className='login-form'
                                         id='loginForm'
                                     >
-                                        <p
-                                            style={{
-                                                fontSize: '25px',
-                                                color: '#108EE9',
-                                                textAlign: 'center',
-                                                marginTop: '20px',
-                                                marginLeft: '5px'
-                                            }}
-                                        >
+                                        <div className='login-title'>
                                             森林大数据建设管理平台
-                                        </p>
+                                        </div>
                                         <FormItem
                                             style={{
-                                                marginTop: '20px',
-                                                marginLeft: '24px'
+                                                marginTop: '33px'
                                             }}
                                         >
                                             {getFieldDecorator('username', {
@@ -600,11 +578,7 @@ class Login extends Component {
                                                 ]
                                             })(
                                                 <Input
-                                                    style={{
-                                                        color: '#000000',
-                                                        borderBottom:
-                                                            '1px solid #cccccc'
-                                                    }}
+                                                    className='login-usernameInput'
                                                     ref={(input) => { this.nameInput = input; }}
                                                     id='username'
                                                     placeholder='请输入用户名(4到16位)'
@@ -613,8 +587,7 @@ class Login extends Component {
                                         </FormItem>
                                         <FormItem
                                             style={{
-                                                marginTop: '40px',
-                                                marginLeft: '24px'
+                                                marginTop: '22px'
                                             }}
                                         >
                                             {getFieldDecorator('password', {
@@ -630,11 +603,7 @@ class Login extends Component {
                                             })(
                                                 <div>
                                                     <Input.Password
-                                                        style={{
-                                                            color: '#000000',
-                                                            borderBottom:
-                                                                '1px solid #cccccc'
-                                                        }}
+                                                        className='login-passwordInput'
                                                         id='pwdInp'
                                                         placeholder='请输入密码'
                                                     />
@@ -643,8 +612,7 @@ class Login extends Component {
                                         </FormItem>
                                         <FormItem
                                             style={{
-                                                marginTop: '30px',
-                                                marginLeft: '10px'
+                                                marginTop: '21px'
                                             }}
                                         >
                                             {getFieldDecorator('remember', {
@@ -653,10 +621,7 @@ class Login extends Component {
                                             })(
                                                 <div style={{display: 'inlineBlock'}}>
                                                     <Checkbox
-                                                        style={{
-                                                            color: 'gray',
-                                                            display: 'inlineBlock'
-                                                        }}
+                                                        className='password-remember-text'
                                                         onChange={this.loginRememberChange.bind(this)}
                                                         checked={this.state.checked}
                                                     >
@@ -671,15 +636,26 @@ class Login extends Component {
                                                 </div>
                                             )}
                                         </FormItem>
-                                        <Button
+                                        {/* <Button
                                             type='primary'
                                             htmlType='submit'
                                             className='login-form-button'
                                         >
                                             登录
-                                        </Button>
-                                        <div style={{marginLeft: 24}}>
+                                        </Button> */}
+                                        <a key='登录'
+                                            title='登录'
+                                            id='loginButton'
+                                            className='login-form-button'
+                                            onClick={this.handleSubmit.bind(this)}
+                                        >
+                                            <span className='login-form-button-text'>
+                                                登录
+                                            </span>
+                                        </a>
+                                        <div>
                                             <a
+                                                className='app-download-button'
                                                 disabled={!(APKUpdateInfo && APKUpdateInfo.url)}
                                                 onClick={this.handleAppDownload.bind(this)}>
                                                     APP下载
@@ -692,44 +668,38 @@ class Login extends Component {
                             appDownloadVisible
                                 ? (
                                     <div className='main-box'>
-                                        <div className='main-at' />
-                                        <a className='login-title'>
-                                            <img src={hello} />
-                                        </a>
                                         <div className='main-img'>
-                                            <div style={{
-                                                marginLeft: 85
-                                            }}>>
-                                                <div style={{
-                                                    paddingTop: 70
-                                                }}>
-                                                    <h2 style={{marginLeft: 5}}>
+                                            <div style={{marginLeft: 31}}>
+                                                <div className='appDownload-title'>
                                                     雄安森林APP下载：
-                                                    </h2>
                                                 </div>
-                                                <p style={{marginLeft: 5, fontSize: '18px'}}>版本号：{APKUpdateInfo.versionName}</p>
-                                                <p style={{marginLeft: 5, fontSize: '18px'}}>提示：请用浏览器打开</p>
+                                                <div>
+                                                    <span className='appDownloadTips' >
+                                                        请用浏览器打开
+                                                    </span>
+                                                </div>
                                                 <QRCode
                                                     style={{
-                                                        width: 210,
-                                                        height: 210
+                                                        width: 215,
+                                                        height: 215
                                                     }}
+                                                    className='QRCodeLayout'
                                                     key={APKUpdateInfo.url}
                                                     id={APKUpdateInfo.url}
                                                     value={APKUpdateInfo.url} />
-                                                <a
-                                                    type='primary'
+                                                <div className='appDownload-edition'>
+                                                    {APKUpdateInfo.versionName}版本
+                                                </div>
+                                                <a key='返回'
+                                                    title='返回'
+                                                    id='frogetPasswordReturnButton'
+                                                    className='froget-password-return-button'
                                                     onClick={this.handleAppDownloadCancel.bind(this)}
-                                                    style={{
-                                                        width: '35%',
-                                                        height: '45px',
-                                                        marginTop: 5,
-                                                        marginLeft: 175,
-                                                        fontSize: 16,
-                                                        display: 'block'
-                                                    }}
                                                 >
-                                            返回
+                                                    <span className='froget-password-return-button-text'>
+                                                    返回
+                                                    </span>
+                                                    <img src={returnIcon} />
                                                 </a>
                                             </div>
                                         </div>
@@ -743,6 +713,9 @@ class Login extends Component {
                                                     color: 'red'
                                                 }}
                                             />
+                                            <div className='froget-password-title'>
+                                                忘记密码
+                                            </div>
                                             <Form
                                                 onSubmit={this.sureSubmit.bind(this)}
                                                 className='login-form'
@@ -750,8 +723,7 @@ class Login extends Component {
                                             >
                                                 <FormItem
                                                     style={{
-                                                        marginTop: '40px',
-                                                        marginLeft: '24px'
+                                                        marginTop: '16px'
                                                     }}
                                                 >
                                                     {getFieldDecorator('nickname', {
@@ -763,22 +735,27 @@ class Login extends Component {
                                                         ]
                                                     })(
                                                         <Input
+                                                            className='login-usernameInput'
                                                             id='nickname'
-                                                            style={{
-                                                                color: '#000000',
-                                                                borderBottom:
-                                                            '1px solid #cccccc'
-                                                            }}
                                                             onChange={this.handleChangeUser.bind(this)}
                                                             placeholder='请输入用户名'
                                                         />
+                                                        // <Input
+                                                        //     id='nickname'
+                                                        //     style={{
+                                                        //         color: '#000000',
+                                                        //         borderBottom:
+                                                        //     '1px solid #cccccc'
+                                                        //     }}
+                                                        //     onChange={this.handleChangeUser.bind(this)}
+                                                        //     placeholder='请输入用户名'
+                                                        // />
                                                     )}
                                                 </FormItem>
 
                                                 <FormItem
                                                     style={{
-                                                        marginTop: '30px',
-                                                        marginLeft: '24px'
+                                                        marginTop: '16px'
                                                     }}
                                                 >
                                                     {getFieldDecorator('phone', {
@@ -791,13 +768,31 @@ class Login extends Component {
                                                     })(
                                                         <div>
                                                             <Input
-                                                                style={{
-                                                                    color: '#000000',
-                                                                    borderBottom:
-                                                                '1px solid #cccccc'
-                                                                }}
+                                                                className='login-usernameInput'
                                                                 id='phoneNumber'
                                                                 placeholder='请输入手机号'
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </FormItem>
+                                                <FormItem
+                                                    style={{
+                                                        marginTop: '16px'
+                                                    }}
+                                                >
+                                                    {getFieldDecorator('securityCode', {
+                                                        rules: [
+                                                            {
+                                                                required: true,
+                                                                message: '请输入验证码'
+                                                            }
+                                                        ]
+                                                    })(
+                                                        <div>
+                                                            <Input
+                                                                id='securityCode'
+                                                                className='login-usernameInput'
+                                                                placeholder='请输入验证码'
                                                             />
                                                             {
                                                                 getSecurityCodeStatus && setUserStatus
@@ -811,39 +806,13 @@ class Login extends Component {
                                                                         )}
                                                                     >获取验证码</a>
                                                             }
-
                                                         </div>
+
                                                     )}
                                                 </FormItem>
                                                 <FormItem
                                                     style={{
-                                                        marginTop: '30px',
-                                                        marginLeft: '24px'
-                                                    }}
-                                                >
-                                                    {getFieldDecorator('securityCode', {
-                                                        rules: [
-                                                            {
-                                                                required: true,
-                                                                message: '请输入验证码'
-                                                            }
-                                                        ]
-                                                    })(
-                                                        <Input
-                                                            id='securityCode'
-                                                            style={{
-                                                                color: '#000000',
-                                                                borderBottom:
-                                                            '1px solid #cccccc'
-                                                            }}
-                                                            placeholder='请输入验证码'
-                                                        />
-                                                    )}
-                                                </FormItem>
-                                                <FormItem
-                                                    style={{
-                                                        marginTop: '30px',
-                                                        marginLeft: '24px'
+                                                        marginTop: '16px'
                                                     }}
                                                 >
                                                     {getFieldDecorator('newPassWord', {
@@ -859,41 +828,32 @@ class Login extends Component {
                                                     })(
                                                         <Input
                                                             id='newPassWord'
-                                                            style={{
-                                                                color: '#000000',
-                                                                borderBottom:
-                                                            '1px solid #cccccc'
-                                                            }}
+                                                            className='login-usernameInput'
                                                             placeholder='6到16位（至少包括字母、数字以及特殊符号中的2种）'
                                                         />
                                                     )}
                                                 </FormItem>
-                                                <Button
-                                                    type='primary'
+                                                <a key='确认'
+                                                    title='确认'
+                                                    id='frogetPasswordButton'
+                                                    className='froget-password-button'
+                                                    onClick={this.sureSubmit.bind(this)}
+                                                >
+                                                    <span className='froget-password-button-text'>
+                                                        确认
+                                                    </span>
+                                                </a>
+                                                <a key='返回'
+                                                    title='返回'
+                                                    id='frogetPasswordReturnButton'
+                                                    className='froget-password-return-button'
                                                     onClick={this.cancel.bind(this)}
-                                                    style={{
-                                                        width: '35%',
-                                                        height: '45px',
-                                                        marginTop: 50,
-                                                        marginLeft: '10%',
-                                                        fontSize: 18
-                                                    }}
                                                 >
-                                            返回
-                                                </Button>
-                                                <Button
-                                                    type='primary'
-                                                    htmlType='submit'
-                                                    style={{
-                                                        width: '35%',
-                                                        height: '45px',
-                                                        marginTop: 50,
-                                                        marginLeft: '10%',
-                                                        fontSize: 18
-                                                    }}
-                                                >
-                                            确定
-                                                </Button>
+                                                    <span className='froget-password-return-button-text'>
+                                                    返回
+                                                    </span>
+                                                    <img src={returnIcon} />
+                                                </a>
                                             </Form>
                                         </div>
                                     </div>
@@ -926,6 +886,7 @@ class Login extends Component {
                         </a>
                     </div> */}
                 </div>
+
             </div>
         );
     }
