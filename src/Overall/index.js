@@ -24,7 +24,10 @@ export default class Overall extends Component {
             Standard,
             Engineering,
             Redios,
-            Interim
+            Interim,
+            DesignChange,
+            NegotiationManagement,
+            VisaManagement
         } = this.state || {};
         return (
             <Body>
@@ -56,6 +59,18 @@ export default class Overall extends Component {
                     {
                         Interim &&
                         <Route path='/overall/interim' component={Interim} />
+                    }
+                    {
+                        DesignChange &&
+                        <Route exact path='/overall/designchange' component={DesignChange} />
+                    }
+                    {
+                        NegotiationManagement &&
+                        <Route path='/overall/negotiationmanagement' component={NegotiationManagement} />
+                    }
+                    {
+                        VisaManagement &&
+                        <Route path='/overall/visaManagement' component={VisaManagement} />
                     }
                 </Switch>
             </Body>

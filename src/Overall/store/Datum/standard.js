@@ -1,4 +1,4 @@
-import { createAction, handleActions, combineActions } from 'redux-actions';
+import { createAction, handleActions } from 'redux-actions';
 
 const ID = 'OVERALL_STANDARD';
 // 获取目录状态

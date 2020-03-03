@@ -433,6 +433,24 @@ export const MODULES = [
                 name: '会议管理'
             },
             {
+                id: 'OVERALL.FORM.NONE',
+                name: '表单管理',
+                children: [
+                    {
+                        id: 'OVERALL.DESIGNCHANGE',
+                        name: '设计变更'
+                    },
+                    {
+                        id: 'OVERALL.VISAMANAGEMENT',
+                        name: '签证管理'
+                    },
+                    {
+                        id: 'OVERALL.NEGOTIATIONMANAGEMENT',
+                        name: '洽商管理'
+                    }
+                ]
+            },
+            {
                 id: 'OVERALL.DATUM.NONE',
                 name: '资料文档',
                 children: [
@@ -681,6 +699,10 @@ export const MODULES = [
             {
                 id: 'SETUP.WORKFLOW',
                 name: '流程设置'
+            },
+            {
+                id: 'SETUP.FLOWNODE',
+                name: '流程节点'
             },
             {
                 id: 'SETUP.BLACKLIST.NONE',
