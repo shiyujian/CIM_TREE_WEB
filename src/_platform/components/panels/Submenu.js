@@ -33,7 +33,7 @@ export default class Submenu extends Component {
                                     rst.push(
                                         <Item key={key}>
                                             <Link onClick={e => disabled && e.preventDefault()} to={path}>
-                                                {icon}
+                                                {/* {icon} */}
                                                 {name}
                                             </Link>
                                         </Item>);
@@ -51,7 +51,7 @@ export default class Submenu extends Component {
                                 return (
                                     <Item key={key}>
                                         <Link onClick={e => disabled && e.preventDefault()} to={path}>
-                                            {icon}
+                                            {/* {icon} */}
                                             {name}
                                         </Link>
                                     </Item>);

@@ -1,0 +1,1 @@
+export TransplantInfoTable from './TransplantInfoTable';

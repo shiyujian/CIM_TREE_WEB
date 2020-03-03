@@ -8,8 +8,9 @@
 
 module.exports = () => {
     return {
-        'icon-url': "'/fonts/iconfont'"
-        /*'disabled-color': '#4D4D4D',
+        'icon-url': "'/fonts/iconfont'",
+        'primary-color': 'rgba(42, 201, 192, 1)'
+        /* 'disabled-color': '#4D4D4D',
 		'icon-url': "'/fonts/iconfont'",
         'table-header-bg': '#9cc8e4',
         'table-padding-vertical': '8px',

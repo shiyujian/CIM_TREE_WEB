@@ -14,6 +14,40 @@ import { loadIgnoreModules, loadHeadLogo } from 'APP/api';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actions from '_platform/store/global/tabs';
+// 首页
+import homeSelect from './layoutImages/首页2.png';
+import homeUnselected from './layoutImages/首页1.png';
+// 综合展示
+import mapSelect from './layoutImages/综合展示2.png';
+import mapUnselect from './layoutImages/综合展示1.png';
+// 综合管理
+import dataSelect from './layoutImages/综合管理2.png';
+import dataUnselect from './layoutImages/综合管理1.png';
+// 进度管理
+import scheduleSelect from './layoutImages/进度管理2.png';
+import scheduleUnselect from './layoutImages/进度管理1.png';
+// 森林大数据
+import forestSelect from './layoutImages/森林大数据2.png';
+import forestUnselect from './layoutImages/森林大数据1.png';
+// 养护管理
+import conservationSelect from './layoutImages/养护管理2.png';
+import conservationUnselect from './layoutImages/养护管理1.png';
+// 考勤管理
+import checkworkSelect from './layoutImages/考勤管理2.png';
+import checkworkUnselect from './layoutImages/考勤管理1.png';
+// 个人中心
+import selfcareSelect from './layoutImages/个人中心2.png';
+import selfcareUnselect from './layoutImages/个人中心1.png';
+// 系统设置
+import setSelect from './layoutImages/系统设置2.png';
+import setUnselect from './layoutImages/系统设置1.png';
+// 项目管理
+import projectSelect from './layoutImages/项目管理2.png';
+import projectUnselect from './layoutImages/项目管理1.png';
+// 退出
+import signOut from './layoutImages/退出1.png';
+// 角色
+import roleIcon from './layoutImages/role.png';
 
 @connect(
     state => {
@@ -76,13 +110,29 @@ export default class Header extends Component {
     };
 
     selectKeys () {
-        const { match: { params: { module = '' } = {} } = {} } = this.props;
+        const {
+            match: {
+                params: {
+                    module = ''
+                } = {}
+            } = {},
+            location: {
+                pathname = ''
+            } = {}
+        } = this.props;
         const { key = '' } =
             Header.menus.find(menu => {
                 const pathnames = /^\/(\w+)/.exec(menu.path) || [];
                 return pathnames[1] === module;
             }) || {};
-        return [key];
+        if (pathname === '/') {
+            return ['home'];
+        }
+        if (key) {
+            return [key];
+        } else {
+            return '';
+        }
     }
 
     signOut () {
@@ -136,77 +186,80 @@ export default class Header extends Component {
                 id: 'HOME',
                 title: '首页',
                 path: '/',
-                icon: <Icon name='home' />
+                icon: homeUnselected,
+                selectedIcon: homeSelect
             },
             {
                 key: 'dashboard',
                 id: 'DASHBOARD',
                 title: '综合展示',
                 path: '/dashboard/onsite',
-                icon: <Icon name='map' />
+                icon: mapUnselect,
+                selectedIcon: mapSelect
             },
             {
                 key: 'overall',
                 id: 'OVERALL',
                 title: '综合管理',
                 path: '/overall/news',
-                icon: <Icon name='cubes' />
+                icon: dataUnselect,
+                selectedIcon: dataSelect
             },
             {
                 key: 'schedule',
                 id: 'SCHEDULE',
                 title: '进度管理',
                 path: '/schedule/stagereport',
-                icon: <Icon name='random' />
+                icon: scheduleUnselect,
+                selectedIcon: scheduleSelect
             },
             {
                 key: 'forest',
                 id: 'FOREST',
                 title: '森林大数据',
                 path: '/forest/nursoverallinfo',
-                icon: <Icon name='tree' />
+                icon: forestUnselect,
+                selectedIcon: forestSelect
             },
             {
                 key: 'conservation',
                 id: 'CONSERVATION',
                 title: '养护管理',
                 path: '/conservation/taskcreate',
-                icon: <Icon name='map' />
+                icon: conservationUnselect,
+                selectedIcon: conservationSelect
             },
-            // {
-            //     key: 'market',
-            //     id: 'MARKET',
-            //     title: '苗木市场',
-            //     path: '/market/seedlingsupply',
-            //     icon: <Icon name='shopping-cart' />
-            // },
             {
                 key: 'checkwork',
                 id: 'CHECKWORK',
                 title: '考勤管理',
                 path: '/checkwork/attendancecount',
-                icon: <Icon name='print' />
+                icon: checkworkUnselect,
+                selectedIcon: checkworkSelect
             },
             {
                 key: 'selfcare',
                 id: 'SELFCARE',
                 title: '个人中心',
                 path: '/selfcare/task',
-                icon: <Icon name='user' />
+                icon: selfcareUnselect,
+                selectedIcon: selfcareSelect
             },
             {
                 key: 'setup',
                 id: 'SETUP',
                 title: '系统设置',
                 path: '/setup/person',
-                icon: <Icon name='cogs' />
+                icon: setUnselect,
+                selectedIcon: setSelect
             },
             {
                 key: 'project',
                 id: 'PROJECT',
                 title: '项目管理',
                 path: '/project/nurseryManagement',
-                icon: <Icon name='sitemap' />
+                icon: projectUnselect,
+                selectedIcon: projectSelect
             }
             // {
             //     key: 'dipping',
@@ -230,6 +283,8 @@ export default class Header extends Component {
         if (roles && roles.RoleName) {
             roleName = roles.RoleName;
         }
+        let selectedKeys = this.selectKeys();
+        console.log('selectedKeys', selectedKeys);
 
         return (
             <header className='header'>
@@ -241,7 +296,7 @@ export default class Header extends Component {
                 </a>
                 <Menu
                     className='nav-menu head-nav'
-                    selectedKeys={this.selectKeys()}
+                    selectedKeys={selectedKeys}
                     mode='horizontal'
                 >
                     {Header.menus.map(menu => {
@@ -286,12 +341,23 @@ export default class Header extends Component {
                                     menu.path = str;
                                 }
                             }
+                            let titleStyle = 'title';
+                            let imgIcon = menu.icon;
+                            if (selectedKeys && menu.key.indexOf(selectedKeys) !== -1) {
+                                titleStyle = 'selectTitle';
+                                imgIcon = menu.selectedIcon;
+                            }
                             if (menu.path === '/dashboard/onsite') {
                                 return (
-                                    <Menu.Item key={menu.key} className='nav-item'>
+                                    <Menu.Item
+                                        key={menu.key}
+                                        className='nav-item'>
                                         <a onClick={this.handleOnsiteChange.bind(this, menu.path)}>
-                                            {menu.icon}
-                                            <span className='title'>
+                                            <img
+                                                src={imgIcon}
+                                                style={{ verticalAlign: 'middle' }}
+                                            />
+                                            <span className={`${titleStyle}`}>
                                                 {menu.title}
                                             </span>
                                         </a>
@@ -299,10 +365,16 @@ export default class Header extends Component {
                                 );
                             } else {
                                 return (
-                                    <Menu.Item key={menu.key} className='nav-item'>
-                                        <Link to={menu.path}>
-                                            {menu.icon}
-                                            <span className='title'>
+                                    <Menu.Item
+                                        key={menu.key}
+                                        className='nav-item'>
+                                        <Link
+                                            to={menu.path}>
+                                            <img
+                                                src={imgIcon}
+                                                style={{ verticalAlign: 'middle' }}
+                                            />
+                                            <span className={`${titleStyle}`}>
                                                 {menu.title}
                                             </span>
                                         </Link>
@@ -314,14 +386,39 @@ export default class Header extends Component {
                 </Menu>
                 <div className='head-right'>
                     <div className='head-info'>
-                        <a className='user'>{name || username}</a>
-                        <Icon
+                        <a className='userName'>{`${name || username} (${roleName})`}</a>
+                        {/* <a onClick={this.onClickDot.bind(this)}>
+                            <img
+                                src={roleIcon}
+                                style={{ verticalAlign: 'middle' }}
+                            />
+                        </a> */}
+                        <Badge count={this.state.tasks}>
+                            <Link to='/selfcare/task'>
+                                <a onClick={this.onClickDot.bind(this)}>
+                                    <img
+                                        src={roleIcon}
+                                        style={{ verticalAlign: 'middle' }}
+                                    />
+                                </a>
+                            </Link>
+                        </Badge>
+                        <a onClick={this.signOut.bind(this)}
+                            style={{marginLeft: 17}}
+                            className='signout'>
+                            {/* <img
+                                title='退出登录'
+                                src={signOut}
+                                style={{ verticalAlign: 'middle' }}
+                            /> */}
+                        </a>
+                        {/* <Icon
                             name='sign-out'
                             title='退出登录'
                             onClick={this.signOut.bind(this)}
-                        />
+                        /> */}
                     </div>
-                    <div className='head-fn'>
+                    {/* <div className='head-fn'>
                         <a style={{marginRight: 5}}>{roleName}</a>
                         <Badge count={this.state.tasks}>
                             <Link to='/selfcare/task'>
@@ -333,7 +430,7 @@ export default class Header extends Component {
                                 />
                             </Link>
                         </Badge>
-                    </div>
+                    </div> */}
                 </div>
             </header>
         );

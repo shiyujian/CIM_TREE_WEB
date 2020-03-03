@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2020-02-24 11:36:26
+ * @Last Modified time: 2020-02-24 15:05:36
  */
 /**
  *
@@ -554,6 +554,10 @@ export const MODULES = [
                     {
                         id: 'FOREST.OWNERINFO',
                         name: '业主抽查信息'
+                    },
+                    {
+                        id: 'FOREST.TRANSPLANTINFO',
+                        name: '移植信息'
                     }
                 ]
             },

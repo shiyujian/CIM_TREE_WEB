@@ -21,3 +21,4 @@ export AgainAccept from './AgainAccept';
 export TreeDataClear from './TreeDataClear';
 export DieTrees from './DieTrees';
 export CompletionPlan from './CompletionPlan';
+export TransplantInfo from './TransplantInfo';

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2019-07-18 09:44:12
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2020-01-03 15:18:06
+ * @Last Modified time: 2020-02-24 15:10:07
  */
 /**
  *
@@ -94,7 +94,8 @@ export default class ForestContainer extends Component {
             AgainAccept = null,
             TreeDataClear = null,
             DieTrees = null,
-            CompletionPlan = null
+            CompletionPlan = null,
+            TransplantInfo = null
         } = this.state || {};
         return (
             <Body>
@@ -261,6 +262,14 @@ export default class ForestContainer extends Component {
                             <Route
                                 path='/forest/completionplan'
                                 component={CompletionPlan}
+                            />
+                        )
+                    }
+                    {
+                        TransplantInfo && (
+                            <Route
+                                path='/forest/transplantinfo'
+                                component={TransplantInfo}
                             />
                         )
                     }
