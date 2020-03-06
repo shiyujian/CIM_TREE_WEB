@@ -265,6 +265,7 @@ export default class AgainAccept extends Component {
         let user = getUser();
         let section = user.section;
         let permission = getUserIsManager();
+        console.log('当前用户标段', section, sectionsData);
         if (permission) {
             // 是admin或者业主
             this.setSectionOption(sectionsData);
@@ -278,6 +279,7 @@ export default class AgainAccept extends Component {
     }
     // 设置标段选项
     setSectionOption (rst) {
+        console.log('设置标段', rst);
         let sectionOptions = [];
         try {
             if (rst instanceof Array) {
@@ -293,7 +295,6 @@ export default class AgainAccept extends Component {
                         row.name = row.No.substr(-7, 7);
                     });
                 });
-                console.log('设置标段选项', rst.children);
                 this.setState({
                     smallClassList: rst.children,
                     sectionoption: sectionOptions
@@ -309,7 +310,6 @@ export default class AgainAccept extends Component {
                         row.name = row.No.substr(-7, 7);
                     });
                 });
-                console.log('设置标段选项', rst.children);
                 this.setState({
                     smallClassList: rst.children,
                     sectionoption: sectionOptions

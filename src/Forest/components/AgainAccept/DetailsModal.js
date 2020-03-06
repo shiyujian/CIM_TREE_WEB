@@ -15,7 +15,8 @@ import {
     Tabs,
     Table,
     Steps,
-    Form
+    Form,
+    Notification
 } from 'antd';
 import {
     getYsTypeByID,
@@ -104,6 +105,7 @@ class AgainCheckModal extends Component {
     }
     onDownload = async (url) => {
         if (url) {
+            console.log('下载文件', url);
             window.open(url);
         } else {
             Notification.error({

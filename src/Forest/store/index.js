@@ -397,6 +397,11 @@ export const getWfreacceptanceByID = forestFetchAction(
     `${TREE_API}/wfreacceptance/{{id}}`,
     []
 );
+// 删除数字化验收重新发起申请流程
+export const deleteWfreacceptance = forestFetchAction(
+    `${TREE_API}/wfreacceptance/{{id}}`,
+    [], 'DELETE'
+);
 // 获取数字化验收详情
 export const getDigitalAcceptDetail = forestFetchAction(
     `${TREE_API}/acceptancedetails`,
@@ -562,6 +567,7 @@ export const actions = {
     getDigitalAcceptList,
     getWfreacceptanceList,
     getWfreacceptanceByID,
+    deleteWfreacceptance,
     postWfreAcceptance,
     postCheckWfreAcceptance,
 

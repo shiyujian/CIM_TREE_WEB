@@ -171,6 +171,7 @@ export default class DegitalAcceptTable extends Component {
             {
                 title: '操作',
                 render: (text, record) => {
+                    console.log('状态', record);
                     const {
                         curingTreeData,
                         filterList
@@ -184,7 +185,9 @@ export default class DegitalAcceptTable extends Component {
                         permission = true;
                     }
                     if (record.CheckType && record.CheckType === 10) {
+                        // 验收类型：造林面积
                         if (record.status === '未申请' || record.status === '退回') {
+                            // 未申请/退回状态
                             let textData = '申请验收';
                             if (record.status === '退回') {
                                 textData = '重新申请';
@@ -198,6 +201,7 @@ export default class DegitalAcceptTable extends Component {
                                 }
                             });
                             if (permission && status) {
+                                // 施工整改人/admin
                                 if (record.status === '未申请') {
                                     return (<div >
                                         <a onClick={this.handleDrawAreaAccept.bind(this, record)} >
@@ -208,31 +212,56 @@ export default class DegitalAcceptTable extends Component {
                                     </div>
                                     );
                                 } else {
-                                    return (<div >
-                                        <a onClick={this.handleDrawAreaAccept.bind(this, record)} >
-                                            {textData}
-                                        </a>
-                                        <Divider type='vertical' />
-                                        <a onClick={this.againCheck.bind(this, record)}>重新验收</a>
-                                    </div>
-                                    );
+                                    if (record.CanReAccpetance === 1) {
+                                        // 可以申请
+                                        return (<div >
+                                            <a onClick={this.handleDrawAreaAccept.bind(this, record)} >
+                                                {textData}
+                                            </a>
+                                            <Divider type='vertical' />
+                                            <a onClick={this.againCheck.bind(this, record)}>重新验收</a>
+                                        </div>);
+                                    } else {
+                                        // 不可以申请
+                                        return (<div >
+                                            <a onClick={this.handleDrawAreaAccept.bind(this, record)} >
+                                                {textData}
+                                            </a>
+                                            <Divider type='vertical' />
+                                            <a style={{color: '#ccc', cursor: 'auto'}}>重新验收</a>
+                                        </div>);
+                                    }
                                 }
                             } else {
                                 return '/';
                             }
                         } else if (record.status === '完成') {
-                            return (<div >
-                                <a onClick={this.viewWord.bind(this, record)} >
-                                    查看
-                                </a>
-                                <Divider type='vertical' />
-                                <a onClick={this.exportFile.bind(this, record)}>导出</a>
-                                <Divider type='vertical' />
-                                <a onClick={this.againCheck.bind(this, record)}>重新验收</a>
-                            </div>
-                            );
+                            if (record.CanReAccpetance === 1) {
+                                return (<div >
+                                    <a onClick={this.viewWord.bind(this, record)} >
+                                        查看
+                                    </a>
+                                    <Divider type='vertical' />
+                                    <a onClick={this.exportFile.bind(this, record)}>导出</a>
+                                    <Divider type='vertical' />
+                                    <a onClick={this.againCheck.bind(this, record)}>重新验收</a>
+                                </div>
+                                );
+                            } else {
+                                return (<div >
+                                    <a onClick={this.viewWord.bind(this, record)} >
+                                        查看
+                                    </a>
+                                    <Divider type='vertical' />
+                                    <a onClick={this.exportFile.bind(this, record)}>导出</a>
+                                    <Divider type='vertical' />
+                                    <a style={{color: '#ccc', cursor: 'auto'}}>重新验收</a>
+                                </div>
+                                );
+                            }
                         }
                     } else if (record.CheckType && record.CheckType === 11) {
+                        // 验收类型：总体合格率
                         let status = true;
                         filterList.map((data, index) => {
                             if (index < 9) {
@@ -254,6 +283,46 @@ export default class DegitalAcceptTable extends Component {
                                 </div>
                                 );
                             } else {
+                                if (record.CanReAccpetance === 1) {
+                                    return (<div >
+                                        <a onClick={this.viewWord.bind(this, record)} >
+                                            查看
+                                        </a>
+                                        <Divider type='vertical' />
+                                        <a onClick={this.exportFile.bind(this, record)}>导出</a>
+                                        <Divider type='vertical' />
+                                        <a onClick={this.againCheck.bind(this, record)}>重新验收</a>
+                                    </div>);
+                                } else {
+                                    return (<div >
+                                        <a onClick={this.viewWord.bind(this, record)} >
+                                            查看
+                                        </a>
+                                        <Divider type='vertical' />
+                                        <a onClick={this.exportFile.bind(this, record)}>导出</a>
+                                        <Divider type='vertical' />
+                                        <a style={{color: '#ccc', cursor: 'auto'}}>重新验收</a>
+                                    </div>);
+                                }
+                            }
+                        } else {
+                            return '/';
+                        }
+                    } else { // 验收类型除10，11
+                        if (record.CanReAccpetance === 1) {
+                            if (record.status === '未申请') {
+                                return (<div >
+                                    <a style={{color: '#ccc'}} >
+                                        重新验收
+                                    </a>
+                                </div>);
+                            } else if (record.status === '待验收') {
+                                return (<div >
+                                    <a onClick={this.againCheck.bind(this, record)} >
+                                        重新验收
+                                    </a>
+                                </div>);
+                            } else if (record.status === '完成') {
                                 return (<div >
                                     <a onClick={this.viewWord.bind(this, record)} >
                                         查看
@@ -264,42 +333,42 @@ export default class DegitalAcceptTable extends Component {
                                     <a onClick={this.againCheck.bind(this, record)}>重新验收</a>
                                 </div>
                                 );
+                            } else {
+                                return (<div >
+                                    <a onClick={this.viewWord.bind(this, record)} >
+                                        查看
+                                    </a>
+                                    <Divider type='vertical' />
+                                    <a onClick={this.againCheck.bind(this, record)}>重新验收</a>
+                                </div>);
                             }
                         } else {
-                            return '/';
-                        }
-                    } else { // 验收类型除10，11
-                        if (record.status === '未申请') {
-                            return (<div >
-                                <a style={{color: '#ccc'}} >
-                                    重新验收
-                                </a>
-                            </div>);
-                        } else if (record.status === '待验收') {
-                            return (<div >
-                                <a onClick={this.againCheck.bind(this, record)} >
-                                    重新验收
-                                </a>
-                            </div>);
-                        } else if (record.status === '完成') {
-                            return (<div >
-                                <a onClick={this.viewWord.bind(this, record)} >
-                                    查看
-                                </a>
-                                <Divider type='vertical' />
-                                <a onClick={this.exportFile.bind(this, record)}>导出</a>
-                                <Divider type='vertical' />
-                                <a onClick={this.againCheck.bind(this, record)}>重新验收</a>
-                            </div>
-                            );
-                        } else {
-                            return (<div >
-                                <a onClick={this.viewWord.bind(this, record)} >
-                                    查看
-                                </a>
-                                <Divider type='vertical' />
-                                <a onClick={this.againCheck.bind(this, record)}>重新验收</a>
-                            </div>);
+                            if (record.status === '未申请' || record.status === '待验收') {
+                                return (<div >
+                                    <a style={{color: '#ccc'}} >
+                                        重新验收
+                                    </a>
+                                </div>);
+                            } else if (record.status === '完成') {
+                                return (<div >
+                                    <a onClick={this.viewWord.bind(this, record)} >
+                                        查看
+                                    </a>
+                                    <Divider type='vertical' />
+                                    <a onClick={this.exportFile.bind(this, record)}>导出</a>
+                                    <Divider type='vertical' />
+                                    <a style={{color: '#ccc'}}>重新验收</a>
+                                </div>
+                                );
+                            } else {
+                                return (<div >
+                                    <a onClick={this.viewWord.bind(this, record)} >
+                                        查看
+                                    </a>
+                                    <Divider type='vertical' />
+                                    <a style={{color: '#ccc'}}>重新验收</a>
+                                </div>);
+                            }
                         }
                     }
                 }
@@ -1334,7 +1403,7 @@ export default class DegitalAcceptTable extends Component {
             </Row>
             <Row className='forest-search-layout' >
                 <div className='forest-mrg20' >
-                    <span className='forest-search-span6' > 申请验收时间： </span>
+                    <span className='forest-search-span6' > 申请验收日期： </span>
                     <RangePicker style={{verticalAlign: 'middle'}}
                         className='forest-forestcalcw6'
                         showTime={{format: 'HH:mm:ss'}}

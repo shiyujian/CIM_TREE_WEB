@@ -33,6 +33,7 @@ class AgainCheckModal extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            section: '', // 标段
             CheckType: '',
             ThinClassLength: 0,
             ThinClass: [], // 勾选中的细班
@@ -73,7 +74,7 @@ class AgainCheckModal extends Component {
         });
     }
     handleOk () {
-        const { owner, supervisor, opinion, fileUrl, CheckType, thinClassList, ThinClass, ThinClassLength, checkItem } = this.state;
+        const { owner, supervisor, opinion, fileUrl, CheckType, section, thinClassList, ThinClass, ThinClassLength, checkItem } = this.state;
         checkItem.unshift({
             thinClassLength: ThinClassLength,
             thinClassList,
@@ -82,7 +83,9 @@ class AgainCheckModal extends Component {
             ThinClass,
             TreeType: 0
         });
+        console.log('提交', checkItem);
         let param = {
+            section,
             owner,
             supervisor,
             opinion,
@@ -121,17 +124,24 @@ class AgainCheckModal extends Component {
     }
     // 小班改变
     handleSmallClassChange (key, value) {
+        console.log('小班', value);
+        let sectionArr = value.split('-');
+        let section = `${sectionArr[0]}-${sectionArr[1]}-${sectionArr[2]}`;
         const { checkItem } = this.state;
-        console.log(999, value, checkItem, this.props.smallClassList);
         if (key === -1) {
+            // 第一项
             let thinClassList = [];
             this.props.smallClassList.map(item => {
                 if (value === item.No) {
                     thinClassList = item.children;
                 }
             });
+            console.log('细班列表', thinClassList);
             this.setState({
-                thinClassList
+                section,
+                thinClassList,
+                ThinClass: [],
+                ThinClassLength: 0
             });
         } else {
             let thinClassList = [];
@@ -143,32 +153,27 @@ class AgainCheckModal extends Component {
             checkItem.map((item, index) => {
                 if (index === key) {
                     item.thinClassList = thinClassList;
+                    item.ThinClass = [];
+                    item.ThinClassLength = 0;
                 }
             });
             console.log('小班改变', checkItem);
             this.setState({
+                section,
                 checkItem
             });
         }
     }
     handleThinClassChange (key, value) {
+        console.log('细班号', value);
         const { checkItem } = this.state;
         let ThinClassLength = 0;
-        let ThinClass = [];
         if (key === -1) {
-            console.log('细班号', value);
+            // 第一项
             ThinClassLength = value.length;
-            value.map(item => {
-                this.state.thinClassList.map(row => {
-                    if (row.name === item) {
-                        ThinClass.push(row.No);
-                    }
-                });
-            });
-            console.log('细班号', ThinClass);
             this.setState({
                 ThinClassLength,
-                ThinClass
+                ThinClass: value
             });
         } else {
             console.log('细班号', value, checkItem);
@@ -176,19 +181,10 @@ class AgainCheckModal extends Component {
             checkItem.map((item, index) => {
                 if (index === key) {
                     item.thinClassLength = ThinClassLength;
-                    let ThinClassArr = [];
-                    value.map(record => {
-                        item.thinClassList.map(row => {
-                            if (row.name === record) {
-                                ThinClassArr.push(row.No);
-                            }
-                        });
-                    });
-                    item.ThinClass = ThinClassArr;
+                    item.ThinClass = value;
                 }
             });
             console.log('细班号', value, checkItem);
-
             this.setState({
                 checkItem
             });
@@ -255,7 +251,7 @@ class AgainCheckModal extends Component {
                 });
             }
         };
-        const { checkItem, ThinClassLength } = this.state;
+        const { checkItem, ThinClassLength, ThinClass } = this.state;
         return (<div>
             <Modal
                 width='750'
@@ -270,7 +266,7 @@ class AgainCheckModal extends Component {
                         <Col span={5}>请选择验收类型</Col>
                         <Col span={1} />
                         <Col span={5}>请选择小班</Col>
-                        <Col span={8}>请选择细班(已选100个)</Col>
+                        <Col span={8}>请选择细班</Col>
                         <Col span={5} />
                     </Row>
                     <Row style={{marginTop: 10}}>
@@ -314,6 +310,7 @@ class AgainCheckModal extends Component {
                                             .toLowerCase()
                                             .indexOf(input.toLowerCase()) >= 0
                                 }
+                                value={ThinClass}
                                 optionLabelProp='value'
                                 onChange={this.handleThinClassChange.bind(this, -1)}
                             >
@@ -371,6 +368,7 @@ class AgainCheckModal extends Component {
                                                         .toLowerCase()
                                                         .indexOf(input.toLowerCase()) >= 0
                                             }
+                                            value={item.ThinClass}
                                             optionLabelProp='value'
                                             onChange={this.handleThinClassChange.bind(this, index)}
                                         >
