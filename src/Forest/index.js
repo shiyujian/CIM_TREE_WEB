@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2019-07-18 09:44:12
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2020-02-24 15:10:07
+ * @Last Modified time: 2020-03-09 11:51:18
  */
 /**
  *
@@ -55,9 +55,16 @@ import React, { Component } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import { Main, Aside, Body } from '_platform/components/layout';
 import Submenu from '_platform/components/panels/Submenu';
+import ContainerRouters from '_platform/components/panels/ContainerRouters';
 import {ForestMenu} from '_platform/MenuJson';
 
 export default class ForestContainer extends Component {
+    constructor (props) {
+        super(props);
+        this.state = {
+            defaultOpenKeys: ['Nursoverallinfo']
+        };
+    }
     async componentDidMount () {
         const { default: reducer } = await import('./store');
         const Containers = await import('./containers');
@@ -67,35 +74,15 @@ export default class ForestContainer extends Component {
         });
     }
 
+    getOnOpenKeys (openKeys) {
+        this.setState({
+            defaultOpenKeys: openKeys
+        });
+    }
+
     render () {
         const {
-            Nursoverallinfo = null,
-            Nursmeasureinfo = null,
-            Locmeasureinfo = null,
-            Supervisorinfo = null,
-            Checkerinfo = null,
-            Faithanalyze = null,
-            Qualityanalyze = null,
-            Enteranalyze = null,
-            Scheduleanalyze = null,
-            Dataimport = null,
-            CarPackage = null,
-            DataExport = null,
-            SeedlingsChange = null,
-            CuringInfo = null,
-            DataStatis = null,
-            TreeAdoptInfo = null,
-            UserAnalysis = null,
-            UserAnalysi = null,
-            NurserySourseAnalysi = null,
-            EnterStrengthAnalysi = null,
-            PlantStrengthAnalysi = null,
-            DegitalAccept = null,
-            AgainAccept = null,
-            TreeDataClear = null,
-            DieTrees = null,
-            CompletionPlan = null,
-            TransplantInfo = null
+            defaultOpenKeys
         } = this.state || {};
         return (
             <Body>
@@ -103,180 +90,19 @@ export default class ForestContainer extends Component {
                     <Submenu
                         {...this.props}
                         menus={ForestMenu}
-                        defaultOpenKeys={ForestContainer.defaultOpenKeys}
+                        getOnOpenKeys={this.getOnOpenKeys.bind(this)}
+                        defaultOpenKeys={defaultOpenKeys}
                     />
                 </Aside>
                 <Main>
-                    {Nursoverallinfo && (
-                        <Route
-                            path='/forest/nursoverallinfo'
-                            component={Nursoverallinfo}
-                        />
-                    )}
-                    {Nursmeasureinfo && (
-                        <Route
-                            path='/forest/nursmeasureinfo'
-                            component={Nursmeasureinfo}
-                        />
-                    )}
-                    {CarPackage && (
-                        <Route
-                            path='/forest/carpackage'
-                            component={CarPackage}
-                        />
-                    )}
-                    {Locmeasureinfo && (
-                        <Route
-                            path='/forest/locmeasureinfo'
-                            component={Locmeasureinfo}
-                        />
-                    )}
-                    {Supervisorinfo && (
-                        <Route
-                            path='/forest/supervisorinfo'
-                            component={Supervisorinfo}
-                        />
-                    )}
-                    {Checkerinfo && (
-                        <Route
-                            path='/forest/checkerinfo'
-                            component={Checkerinfo}
-                        />
-                    )}
-                    {Faithanalyze && (
-                        <Route
-                            path='/forest/faithanalyze'
-                            component={Faithanalyze}
-                        />
-                    )}
-                    {Qualityanalyze && (
-                        <Route
-                            path='/forest/qualityanalyze'
-                            component={Qualityanalyze}
-                        />
-                    )}
-                    {Enteranalyze && (
-                        <Route
-                            path='/forest/enteranalyze'
-                            component={Enteranalyze}
-                        />
-                    )}
-                    {Scheduleanalyze && (
-                        <Route
-                            path='/forest/scheduleanalyze'
-                            component={Scheduleanalyze}
-                        />
-                    )}
-                    {Dataimport && (
-                        <Route
-                            path='/forest/dataimport'
-                            component={Dataimport}
-                        />
-                    )}
-                    {DataExport && (
-                        <Route
-                            path='/forest/dataexport'
-                            component={DataExport}
-                        />
-                    )}
-                    {SeedlingsChange && (
-                        <Route
-                            path='/forest/seedlingschange'
-                            component={SeedlingsChange}
-                        />
-                    )}
-                    {CuringInfo && (
-                        <Route
-                            path='/forest/curinginfo'
-                            component={CuringInfo}
-                        />
-                    )}
-                    {TreeAdoptInfo && (
-                        <Route
-                            path='/forest/treeadoptinfo'
-                            component={TreeAdoptInfo}
-                        />
-                    )}
-                    {DataStatis && (
-                        <Route
-                            path='/forest/datastatis'
-                            component={DataStatis}
-                        />
-                    )}
-                    {UserAnalysis && (
-                        <Route
-                            path='/forest/useranalysis'
-                            component={UserAnalysis}
-                        />
-                    )}
-                    {UserAnalysi && (
-                        <Route
-                            path='/forest/useranalysi'
-                            component={UserAnalysi}
-                        />
-                    )}
-                    {NurserySourseAnalysi && (
-                        <Route
-                            path='/forest/nurserysourseanalysi'
-                            component={NurserySourseAnalysi}
-                        />
-                    )}
-                    {EnterStrengthAnalysi && (
-                        <Route
-                            path='/forest/enterstrengthanalysi'
-                            component={EnterStrengthAnalysi}
-                        />
-                    )}
-                    {PlantStrengthAnalysi && (
-                        <Route
-                            path='/forest/plantstrengthanalysi'
-                            component={PlantStrengthAnalysi}
-                        />
-                    )}
-                    {DegitalAccept && (
-                        <Route
-                            path='/forest/degitalaccept'
-                            component={DegitalAccept}
-                        />
-                    )}
-                    {AgainAccept && (
-                        <Route
-                            path='/forest/againaccept'
-                            component={AgainAccept}
-                        />
-                    )}
-                    {TreeDataClear && (
-                        <Route
-                            path='/forest/treedataclear'
-                            component={TreeDataClear}
-                        />
-                    )}
-                    {DieTrees && (
-                        <Route
-                            path='/forest/dietrees'
-                            component={DieTrees}
-                        />
-                    )}
-                    {
-                        CompletionPlan && (
-                            <Route
-                                path='/forest/completionplan'
-                                component={CompletionPlan}
-                            />
-                        )
-                    }
-                    {
-                        TransplantInfo && (
-                            <Route
-                                path='/forest/transplantinfo'
-                                component={TransplantInfo}
-                            />
-                        )
-                    }
+                    <ContainerRouters
+                        menus={ForestMenu}
+                        containers={this.state}
+                    />
                 </Main>
             </Body>
         );
     }
 
-    static defaultOpenKeys = [''];
+    static defaultOpenKeys = ['Nursoverallinfo'];
 }

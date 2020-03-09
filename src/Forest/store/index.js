@@ -484,6 +484,17 @@ export const uploadFileHandler = myFetch(`${base}/OSSUploadHandler.ashx?filetype
 export const getTransplantLocMess = forestFetchAction(`${TREE_API}/trees`, []);
 // 移植信息查看移植前信息
 export const getTransplantTransMess = forestFetchAction(`${TREE_API}/treetransplants`, []);
+/**
+ * 现状调查
+ */
+// 获取调查类型列表
+export const getInvestigationTypes = forestFetchAction(`${TREEPIPE_API}/investigation/investigationtypes`, []);
+// 现状调查查询（点要素）
+export const getInvestigationPoints = forestFetchAction(`${TREEPIPE_API}/investigation/investigationpoints`, []);
+// 现状调查查询（线要素）
+export const getInvestigationLines = forestFetchAction(`${TREEPIPE_API}/investigation/investigationlines`, []);
+// 现状调查查询（面要素）
+export const getInvestigationPolygons = forestFetchAction(`${TREEPIPE_API}/investigation/investigationpolygons`, []);
 export const actions = {
     exportEcporttreestatuss,
     getTotalSat,
@@ -606,7 +617,11 @@ export const actions = {
     getExportPipeDrawing,
     postPipeCoordinate,
     getTransplantLocMess,
-    getTransplantTransMess
+    getTransplantTransMess,
+    getInvestigationTypes,
+    getInvestigationPoints,
+    getInvestigationLines,
+    getInvestigationPolygons
 };
 export default handleActions({
     [getTreeOK]: (state, {

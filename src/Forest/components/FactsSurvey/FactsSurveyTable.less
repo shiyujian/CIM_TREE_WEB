@@ -1,0 +1,342 @@
+.FactsSurveyTable-container{
+    display: flex;
+    position: absolute;
+    top: 120px;
+    width: calc(~'100% - 400px');
+    height: 700px;
+    left: 390px;
+
+    .FactsSurveyTable-button-layout {
+        position: absolute;
+        z-index: 960;
+        top: 20px;
+        left: 20px;
+    }
+}
+.FactsSurveyTable-Data-container{
+    display: flex;
+    position: absolute;
+    // width: calc(~'100% - 44px');
+    left: 10px;
+    top: 10px;
+    width: 665px;
+    height: 265px;
+
+    .FactsSurveyTable-r-main{
+    flex:1 1 auto;
+    position: relative;
+    overflow: hidden;
+    }
+
+    .FactsSurveyTable-foldBtn {
+        position: absolute;
+        width: 64px;
+        height: 64px;
+        text-align: center;
+        cursor: pointer;
+        z-index: 500;
+        -webkit-transition: all .3s;
+        -o-transition: all .3s;
+        transition: all .3s;
+        // border:1px solid rgba(97,245,171,1);
+    }
+
+    .FactsSurveyTable-menuPanel {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 265px;
+        transition: all 0.8s;
+        z-index: 980;
+        // background:rgba(19,34,36,0.8);
+        // background-image: url("./FactsSurveyImg/bottom1.png");
+        // background-repeat: no-repeat;
+  
+        .FactsSurveyTable-menuBackground {
+            background-image: url("./FactsSurveyImg/bottom1.png");
+            background-repeat: no-repeat;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            bottom: 0;
+            // background: rgba(19,34,36,1);
+            opacity: 0.7;
+        }
+        .FactsSurveyTable-aside {
+            position: absolute;
+            left: 24px;
+            width: calc(~'100% - 24px');;
+            height: 100%;
+            color: #333;
+            z-index: 999;
+            overflow: auto;
+
+            .FactsSurveyTable-MenuNameLayout { 
+                display: inline-block;
+                margin-top: 18px;
+                width: 100%;
+            }
+             .FactsSurveyTable-MenuName {
+                width: 65px;
+                height: 17px;
+                font-size: 16px;
+                font-family: Microsoft YaHei;
+                font-weight: bold;
+                color: #61f5ab;
+                position: absolute;
+                left: 12px;
+                top: 18px;
+            }
+            .FactsSurveyTable-MenuHideButton {
+                float: right;
+                cursor: pointer;
+                margin-right: 23px;
+            }
+            .FactsSurveyTable-asideTree {
+                margin-top: 10px;
+                // margin-left: 10px;
+            }
+            .FactsSurveyTable-StatusButton {
+                display: inline-block;
+                // width: 220px;
+            }
+            .FactsSurveyTable-button-statusSel {
+                width:72px;
+                height:32px;
+                border:1px solid rgba(60,248,247,1);
+                background-image: url("./FactsSurveyImg/3selection.png");
+                display: inline-block;
+                opacity: 0.8;
+            }
+            .FactsSurveyTable-button-status {
+                width:72px;
+                height:32px;
+                background-image: url("./FactsSurveyImg/3levitate.png");
+                display: inline-block;
+                // border:1px solid rgba(60,248,247,1);
+                opacity: 0.8;
+            }
+            .FactsSurveyTable-button-status-textSel {
+                width:72px;
+                height:32px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:400;
+                color:rgba(102,255,179,1);
+                line-height:32px;
+                text-align: center;
+                display: block;
+            }
+            .FactsSurveyTable-button-status-text {
+                width:72px;
+                height:32px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:400;
+                color:rgba(161,182,194,1);
+                line-height:32px;
+                text-align: center;
+                display: block;
+            }
+            .FactsSurveyTable-TimeButton {
+                display: inline-block;
+                margin-left: 67px;
+            }
+            .FactsSurveyTable-button-timeSel {
+                width:72px;
+                height:32px;
+                border:1px solid rgba(60,248,247,1);
+                background-image: url("./FactsSurveyImg/3selection.png");
+                display: inline-block;
+                opacity: 0.8;
+            }
+            .FactsSurveyTable-button-time {
+                width:72px;
+                height:32px;
+                background-image: url("./FactsSurveyImg/3levitate.png");
+                display: inline-block;
+                // border:1px solid rgba(60,248,247,1);
+                opacity: 0.8;
+            }
+            .FactsSurveyTable-button-customTimeSel {
+                background-color: unset !important;
+                width:148px;
+                height:32px;
+                border:1px solid rgba(60,248,247,1);
+                background-image: url("./FactsSurveyImg/4selection.png");
+                display: inline-block;
+                position: absolute;
+                // opacity: 0.8;
+
+                span.ant-calendar-picker-input.ant-input {
+                    box-sizing: border-box;
+                    margin: 0;
+                    padding: 0;
+                    font-variant: tabular-nums;
+                    list-style: none;
+                    font-feature-settings: 'tnum';
+                    position: relative;
+                    display: inline-block;
+                    width: 100%;
+                    height: 32px;
+                    background-image: none;
+                    transition: all 0.3s;
+                    background-color: unset;
+                    font-size:14px;
+                    font-family:Microsoft YaHei;
+                    font-weight:400;
+                    color:rgba(102,255,179,1);
+                    line-height:40px;
+                    border: unset;
+                }
+                input.ant-calendar-range-picker-input {
+                    width: 45%;
+                    height: 100%;
+                    text-align: center;
+                    background-color: transparent;
+                    border: unset;
+                    outline: 0;
+                    padding: unset;
+                    font-size: 12px;
+                    vertical-align: top;
+                }
+                span.ant-calendar-range-picker-separator {
+                    color:rgba(102,255,179,1);
+                    vertical-align: top;
+                }
+            }
+            .FactsSurveyTable-button-customTime {
+                background-color: unset !important;
+                width:148px;
+                height:32px;
+                background-image: url("./FactsSurveyImg/4levitate.png");
+                display: inline-block;
+                position: absolute;
+                // opacity: 0.8;
+
+                span.ant-calendar-picker-input.ant-input {
+                    box-sizing: border-box;
+                    margin: 0;
+                    padding: 0;
+                    font-variant: tabular-nums;
+                    list-style: none;
+                    font-feature-settings: 'tnum';
+                    position: relative;
+                    display: inline-block;
+                    width: 100%;
+                    height: 32px;
+                    background-image: none;
+                    transition: all 0.3s;
+                    background-color: unset;
+                    font-size:14px;
+                    font-family:Microsoft YaHei;
+                    font-weight:400;
+                    color:rgba(93,110,120,1);
+                    line-height:40px;
+                    border: unset;
+                }
+                input.ant-calendar-range-picker-input {
+                    width: 45%;
+                    height: 100%;
+                    text-align: center;
+                    background-color: transparent;
+                    border: unset;
+                    outline: 0;
+                    padding: unset;
+                    font-size: 12px;
+                    vertical-align: top;
+                }
+                span.ant-calendar-range-picker-separator {
+                    color:rgba(161,182,194,1);
+                    vertical-align: top;
+                }
+            }
+            .FactsSurveyTable-button-time-textSel {
+                width:72px;
+                height:32px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:400;
+                color:rgba(102,255,179,1);
+                line-height:32px;
+                text-align: center;
+                display: block;
+            }
+            .FactsSurveyTable-button-time-text {
+                width:72px;
+                height:32px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:400;
+                color:rgba(161,182,194,1);
+                line-height:32px;
+                text-align: center;
+                display: block;
+            }
+            .FactsSurveyTable-button {
+                display: block;
+                // width: 220px;
+            }
+            .FactsSurveyTable-button-layout {
+                width:148px;
+                height:71px;
+                // border:1px solid rgba(60,248,247,1);
+                border-radius:2px;
+                background-image: url("./FactsSurveyImg/2levitate.png");
+                display: inline-block;
+            }
+            .FactsSurveyTable-button-layoutSel {
+                width:148px;
+                height:71px;
+                border:1px solid rgba(60,248,247,1);
+                border-radius:2px;
+                background-image: url("./FactsSurveyImg/2selection.png");
+                display: inline-block;
+            }
+            .FactsSurveyTable-button-layout-text {
+                width: 148px;
+                height:14px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:bold;
+                color:rgba(255,255,255,1);
+                line-height: 25px;
+                margin-left: 12px;
+                display: inline-block;
+            }
+            .FactsSurveyTable-button-layout-img {
+                width:17px;
+                height:17px;
+                // opacity:0.6;
+                display: inline-block;
+                margin-top: 10px;
+                margin-left: 12px;
+            }
+            .FactsSurveyTable-button-layout-numSel {
+                width: 105px;
+                height: 22px;
+                font-size: 32px;
+                font-family: Digital-7;
+                font-weight: 400;
+                display: inline-block;
+                color: #66ffb3;
+                line-height: 40px;
+                position: absolute;
+                text-align: right;
+            }
+            .FactsSurveyTable-button-layout-num {
+                width: 105px;
+                height: 22px;
+                font-size: 32px;
+                font-family: Digital-7;
+                font-weight: 400;
+                display: inline-block;
+                color: #66ffb3;
+                line-height: 40px;
+                position: absolute;
+                text-align: right;
+                opacity:0.02;
+            }
+        }
+    }
+}

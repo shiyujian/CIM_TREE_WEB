@@ -100,7 +100,7 @@ export const ScheduleMenu = [
 ];
 export const ForestMenu = [
     {
-        key: 'nursoverallinfo',
+        key: 'Nursoverallinfo',
         id: 'FOREST.NURSOVERALLINFO',
         path: '/forest/nursoverallinfo',
         name: '苗木综合信息'
@@ -111,41 +111,29 @@ export const ForestMenu = [
         name: '统计图表',
         children: [
             {
-                key: 'useranalysi',
+                key: 'UserAnalysis',
                 id: 'FOREST.USERANALYSI',
                 path: '/forest/useranalysi',
                 name: '用户分析'
             },
             {
-                key: 'nurserysourseanalysi',
+                key: 'NurserySourseAnalysi',
                 id: 'FOREST.NURSERYSOURSEANALYSI',
                 path: '/forest/nurserysourseanalysi',
                 name: '苗木来源地分析'
             },
             {
-                key: 'enterstrengthanalysi',
+                key: 'EnterStrengthAnalysi',
                 id: 'FOREST.ENTERSTRENGTHANALYSI',
                 path: '/forest/enterstrengthanalysi',
                 name: '进场强度分析'
             },
             {
-                key: 'plantstrengthanalysi',
+                key: 'PlantStrengthAnalysi',
                 id: 'FOREST.PLANTSTRENGTHANALYSI',
                 path: '/forest/plantstrengthanalysi',
                 name: '栽植强度分析'
             }
-            // {
-            //     key: 'datastatis',
-            //     id: 'FOREST.DATASTATIS',
-            //     path: '/forest/datastatis',
-            //     name: '数据统计'
-            // },
-            // {
-            //     key: 'useranalysis',
-            //     id: 'FOREST.USERANALYSIS',
-            //     path: '/forest/useranalysis',
-            //     name: '用户行为统计'
-            // }
         ]
     },
     {
@@ -154,40 +142,34 @@ export const ForestMenu = [
         name: '建设期信息',
         children: [
             {
-                key: 'nursmeasureinfo',
+                key: 'Nursmeasureinfo',
                 id: 'FOREST.NURSMEASUREINFO',
                 path: '/forest/nursmeasureinfo',
                 name: '苗圃测量信息'
             },
             {
-                key: 'carpackage',
+                key: 'CarPackage',
                 id: 'FOREST.CARPACKAGE',
                 path: '/forest/carpackage',
                 name: '车辆打包信息'
             },
             {
-                key: 'locmeasureinfo',
+                key: 'Locmeasureinfo',
                 id: 'FOREST.LOCMEASUREINFO',
                 path: '/forest/locmeasureinfo',
                 name: '现场测量信息'
             },
             {
-                key: 'supervisorinfo',
+                key: 'Supervisorinfo',
                 id: 'FOREST.SUPERVISORINFO',
                 path: '/forest/supervisorinfo',
                 name: '监理抽查信息'
             },
             {
-                key: 'checkerinfo',
+                key: 'Checkerinfo',
                 id: 'FOREST.OWNERINFO',
                 path: '/forest/checkerinfo',
                 name: '业主抽查信息'
-            },
-            {
-                key: 'transplantinfo',
-                id: 'FOREST.TRANSPLANTINFO',
-                path: '/forest/transplantinfo',
-                name: '移植信息'
             }
         ]
     },
@@ -197,22 +179,28 @@ export const ForestMenu = [
         name: '养管护信息',
         children: [
             {
-                key: 'curinginfo',
+                key: 'CuringInfo',
                 id: 'FOREST.CURINGINFO',
                 path: '/forest/curinginfo',
                 name: '养护信息'
             },
             {
-                key: 'treeadoptinfo',
+                key: 'TreeAdoptInfo',
                 id: 'FOREST.TREEADOPTINFO',
                 path: '/forest/treeadoptinfo',
                 name: '苗木死亡调查'
             },
             {
-                key: 'dietrees',
+                key: 'DieTrees',
                 id: 'FOREST.DIETREES',
                 path: '/forest/dietrees',
                 name: '苗木死亡信息'
+            },
+            {
+                key: 'TransplantInfo',
+                id: 'FOREST.TRANSPLANTINFO',
+                path: '/forest/transplantinfo',
+                name: '移植信息'
             }
         ]
     },
@@ -222,25 +210,25 @@ export const ForestMenu = [
         name: '数据信息维护',
         children: [
             {
-                key: 'seedlingschange',
+                key: 'SeedlingsChange',
                 id: 'FOREST.SEEDLINGSCHANGE',
                 path: '/forest/seedlingschange',
                 name: '苗木信息修改'
             },
             {
-                key: 'treedataclear',
+                key: 'TreeDataClear',
                 id: 'FOREST.TREEDATACLEAR',
                 path: '/forest/treedataclear',
                 name: '苗木信息删除'
             },
             {
-                key: 'dataimport',
+                key: 'Dataimport',
                 id: 'FOREST.DATAIMPORT',
                 path: '/forest/dataimport',
                 name: '定位数据导入'
             },
             {
-                key: 'dataexport',
+                key: 'DataExport',
                 id: 'FOREST.DATAEXPORT',
                 path: '/forest/dataexport',
                 name: '定位数据导出'
@@ -248,22 +236,28 @@ export const ForestMenu = [
         ]
     },
     {
-        key: 'degitalaccept',
+        key: 'DegitalAccept',
         id: 'FOREST.DEGITALACCEPT',
         path: '/forest/degitalaccept',
         name: '数字化验收'
     },
     {
-        key: 'againaccept',
+        key: 'AgainAccept',
         id: 'FOREST.AGAINACCEPT',
         path: '/forest/againaccept',
         name: '重新验收'
     },
     {
-        key: 'completionplan',
+        key: 'CompletionPlan',
         id: 'FOREST.COMPLETIONPLAN',
         path: '/forest/completionplan',
         name: '灌溉竣工图导出'
+    },
+    {
+        key: 'FactsSurvey',
+        id: 'FOREST.FACTSSURVEY',
+        path: '/forest/factssurvey',
+        name: '现状调查图导出'
     }
 ];
 export const ConservationMenu = [
