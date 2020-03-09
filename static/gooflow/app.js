@@ -24,9 +24,11 @@ $(function () {
     var putDirectionUrl = prefix + '/flow/direction';
     // 流向删除
     var deleteDirectionUrl = prefix + '/flow/direction/';
+    // 新增流程节点和流向
     var postNodeDirection = prefix + '/flow/nodedirection';
 
     let originData = []; // 回显的节点和流向ID
+    let actionEdit = false; // 是否为编辑
     var temp_name = getUrlParam('name');
     var temp_id = getUrlParam('id');
     var user_id = getUrlParam('userID');
@@ -170,65 +172,86 @@ $(function () {
         let Nodes = [];
         let Directions = [];
         for (let item in nodeData) {
-            if (originData.includes(item)) {
+            // if (originData.includes(item)) {
 
+            // } else {
+            // 确定节点类型
+            let NodeType = '';
+            if (nodeData[item].type === 'start round mix') {
+                NodeType = 1;
+            } else if (nodeData[item].type === 'task') {
+                NodeType = 2;
+            } else if (nodeData[item].type === 'end round') {
+                NodeType = 0;
             } else {
-                // 确定节点类型
-                let NodeType = '';
-                if (nodeData[item].type === 'start round mix') {
-                    NodeType = 1;
-                } else if (nodeData[item].type === 'task') {
-                    NodeType = 2;
-                } else if (nodeData[item].type === 'end round') {
-                    NodeType = 0;
-                } else {
-                    NodeType = 2;
-                }
-                Nodes.push({
-                    Creater: parseInt(user_id), // 创建人
-                    FlowID: temp_id, // 流程ID
-                    FlowName: temp_name, // 流程名称
-                    Name: nodeData[item].name, // 节点名称
-                    NodeDescribe: nodeData[item].describe || '', // 节点说明
-                    NodeType: NodeType // 节点类型
-                });
+                NodeType = 2;
             }
+            Nodes.push({
+                Creater: parseInt(user_id), // 创建人
+                FlowID: temp_id, // 流程ID
+                FlowName: temp_name, // 流程名称
+                X: nodeData[item].left, // left
+                Y: nodeData[item].top, // top
+                Width: nodeData[item].width, // width
+                Height: nodeData[item].height, // height
+                Name: nodeData[item].name, // 节点名称
+                NodeDescribe: nodeData[item].describe || '', // 节点说明
+                NodeType: NodeType // 节点类型
+            });
+            // }
         }
         for (let item in lineData) {
-            if (originData.includes(item)) {
+            // if (originData.includes(item)) {
 
-            } else {
-                Directions.push({
-                    Creater: parseInt(user_id), // 创建人
-                    FlowID: temp_id, // 流程ID
-                    FlowName: temp_name, // 流程名称
-                    Name: lineData[item].name, // 流向名称
-                    DCondition: lineData[item].describe || '', // 流向条件
-                    FromNode: nodeData[lineData[item].from].name, // 节点起点
-                    ToNode: nodeData[lineData[item].to].name, // 节点终点
-                    DirectionChannel: lineData[item].channel // 流向通道 01进 11进退 10退
-                });
-            }
+            // } else {
+            Directions.push({
+                Creater: parseInt(user_id), // 创建人
+                FlowID: temp_id, // 流程ID
+                FlowName: temp_name, // 流程名称
+                Name: lineData[item].name, // 流向名称
+                DCondition: lineData[item].describe || '', // 流向条件
+                FromNode: nodeData[lineData[item].from].name, // 节点起点
+                ToNode: nodeData[lineData[item].to].name, // 节点终点
+                DirectionChannel: lineData[item].channel // 流向通道 01进 11进退 10退
+            });
+            // }
         }
         console.log('新增', Nodes, Directions);
         let params = {
             Nodes,
             Directions
         };
-        $.ajax({
-            url: postNodeDirection,
-            data: JSON.stringify(params),
-            contentType: 'application/json',
-            type: 'POST',
-            success: function (rep) {
-                if (rep.code === 1) {
-                    alert('上传流程模板成功');
-                    getLoadData(); // 刷新工作区
-                } else {
-                    alert('上传流程模板失败');
+        if (actionEdit) {
+            $.ajax({
+                url: postNodeDirection,
+                data: JSON.stringify(params),
+                contentType: 'application/json',
+                type: 'POST',
+                success: function (rep) {
+                    if (rep.code === 1) {
+                        alert('上传流程模板成功');
+                        getLoadData(); // 刷新工作区
+                    } else {
+                        alert(`上传流程模板失败，${rep.msg}`);
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            $.ajax({
+                url: postNodeDirection,
+                data: JSON.stringify(params),
+                contentType: 'application/json',
+                type: 'POST',
+                success: function (rep) {
+                    if (rep.code === 1) {
+                        alert('上传流程模板成功');
+                        getLoadData(); // 刷新工作区
+                    } else {
+                        alert(`上传流程模板失败，${rep.msg}`);
+                    }
+                }
+            });
+        }
     }
     function onItemDel (id, mode) {
         console.log('删除', id, mode);
@@ -284,10 +307,10 @@ $(function () {
                         name: item.Name,
                         describe: item.NodeDescribe,
                         code: item.Code,
-                        height: 28,
-                        width: 30,
-                        top: 40,
-                        left: 40,
+                        height: item.Height,
+                        width: item.Width,
+                        top: item.Y,
+                        left: item.X,
                         alt: true,
                         type: 'start round mix'
                     };
@@ -297,10 +320,10 @@ $(function () {
                         name: item.Name,
                         describe: item.NodeDescribe,
                         code: item.Code,
-                        height: 28,
-                        width: 30,
-                        top: 100 + index * 120,
-                        left: 220,
+                        height: item.Height,
+                        width: item.Width,
+                        top: item.Y,
+                        left: item.X,
                         alt: true,
                         type: 'task'
                     };
@@ -310,10 +333,10 @@ $(function () {
                         name: item.Name,
                         describe: item.NodeDescribe,
                         code: item.Code,
-                        height: 28,
-                        width: 30,
-                        top: 480,
-                        left: 480,
+                        height: item.Height,
+                        width: item.Width,
+                        top: item.Y,
+                        left: item.X,
                         alt: true,
                         type: 'end round'
                     };
@@ -346,7 +369,7 @@ $(function () {
                     areas: {},
                     initNum: 0
                 };
-                console.log('回显的数据', data);
+                console.log('回显的数据999999', data);
                 flow.loadData(data);
             });
         });
@@ -376,6 +399,9 @@ $(function () {
             type: '', // 节点类型
             status: 1 // 节点状态
         }).success(function (rep) {
+            if (rep && rep.length) {
+                actionEdit = true;
+            }
             let nodes = {};
             rep.map((item, index) => {
                 originData.push(item.ID);
@@ -385,10 +411,10 @@ $(function () {
                         name: item.Name,
                         describe: item.NodeDescribe,
                         code: item.Code,
-                        height: 28,
-                        width: 30,
-                        top: 40,
-                        left: 40,
+                        height: item.Height,
+                        width: item.Width,
+                        top: item.Y,
+                        left: item.X,
                         alt: true,
                         type: 'start round mix'
                     };
@@ -398,10 +424,10 @@ $(function () {
                         name: item.Name,
                         describe: item.NodeDescribe,
                         code: item.Code,
-                        height: 28,
-                        width: 30,
-                        top: 100 + index * 120,
-                        left: 220,
+                        height: item.Height,
+                        width: item.Width,
+                        top: item.Y,
+                        left: item.X,
                         alt: true,
                         type: 'task'
                     };
@@ -411,10 +437,10 @@ $(function () {
                         name: item.Name,
                         describe: item.NodeDescribe,
                         code: item.Code,
-                        height: 28,
-                        width: 30,
-                        top: 480,
-                        left: 480,
+                        height: item.Height,
+                        width: item.Width,
+                        top: item.Y,
+                        left: item.X,
                         alt: true,
                         type: 'end round'
                     };

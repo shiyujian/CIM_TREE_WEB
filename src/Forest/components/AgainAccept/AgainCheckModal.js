@@ -8,31 +8,27 @@ import {
     Modal,
     Select,
     Upload,
-    message,
     Row,
     Col,
     Form
 } from 'antd';
-import {
-    getYsTypeByID,
-    getStatusByID
-} from './auth';
 const { TextArea } = Input;
 const { Option } = Select;
 const formItemLayout = {
     labelCol: {
         xs: { span: 24 },
-        sm: { span: 6 }
+        sm: { span: 8 }
     },
     wrapperCol: {
         xs: { span: 24 },
-        sm: { span: 18 }
+        sm: { span: 16 }
     }
 };
 class AgainCheckModal extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            section: '', // 标段
             CheckType: '',
             ThinClassLength: 0,
             ThinClass: [], // 勾选中的细班
@@ -40,8 +36,7 @@ class AgainCheckModal extends Component {
             checkItem: [{
                 thinClassLength: 0,
                 thinClassList: [],
-                CheckType: 0,
-                Section: '',
+                CheckType: '',
                 ThinClass: [],
                 TreeType: 0
             }], // 验收项
@@ -49,23 +44,11 @@ class AgainCheckModal extends Component {
             fileUrl: '', // 附件地址
             fileListNew: [], // 附件列表
             loading: false, // 加载
-            opinion: '', // 意见
-            supervisor: '', // 监理
-            owner: '' // 业主
+            opinion: '' // 意见
         };
     }
     componentDidMount () {
 
-    }
-    handleOwnerChange (value) {
-        this.setState({
-            owner: value
-        });
-    }
-    handleSupervisorChange (value) {
-        this.setState({
-            supervisor: value
-        });
     }
     handleOpinionChange (e) {
         this.setState({
@@ -73,23 +56,38 @@ class AgainCheckModal extends Component {
         });
     }
     handleOk () {
-        const { owner, supervisor, opinion, fileUrl, CheckType, thinClassList, ThinClass, ThinClassLength, checkItem } = this.state;
-        checkItem.unshift({
-            thinClassLength: ThinClassLength,
-            thinClassList,
-            CheckType,
-            Section: '',
-            ThinClass,
-            TreeType: 0
+        const {
+            form: { validateFields }
+        } = this.props;
+        const { opinion, fileUrl, CheckType, section, thinClassList, ThinClass, ThinClassLength, checkItem } = this.state;
+        validateFields((err, values) => {
+            console.log('有问题', err);
+            if (err) {
+                return;
+            }
+            let newCheckItem = [];
+            newCheckItem.push({
+                thinClassLength: ThinClassLength,
+                thinClassList,
+                CheckType,
+                ThinClass,
+                TreeType: 0
+            });
+            checkItem.map(item => {
+                if (item.CheckType && item.ThinClass && item.ThinClass.length > 0) {
+                    newCheckItem.push(item);
+                }
+            });
+            let param = {
+                section,
+                owner: values.owner,
+                supervisor: values.supervisor,
+                opinion,
+                fileUrl,
+                checkItem: newCheckItem
+            };
+            this.props.handleOk(param);
         });
-        let param = {
-            owner,
-            supervisor,
-            opinion,
-            fileUrl,
-            checkItem
-        };
-        this.props.handleOk(param);
     }
     onAddCheckItem () {
         const { checkItem } = this.state;
@@ -97,7 +95,6 @@ class AgainCheckModal extends Component {
             thinClassLength: 0,
             thinClassList: [],
             CheckType: 0,
-            Section: '',
             ThinClass: [],
             TreeType: 0
         });
@@ -121,17 +118,24 @@ class AgainCheckModal extends Component {
     }
     // 小班改变
     handleSmallClassChange (key, value) {
+        console.log('小班', value);
+        let sectionArr = value.split('-');
+        let section = `${sectionArr[0]}-${sectionArr[1]}-${sectionArr[2]}`;
         const { checkItem } = this.state;
-        console.log(999, value, checkItem, this.props.smallClassList);
         if (key === -1) {
+            // 第一项
             let thinClassList = [];
             this.props.smallClassList.map(item => {
                 if (value === item.No) {
                     thinClassList = item.children;
                 }
             });
+            console.log('细班列表', thinClassList);
             this.setState({
-                thinClassList
+                section,
+                thinClassList,
+                ThinClass: [],
+                ThinClassLength: 0
             });
         } else {
             let thinClassList = [];
@@ -143,32 +147,27 @@ class AgainCheckModal extends Component {
             checkItem.map((item, index) => {
                 if (index === key) {
                     item.thinClassList = thinClassList;
+                    item.ThinClass = [];
+                    item.ThinClassLength = 0;
                 }
             });
             console.log('小班改变', checkItem);
             this.setState({
+                section,
                 checkItem
             });
         }
     }
     handleThinClassChange (key, value) {
+        console.log('细班号', value);
         const { checkItem } = this.state;
         let ThinClassLength = 0;
-        let ThinClass = [];
         if (key === -1) {
-            console.log('细班号', value);
+            // 第一项
             ThinClassLength = value.length;
-            value.map(item => {
-                this.state.thinClassList.map(row => {
-                    if (row.name === item) {
-                        ThinClass.push(row.No);
-                    }
-                });
-            });
-            console.log('细班号', ThinClass);
             this.setState({
                 ThinClassLength,
-                ThinClass
+                ThinClass: value
             });
         } else {
             console.log('细班号', value, checkItem);
@@ -176,19 +175,10 @@ class AgainCheckModal extends Component {
             checkItem.map((item, index) => {
                 if (index === key) {
                     item.thinClassLength = ThinClassLength;
-                    let ThinClassArr = [];
-                    value.map(record => {
-                        item.thinClassList.map(row => {
-                            if (row.name === record) {
-                                ThinClassArr.push(row.No);
-                            }
-                        });
-                    });
-                    item.ThinClass = ThinClassArr;
+                    item.ThinClass = value;
                 }
             });
             console.log('细班号', value, checkItem);
-
             this.setState({
                 checkItem
             });
@@ -215,7 +205,6 @@ class AgainCheckModal extends Component {
         }
     }
     render () {
-        // const { getFieldDecorator } = this.props.form;
         const props = {
             name: 'file',
             showUploadList: true,
@@ -255,7 +244,12 @@ class AgainCheckModal extends Component {
                 });
             }
         };
-        const { checkItem, ThinClassLength } = this.state;
+        const { checkItem, ThinClassLength, ThinClass } = this.state;
+        const {
+            form: {
+                getFieldDecorator
+            }
+        } = this.props;
         return (<div>
             <Modal
                 width='750'
@@ -270,7 +264,7 @@ class AgainCheckModal extends Component {
                         <Col span={5}>请选择验收类型</Col>
                         <Col span={1} />
                         <Col span={5}>请选择小班</Col>
-                        <Col span={8}>请选择细班(已选100个)</Col>
+                        <Col span={8}>请选择细班</Col>
                         <Col span={5} />
                     </Row>
                     <Row style={{marginTop: 10}}>
@@ -314,6 +308,7 @@ class AgainCheckModal extends Component {
                                             .toLowerCase()
                                             .indexOf(input.toLowerCase()) >= 0
                                 }
+                                value={ThinClass}
                                 optionLabelProp='value'
                                 onChange={this.handleThinClassChange.bind(this, -1)}
                             >
@@ -371,6 +366,7 @@ class AgainCheckModal extends Component {
                                                         .toLowerCase()
                                                         .indexOf(input.toLowerCase()) >= 0
                                             }
+                                            value={item.ThinClass}
                                             optionLabelProp='value'
                                             onChange={this.handleThinClassChange.bind(this, index)}
                                         >
@@ -389,23 +385,31 @@ class AgainCheckModal extends Component {
                     }
                     <Row style={{marginTop: 10}}>
                         <Col span={10}>
-                            <Form.Item label='审核监理' style={{marginBottom: 0}} >
-                                <Select
-                                    allowClear showSearch
-                                    filterOption={
-                                        (input, option) => {
-                                            return option.props.children[0]
-                                            .toLowerCase()
-                                            .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
-                                            .toLowerCase()
-                                            .indexOf(input.toLowerCase()) >= 0;
-                                        }
-                                    }
-                                    defaultValue=''
-                                    onChange={this.handleSupervisorChange.bind(this)}
-                                    style={{ width: 223 }}>
-                                    {this.props.jianliOptions}
-                                </Select>
+                            <Form.Item
+                                label='审核监理'
+                                style={{marginBottom: 0}}
+                            >
+                                {
+                                    getFieldDecorator('supervisor', {
+                                        rules: [{ required: true, message: '请选择' }],
+                                        initialValue: ''
+                                    })(
+                                        <Select
+                                            allowClear showSearch
+                                            filterOption={
+                                                (input, option) => {
+                                                    return option.props.children[0]
+                                                    .toLowerCase()
+                                                    .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
+                                                    .toLowerCase()
+                                                    .indexOf(input.toLowerCase()) >= 0;
+                                                }
+                                            }
+                                            style={{ width: 223 }}>
+                                            {this.props.jianliOptions}
+                                        </Select>
+                                    )
+                                }
                             </Form.Item>
                         </Col>
                         <Col span={14} />
@@ -413,29 +417,38 @@ class AgainCheckModal extends Component {
                     <Row style={{marginTop: 10}}>
                         <Col span={10}>
                             <Form.Item label='审核业主' style={{marginBottom: 0}} >
-                                <Select
-                                    allowClear showSearch
-                                    filterOption={
-                                        (input, option) => {
-                                            return option.props.children[0]
-                                            .toLowerCase()
-                                            .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
-                                            .toLowerCase()
-                                            .indexOf(input.toLowerCase()) >= 0;
-                                        }
-                                    }
-                                    defaultValue=''
-                                    onChange={this.handleOwnerChange.bind(this)}
-                                    style={{ width: 223 }}>
-                                    {this.props.yezhuOptions}
-                                </Select>
+                                {
+                                    getFieldDecorator('owner', {
+                                        rules: [{ required: true, message: '请选择' }],
+                                        initialValue: ''
+                                    })(
+                                        <Select
+                                            allowClear showSearch
+                                            filterOption={
+                                                (input, option) => {
+                                                    return option.props.children[0]
+                                                    .toLowerCase()
+                                                    .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
+                                                    .toLowerCase()
+                                                    .indexOf(input.toLowerCase()) >= 0;
+                                                }
+                                            }
+                                            style={{ width: 223 }}>
+                                            {this.props.yezhuOptions}
+                                        </Select>
+                                    )
+                                }
                             </Form.Item>
                         </Col>
                         <Col span={14} />
                     </Row>
                     <Row style={{marginTop: 10}}>
                         <Col span={24}>
-                            <TextArea rows={6} onChange={this.handleOpinionChange.bind(this)} />
+                            <TextArea
+                                rows={6}
+                                maxLength={200}
+                                allowClear
+                                onChange={this.handleOpinionChange.bind(this)} />
                             <Upload {...props}>
                                 <Button>
                                     <Icon type='upload' /> 上传附件

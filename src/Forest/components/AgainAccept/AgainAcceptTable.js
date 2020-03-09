@@ -18,7 +18,6 @@ import {
     DOCEXPORT_API
 } from '_platform/api';
 import moment from 'moment';
-import DrawAreaAcceptModal from './DrawAreaAcceptModal';
 import AgainCheckModal from './AgainCheckModal';
 import DetailsModal from './DetailsModal';
 import CheckModal from './CheckModal';
@@ -47,7 +46,7 @@ export default class AgainAcceptTable extends Component {
             curingTreeData: [], // 表格信息
             pagination: {},
             loading: false,
-            size: 11,
+            size: 10,
             exportsize: 100,
             stime1: '',
             etime1: '',
@@ -111,10 +110,10 @@ export default class AgainAcceptTable extends Component {
                 title: '验收类型数量',
                 dataIndex: 'ystypeNum'
             },
-            {
-                title: '树种',
-                dataIndex: 'TreeType'
-            },
+            // {
+            //     title: '树种',
+            //     dataIndex: 'TreeType'
+            // },
             {
                 title: '状态',
                 dataIndex: 'status'
@@ -173,6 +172,10 @@ export default class AgainAcceptTable extends Component {
                             <a onClick={this.onCheck.bind(this, record)}>审核</a>
                         );
                     }
+                    // arr.push(
+                    //     <Divider type='vertical' />,
+                    //     <a onClick={this.onDelete.bind(this, record)}>删除</a>
+                    // );
                     return (<div>
                         {
                             arr
@@ -181,6 +184,41 @@ export default class AgainAcceptTable extends Component {
                 }
             }
         ];
+    }
+    // 获取各个标段对应的公司和项目经理
+    componentDidMount = async () => {
+        const {
+            actions: {
+                getUnitMessageBySection
+            }
+        } = this.props;
+        let unitMessage = await getUnitMessageBySection();
+        // 获取监理和业主
+        await this.getOwnerInfo();
+        // 获取所有重新验收记录
+        await this.query(1);
+        this.setState({
+            unitMessage
+        });
+    }
+    onDelete (record) {
+        const { deleteWfreacceptance } = this.props.actions;
+        deleteWfreacceptance({
+            id: record.ID
+        }, {}).then(rep => {
+            if (rep.code === 1) {
+                Notification.success({
+                    message: '提示',
+                    description: '删除重新验收申请成功'
+                });
+                this.query(1);
+            } else {
+                Notification.error({
+                    message: '提示',
+                    description: '删除重新验收申请失败'
+                });
+            }
+        });
     }
     // 审核
     onCheck (record) {
@@ -239,20 +277,6 @@ export default class AgainAcceptTable extends Component {
             detailsModalVisible: false
         });
     }
-    // 获取各个标段对应的公司和项目经理
-    componentDidMount = async () => {
-        const {
-            actions: {
-                getUnitMessageBySection
-            }
-        } = this.props;
-        let unitMessage = await getUnitMessageBySection();
-        // 获取监理和业主
-        this.getOwnerInfo();
-        this.setState({
-            unitMessage
-        });
-    }
     async getOwnerInfo (section = '') {
         let user = getUser();
         if (section) {
@@ -261,6 +285,7 @@ export default class AgainAcceptTable extends Component {
             section = user.section;
         }
         const {
+            sectionSelect,
             actions: {
                 getUsers,
                 getRoles
@@ -317,7 +342,6 @@ export default class AgainAcceptTable extends Component {
                 </Option>);
             });
         }
-        console.log('监理账号', jianli.content);
         if (jianli && jianli.content && jianli.content instanceof Array) {
             jianli.content.map(item => {
                 jianliOptions.push(<Option value={item.ID} key={item.ID} title={item.User_Name}>
@@ -332,7 +356,9 @@ export default class AgainAcceptTable extends Component {
                 </Option>);
             });
         }
+        sectionSelect(section);
         this.setState({
+            section,
             shigongOptions,
             jianliOptions,
             yezhuOptions
@@ -364,6 +390,9 @@ export default class AgainAcceptTable extends Component {
     }
     // 重新验收提交
     handleOkAgainCheck = async (param) => {
+        this.setState({
+            againCheckModalVisible: false
+        });
         confirm({
             title: '提示',
             content: '点击确认并经监理、业主审核通过后，所选原有验收数据将被删除，所选验收状态将被退回，是否继续？',
@@ -374,23 +403,25 @@ export default class AgainAcceptTable extends Component {
                 let CheckTypeIDArr = [];
                 let CheckTypeArr = [];
                 let ThinClassArr = [];
+                console.log('参数', param.checkItem);
+                let sectionArr = param.section.split('-');
                 param.checkItem.map(item => {
                     if (!CheckTypeIDArr.includes(item.CheckType)) {
                         CheckTypeIDArr.push(item.CheckType);
                     }
                     // 所有细班验收项
                     item.ThinClass.map(row => {
-                        let rowArr = row.split('-');
-                        let newRow = `${rowArr[0]}-${rowArr[2]}-${rowArr[3]}-${rowArr[4]}`;
+                        let newRow = `${sectionArr[0]}-${sectionArr[1]}-${row}`;
                         ThinClassArr.push(newRow);
                         Details.push({
                             CheckType: parseInt(item.CheckType),
-                            Section: user.section,
+                            Section: param.section,
                             ThinClass: newRow,
                             TreeType: 0
                         });
                     });
                 });
+                console.log('数组', CheckTypeIDArr);
                 // 得到验收类型数组
                 CheckTypeIDArr.map(item => {
                     CheckTypeArr.push(getYsTypeByID(parseInt(item)));
@@ -415,6 +446,7 @@ export default class AgainAcceptTable extends Component {
                         message: '提示',
                         description: '您发起的批量重新验收已提交'
                     });
+                    this.query(1);
                 } else if (rep.code === 2) {
                     Notification.error({
                         message: '提示',
@@ -432,9 +464,6 @@ export default class AgainAcceptTable extends Component {
                     againCheckModalVisible: true
                 });
             }
-        });
-        this.setState({
-            againCheckModalVisible: false
         });
     }
     handleCancelAgainCheck () {
@@ -503,6 +532,13 @@ export default class AgainAcceptTable extends Component {
         const {
             section
         } = this.state;
+        console.log('细班选择', value);
+        if (!value) {
+            this.setState({
+                thinclass: ''
+            });
+            return;
+        }
         let array = value.split('-');
         let array1 = [];
         let treetypeoption = [];
@@ -598,11 +634,6 @@ export default class AgainAcceptTable extends Component {
             ystype = '',
             treetypename = ''
         } = this.state;
-        if (thinclass === '') {
-            message.info('请选择项目，标段，小班及细班信息');
-            return;
-        }
-
         const {
             actions: {
                 getWfreacceptanceList
@@ -620,7 +651,6 @@ export default class AgainAcceptTable extends Component {
             }
         });
         let user = getUser();
-        console.log('当前用户', user);
         // 施工文书可以查看本标段，非施工文书只能查看自己
         let applier = '', supervisor = '', owner = '';
         if (user.roles.ID === 10) {
@@ -675,7 +705,7 @@ export default class AgainAcceptTable extends Component {
                     curingTree.Project = getProjectNameBySection(curingTree.Section, thinClassTree);
                     curingTree.smallclass = `${smallclassData}号小班`;
                     let thinClass = curingTree.ThinClass.split(',')[0];
-                    curingTree.thinclass = `${thinClass.substr(-7, 7)}等`;
+                    curingTree.thinclass = `${thinClass.substr(-7, 7)}`;
                     curingTree.thinclassNum = curingTree.ThinClassNum;
                     result.push(curingTree);
                 });
@@ -798,7 +828,6 @@ export default class AgainAcceptTable extends Component {
             // 施工身份
             queryArr.push(supervisor, owner);
         }
-        console.log('用户身份', user, user.roles.ID);
         header = (<div >
             <Row className='forest-search-layout' >
                 <div className='forest-mrg10' >
@@ -867,7 +896,7 @@ export default class AgainAcceptTable extends Component {
                         {ystypeoption}
                     </Select>
                 </div>
-                <div className='forest-mrg10' >
+                {/* <div className='forest-mrg10' >
                     <span className='forest-search-span' > 树种： </span>
                     <Select allowClear showSearch
                         filterOption={
@@ -882,7 +911,7 @@ export default class AgainAcceptTable extends Component {
                         onChange={this.onTreeTypeChange.bind(this)} >
                         {treetypeoption}
                     </Select>
-                </div>
+                </div> */}
                 <div className='forest-mrg10' >
                     <span className='forest-search-span' > 状态： </span>
                     <Select allowClear className='forest-forestcalcw4'
@@ -898,7 +927,7 @@ export default class AgainAcceptTable extends Component {
             </Row>
             <Row className='forest-search-layout' >
                 <div className='forest-mrg20' >
-                    <span className='forest-search-span6' > 申请验收时间： </span>
+                    <span className='forest-search-span6' > 申请验收日期： </span>
                     <RangePicker style={{verticalAlign: 'middle'}}
                         className='forest-forestcalcw6'
                         showTime={{format: 'HH:mm:ss'}}
@@ -920,9 +949,9 @@ export default class AgainAcceptTable extends Component {
                 </Col>
                 <Col span={2}>
                     {
-                        user.ID === 11 ? '' : <Button type='primary' onClick={this.onAgainCheck.bind(this)} >
+                        user.roles.ID === 10 ? <Button type='primary' onClick={this.onAgainCheck.bind(this)} >
                             重新验收
-                        </Button>
+                        </Button> : ''
                     }
                 </Col>
                 <Col span={1} />
@@ -953,7 +982,7 @@ export default class AgainAcceptTable extends Component {
                             spinning: this.state.loading
                         }
                     }
-                    locale={{emptyText: '暂无验收消息'}}
+                    locale={{emptyText: '暂无验收数据'}}
                     dataSource={details}
                     onChange={this.handleTableChange.bind(this)}
                     pagination={this.state.pagination}
