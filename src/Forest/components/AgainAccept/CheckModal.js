@@ -13,10 +13,6 @@ import {
     Col,
     Form
 } from 'antd';
-import {
-    getYsTypeByID,
-    getStatusByID
-} from './auth';
 const { TextArea } = Input;
 const { Option } = Select;
 const formItemLayout = {

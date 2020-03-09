@@ -53,7 +53,7 @@ export default class Sidebar extends Component {
                 <div
                     style={{
                         width: '100%',
-                        height: '999em',
+                        height: 'calc(100vh - 170px)',
                         position: 'absolute',
                         left: 0,
                         top: 0,

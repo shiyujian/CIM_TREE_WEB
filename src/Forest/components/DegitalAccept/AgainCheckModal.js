@@ -32,8 +32,6 @@ class AgainCheckModal extends Component {
             fileListNew: [], // 附件列表
             loading: false, // 加载
             opinion: '', // 意见
-            supervisor: '', // 监理
-            owner: '', // 业主
             treeType: [] // 树种数组
         };
     }
@@ -49,34 +47,36 @@ class AgainCheckModal extends Component {
             treeType: value
         });
     }
-    handleOwnerChange (value) {
-        this.setState({
-            owner: value
-        });
-    }
-    handleSupervisorChange (value) {
-        this.setState({
-            supervisor: value
-        });
-    }
     handleOpinionChange (e) {
         this.setState({
             opinion: e.target.value
         });
     }
     handleOk () {
-        const { treeType, owner, supervisor, opinion, fileUrl } = this.state;
-        let param = {
-            treeType,
-            owner,
-            supervisor,
-            opinion,
-            fileUrl
-        };
-        this.props.handleOk(param);
+        const {
+            form: { validateFields }
+        } = this.props;
+        const { treeType, opinion, fileUrl } = this.state;
+        validateFields((err, values) => {
+            if (err) {
+                return;
+            }
+            let param = {
+                treeType,
+                owner: values.owner,
+                supervisor: values.supervisor,
+                opinion,
+                fileUrl
+            };
+            this.props.handleOk(param);
+        });
     }
     render () {
-        // const { getFieldDecorator } = this.props.form;
+        const {
+            form: {
+                getFieldDecorator
+            }
+        } = this.props;
         const props = {
             name: 'file',
             showUploadList: true,
@@ -142,42 +142,56 @@ class AgainCheckModal extends Component {
                         </Select>
                     </Form.Item>
                     <Form.Item label='审核监理'>
-                        <Select
-                            allowClear showSearch
-                            filterOption={
-                                (input, option) => {
-                                    return option.props.children[0]
-                                    .toLowerCase()
-                                    .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
-                                    .toLowerCase()
-                                    .indexOf(input.toLowerCase()) >= 0;
-                                }
-                            }
-                            defaultValue=''
-                            onChange={this.handleSupervisorChange.bind(this)}
-                            style={{ width: 240 }}>
-                            {this.props.jianliOptions}
-                        </Select>
+                        {
+                            getFieldDecorator('supervisor', {
+                                rules: [{ required: true, message: '请选择' }],
+                                initialValue: ''
+                            })(
+                                <Select
+                                    allowClear showSearch
+                                    filterOption={
+                                        (input, option) => {
+                                            return option.props.children[0]
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0;
+                                        }
+                                    }
+                                    style={{ width: 240 }}>
+                                    {this.props.jianliOptions}
+                                </Select>
+                            )
+                        }
                     </Form.Item>
                     <Form.Item label='审核业主'>
-                        <Select
-                            allowClear showSearch
-                            filterOption={
-                                (input, option) => {
-                                    return option.props.children[0]
-                                    .toLowerCase()
-                                    .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
-                                    .toLowerCase()
-                                    .indexOf(input.toLowerCase()) >= 0;
-                                }
-                            }
-                            defaultValue=''
-                            onChange={this.handleOwnerChange.bind(this)}
-                            style={{ width: 240 }}>
-                            {this.props.yezhuOptions}
-                        </Select>
+                        {
+                            getFieldDecorator('owner', {
+                                rules: [{ required: true, message: '请选择' }],
+                                initialValue: ''
+                            })(
+                                <Select
+                                    allowClear showSearch
+                                    filterOption={
+                                        (input, option) => {
+                                            return option.props.children[0]
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0;
+                                        }
+                                    }
+                                    style={{ width: 240 }}>
+                                    {this.props.yezhuOptions}
+                                </Select>
+                            )
+                        }
                     </Form.Item>
-                    <TextArea rows={6} onChange={this.handleOpinionChange.bind(this)} />
+                    <TextArea
+                        rows={6}
+                        maxLength={200}
+                        allowClear
+                        onChange={this.handleOpinionChange.bind(this)} />
                     <Upload {...props}>
                         <Button>
                             <Icon type='upload' /> 上传附件

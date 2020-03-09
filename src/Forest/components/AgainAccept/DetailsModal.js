@@ -19,8 +19,7 @@ import {
     Notification
 } from 'antd';
 import {
-    getYsTypeByID,
-    getStatusByID
+    getYsTypeByID
 } from './auth';
 const { TextArea } = Input;
 const { Option } = Select;

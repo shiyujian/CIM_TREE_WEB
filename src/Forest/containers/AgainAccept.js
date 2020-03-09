@@ -265,7 +265,7 @@ export default class AgainAccept extends Component {
         let user = getUser();
         let section = user.section;
         let permission = getUserIsManager();
-        console.log('当前用户标段', section, sectionsData);
+        console.log('当前用户标段', permission, section, sectionsData);
         if (permission) {
             // 是admin或者业主
             this.setSectionOption(sectionsData);
@@ -290,13 +290,7 @@ export default class AgainAccept extends Component {
                         </Option>
                     );
                 });
-                rst.children.map(item => {
-                    item.children.map(row => {
-                        row.name = row.No.substr(-7, 7);
-                    });
-                });
                 this.setState({
-                    smallClassList: rst.children,
                     sectionoption: sectionOptions
                 });
             } else {

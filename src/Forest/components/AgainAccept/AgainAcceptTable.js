@@ -18,7 +18,6 @@ import {
     DOCEXPORT_API
 } from '_platform/api';
 import moment from 'moment';
-import DrawAreaAcceptModal from './DrawAreaAcceptModal';
 import AgainCheckModal from './AgainCheckModal';
 import DetailsModal from './DetailsModal';
 import CheckModal from './CheckModal';
@@ -47,7 +46,7 @@ export default class AgainAcceptTable extends Component {
             curingTreeData: [], // 表格信息
             pagination: {},
             loading: false,
-            size: 11,
+            size: 10,
             exportsize: 100,
             stime1: '',
             etime1: '',
@@ -111,10 +110,10 @@ export default class AgainAcceptTable extends Component {
                 title: '验收类型数量',
                 dataIndex: 'ystypeNum'
             },
-            {
-                title: '树种',
-                dataIndex: 'TreeType'
-            },
+            // {
+            //     title: '树种',
+            //     dataIndex: 'TreeType'
+            // },
             {
                 title: '状态',
                 dataIndex: 'status'
@@ -195,9 +194,9 @@ export default class AgainAcceptTable extends Component {
         } = this.props;
         let unitMessage = await getUnitMessageBySection();
         // 获取监理和业主
-        this.getOwnerInfo();
+        await this.getOwnerInfo();
         // 获取所有重新验收记录
-        this.query(1);
+        await this.query(1);
         this.setState({
             unitMessage
         });
@@ -286,6 +285,7 @@ export default class AgainAcceptTable extends Component {
             section = user.section;
         }
         const {
+            sectionSelect,
             actions: {
                 getUsers,
                 getRoles
@@ -356,7 +356,9 @@ export default class AgainAcceptTable extends Component {
                 </Option>);
             });
         }
+        sectionSelect(section);
         this.setState({
+            section,
             shigongOptions,
             jianliOptions,
             yezhuOptions
@@ -402,13 +404,14 @@ export default class AgainAcceptTable extends Component {
                 let CheckTypeArr = [];
                 let ThinClassArr = [];
                 console.log('参数', param.checkItem);
+                let sectionArr = param.section.split('-');
                 param.checkItem.map(item => {
                     if (!CheckTypeIDArr.includes(item.CheckType)) {
                         CheckTypeIDArr.push(item.CheckType);
                     }
                     // 所有细班验收项
                     item.ThinClass.map(row => {
-                        let newRow = `${param.section}-${row}`;
+                        let newRow = `${sectionArr[0]}-${sectionArr[1]}-${row}`;
                         ThinClassArr.push(newRow);
                         Details.push({
                             CheckType: parseInt(item.CheckType),
@@ -418,6 +421,7 @@ export default class AgainAcceptTable extends Component {
                         });
                     });
                 });
+                console.log('数组', CheckTypeIDArr);
                 // 得到验收类型数组
                 CheckTypeIDArr.map(item => {
                     CheckTypeArr.push(getYsTypeByID(parseInt(item)));
@@ -528,6 +532,13 @@ export default class AgainAcceptTable extends Component {
         const {
             section
         } = this.state;
+        console.log('细班选择', value);
+        if (!value) {
+            this.setState({
+                thinclass: ''
+            });
+            return;
+        }
         let array = value.split('-');
         let array1 = [];
         let treetypeoption = [];
@@ -885,7 +896,7 @@ export default class AgainAcceptTable extends Component {
                         {ystypeoption}
                     </Select>
                 </div>
-                <div className='forest-mrg10' >
+                {/* <div className='forest-mrg10' >
                     <span className='forest-search-span' > 树种： </span>
                     <Select allowClear showSearch
                         filterOption={
@@ -900,7 +911,7 @@ export default class AgainAcceptTable extends Component {
                         onChange={this.onTreeTypeChange.bind(this)} >
                         {treetypeoption}
                     </Select>
-                </div>
+                </div> */}
                 <div className='forest-mrg10' >
                     <span className='forest-search-span' > 状态： </span>
                     <Select allowClear className='forest-forestcalcw4'
@@ -938,9 +949,9 @@ export default class AgainAcceptTable extends Component {
                 </Col>
                 <Col span={2}>
                     {
-                        user.ID === 11 ? '' : <Button type='primary' onClick={this.onAgainCheck.bind(this)} >
+                        user.roles.ID === 10 ? <Button type='primary' onClick={this.onAgainCheck.bind(this)} >
                             重新验收
-                        </Button>
+                        </Button> : ''
                     }
                 </Col>
                 <Col span={1} />
@@ -971,7 +982,7 @@ export default class AgainAcceptTable extends Component {
                             spinning: this.state.loading
                         }
                     }
-                    locale={{emptyText: '暂无验收消息'}}
+                    locale={{emptyText: '暂无验收数据'}}
                     dataSource={details}
                     onChange={this.handleTableChange.bind(this)}
                     pagination={this.state.pagination}
