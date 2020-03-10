@@ -1,2 +1,2 @@
 export FactsSurveyTable from './FactsSurveyTable';
-export ThinClassTree from './ThinClassTree';
+export PkCodeTree from './PkCodeTree';

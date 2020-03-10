@@ -2,11 +2,13 @@ import React, { Component } from 'react';
 import {
     Button,
     Notification,
-    Spin
+    Spin,
+    Tree
 } from 'antd';
 import XLSX from 'xlsx';
 import L from 'leaflet';
 import 'leaflet-editable';
+import Scrollbar from 'smooth-scrollbar';
 import { getUser } from '_platform/auth';
 import {
     FOREST_GIS_API,
@@ -24,12 +26,15 @@ import {
     computeSignedArea,
     handlePolygonLatLngs,
     handlePolylineLatLngs,
-    getHandleWktData
+    getHandleWktData,
+    handlePOLYGONWktData
 } from '_platform/gisAuth';
 import './FactsSurveyTable.less';
 import decoration from './FactsSurveyImg/decoration.png';
 import hide from './FactsSurveyImg/hide2.png';
 import display from './FactsSurveyImg/display2.png';
+
+const TreeNode = Tree.TreeNode;
 
 export default class FactsSurveyTable extends Component {
     constructor (props) {
@@ -42,7 +47,11 @@ export default class FactsSurveyTable extends Component {
             loading: false,
             permission: false,
             menuIsExtend: true /* 菜单是否展开 */,
-            menuWidth: 665 /* 菜单宽度 */
+            menuWidth: 665, /* 菜单宽度 */
+            pointsData: [],
+            linesData: [],
+            polygonsData: [],
+            layerList: {}
         };
         this.tileTreeLayerBasic = null;
         this.tileLayerTreeFilter = null;
@@ -96,6 +105,10 @@ export default class FactsSurveyTable extends Component {
                 // 初始化地图
                 this.initMap();
             });
+        }
+        if (document.querySelector('#FactsSurveyAsideDom')) {
+            let FactsSurveyAsideDom = Scrollbar.init(document.querySelector('#FactsSurveyAsideDom'));
+            console.log('FactsSurveyAsideDom', FactsSurveyAsideDom);
         }
     }
     componentDidUpdate = async (prevProps, prevState) => {
@@ -318,8 +331,15 @@ export default class FactsSurveyTable extends Component {
             let postData = {
                 land: eventKey
             };
-            let pointsData = await getInvestigationPoints({}, postData);
-            console.log('pointsData', pointsData);
+            let pointsData = [];
+            let data = await getInvestigationPoints({}, postData);
+            console.log('data', data);
+            if (data && data.content && data.content instanceof Array) {
+                pointsData = data.content;
+            }
+            this.setState({
+                pointsData
+            });
         } catch (e) {
             console.log('handleGetInvestigationPoints', e);
         }
@@ -335,8 +355,15 @@ export default class FactsSurveyTable extends Component {
             let postData = {
                 land: eventKey
             };
-            let linesData = await getInvestigationLines({}, postData);
-            console.log('linesData', linesData);
+            let linesData = [];
+            let data = await getInvestigationLines({}, postData);
+            console.log('data', data);
+            if (data && data.content && data.content instanceof Array) {
+                linesData = data.content;
+            }
+            this.setState({
+                linesData
+            });
         } catch (e) {
             console.log('handleGetInvestigationLines', e);
         }
@@ -352,8 +379,15 @@ export default class FactsSurveyTable extends Component {
             let postData = {
                 land: eventKey
             };
-            let polygonsData = await getInvestigationPolygons({}, postData);
-            console.log('polygonsData', polygonsData);
+            let polygonsData = [];
+            let data = await getInvestigationPolygons({}, postData);
+            console.log('data', data);
+            if (data && data.content && data.content instanceof Array) {
+                polygonsData = data.content;
+            }
+            this.setState({
+                polygonsData
+            });
         } catch (e) {
             console.log('handleGetInvestigationPolygons', e);
         }
@@ -412,6 +446,14 @@ export default class FactsSurveyTable extends Component {
                     fillOpacity: 0.3
                 }).addTo(this.map);
                 return polygon;
+            } else if (geo.properties.type === 'line') {
+                // 创建区域图形
+                let polyline = L.polyline(geo.geometry.coordinates, {
+                    color: '#201ffd',
+                    fillColor: fillAreaColor(geo.key),
+                    fillOpacity: 0.3
+                }).addTo(this.map);
+                return polyline;
             }
         } catch (e) {
             console.log('e', e);
@@ -489,176 +531,6 @@ export default class FactsSurveyTable extends Component {
         await document.body.removeChild(link);
     };
 
-    handleExportPipeCoordinateOk = async () => {
-        const {
-            actions: {
-                postPipeCoordinate
-            }
-        } = this.props;
-        const {
-            section,
-            isSuperAdmin
-        } = this.state;
-        if (this.editPolygon && section) {
-            this.setState({
-                loading: true
-            });
-            let coordinates = handlePolygonLatLngs(this.editPolygon);
-            console.log('coordinates', coordinates);
-            let wkt = 'POLYGON(';
-            // 获取手动框选坐标wkt
-            wkt = wkt + getHandleWktData(coordinates);
-            wkt = wkt + ')';
-            console.log('wkt', wkt);
-            let postData = {
-                Sql: ` and  Section = "${section}"`,
-                Bbox: wkt
-            };
-            let data = await postPipeCoordinate({}, postData);
-            console.log('data', data);
-            if (data && data.Pipes && data.PipeNodes) {
-                let pipeNodes = data.PipeNodes;
-                let pipes = data.Pipes;
-                let PipeNodesName = [`管点`];
-                let PipeNodesNameData = PipeNodesName.map((data, i) =>
-                    Object.assign(
-                        {},
-                        {
-                            v: data, position: String.fromCharCode(65 + i) + 1
-                        })).reduce((prev, next) =>
-                    Object.assign(
-                        {}, prev, {
-                            [next.position]: { v: next.v }
-                        }), {});
-                let _pipeNodesHeader = ['名称', '类型', '创建时间', '标段', '坐标'];
-                let pipeNodesHeader = _pipeNodesHeader.map((data, i) =>
-                    Object.assign(
-                        {},
-                        {
-                            v: data, position: String.fromCharCode(65 + i) + 2
-                        })).reduce((prev, next) =>
-                    Object.assign(
-                        {}, prev, {
-                            [next.position]: { v: next.v }
-                        }), {});
-                let pipeNodesData = [];
-                let pipeNodesTableData = [];
-                if (pipeNodes instanceof Array && pipeNodes.length > 0) {
-                    pipeNodes.map(item => {
-                        let obj = {};
-                        obj['名称'] = item.Name;
-                        obj['类型'] = item.PipeType;
-                        obj['创建时间'] = item.CreateTime;
-                        obj['标段'] = item.Section;
-                        obj['坐标'] = item.Geom;
-                        pipeNodesData.push(obj);
-                    });
-                    pipeNodesTableData = pipeNodesData.map((data, i) =>
-                        _pipeNodesHeader.map((k, j) =>
-                            Object.assign(
-                                {},
-                                {
-                                    v: data[k],
-                                    position: String.fromCharCode(65 + j) + (i + 3)
-                                }))).reduce((prev, next) =>
-                        prev.concat(next)).reduce((prev, next) =>
-                        Object.assign(
-                            {}, prev, {
-                                [next.position]: { v: next.v }
-                            }),
-                    {});
-                }
-
-                let length = pipeNodes.length;
-                let pipesName = [`管线`];
-                let pipesNameData = pipesName.map((data, i) =>
-                    Object.assign(
-                        {},
-                        {
-                            v: data, position: String.fromCharCode(65 + i) + (length + 5)
-                        })).reduce((prev, next) =>
-                    Object.assign(
-                        {}, prev, {
-                            [next.position]: { v: next.v }
-                        }), {});
-                let _pipesHeader = ['材质', '创建时间', '长度', '标段', '坐标'];
-                let pipesHeader = _pipesHeader.map((data, i) =>
-                    Object.assign(
-                        {},
-                        {
-                            v: data, position: String.fromCharCode(65 + i) + (length + 6)
-                        })).reduce((prev, next) =>
-                    Object.assign(
-                        {}, prev, {
-                            [next.position]: { v: next.v }
-                        }), {});
-                let pipesData = [];
-                let pipesTableData = [];
-                if (pipes instanceof Array && pipes.length > 0) {
-                    pipes.map(item => {
-                        let obj = {};
-                        obj['材质'] = item.Material;
-                        obj['创建时间'] = item.CreateTime;
-                        obj['长度'] = item.Length;
-                        obj['标段'] = item.Section;
-                        obj['坐标'] = item.Geom;
-                        pipesData.push(obj);
-                    });
-                    pipesTableData = pipesData.map((data, i) =>
-                        _pipesHeader.map((k, j) =>
-                            Object.assign(
-                                {},
-                                {
-                                    v: data[k],
-                                    position: String.fromCharCode(65 + j) + (i + length + 7)
-                                }))).reduce((prev, next) =>
-                        prev.concat(next)).reduce((prev, next) =>
-                        Object.assign(
-                            {}, prev, {
-                                [next.position]: { v: next.v }
-                            }),
-                    {});
-                }
-
-                let output = Object.assign(
-                    {},
-                    PipeNodesNameData,
-                    pipeNodesHeader,
-                    pipeNodesTableData,
-                    pipesNameData,
-                    pipesHeader,
-                    pipesTableData
-                );
-                // 获取所有单元格的位置
-                let outputPos = Object.keys(output);
-                // 计算出范围
-                let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
-                // 构建 workbook 对象
-                let wb = {
-                    SheetNames: ['mySheet'],
-                    Sheets: {
-                        'mySheet': Object.assign({}, output, { '!ref': ref })
-                    }
-                };
-                XLSX.writeFile(wb, `灌溉坐标表.xlsx`);
-                this.setState({
-                    loading: false
-                });
-            } else {
-                Notification.error({
-                    message: '获取数据为空，请重新框选范围'
-                });
-                this.setState({
-                    loading: false
-                });
-            }
-        } else {
-            Notification.error({
-                message: '当前用户未关联标段，请重新切换用户'
-            });
-        }
-    }
-
     handleCreateTaskCancel = async () => {
         if (this.editPolygon) {
             this.map.removeLayer(this.editPolygon);
@@ -669,9 +541,123 @@ export default class FactsSurveyTable extends Component {
             createBtnVisible: false
         });
     }
+    // 树节点选中
+    handleTreeCheck = async (checkedKeys, e) => {
+        console.log('onCheck', checkedKeys);
+        console.log('e', e);
+        let checked = e.checked;
+        let node = e && e.node && e.node.props;
+        console.log('node', node);
+        if (checked) {
+            if (node && node.children && node.children instanceof Array && node.children.length > 0) {
+                let children = node.children;
+                for (let i = 0; i < children.length; i++) {
+                    let child = children[i];
+                    let focus = false;
+                    if (i === children.length - 1) {
+                        focus = true;
+                    }
+                    this.handleDrawMapData((child && child.props), focus);
+                }
+            } else {
+                this.handleDrawMapData(node, true);
+            }
+        } else {
+            if (node && node.children && node.children instanceof Array && node.children.length > 0) {
+                let children = node.children;
+                for (let i = 0; i < children.length; i++) {
+                    let child = children[i];
+                    this.handleRemoveMapData((child && child.props));
+                }
+            } else {
+                this.handleRemoveMapData(node);
+            }
+        }
+        this.setState({ checkedKeys });
+    }
+    // 在地图上进行标注
+    handleDrawMapData = async (node, focus) => {
+        const {
+            layerList = {}
+        } = this.state;
+        let geom = (node && node.Geom) || '';
+        if (geom.indexOf('POINT') !== -1) {
+            let str = handlePOLYGONWktData(geom);
+            let data = str.split(' ');
+            if (data && data instanceof Array && data.length > 0) {
+                let coordinates = [];
+                if (data && data instanceof Array && data.length === 2) {
+                    coordinates.push(data[1], data[0]);
+                    let marker = L.marker(coordinates, {});
+                    marker.addTo(this.map);
+                    layerList[node.ID] = marker;
+                    if (focus) {
+                        this.map.panTo(coordinates);
+                    }
+                }
+            }
+        } else if (geom.indexOf('LINESTRING') !== -1) {
+            let str = handlePOLYGONWktData(geom);
+            let coordinates = handleCoordinates(str);
+            let message = {
+                key: 3,
+                type: 'Feature',
+                properties: {name: '', type: 'line'},
+                geometry: { type: 'PolyLine', coordinates: coordinates }
+            };
+            let layer = this._createMarker(message);
+            layerList[node.ID] = layer;
+            if (focus) {
+                this.map.fitBounds(layer.getBounds());
+            }
+        } else if (geom.indexOf('POLYGON') !== -1) {
+            let str = handlePOLYGONWktData(geom);
+            let coordinates = handleCoordinates(str);
+            let message = {
+                key: 3,
+                type: 'Feature',
+                properties: {name: '', type: 'area'},
+                geometry: { type: 'Polygon', coordinates: coordinates }
+            };
+            let layer = this._createMarker(message);
+            layerList[node.ID] = layer;
+            if (focus) {
+                this.map.fitBounds(layer.getBounds());
+            }
+        }
+        this.setState({
+            layerList
+        });
+    }
+    // 取消地图标注
+    handleRemoveMapData = async (node) => {
+        const {
+            layerList
+        } = this.state;
+        if (layerList[node.ID]) {
+            this.map.removeLayer(layerList[node.ID]);
+        }
+    }
     /* 菜单展开收起 */
     _extendAndFold = () => {
         this.setState({ menuIsExtend: !this.state.menuIsExtend });
+    }
+    // 树数据处理
+    renderTreeNodes = (data) => {
+        if (data) {
+            return (
+                <TreeNode
+                    title={data.title || data.Title}
+                    key={data.Key || data.ID}
+                    {...data}
+                >
+                    {data.children &&
+                        data.children.map(m => {
+                            return this.renderTreeNodes(m);
+                        })}
+                </TreeNode>
+            );
+        }
     }
     render () {
         const {
@@ -681,8 +667,28 @@ export default class FactsSurveyTable extends Component {
             section,
             permission,
             menuIsExtend,
-            menuWidth
+            menuWidth,
+            pointsData = [],
+            linesData = [],
+            polygonsData = []
         } = this.state;
+        let treeData = [
+            {
+                title: '点数据',
+                key: '点数据',
+                children: pointsData
+            },
+            {
+                title: '线数据',
+                key: '线数据',
+                children: linesData
+            },
+            {
+                title: '面数据',
+                key: '面数据',
+                children: polygonsData
+            }
+        ];
         return (
             <div style={{height: '100%', width: '100%'}}>
                 <div className='FactsSurveyTable-container'>
@@ -728,7 +734,7 @@ export default class FactsSurveyTable extends Component {
                                 }
                             >
                                 <div className='FactsSurveyTable-menuBackground' />
-                                <aside className='FactsSurveyTable-aside' id='ConservationAsideDom'>
+                                <aside className='FactsSurveyTable-aside' id='FactsSurveyAsideDom'>
                                     <div className='FactsSurveyTable-MenuNameLayout'>
                                         <img src={decoration} />
                                         <span className='FactsSurveyTable-MenuName'>现状数据</span>
@@ -739,7 +745,19 @@ export default class FactsSurveyTable extends Component {
                                     <div className='FactsSurveyTable-asideTree'>
                                         <Spin spinning={loading}>
                                             <div className='FactsSurveyTable-StatusButton'>
-                                                测试
+                                                <Tree
+                                                    onCheck={this.handleTreeCheck.bind(this)}
+                                                    selectable={false}
+                                                    checkable>
+                                                    {
+                                                        treeData.map(data => {
+                                                            return this.renderTreeNodes(data);
+                                                        })
+                                                    }
+                                                </Tree>
+                                                {/* <div>
+                                                    导出
+                                                </div> */}
                                             </div>
                                         </Spin>
                                     </div>
@@ -768,12 +786,6 @@ export default class FactsSurveyTable extends Component {
                                         onClick={this.handleExportPipeDrawingOk.bind(this)}>
                                                 竣工图
                                     </Button>
-                                    {/* <Button
-                                        disabled={loading}
-                                        style={{marginRight: 10}}
-                                        onClick={this.handleExportPipeCoordinateOk.bind(this)}>
-                                                坐标表格
-                                    </Button> */}
                                     <Button
                                         disabled={loading}
                                         type='danger'

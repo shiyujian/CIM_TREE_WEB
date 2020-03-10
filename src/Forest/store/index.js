@@ -493,13 +493,13 @@ export const getTransplantTransMess = forestFetchAction(`${TREE_API}/treetranspl
  * 现状调查
  */
 // 获取调查类型列表
-export const getInvestigationTypes = forestFetchAction(`${TREEPIPE_API}/investigation/investigationtypes`, []);
+export const getInvestigationTypes = createFetchAction(`${TREEPIPE_API}/investigation/investigationtypes`, [], 'GET', []);
 // 现状调查查询（点要素）
-export const getInvestigationPoints = forestFetchAction(`${TREEPIPE_API}/investigation/investigationpoints`, []);
+export const getInvestigationPoints = createFetchAction(`${TREEPIPE_API}/investigation/investigationpoints`, [], 'GET', []);
 // 现状调查查询（线要素）
-export const getInvestigationLines = forestFetchAction(`${TREEPIPE_API}/investigation/investigationlines`, []);
+export const getInvestigationLines = createFetchAction(`${TREEPIPE_API}/investigation/investigationlines`, [], 'GET', []);
 // 现状调查查询（面要素）
-export const getInvestigationPolygons = forestFetchAction(`${TREEPIPE_API}/investigation/investigationpolygons`, []);
+export const getInvestigationPolygons = createFetchAction(`${TREEPIPE_API}/investigation/investigationpolygons`, [], 'GET', []);
 export const actions = {
     exportEcporttreestatuss,
     getTotalSat,
