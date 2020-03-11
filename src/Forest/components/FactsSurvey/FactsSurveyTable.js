@@ -51,7 +51,8 @@ export default class FactsSurveyTable extends Component {
             pointsData: [],
             linesData: [],
             polygonsData: [],
-            layerList: {}
+            layerList: {},
+            investigationLoading: false
         };
         this.tileTreeLayerBasic = null;
         this.tileLayerTreeFilter = null;
@@ -121,10 +122,10 @@ export default class FactsSurveyTable extends Component {
         } = this.state;
         if (leftkeycode && leftkeycode !== prevProps.leftkeycode) {
             if (isSuperAdmin || section) {
-                this.handleGetInvestigationTypes(leftkeycode);
-                this.handleGetInvestigationPoints(leftkeycode);
-                this.handleGetInvestigationLines(leftkeycode);
-                this.handleGetInvestigationPolygons(leftkeycode);
+                await this.handleGetInvestigationTypes(leftkeycode);
+                await this.handleGetInvestigationPoints(leftkeycode);
+                await this.handleGetInvestigationLines(leftkeycode);
+                await this.handleGetInvestigationPolygons(leftkeycode);
             }
         }
     }
@@ -314,6 +315,9 @@ export default class FactsSurveyTable extends Component {
             }
         } = this.props;
         try {
+            this.setState({
+                investigationLoading: true
+            });
             let investigationTypes = await getInvestigationTypes();
             console.log('investigationTypes', investigationTypes);
         } catch (e) {
@@ -386,7 +390,8 @@ export default class FactsSurveyTable extends Component {
                 polygonsData = data.content;
             }
             this.setState({
-                polygonsData
+                polygonsData,
+                investigationLoading: false
             });
         } catch (e) {
             console.log('handleGetInvestigationPolygons', e);
@@ -664,6 +669,7 @@ export default class FactsSurveyTable extends Component {
             createBtnVisible,
             isSuperAdmin,
             loading,
+            investigationLoading,
             section,
             permission,
             menuIsExtend,
@@ -743,7 +749,7 @@ export default class FactsSurveyTable extends Component {
                                             className='FactsSurveyTable-MenuHideButton' />
                                     </div>
                                     <div className='FactsSurveyTable-asideTree'>
-                                        <Spin spinning={loading}>
+                                        <Spin spinning={investigationLoading}>
                                             <div className='FactsSurveyTable-StatusButton'>
                                                 <Tree
                                                     onCheck={this.handleTreeCheck.bind(this)}

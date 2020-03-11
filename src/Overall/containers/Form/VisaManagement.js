@@ -113,7 +113,7 @@ export default class VisaManagement extends Component {
         };
         let postCostdata = {
             role: postCostID,
-            section: userInfo.section || '',
+            // section: userInfo.section || '',
             status: 1,
             page: '',
             size: ''
