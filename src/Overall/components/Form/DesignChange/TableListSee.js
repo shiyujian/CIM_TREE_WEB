@@ -179,7 +179,8 @@ class TableList extends Component {
     render () {
         const {
             dataList,
-            spinning
+            spinning,
+            DetailsModalVisible
         } = this.state;
         return <div>
             <Query
@@ -195,14 +196,16 @@ class TableList extends Component {
                     rowKey='ID'
                 />
             </Spin>
-            <Details
-                {...this.props}
-                {...this.state}
-                detailRow={this.state.detailRow}
-                DetailsModalVisible={this.state.DetailsModalVisible}
-                DetailsReturn={this.DetailsReturn.bind(this)}
-                reloadList={this.reloadList.bind(this)}
-            />
+            {
+                DetailsModalVisible
+                    ? <Details
+                        {...this.props}
+                        {...this.state}
+                        DetailsReturn={this.DetailsReturn.bind(this)}
+                        reloadList={this.reloadList.bind(this)}
+                    /> : ''
+            }
+
         </div>;
     }
 
