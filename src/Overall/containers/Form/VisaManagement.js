@@ -113,7 +113,7 @@ export default class VisaManagement extends Component {
         };
         let postCostdata = {
             role: postCostID,
-            // section: userInfo.section || '',
+            section: userInfo.section || '',
             status: 1,
             page: '',
             size: ''
@@ -132,9 +132,13 @@ export default class VisaManagement extends Component {
         let OwnerData = await getUsers({}, postOwnerdata);
         let activeKey = 'initiate';
         let allowKeyArr = ['initiate', 'commission', 'finished'];
-        if (userInfo.roles && userInfo.roles.RoleName === '施工文书') {
+        console.log(userInfo, '用户信息');
+        if (userInfo.roles && userInfo.roles.ID === 10) {
             activeKey = 'initiate';
             allowKeyArr = ['initiate'];
+        } else if (userInfo.username === 'admin') {
+            activeKey = 'initiate';
+            allowKeyArr = ['initiate', 'commission', 'finished'];
         } else {
             activeKey = 'commission';
             allowKeyArr = ['commission', 'finished'];
@@ -290,6 +294,7 @@ export default class VisaManagement extends Component {
                 sectionList = item.children;
             }
         });
+        console.log('sectionList', sectionList);
         this.setState({
             leftkeycode: keycode,
             sectionList

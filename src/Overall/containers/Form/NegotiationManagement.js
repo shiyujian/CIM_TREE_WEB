@@ -121,9 +121,12 @@ class NegotiationManagement extends Component {
         let OwnerData = await getUsers({}, postOwnerdata);
         let activeKey = 'initiate';
         let allowKeyArr = ['initiate', 'commission', 'finished'];
-        if (userInfo.roles && userInfo.roles.RoleName === '施工文书') {
+        if (userInfo.roles && userInfo.roles.ID === 10) {
             activeKey = 'initiate';
             allowKeyArr = ['initiate'];
+        } else if (userInfo.username === 'admin') {
+            activeKey = 'initiate';
+            allowKeyArr = ['initiate', 'commission', 'finished'];
         } else {
             activeKey = 'commission';
             allowKeyArr = ['commission', 'finished'];

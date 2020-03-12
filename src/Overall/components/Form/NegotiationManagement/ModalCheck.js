@@ -375,6 +375,7 @@ class ModalCheck extends Component {
                     okButtonProps={{disabled: true}}
                     title='工程洽商记录'
                     maskClosable={false}
+                    footer={null}
                     visible={this.props.showModal}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
@@ -505,7 +506,7 @@ class ModalCheck extends Component {
                     </Tabs>
                     <Form style={{marginTop: 10}}>
                         {
-                            getUser().duty === '业主文书' ? '' : <Row style={{marginTop: 10}}>
+                            getUser().roles.ID === 13 ? '' : <Row style={{marginTop: 10}}>
                                 <FormItem
                                     {...formItemLayout}
                                     label='选择业主'
@@ -518,6 +519,14 @@ class ModalCheck extends Component {
                                         })(
                                             <Select
                                                 style={{ width: '100%' }}
+                                                showSearch
+                                                filterOption={
+                                                    (input, option) => {
+                                                        return option.props.children
+                                                        .toLowerCase()
+                                                        .indexOf(input.toLowerCase()) >= 0;
+                                                    }
+                                                }
                                                 maxTagCount={4}
                                                 dropdownStyle={{height: 100}}
                                                 dropdownMenuStyle={{height: 100}}
