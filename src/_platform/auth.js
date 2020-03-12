@@ -200,9 +200,16 @@ export const getAreaTreeData = async (getTreeNodeList, getThinClassList) => {
         permission = true;
     }
     let userRoles = user.roles || '';
-    if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('业主') !== -1) {
-        permission = true;
+    if (userRoles && userRoles.RoleName) {
+        if (userRoles.RoleName.indexOf('业主') !== -1) {
+            permission = true;
+        } else if (userRoles.RoleName.indexOf('项目技术负责人') !== -1) {
+            permission = true;
+        } else if (userRoles.RoleName.indexOf('项目经理') !== -1) {
+            permission = true;
+        }
     }
+
     if (rst instanceof Array && rst.length > 0) {
         rst.map(node => {
             if (permission) {

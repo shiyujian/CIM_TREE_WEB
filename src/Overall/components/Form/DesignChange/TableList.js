@@ -1,36 +1,15 @@
 import React, { Component } from 'react';
 import {
-    Tabs,
-    Modal,
-    Row,
-    Col,
     Table,
-    Button,
-    Popconfirm,
-    Input,
-    Progress,
-    Select,
     Form,
-    message,
-    InputNumber,
-    Notification,
-    DatePicker,
-    Spin 
+    Spin
 } from 'antd';
-import {getFieldValue} from '../../../../_platform/store/util';
-import { getUserIsManager, getUser } from '_platform/auth';
+import { getUser } from '_platform/auth';
 import {
     WFStatusList
 } from '_platform/api';
 import Query from './Query';
 import Details from './Details';
-import moment from 'moment'; 
-const { TextArea } = Input;
-const { Option } = Select;
-const FormItem = Form.Item;
-const { TabPane } = Tabs;
-const { RangePicker } = DatePicker;
-const dateTimeFormat = 'YYYY-MM-DD HH:mm:ss';
 class TableList extends Component {
     static layout = {
         labelCol: {span: 8},
@@ -58,170 +37,12 @@ class TableList extends Component {
             weekPlanDataSource: [], //
             user: '',
             page: 1,
-            dataList:[], //表单数据
+            dataList: [], // 表单数据
             spinning: true,
-            DetailsModalVisible:false, 
-            detailRow:{},
+            DetailsModalVisible: false,
+            detailRow: {}
         };
     }
-    async componentDidMount () {
-        this.getFlowList(); // 获取流程
-    }
-
-    getFlowList () {
-        const { getFlowList } = this.props.actions;
-        getFlowList({}, {
-            name: '', // 流程名称
-            status: 1, // 流程状态
-            page: '',
-            size: ''
-        }).then(rep => {
-            if (rep.code === 1) {
-                let flowID = '';
-                let flowName = '';
-                rep.content.map(item => {
-                    if (item.Name === '设计变更流程') {
-                        flowID = item.ID;
-                        flowName = item.Name;
-                    }
-                });
-                this.setState({
-                    flowID,
-                    flowName
-                }, () => {
-                    this.getWorkList(); // 获取任务列表
-                });
-            }
-        });
-    }
-    getWorkList (values = {}) {
-        let {
-            actions: { getWorkList }
-        } = this.props;
-        const { flowID, page } = this.state;
-        this.setState({
-            spinning: true
-        });
-        let StartTime = '', EndTime = '';
-        if (values.stime) {
-            StartTime = values.stime;
-        }
-        if (values.etime) {
-            EndTime = values.etime;
-        }
-        let keys = [], vals = [];
-        if (values.drawingno) {
-            keys.push("DrawingNo");
-            vals.push(values.drawingno);
-        }
-        // if (values.no) {
-        //     keys.push("No");
-        //     vals.push(values.no);
-        // }
-        let keysarr = "", valsarr = "";
-        if(keys.length>0){
-            for(let i=0;i<keys.length;i++){
-                if(i=0){
-                    keysarr = keys[i];
-                }else{
-                    keysarr = keysarr + '|' + keys[i];
-                }
-                
-            }
-        }
-        if(vals.length>0){
-            for(let j=0;j<vals.length;j++){
-                if(j=0){
-                    valsarr = vals[j];
-                }else{
-                    valsarr = valsarr + '|' + vals[j];
-                }
-                
-            }
-        }
-        let param = {
-            workid: '', // 任务ID
-            title: values.name || '', // 任务名称
-            flowid: flowID, // 流程类型或名称
-            starter: values.starter || '', // 发起人
-            currentnode: '', // 节点ID
-            prevnode: '', // 上一结点ID
-            executor: getUser().ID, // 执行人
-            sender: '', // 上一节点发送人
-            wfstate: '0,1', // 待办 0,1
-            stime: StartTime, // 开始时间
-            etime: EndTime, // 结束时间
-            workno: values.no || '', //表单编号
-            keys: keys || '', // 查询键
-            values: vals || '', // 查询值
-            page: page, // 页码
-            size: '10' // 页数
-        };
-        getWorkList({}, param).then(rep => {
-            if (rep && rep.code === 200 && rep.content) {
-                this.setState({
-                    dataList: rep.content,
-                    spinning: false
-                });
-            }
-        });
-    }
-    reloadList(){    //刷新表单
-        this.getFlowList();
-    }
-
-    onDetails(record){
-        this.setState({
-            detailRow:record,
-            DetailsModalVisible:true,
-        })
-    }
-
-    onCheck(record){
-        this.setState({
-            detailRow:record,
-            DetailsModalVisible:true,
-        })
-    }
-
-    DetailsReturn(){  //返回表单页面
-        this.setState({
-            detailRow:{},
-            DetailsModalVisible:false,
-        })
-    }
- 
-    render () {
-        const { getFieldDecorator } = this.props.form;
-        const {
-            dataList,
-            spinning
-        } = this.state;
-        return <div>
-                <Query
-                    {...this.props} 
-                    {...this.state}
-                    reloadList = {this.reloadList.bind(this)}
-                    query = {this.getWorkList.bind(this)}
-                />
-                <Spin spinning={spinning}>
-                    <Table
-                        columns={this.columns}
-                        dataSource={dataList}
-                        rowKey='ID'
-                    />
-                </Spin>
-                <Details 
-                    {...this.props}
-                    {...this.state}
-                    detailRow={this.state.detailRow}
-                    DetailsModalVisible={this.state.DetailsModalVisible}
-                    DetailsReturn={this.DetailsReturn.bind(this)}
-                    reloadList = {this.reloadList.bind(this)}
-                />
-        </div>;
-    }
-
     columns = [
         {
             title: '序号',
@@ -232,7 +53,7 @@ class TableList extends Component {
         },
         {
             title: '表单号',
-            dataIndex: 'WorkNo',
+            dataIndex: 'WorkNo'
         },
         // {
         //     title: '图号',
@@ -306,13 +127,13 @@ class TableList extends Component {
                     } else {
                         return `(${text[0].User_Name || ''})`;
                     }
-                } else if(text && text.length === 2) {
-                    if (text[0].Full_Name&&text[1].Full_Name) {
+                } else if (text && text.length === 2) {
+                    if (text[0].Full_Name && text[1].Full_Name) {
                         return `${text[0].Full_Name || ''}(${text[0].User_Name || ''})/${text[1].Full_Name || ''}(${text[1].User_Name || ''})`;
                     } else {
                         return `(${text[0].User_Name || ''})/(${text[1].User_Name || ''})`;
                     }
-                }else {
+                } else {
                     return '/';
                 }
             }
@@ -322,15 +143,169 @@ class TableList extends Component {
             dataIndex: 'active',
             render: (text, record, index) => {
                 return (<div>
-                    {this.props.tabs == "pending"?
-                        <span style={{color: '#1890ff', marginRight: 10, cursor: 'pointer'}} onClick={this.onCheck.bind(this, record)}>审核</span>
-                        :''
+                    {this.props.tabs === 'pending'
+                        ? <a onClick={this.onCheck.bind(this, record)}>审核</a>
+                        : ''
                     }
                 </div>);
             }
         }
     ];
+    async componentDidMount () {
+        this.getFlowList(); // 获取流程
+    }
 
+    getFlowList () {
+        const { getFlowList } = this.props.actions;
+        getFlowList({}, {
+            name: '', // 流程名称
+            status: 1, // 流程状态
+            page: '',
+            size: ''
+        }).then(rep => {
+            if (rep.code === 1) {
+                let flowID = '';
+                let flowName = '';
+                rep.content.map(item => {
+                    if (item.Name === '设计变更流程') {
+                        flowID = item.ID;
+                        flowName = item.Name;
+                    }
+                });
+                this.setState({
+                    flowID,
+                    flowName
+                }, () => {
+                    this.getWorkList(); // 获取任务列表
+                });
+            }
+        });
+    }
+    getWorkList (values = {}) {
+        let {
+            actions: { getWorkList }
+        } = this.props;
+        const { flowID, page } = this.state;
+        this.setState({
+            spinning: true
+        });
+        let StartTime = '', EndTime = '';
+        if (values.stime) {
+            StartTime = values.stime;
+        }
+        if (values.etime) {
+            EndTime = values.etime;
+        }
+        let keys = [], vals = [];
+        if (values.drawingno) {
+            keys.push('DrawingNo');
+            vals.push(values.drawingno);
+        }
+        // if (values.no) {
+        //     keys.push("No");
+        //     vals.push(values.no);
+        // }
+        let keysarr = '', valsarr = '';
+        if (keys.length > 0) {
+            for (let i = 0; i < keys.length; i++) {
+                if (i === 0) {
+                    keysarr = keys[i];
+                } else {
+                    keysarr = keysarr + '|' + keys[i];
+                }
+            }
+        }
+        if (vals.length > 0) {
+            for (let j = 0; j < vals.length; j++) {
+                if (j === 0) {
+                    valsarr = vals[j];
+                } else {
+                    valsarr = valsarr + '|' + vals[j];
+                }
+            }
+        }
+        let param = {
+            workid: '', // 任务ID
+            title: values.name || '', // 任务名称
+            flowid: flowID, // 流程类型或名称
+            starter: values.starter || '', // 发起人
+            currentnode: '', // 节点ID
+            prevnode: '', // 上一结点ID
+            executor: getUser().ID, // 执行人
+            sender: '', // 上一节点发送人
+            wfstate: '0,1', // 待办 0,1
+            stime: StartTime, // 开始时间
+            etime: EndTime, // 结束时间
+            workno: values.no || '', // 表单编号
+            keys: keys || '', // 查询键
+            values: vals || '', // 查询值
+            page: page, // 页码
+            size: '10' // 页数
+        };
+        getWorkList({}, param).then(rep => {
+            if (rep && rep.code === 200 && rep.content) {
+                this.setState({
+                    dataList: rep.content,
+                    spinning: false
+                });
+            }
+        });
+    }
+    reloadList () { // 刷新表单
+        this.getFlowList();
+    }
+
+    onDetails (record) {
+        this.setState({
+            detailRow: record,
+            DetailsModalVisible: true
+        });
+    }
+
+    onCheck (record) {
+        this.setState({
+            detailRow: record,
+            DetailsModalVisible: true
+        });
+    }
+
+    DetailsReturn () { // 返回表单页面
+        this.setState({
+            detailRow: {},
+            DetailsModalVisible: false
+        });
+    }
+
+    render () {
+        const {
+            dataList,
+            spinning,
+            DetailsModalVisible
+        } = this.state;
+        return <div>
+            <Query
+                {...this.props}
+                {...this.state}
+                reloadList={this.reloadList.bind(this)}
+                query={this.getWorkList.bind(this)}
+            />
+            <Spin spinning={spinning}>
+                <Table
+                    columns={this.columns}
+                    dataSource={dataList}
+                    rowKey='ID'
+                />
+            </Spin>
+            {
+                DetailsModalVisible
+                    ? <Details
+                        {...this.props}
+                        {...this.state}
+                        DetailsReturn={this.DetailsReturn.bind(this)}
+                        reloadList={this.reloadList.bind(this)}
+                    /> : ''
+            }
+        </div>;
+    }
 };
-TableList = Form.create()(TableList);
-export default TableList;
+export default Form.create()(TableList);

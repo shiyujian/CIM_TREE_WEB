@@ -4,33 +4,24 @@ import {
     Modal,
     Row,
     Col,
-    Table,
     Button,
-    Popconfirm,
     Input,
-    Progress,
     Select,
     Form,
-    message,
-    InputNumber,
     Notification,
-    DatePicker,
     Upload,
     Icon,
-    Checkbox,
-    Card 
+    Card
 } from 'antd';
-import {getFieldValue} from '../../../../_platform/store/util';
+import {getFieldValue} from '_platform/store/util';
 import { getUser } from '_platform/auth';
-import moment from 'moment'; 
+import {getSectionNameBySection} from '_platform/gisAuth';
+import moment from 'moment';
 const { TextArea } = Input;
 const { Option } = Select;
 const FormItem = Form.Item;
 const { TabPane } = Tabs;
-const { RangePicker } = DatePicker;
-const dateTimeFormat = 'YYYY-MM-DD HH:mm:ss';
 const newDateTimeFormat = 'YYYY/MM/DD HH:mm:ss';
-const Dragger = Upload.Dragger;
 class Details extends Component {
     static layout = {
         labelCol: {span: 8},
@@ -39,11 +30,11 @@ class Details extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            executor:'',  //下一步执行人
+            executor: '', // 下一步执行人
             userInfo: {}, // 用户信息
             FileName: '', //  附件名称
             CheckFile: '', //  附件地址
-            Meeting:'',  //关联会议
+            Meeting: '', // 关联会议
             Remark: '', // 备注
             // CheckStatus: '', // 审核结果
             Works: [], // 流程列表
@@ -51,64 +42,25 @@ class Details extends Component {
             CurrentNodeName: '', // 当前节点名称
             passNodeID: '', // 通过节点ID
             noPassNodeID: '', // 不通过节点ID
-            meetingList:[],  //会议列表
+            meetingList: [], // 会议列表
+            TechnicalDirectorList: [],
+            ProjectManagerList: [],
+            SupervisorList: [],
+            CostList: [],
+            ConstructionList: []
         };
-        this.Row = {};
     }
     componentDidMount () {
-        // this.getWorkDetails();
-        // // 获取下一个执行节点ID
-        // this.getNextNode();
-    }
-    componentWillReceiveProps (nextProps) {
-        if(nextProps.detailRow != this.props.detailRow){
-            this.Row = nextProps.detailRow;
-            this.getWorkDetails();
-            // 获取下一个执行节点ID
-            //this.getNextNode();
-        }
-
-    }
-    getNextNode () {
-        const {
-            //flowID,
-            actions: { getDirectionList }
-        } = this.props;
-        const { CurrentNode } = this.state;
-        let param = {
-            fiowid: this.Row.FlowID,
-            fromnodeid: CurrentNode,
-            name: '',
-            status: '',
-            page: '',
-            size: ''
-        };
-        getDirectionList({}, param).then(rep => {
-            if (rep && rep.length) {
-                let passNodeID = '', noPassNodeID = '';
-                rep.map(item => {
-                    //if (item.Name === '同意') {
-                    if (item.Name === '通过') {
-                        passNodeID = item.ToNode;
-                    } else {
-                        noPassNodeID = item.ToNode;
-                    }
-                });
-                this.setState({
-                    passNodeID,
-                    noPassNodeID
-                });
-            }
-        });
+        this.getWorkDetails();
     }
     getWorkDetails = async () => {
         const {
             detailRow,
             actions: { getWorkDetails }
         } = this.props;
-        let workDetails = await getWorkDetails({ID:this.Row.ID}, {});
+        let workDetails = await getWorkDetails({ID: detailRow.ID}, {});
         if (workDetails && workDetails.StarterObj && workDetails.Works) {
-            let DrawingNo = '', VersionNum = '', Section = '', Remark = '', CheckFile = '',FileName = '', MajorName = '', Meeting = '';
+            let DrawingNo = '', VersionNum = '', Section = '', Remark = '', CheckFile = '', FileName = '', MajorName = '', Meeting = '';
             // 获取表单信息
             if (workDetails.Works.length && workDetails.Works[0].FormValues && workDetails.Works[0].FormValues.length) {
                 let FormParams = workDetails.Works[0].FormValues[0].FormParams;
@@ -125,9 +77,9 @@ class Details extends Component {
                         CheckFile = item.Val;
                     } else if (item.Key === 'FileName') {
                         FileName = item.Val;
-                    } else if (item.Key === 'MajorName'){
+                    } else if (item.Key === 'MajorName') {
                         MajorName = item.Val;
-                    } else if (item.Key === 'Meeting'){
+                    } else if (item.Key === 'Meeting') {
                         Meeting = item.Val;
                     }
                 });
@@ -151,35 +103,213 @@ class Details extends Component {
                 CurrentNodeName: workDetails.CurrentNodeName,
                 Works: workDetails.Works
             });
+            this.getAuditor(Section);
             this.getNextNode();
             this.getMeetingList();
         }
+    }
+    getAuditor = async (Section) => {
+        const {
+            actions: {
+                getUsers,
+                getRoles
+            }
+        } = this.props;
+        let userInfo = await getUser();
+        console.log('userInfo', userInfo);
+        let userRoles = userInfo.roles;
+        let userRoleName = (userInfo && userInfo.roles && userRoles.RoleName) || '';
+        if (userRoleName) {
+            let roles = await getRoles();
+            let constructionRoleID = ''; // 施工文书ID
+            let supervisorRoleID = ''; // 监理文书ID
+            let costRoleID = ''; // 造价文书ID
+            let technicalDirectorRoleID = ''; // 项目技术负责人ID
+            let projectManagerRoleID = ''; // 项目经理ID
+
+            roles.map((role) => {
+                if (role && role.ID && role.ParentID && role.RoleName) {
+                    if (role.RoleName === '施工文书') {
+                        constructionRoleID = role.ID;
+                    } else if (role.RoleName === '监理文书') {
+                        supervisorRoleID = role.ID;
+                    } else if (role.RoleName === '造价文书') {
+                        costRoleID = role.ID;
+                    } else if (role.RoleName === '项目技术负责人') {
+                        technicalDirectorRoleID = role.ID;
+                    } else if (role.RoleName === '项目经理') {
+                        projectManagerRoleID = role.ID;
+                    }
+                }
+            });
+            let TechnicalDirectorList = []; // 项目技术负责人
+            let ProjectManagerList = []; // 项目经理
+            let SupervisorList = []; // 监理文书
+            let CostList = []; // 造价文书
+            let ConstructionList = []; // 施工文书
+            if (userRoleName === '设计文书') {
+                // 获取项目技术负责人
+                let postTechnicalDirectorData = {
+                    role: technicalDirectorRoleID,
+                    section: '',
+                    status: 1,
+                    page: '',
+                    size: ''
+                };
+                let TechnicalDirectorData = await getUsers({}, postTechnicalDirectorData);
+                if (TechnicalDirectorData && TechnicalDirectorData.code && TechnicalDirectorData.code === 200) {
+                    TechnicalDirectorData.content.map(item => {
+                        TechnicalDirectorList.push({
+                            Full_Name: item.Full_Name,
+                            User_Name: item.User_Name,
+                            id: item.ID
+                        });
+                    });
+                }
+            } else if (userRoleName === '项目技术负责人') {
+                // 获取项目经理
+                let postProjectManagerData = {
+                    role: projectManagerRoleID,
+                    section: '',
+                    status: 1,
+                    page: '',
+                    size: ''
+                };
+                let ProjectManagerData = await getUsers({}, postProjectManagerData);
+                if (ProjectManagerData && ProjectManagerData.code && ProjectManagerData.code === 200) {
+                    ProjectManagerData.content.map(item => {
+                        ProjectManagerList.push({
+                            Full_Name: item.Full_Name,
+                            User_Name: item.User_Name,
+                            id: item.ID
+                        });
+                    });
+                }
+            } else if (userRoleName === '项目经理') {
+                // 获取本标段的监理文书
+                let postSupervisorData = {
+                    role: supervisorRoleID,
+                    section: Section,
+                    status: 1,
+                    page: '',
+                    size: ''
+                };
+                let SupervisorData = await getUsers({}, postSupervisorData);
+                if (SupervisorData && SupervisorData.code && SupervisorData.code === 200) {
+                    SupervisorData.content.map(item => {
+                        SupervisorList.push({
+                            Full_Name: item.Full_Name,
+                            User_Name: item.User_Name,
+                            id: item.ID
+                        });
+                    });
+                }
+                // 获取本标段的造价文书
+                let postCostData = {
+                    role: costRoleID,
+                    section: Section,
+                    status: 1,
+                    page: '',
+                    size: ''
+                };
+                let CostData = await getUsers({}, postCostData);
+                if (CostData && CostData.code && CostData.code === 200) {
+                    CostData.content.map(item => {
+                        CostList.push({
+                            Full_Name: item.Full_Name,
+                            User_Name: item.User_Name,
+                            id: item.ID
+                        });
+                    });
+                }
+            } else if (userRoleName === '监理文书' || userRoleName === '造价文书') {
+                // 获取本标段的施工文书
+                let postConstructionData = {
+                    role: constructionRoleID,
+                    section: Section,
+                    status: 1,
+                    page: '',
+                    size: ''
+                };
+                let ConstructionData = await getUsers({}, postConstructionData);
+                if (ConstructionData && ConstructionData.code && ConstructionData.code === 200) {
+                    ConstructionData.content.map(item => {
+                        ConstructionList.push({
+                            Full_Name: item.Full_Name,
+                            User_Name: item.User_Name,
+                            id: item.ID
+                        });
+                    });
+                }
+            }
+
+            this.setState({
+                TechnicalDirectorList,
+                ProjectManagerList,
+                SupervisorList,
+                CostList,
+                ConstructionList
+            });
+        }
+    }
+    getNextNode () {
+        const {
+            // flowID,
+            detailRow,
+            actions: { getDirectionList }
+        } = this.props;
+        const { CurrentNode } = this.state;
+        let param = {
+            fiowid: detailRow.FlowID,
+            fromnodeid: CurrentNode,
+            name: '',
+            status: '',
+            page: '',
+            size: ''
+        };
+        getDirectionList({}, param).then(rep => {
+            if (rep && rep.length) {
+                let passNodeID = '', noPassNodeID = '';
+                rep.map(item => {
+                    // if (item.Name === '同意') {
+                    if (item.Name === '通过') {
+                        passNodeID = item.ToNode;
+                    } else {
+                        noPassNodeID = item.ToNode;
+                    }
+                });
+                this.setState({
+                    passNodeID,
+                    noPassNodeID
+                });
+            }
+        });
     }
     // save(){
     //     this.props.DetailsReturn();
     // }
 
-    cancel(){
+    cancel () {
         this.props.DetailsReturn();
     }
 
     changeFormField (key, event) {
         let value = getFieldValue(event);
-        if(key == "executor"){
+        if (key === 'executor') {
             this.setState({
-                executor:value
-            })
-          
+                executor: value
+            });
         }
     }
 
-    onReturn(){
+    onReturn () {
         const {
             flowID,
             flowName,
             workID,
             actions: { postSendwork },
-            form: { validateFields }
+            form: { validateFields },
+            detailRow
         } = this.props;
         const { CurrentNode, CurrentNodeName, noPassNodeID, CheckFile, FileName } = this.state;
         validateFields((err, values) => {
@@ -209,7 +339,7 @@ class Details extends Component {
                 let params = {
                     FlowID: flowID, // 流程ID
                     FlowName: flowName, // 流程名称
-                    WorkID: this.Row.ID, // 任务ID
+                    WorkID: detailRow.ID, // 任务ID
                     CurrentNode: CurrentNode, // 当前节点
                     CurrentNodeName: CurrentNodeName, // 当前节点名称
                     NextNode: noPassNodeID,
@@ -238,11 +368,12 @@ class Details extends Component {
         });
     }
 
-    onSubmit(){
+    onSubmit () {
         const {
             flowID,
             flowName,
             workID,
+            detailRow,
             actions: { postSendwork },
             form: { validateFields }
         } = this.props;
@@ -271,11 +402,11 @@ class Details extends Component {
                         Val: FileName
                     }
                 ];
-                let executor = values.executor1!=""&&values.executor1!=undefined?values.executor + '|'+values.executor1:values.executor;
+                let executor = values.executor1 !== '' && values.executor1 !== undefined ? values.executor + '|' + values.executor1 : values.executor;
                 let params = {
                     FlowID: flowID, // 流程ID
                     FlowName: flowName, // 流程名称
-                    WorkID: this.Row.ID, // 任务ID
+                    WorkID: detailRow.ID, // 任务ID
                     CurrentNode: CurrentNode, // 当前节点
                     CurrentNodeName: CurrentNodeName, // 当前节点名称
                     NextNode: passNodeID,
@@ -327,6 +458,8 @@ class Details extends Component {
         return CheckContentVal;
     }
     getCheckFileVal (FormValues) {
+        console.log('FormValues', FormValues);
+
         let CheckFileVal = '', FileNameVal = '';
         if (FormValues.length && FormValues[0].FormParams) {
             FormValues[0].FormParams.map(item => {
@@ -337,6 +470,7 @@ class Details extends Component {
                 }
             });
         }
+        console.log('CheckFileVal', CheckFileVal);
         let node = '';
         if (FileNameVal && CheckFileVal) {
             node = (<div style={{float: 'left'}}>
@@ -350,85 +484,101 @@ class Details extends Component {
                 </a>
             </div>);
         }
+        console.log('node', node);
+
         return node;
     }
     getFormatTime (time) {
         return moment(time).format('YYYY-MM-DD HH:mm:ss');
     }
 
-    getMeetingList(){
+    getMeetingList () {
         const { getMeetingList } = this.props.actions;
         getMeetingList({}).then(rep => {
             if (rep && rep.code === 1) {
                 this.setState({
-                    meetingList: rep.content,
+                    meetingList: rep.content
                 });
             }
         });
     }
 
     render () {
-        const { getFieldDecorator } = this.props.form;
+        const {
+            tabs,
+            detailRow,
+            DetailsModalVisible,
+            currentUserRole = '',
+            form: {
+                getFieldDecorator
+            },
+            platform: { tree = {} }
+        } = this.props;
         const {
             Title,
             DrawingNo,
             constructionOrg,
             Starter,
             Section,
-            VersionNum,
             Remark,
             StarterPhone,
             Createtime,
             Works,
             CurrentNodeName,
-            userInfo,
             CheckFile,
             FileName,
             MajorName,
             Meeting,
             meetingList,
+            ProjectManagerList,
+            SupervisorList,
+            CostList,
+            ConstructionList
         } = this.state;
-        let detailRow = this.props.detailRow;
-        let meeting = [];   
-        if(Meeting){
-            meeting = Meeting.split(",");
+        let meeting = [];
+        if (Meeting) {
+            meeting = Meeting.split(',');
         }
         let meetingArr = [];
-        if(meetingList&&Meeting){
-            for(let i=0;i<meetingList.length;i++){
-                for(let j=0;j<meeting.length;j++){
-                    if(meetingList[i].ID == meeting[j]){
+        if (meetingList && Meeting) {
+            for (let i = 0; i < meetingList.length; i++) {
+                for (let j = 0; j < meeting.length; j++) {
+                    if (meetingList[i].ID === meeting[j]) {
                         meetingArr.push(meetingList[i]);
                     }
                 }
             }
         }
         let checkList = [];
-        if(meetingArr && meetingArr.length>0){
+        if (meetingArr && meetingArr.length > 0) {
             checkList = meetingArr.map((item, index) => {
-                return <div style={{border:'1px solid #ccc',borderRadius:5,color:'#17bfb1',textAlign:'center',marginBottom:'5px'}} value={item.ID} key={index}>{item.MeetingName}
-                    </div>;
+                return <div
+                    style={{
+                        border: '1px solid #ccc',
+                        borderRadius: 5,
+                        color: '#17bfb1',
+                        textAlign: 'center',
+                        marginBottom: '5px'
+                    }}
+                    value={item.ID}
+                    key={index}>
+                    {item.MeetingName}
+                </div>;
             });
         }
-        let NextExecutorObjs = [];   //通过NextExecutorObjs数组长度来判断是否需要选择下一步执行人，只有最后一个人需要选择
-        if(JSON.stringify(detailRow) !== "{}"){
+        // 通过NextExecutorObjs数组长度来判断是否需要选择下一步执行人，只有最后一个人需要选择
+        let NextExecutorObjs = [];
+        if (JSON.stringify(detailRow) !== '{}') {
             NextExecutorObjs = detailRow.NextExecutorObjs;
         }
-        let projectList = this.props.projectList;
-        let sections = "";
-        if (projectList.length > 0 &&Section) {
-            for (let i = 0; i < projectList.length; i++) {
-                if (projectList[i].No == Section.split('-')[0]) {
-                    let list = projectList[i].children;
-                    for (let j = 0; j < list.length; j++) {
-                        if (list[j].No == Section) {
-                            sections = list[j].Name;
-                        }
-                    }
-                }
+        let sectionName = '';
+        if (Section) {
+            let treeList = [];
+            if (tree.thinClassTree) {
+                treeList = tree.thinClassTree;
             }
+            sectionName = getSectionNameBySection(Section, treeList);
         }
-        
         const Uploadprops = {
             name: '',
             action: '',
@@ -449,77 +599,86 @@ class Details extends Component {
             }
         };
         return <div>
-            <Modal style={{top: 100}}
-                title="设计变更通知单"
-                width={720} visible={this.props.DetailsModalVisible}
-                //onOk={this.save.bind(this)} 
-                okButtonProps={{disabled: true}}
+            <Modal
+                title='设计变更通知单'
+                width={720}
+                visible={DetailsModalVisible}
+                footer={null}
+                // onOk={this.save.bind(this)}
                 onCancel={this.cancel.bind(this)}
-                >
-                <div style={{color:'#ff0000',position:'absolute',top:'35px',fontSize:'12px'}}>表单编号：{detailRow.WorkNo}</div>
+            >
+                <div style={{color: '#ff0000', position: 'absolute', top: '35px', fontSize: '12px'}}>
+                    表单编号：{detailRow.WorkNo}
+                </div>
                 <Tabs
                     defaultActiveKey='formdetails'
-                    >
+                >
                     <TabPane tab='表单详情' key='formdetails'>
                         <Form>
                             <Row>
                                 <Col span={12}>
                                     <FormItem {...Details.layout} label='变更名称'>
-                                        <Input value={Title} readOnly style={{width: 'calc(100% * 2)', maxWidth: 'calc(100% * 2)'}}/>
+                                        <Input
+                                            value={Title}
+                                            readOnly
+                                            style={{width: 'calc(100% * 2)', maxWidth: 'calc(100% * 2)'}} />
                                     </FormItem>
-                                </Col> 
+                                </Col>
                             </Row>
                             <Row>
                                 <Col span={12}>
                                     <FormItem {...Details.layout} label='设计单位'>
-                                        <Input value={constructionOrg} readOnly style={{width: 'calc(100% * 2)', maxWidth: 'calc(100% * 2)'}}/>
+                                        <Input
+                                            value={constructionOrg}
+                                            readOnly
+                                            style={{width: 'calc(100% * 2)', maxWidth: 'calc(100% * 2)'}} />
                                     </FormItem>
-                                </Col> 
+                                </Col>
                             </Row>
                             <Row>
                                 <Col span={12}>
                                     <FormItem {...Details.layout} label='图号'>
-                                        <Input value={DrawingNo} readOnly/>
+                                        <Input value={DrawingNo} readOnly />
                                     </FormItem>
-                                </Col> 
+                                </Col>
                                 <Col span={12}>
                                     <FormItem {...Details.layout} label='标段'>
-                                        <Input value={sections} readOnly/>
+                                        <Input value={`${sectionName}(${Section})`} readOnly />
                                     </FormItem>
-                                </Col>  
+                                </Col>
                             </Row>
                             <Row>
                                 <Col span={12}>
                                     <FormItem {...Details.layout} label='专业名称'>
-                                        <Input value={MajorName} readOnly style={{width: 'calc(100% * 2)', maxWidth: 'calc(100% * 2)'}}/>
+                                        <Input value={MajorName} readOnly style={{width: 'calc(100% * 2)', maxWidth: 'calc(100% * 2)'}} />
                                     </FormItem>
-                                </Col> 
+                                </Col>
                             </Row>
                             <Row>
                                 <Col span={12}>
                                     <FormItem {...Details.layout} label='发起人'>
-                                        <Input value={Starter} readOnly/>
+                                        <Input value={Starter} readOnly />
                                     </FormItem>
-                                </Col> 
+                                </Col>
                                 <Col span={12}>
                                     <FormItem {...Details.layout} label='联系电话'>
-                                        <Input value={StarterPhone} readOnly/>
+                                        <Input value={StarterPhone} readOnly />
                                     </FormItem>
-                                </Col> 
+                                </Col>
                             </Row>
                             <Row>
                                 <Col span={12}>
                                     <FormItem {...Details.layout} label='发起时间'>
-                                        <Input value={Createtime} readOnly/>
+                                        <Input value={Createtime} readOnly />
                                     </FormItem>
-                                </Col> 
+                                </Col>
                             </Row>
                             <Row>
                                 <Col span={12}>
                                     <FormItem {...Details.layout} label='关联会议'>
                                         <div>
                                             {checkList}
-                                        </div>                              
+                                        </div>
                                     </FormItem>
                                 </Col>
                             </Row>
@@ -533,30 +692,41 @@ class Details extends Component {
                             <Row>
                                 <Col span={12}>
                                     <FormItem {...Details.layout} label='附件'>
-                                        {CheckFile!=""?<a title="点击下载附件" href={CheckFile}>{FileName}</a>:'暂无附件'}
+                                        {CheckFile != '' ? <a title='点击下载附件' href={CheckFile}>{FileName}</a> : '暂无附件'}
                                     </FormItem>
                                 </Col>
                             </Row>
                         </Form>
                     </TabPane>
-                    <TabPane tab='流程细节' key='flowdetails' style={{marginBottom:'20px'}}>
+                    <TabPane tab='流程细节' key='flowdetails' style={{marginBottom: '20px'}}>
                         {
                             Works.map((item, index) => {
-                                if(item.CurrentNodeName == "监理和造价咨询"){
-                                    if(item.ExecutorObj.Roles[0].RoleName.indexOf("监理")>-1){
-                                        item.CurrentNodeName = "监理";
-                                    }else if(item.ExecutorObj.Roles[0].RoleName.indexOf("造价")>-1){
-                                        item.CurrentNodeName = "造价咨询";
+                                if (item.CurrentNodeName === '监理和造价咨询') {
+                                    if (item.ExecutorObj.Roles[0].RoleName.indexOf('监理') > -1) {
+                                        item.CurrentNodeNameNew = '监理';
+                                    } else if (item.ExecutorObj.Roles[0].RoleName.indexOf('造价') > -1) {
+                                        item.CurrentNodeNameNew = '造价咨询';
                                     }
+                                } else {
+                                    item.CurrentNodeNameNew = item.CurrentNodeName;
                                 }
                                 if (CurrentNodeName === item.CurrentNodeName) {
-                                    if(item.FormValues.length>0){
-                                        return <Card size='small' key={index} style={{width: '100%'}} title={item.CurrentNodeName} extra={<div>
-                                            <span>{item.ExecutorObj && item.ExecutorObj.Full_Name}</span>
-                                            <span style={{display: 'inline-block', marginLeft: 20, width: 130}}>
-                                                {this.getFormatTime(item.RunTime)}
-                                            </span>
-                                        </div>}>
+                                    console.log('item', item);
+
+                                    if (item.FormValues.length > 0) {
+                                        return <Card
+                                            size='small'
+                                            key={index}
+                                            style={{width: '100%'}}
+                                            title={item.CurrentNodeNameNew}
+                                            extra={
+                                                <div>
+                                                    <span>{`${item.ExecutorObj && item.ExecutorObj.Full_Name}(${item.ExecutorObj.User_Name})`}</span>
+                                                    <span style={{display: 'inline-block', marginLeft: 20, width: 130}}>
+                                                        {this.getFormatTime(item.RunTime)}
+                                                    </span>
+                                                </div>
+                                            }>
                                             <div>
                                                 <span style={{display: 'inline-block', width: 50}}>
                                                     {this.getCheckStatusVal(item.FormValues)}
@@ -569,16 +739,23 @@ class Details extends Component {
                                                 }
                                             </div>
                                         </Card>;
-                                    }else{
+                                    } else {
                                         return '';
                                     }
                                 } else {
-                                    return <Card size='small' key={index} style={{width: '100%'}} title={item.CurrentNodeName} extra={<div>
-                                        <span>{item.ExecutorObj && item.ExecutorObj.Full_Name}</span>
-                                        <span style={{display: 'inline-block', marginLeft: 20, width: 130}}>
-                                            {this.getFormatTime(item.RunTime)}
-                                        </span>
-                                    </div>}>
+                                    return <Card
+                                        size='small'
+                                        key={index}
+                                        style={{width: '100%'}}
+                                        title={item.CurrentNodeNameNew}
+                                        extra={
+                                            <div>
+                                                <span>{`${item.ExecutorObj && item.ExecutorObj.Full_Name}(${item.ExecutorObj.User_Name})`}</span>
+                                                <span style={{display: 'inline-block', marginLeft: 20, width: 130}}>
+                                                    {this.getFormatTime(item.RunTime)}
+                                                </span>
+                                            </div>
+                                        }>
                                         <div>
                                             <span style={{display: 'inline-block', width: 50}}>
                                                 {this.getCheckStatusVal(item.FormValues)}
@@ -597,8 +774,10 @@ class Details extends Component {
                     </TabPane>
                 </Tabs>
                 <Form>
-                    {this.props.role.indexOf("业主")>-1&&detailRow.CurrentNodeName == "项目技术负责人"&&this.props.tabs == 'pending'?
-                        <Row>
+                    {currentUserRole.indexOf('项目技术负责人') > -1 &&
+                        detailRow.CurrentNodeName === '项目技术负责人' &&
+                        tabs === 'pending'
+                        ? <Row>
                             <Col span={12}>
                                 <FormItem {...Details.layout} label='项目经理选择'>
                                     {
@@ -608,17 +787,16 @@ class Details extends Component {
                                             ]
                                         })(
                                             <Select
-                                                placeholder="请选择"
-                                                onChange={this.changeFormField.bind(this,
-                                            'executor')}
+                                                placeholder='请选择'
+                                                onChange={this.changeFormField.bind(this, 'executor')}
                                                 allowClear
                                                 showSearch
                                                 filterOption={(input, option) =>
-                                                   option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                                    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                                 }
                                             >
                                                 {
-                                                    this.props.OwnerList.map(item => {
+                                                    ProjectManagerList.map(item => {
                                                         return <Option
                                                             value={item.id}
                                                             title={`${item.Full_Name}(${item.User_Name})`}
@@ -628,91 +806,90 @@ class Details extends Component {
                                                     })
                                                 }
                                             </Select>
-                                    )}
+                                        )}
                                 </FormItem>
                             </Col>
                         </Row>
-                        :
-                        ''
+                        : ''
                     }
-                    {this.props.role.indexOf("业主")>-1&&detailRow.CurrentNodeName == "项目经理"&&this.props.tabs == 'pending'?
-                        <Row>
-                            <Col span={12}>
-                                <FormItem {...Details.layout} label='监理选择'>
-                                    {
-                                        getFieldDecorator('executor', {
-                                            rules: [
-                                                { required: true, message: '请选择监理' }
-                                            ]
-                                        })(
-                                            <Select
-                                                placeholder="请选择"
-                                                onChange={this.changeFormField.bind(this,
-                                            'executor')}
-                                                allowClear
-                                                showSearch
-                                                filterOption={(input, option) =>
-                                                   option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                                                }
-                                            >
-                                                {
-                                                    this.props.SupervisorList.map(item => {
-                                                        return <Option
-                                                            value={item.id}
-                                                            title={`${item.Full_Name}(${item.User_Name})`}
-                                                            key={item.id}>
-                                                            {`${item.Full_Name}(${item.User_Name})`}
-                                                        </Option>;
-                                                    })
-                                                }
-                                            </Select>
-                                    )}
-                                </FormItem>
-                            </Col>
+                    {currentUserRole.indexOf('项目经理') > -1 &&
+                        detailRow.CurrentNodeName === '项目经理' &&
+                        tabs === 'pending'
+                        ? <Row>
+                            <Row>
+                                <Col span={12}>
+                                    <FormItem {...Details.layout} label='监理选择'>
+                                        {
+                                            getFieldDecorator('executor', {
+                                                rules: [
+                                                    { required: true, message: '请选择监理' }
+                                                ]
+                                            })(
+                                                <Select
+                                                    placeholder='请选择'
+                                                    onChange={this.changeFormField.bind(this,
+                                                        'executor')}
+                                                    allowClear
+                                                    showSearch
+                                                    filterOption={(input, option) =>
+                                                        option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                                    }
+                                                >
+                                                    {
+                                                        SupervisorList.map(item => {
+                                                            return <Option
+                                                                value={item.id}
+                                                                title={`${item.Full_Name}(${item.User_Name})`}
+                                                                key={item.id}>
+                                                                {`${item.Full_Name}(${item.User_Name})`}
+                                                            </Option>;
+                                                        })
+                                                    }
+                                                </Select>
+                                            )}
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span={12}>
+                                    <FormItem {...Details.layout} label='造价咨询选择'>
+                                        {
+                                            getFieldDecorator('executor1', {
+                                                rules: [
+                                                    { required: true, message: '请选择造价咨询' }
+                                                ]
+                                            })(
+                                                <Select
+                                                    placeholder='请选择'
+                                                    onChange={this.changeFormField.bind(this,
+                                                        'executor1')}
+                                                    allowClear
+                                                    showSearch
+                                                    filterOption={(input, option) =>
+                                                        option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                                    }
+                                                >
+                                                    {
+                                                        CostList.map(item => {
+                                                            return <Option
+                                                                value={item.id}
+                                                                title={`${item.Full_Name}(${item.User_Name})`}
+                                                                key={item.id}>
+                                                                {`${item.Full_Name}(${item.User_Name})`}
+                                                            </Option>;
+                                                        })
+                                                    }
+                                                </Select>
+                                            )}
+                                    </FormItem>
+                                </Col>
+                            </Row>
                         </Row>
-                        :
-                        ''
+                        : ''
                     }
-                    {this.props.role.indexOf("业主")>-1&&detailRow.CurrentNodeName == "项目经理"&&this.props.tabs == 'pending'?
-                        <Row>
-                            <Col span={12}>
-                                <FormItem {...Details.layout} label='造价咨询选择'>
-                                    {
-                                        getFieldDecorator('executor1', {
-                                            rules: [
-                                                { required: true, message: '请选择造价咨询' }
-                                            ]
-                                        })(
-                                            <Select
-                                                placeholder="请选择"
-                                                onChange={this.changeFormField.bind(this,
-                                            'executor1')}
-                                                allowClear
-                                                showSearch
-                                                filterOption={(input, option) =>
-                                                   option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                                                }
-                                            >
-                                                {
-                                                    this.props.CostList.map(item => {
-                                                        return <Option
-                                                            value={item.id}
-                                                            title={`${item.Full_Name}(${item.User_Name})`}
-                                                            key={item.id}>
-                                                            {`${item.Full_Name}(${item.User_Name})`}
-                                                        </Option>;
-                                                    })
-                                                }
-                                            </Select>
-                                    )}
-                                </FormItem>
-                            </Col>
-                        </Row>
-                        :
-                        ''
-                    }
-                    {(this.props.role.indexOf("造价")>-1||this.props.role.indexOf("监理")>-1)&&this.props.tabs == 'pending'&&NextExecutorObjs.length == 1?
-                        <Row>
+                    {(currentUserRole.indexOf('造价') > -1 || currentUserRole.indexOf('监理') > -1) &&
+                        tabs === 'pending' && NextExecutorObjs.length === 1
+                        ? <Row>
                             <Col span={12}>
                                 <FormItem {...Details.layout} label='施工文书选择'>
                                     {
@@ -722,17 +899,17 @@ class Details extends Component {
                                             ]
                                         })(
                                             <Select
-                                                placeholder="请选择"
+                                                placeholder='请选择'
                                                 onChange={this.changeFormField.bind(this,
-                                            'executor')}
+                                                    'executor')}
                                                 allowClear
                                                 showSearch
                                                 filterOption={(input, option) =>
-                                                   option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                                    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                                                 }
                                             >
                                                 {
-                                                    this.props.ConstructionList.map(item => {
+                                                    ConstructionList.map(item => {
                                                         return <Option
                                                             value={item.id}
                                                             title={`${item.Full_Name}(${item.User_Name})`}
@@ -742,62 +919,68 @@ class Details extends Component {
                                                     })
                                                 }
                                             </Select>
-                                    )}
+                                        )}
                                 </FormItem>
                             </Col>
                         </Row>
-                        :
-                        ''
+                        : ''
                     }
-                    {this.props.tabs == 'pending'?
-                        <Row>
+                    {tabs === 'pending'
+                        ? <Row>
                             <Col span={12}>
                                 <FormItem
-                                        {...Details.layout}
-                                        label='备注说明'
-                                    >
-                                        {
-                                            getFieldDecorator('CheckContent', {
-                                            })(
-                                                <TextArea rows={4} />
-                                            )
-                                        }
+                                    {...Details.layout}
+                                    label='备注说明'
+                                >
+                                    {
+                                        getFieldDecorator('CheckContent', {
+                                        })(
+                                            <TextArea rows={4} />
+                                        )
+                                    }
                                 </FormItem>
                             </Col>
                         </Row>
-                        :''
+                        : ''
                     }
-                    {this.props.tabs == 'pending'?
-                        <Row>
+                    {tabs === 'pending'
+                        ? <Row>
                             <Col span={12}>
                                 <FormItem
-                                        {...Details.layout}
-                                        label='上传附件'
-                                    >
-                                        <Upload {...Uploadprops}>
-                                            <Button>
-                                                <Icon type='upload' /> 上传附件
-                                            </Button>
-                                        </Upload>
+                                    {...Details.layout}
+                                    label='上传附件'
+                                >
+                                    <Upload {...Uploadprops}>
+                                        <Button>
+                                            <Icon type='upload' /> 上传附件
+                                        </Button>
+                                    </Upload>
                                 </FormItem>
                             </Col>
                         </Row>
-                        :''
+                        : ''
                     }
                 </Form>
-                {this.props.tabs == 'pending'?
-                    <Row>
-                        <Col span={24} style={{textAlign:'center'}}>
-                            <Button style={{marginRight: 150, cursor: 'pointer'}} onClick={this.onReturn.bind(this)}>不通过</Button>
-                            <Button type='primary' style={{cursor: 'pointer'}} onClick={this.onSubmit.bind(this)}>通过</Button>     
+                {tabs === 'pending'
+                    ? <Row>
+                        <Col span={24} style={{textAlign: 'center'}}>
+                            <Button
+                                style={{marginRight: 150, cursor: 'pointer'}}
+                                onClick={this.onReturn.bind(this)}>
+                                    不通过
+                            </Button>
+                            <Button
+                                type='primary'
+                                style={{cursor: 'pointer'}}
+                                onClick={this.onSubmit.bind(this)}>
+                                    通过
+                            </Button>
                         </Col>
                     </Row>
-                    :''
+                    : ''
                 }
             </Modal>
         </div>;
     }
-
 };
-Details = Form.create()(Details);
-export default Details;
+export default Form.create()(Details);

@@ -1,36 +1,16 @@
 import React, { Component } from 'react';
 import {
-    Tabs,
-    Modal,
-    Row,
-    Col,
     Table,
-    Button,
-    Popconfirm,
-    Input,
-    Progress,
-    Select,
     Form,
-    message,
-    InputNumber,
     Notification,
-    DatePicker,
-    Spin 
+    Spin
 } from 'antd';
-import {getFieldValue} from '../../../../_platform/store/util';
-import { getUserIsManager, getUser } from '_platform/auth';
+import { getUser } from '_platform/auth';
 import {
     WFStatusList
 } from '_platform/api';
 import Query from './Query';
 import Details from './Details';
-import moment from 'moment'; 
-const { TextArea } = Input;
-const { Option } = Select;
-const FormItem = Form.Item;
-const { TabPane } = Tabs;
-const { RangePicker } = DatePicker;
-const dateTimeFormat = 'YYYY-MM-DD HH:mm:ss';
 class TableList extends Component {
     static layout = {
         labelCol: {span: 8},
@@ -58,10 +38,10 @@ class TableList extends Component {
             weekPlanDataSource: [], //
             user: '',
             page: 1,
-            dataList:[], //表单数据
+            dataList: [], // 表单数据
             spinning: true,
-            DetailsModalVisible:false, 
-            detailRow:{},
+            DetailsModalVisible: false,
+            detailRow: {}
         };
     }
     async componentDidMount () {
@@ -111,36 +91,34 @@ class TableList extends Component {
         }
         let keys = [], vals = [];
         if (values.section) {
-            keys.push("Section");
+            keys.push('Section');
             vals.push(values.section);
         }
         if (values.drawingno) {
-            keys.push("DrawingNo");
+            keys.push('DrawingNo');
             vals.push(values.drawingno);
         }
         // if (values.no) {
         //     keys.push("No");
         //     vals.push(values.no);
         // }
-        let keysarr = "", valsarr = "";
-        if(keys.length>0){
-            for(let i=0;i<keys.length;i++){
-                if(i=0){
+        let keysarr = '', valsarr = '';
+        if (keys.length > 0) {
+            for (let i = 0; i < keys.length; i++) {
+                if (i === 0) {
                     keysarr = keys[i];
-                }else{
+                } else {
                     keysarr = keysarr + '|' + keys[i];
                 }
-                
             }
         }
-        if(vals.length>0){
-            for(let j=0;j<vals.length;j++){
-                if(j=0){
+        if (vals.length > 0) {
+            for (let j = 0; j < vals.length; j++) {
+                if (j === 0) {
                     valsarr = vals[j];
-                }else{
+                } else {
                     valsarr = valsarr + '|' + vals[j];
                 }
-                
             }
         }
         let executor = '';
@@ -156,7 +134,7 @@ class TableList extends Component {
             starter: values.starter || '', // 发起人
             currentnode: '', // 节点ID]
             executor: executor, // 执行人
-            workno: values.no || '', //表单编号
+            workno: values.no || '', // 表单编号
             stime: StartTime, // 开始时间
             etime: EndTime, // 结束时间
             keys: keys || '', // 查询键
@@ -173,59 +151,58 @@ class TableList extends Component {
             }
         });
     }
-    reloadList(){    //刷新表单
+    reloadList () { // 刷新表单
         this.getFlowList();
     }
 
-    onDetails(record){
+    onDetails (record) {
         this.setState({
-            detailRow:record,
-            DetailsModalVisible:true,
-        })
+            detailRow: record,
+            DetailsModalVisible: true
+        });
     }
 
-    onCheck(record){
+    onCheck (record) {
         this.setState({
-            detailRow:record,
-            DetailsModalVisible:true,
-        })
+            detailRow: record,
+            DetailsModalVisible: true
+        });
     }
 
-    DetailsReturn(){  //返回表单页面
+    DetailsReturn () { // 返回表单页面
         this.setState({
-            detailRow:{},
-            DetailsModalVisible:false,
-        })
+            detailRow: {},
+            DetailsModalVisible: false
+        });
     }
- 
+
     render () {
-        const { getFieldDecorator } = this.props.form;
         const {
             dataList,
             spinning
         } = this.state;
         return <div>
-                <Query
-                    {...this.props} 
-                    {...this.state}
-                    reloadList = {this.reloadList.bind(this)}
-                    query = {this.getWorkList.bind(this)}
+            <Query
+                {...this.props}
+                {...this.state}
+                reloadList={this.reloadList.bind(this)}
+                query={this.getWorkList.bind(this)}
+            />
+            <Spin spinning={spinning}>
+                <Table
+                    columns={this.columns}
+                    dataSource={dataList}
+                    rowKey='ID'
                 />
-                <Spin spinning={spinning}>
-                    <Table
-                        columns={this.columns}
-                        dataSource={dataList}
-                        rowKey='ID'
-                    />
-                </Spin>
-                <Details 
-                    {...this.props}
-                    {...this.state}
-                    detailRow={this.state.detailRow}
-                    DetailsModalVisible={this.state.DetailsModalVisible}
-                    DetailsReturn={this.DetailsReturn.bind(this)}
-                    reloadList = {this.reloadList.bind(this)}
-                />
+            </Spin>
+            <Details
+                {...this.props}
+                {...this.state}
+                detailRow={this.state.detailRow}
+                DetailsModalVisible={this.state.DetailsModalVisible}
+                DetailsReturn={this.DetailsReturn.bind(this)}
+                reloadList={this.reloadList.bind(this)}
+            />
         </div>;
     }
 
@@ -239,7 +216,7 @@ class TableList extends Component {
         },
         {
             title: '表单号',
-            dataIndex: 'WorkNo',
+            dataIndex: 'WorkNo'
         },
         // {
         //     title: '图号',
@@ -248,7 +225,7 @@ class TableList extends Component {
         {
             title: '标段',
             dataIndex: 'ExecutorObj',
-            render: (text,record,index) => {
+            render: (text, record, index) => {
                 let projectList = this.props.projectList;
                 let section = text.Section;
                 if (text) {
@@ -314,13 +291,13 @@ class TableList extends Component {
                     } else {
                         return `(${text[0].User_Name || ''})`;
                     }
-                } else if(text && text.length === 2) {
-                    if (text[0].Full_Name&&text[1].Full_Name) {
+                } else if (text && text.length === 2) {
+                    if (text[0].Full_Name && text[1].Full_Name) {
                         return `${text[0].Full_Name || ''}(${text[0].User_Name || ''})/${text[1].Full_Name || ''}(${text[1].User_Name || ''})`;
                     } else {
                         return `(${text[0].User_Name || ''})/(${text[1].User_Name || ''})`;
                     }
-                }else{
+                } else {
                     return '/';
                 }
             }
@@ -330,15 +307,14 @@ class TableList extends Component {
             dataIndex: 'active',
             render: (text, record, index) => {
                 return (<div>
-                    {this.props.tabs == "processed"?
-                        <span style={{color: '#1890ff', marginRight: 10, cursor: 'pointer'}} onClick={this.onDetails.bind(this, record)}>查看</span>
-                        :''
-                    }    
+                    {this.props.tabs == 'processed'
+                        ? <span style={{color: '#1890ff', marginRight: 10, cursor: 'pointer'}} onClick={this.onDetails.bind(this, record)}>查看</span>
+                        : ''
+                    }
                 </div>);
             }
         }
     ];
-
 };
 TableList = Form.create()(TableList);
 export default TableList;
