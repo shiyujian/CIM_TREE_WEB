@@ -10,6 +10,7 @@ import {
     Input,
     Pagination,
     Modal,
+    Popconfirm,
     Form,
     Spin,
     Notification
@@ -97,17 +98,24 @@ class TableList extends Component {
             StartTime = moment(values.timeArr[0]).format(dateTimeFormat);
             EndTime = moment(values.timeArr[1]).format(dateTimeFormat);
         }
+        let starter = '';
+        let user = getUser();
+        if (user.username === 'admin') {
+
+        } else {
+            starter = getUser().ID;
+        }
         let param = {
             workid: '', // 任务ID
             workno: values.workNo || '', // 表单编号
             title: values.name || '', // 任务名称
             flowid: flowID, // 流程类型或名称
-            starter: getUser().ID, // 发起人
+            starter: starter, // 发起人
             currentnode: '', // 节点ID
             prevnode: '', // 上一结点ID
             executor: '', // 执行人
             sender: '', // 上一节点发送人
-            wfstate: values.state || '1,2', // 待办 0,1
+            wfstate: values.state || '', // 待办
             stime: StartTime, // 开始时间
             etime: EndTime, // 结束时间
             keys: '', // 查询键
@@ -183,6 +191,9 @@ class TableList extends Component {
             }
         });
     }
+    onCancel () {
+        
+    }
     render () {
         const {
             dataList,
@@ -230,7 +241,7 @@ class TableList extends Component {
                                         <FormItem label='流转状态'>
                                             {
                                                 getFieldDecorator('state', {
-                                                    initialValue: '1,2'
+                                                    initialValue: ''
                                                 })(
                                                     <Select style={{ width: 180 }} allowClear>
                                                         {
@@ -392,10 +403,21 @@ class TableList extends Component {
             title: '操作',
             dataIndex: 'actions',
             render: (text, record, index) => {
+                let user = getUser();
+                let arr = [<a onClick={this.onSee.bind(this, record.ID)}>查看</a>];
+                if (user.username === 'admin') {
+                    arr.push(<Divider type='vertical' />, <Popconfirm
+                        title='确定要删除吗？'
+                        onConfirm={this.onDelete.bind(this, record.ID)}
+                        onCancel={this.onCancel.bind(this, record.ID)}
+                        okText='Yes'
+                        cancelText='No'
+                    >
+                        <a href='#' >删除</a>
+                    </Popconfirm>);
+                }
                 return <span>
-                    <a onClick={this.onSee.bind(this, record.ID)}>查看</a>
-                    <Divider type='vertical' />
-                    <a onClick={this.onDelete.bind(this, record.ID)}>删除</a>
+                    {arr}
                 </span>;
             }
         }

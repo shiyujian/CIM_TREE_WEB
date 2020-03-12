@@ -388,6 +388,7 @@ class ModalCheck extends Component {
                     okButtonProps={{disabled: true}}
                     title='工程量现场确认单'
                     maskClosable={false}
+                    footer={null}
                     visible={this.props.showModal}
                     onCancel={this.handleCancel}
                 >
@@ -554,7 +555,7 @@ class ModalCheck extends Component {
                     </Tabs>
                     <Form style={{marginTop: 10}}>
                         {
-                            userInfo.roles && userInfo.roles.RoleName === '监理文书' ? <Row style={{marginTop: 10}}>
+                            userInfo.roles && userInfo.roles.ID === 11 ? <Row style={{marginTop: 10}}>
                                 <FormItem
                                     {...formItemLayout}
                                     label='选择造价'
@@ -566,6 +567,14 @@ class ModalCheck extends Component {
                                             ]
                                         })(
                                             <Select
+                                                showSearch
+                                                filterOption={
+                                                    (input, option) => {
+                                                        return option.props.children
+                                                        .toLowerCase()
+                                                        .indexOf(input.toLowerCase()) >= 0;
+                                                    }
+                                                }
                                                 style={{width: '100%'}}
                                                 maxTagCount={4}
                                                 dropdownStyle={{height: 100}}
@@ -589,7 +598,7 @@ class ModalCheck extends Component {
                             </Row> : ''
                         }
                         {
-                            userInfo.roles && userInfo.roles.RoleName === '造价文书' ? <Row style={{marginTop: 10}}>
+                            userInfo.roles && userInfo.roles.ID === 111 ? <Row style={{marginTop: 10}}>
                                 <FormItem
                                     {...formItemLayout}
                                     label='选择业主'
@@ -603,6 +612,14 @@ class ModalCheck extends Component {
                                             <Select
                                                 style={{width: '100%'}}
                                                 maxTagCount={4}
+                                                showSearch
+                                                filterOption={
+                                                    (input, option) => {
+                                                        return option.props.children
+                                                        .toLowerCase()
+                                                        .indexOf(input.toLowerCase()) >= 0;
+                                                    }
+                                                }
                                                 dropdownStyle={{height: 100}}
                                                 dropdownMenuStyle={{height: 100}}
                                                 allowClear

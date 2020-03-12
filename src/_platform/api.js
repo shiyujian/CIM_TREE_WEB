@@ -317,6 +317,10 @@ export const SCHEDULRPROJECT = [
 ];
 // 流程状态
 export const WFStatusList = [
+    {
+        value: '',
+        label: '全部'
+    },
     // {
     //     value: 0,
     //     label: '草稿中'

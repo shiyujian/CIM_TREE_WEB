@@ -95,11 +95,19 @@ class Tablelevel extends Component {
                 FileName,
                 Works: workDetails.Works
             });
+            let Starter = '';
+            let StarterPhone = '';
+            let constructionOrg = '';
+            if (workDetails.StarterObj && workDetails.StarterObj.User_Name && workDetails.StarterObj.OrgObj) {
+                Starter = `${workDetails.StarterObj.Full_Name}（${workDetails.StarterObj.User_Name}）`;
+                StarterPhone = workDetails.StarterObj.Phone;
+                constructionOrg = workDetails.StarterObj.OrgObj.OrgName;
+            }
             setFieldsValue({
                 Title: workDetails.Title,
-                constructionOrg: workDetails.StarterObj.OrgObj && workDetails.StarterObj.OrgObj.OrgName,
-                Starter: workDetails.StarterObj.Full_Name,
-                StarterPhone: workDetails.StarterObj.Phone,
+                constructionOrg,
+                Starter,
+                StarterPhone,
                 Createtime: moment(workDetails.CreateTime, newDateTimeFormat),
                 Summary: Summary,
                 Content: Content
@@ -249,6 +257,9 @@ class Tablelevel extends Component {
                     });
                 });
                 return false;
+            },
+            showUploadList: {
+                showRemoveIcon: false
             }
         };
         return (
@@ -257,6 +268,7 @@ class Tablelevel extends Component {
                     okButtonProps={{disabled: true}}
                     title='工程洽商记录'
                     maskClosable={false}
+                    footer={null}
                     visible={this.props.showModal}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
@@ -375,7 +387,7 @@ class Tablelevel extends Component {
                             {
                                 Works.map((item, index) => {
                                     return <Card size='small' key={index} style={{width: '100%'}} title={item.CurrentNodeName} extra={<div>
-                                        <span>{item.ExecutorObj && item.ExecutorObj.Full_Name}</span>
+                                        <span>{item.ExecutorObj && item.ExecutorObj.Full_Name}（{item.ExecutorObj && item.ExecutorObj.User_Name}）</span>
                                         <span style={{display: 'inline-block', marginLeft: 20, width: 90}}>
                                             {this.getFormatTime(item.RunTime)}
                                         </span>

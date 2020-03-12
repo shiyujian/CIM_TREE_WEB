@@ -60,13 +60,24 @@ class ModalAdd extends Component {
         this.setStarter();
     }
     setStarter () {
-        let userInfo = getUser();
         const {
+            sectionList,
             form: { setFieldsValue }
         } = this.props;
+        let userInfo = getUser();
+        let Section = '';
+        let Starter = '';
+        sectionList.map(item => {
+            if (item.No === userInfo.section) {
+                Section = `${item.Name}（${item.No}）`;
+            }
+        });
+        if (userInfo && userInfo.username) {
+            Starter = `${userInfo.name}（${userInfo.username}）`;
+        }
         setFieldsValue({
-            Section: userInfo.section,
-            Starter: userInfo.name,
+            Section,
+            Starter,
             StarterPhone: userInfo.phone,
             constructionOrg: userInfo.orgObj && userInfo.orgObj.OrgName,
             StarterTime: moment()
@@ -159,6 +170,12 @@ class ModalAdd extends Component {
                     });
                 });
                 return false;
+            },
+            onRemove: (file) => {
+                this.setState({
+                    FileName: '',
+                    CheckFile: ''
+                });
             }
         };
         return (

@@ -64,13 +64,25 @@ class ModalAdd extends Component {
     }
     setStarter () {
         console.log('当前用户信息', getUser());
-        let userInfo = getUser();
+        console.log('当前用户信息', this.props.sectionList);
         const {
+            sectionList,
             form: { setFieldsValue }
         } = this.props;
+        let userInfo = getUser();
+        let Section = '';
+        let Starter = '';
+        sectionList.map(item => {
+            if (item.No === userInfo.section) {
+                Section = `${item.Name}（${item.No}）`;
+            }
+        });
+        if (userInfo && userInfo.username) {
+            Starter = `${userInfo.name}（${userInfo.username}）`;
+        }
         setFieldsValue({
-            Section: userInfo.section,
-            Starter: userInfo.name,
+            Section,
+            Starter,
             StarterPhone: userInfo.phone,
             constructionOrg: userInfo.orgObj && userInfo.orgObj.OrgName,
             StarterTime: moment()
