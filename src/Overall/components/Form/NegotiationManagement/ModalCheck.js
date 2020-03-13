@@ -71,7 +71,6 @@ class ModalCheck extends Component {
         this.handleCancel = this.handleCancel.bind(this);
     }
     async componentDidMount () {
-        console.log(getUser());
         // 获取任务详情
         await this.getWorkDetails();
         // 获取下一个执行节点ID
@@ -152,7 +151,6 @@ class ModalCheck extends Component {
                 Summary: Summary,
                 Content: Content
             });
-            console.log('Works', workDetails.Works);
             this.setState({
                 CurrentNode: workDetails.CurrentNode,
                 CurrentNodeName: workDetails.CurrentNodeName,

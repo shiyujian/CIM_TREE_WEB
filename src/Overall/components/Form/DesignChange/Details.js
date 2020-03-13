@@ -116,7 +116,6 @@ class Details extends Component {
             }
         } = this.props;
         let userInfo = await getUser();
-        console.log('userInfo', userInfo);
         let userRoles = userInfo.roles;
         let userRoleName = (userInfo && userInfo.roles && userRoles.RoleName) || '';
         if (userRoleName) {
@@ -458,7 +457,6 @@ class Details extends Component {
         return CheckContentVal;
     }
     getCheckFileVal (FormValues) {
-        console.log('FormValues', FormValues);
 
         let CheckFileVal = '', FileNameVal = '';
         if (FormValues.length && FormValues[0].FormParams) {
@@ -470,7 +468,6 @@ class Details extends Component {
                 }
             });
         }
-        console.log('CheckFileVal', CheckFileVal);
         let node = '';
         if (FileNameVal && CheckFileVal) {
             node = (<div style={{float: 'left'}}>
@@ -484,7 +481,6 @@ class Details extends Component {
                 </a>
             </div>);
         }
-        console.log('node', node);
 
         return node;
     }
@@ -589,7 +585,6 @@ class Details extends Component {
                 const formdata = new FormData();
                 formdata.append('a_file', file);
                 uploadFileHandler({}, formdata).then(rep => {
-                    console.log(rep);
                     this.setState({
                         FileName: file.name,
                         CheckFile: rep
@@ -711,7 +706,6 @@ class Details extends Component {
                                     item.CurrentNodeNameNew = item.CurrentNodeName;
                                 }
                                 if (CurrentNodeName === item.CurrentNodeName) {
-                                    console.log('item', item);
 
                                     if (item.FormValues.length > 0) {
                                         return <Card

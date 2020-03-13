@@ -200,6 +200,7 @@ class TableList extends Component {
     }
     getWorkList (values = {}) {
         let {
+            leftkeycode,
             actions: { getWorkList }
         } = this.props;
         const { flowID, page } = this.state;
@@ -246,6 +247,7 @@ class TableList extends Component {
             }
         }
         let param = {
+            Section: leftkeycode,
             workid: '', // 任务ID
             title: values.title || '', // 任务名称
             flowid: flowID, // 流程类型或名称

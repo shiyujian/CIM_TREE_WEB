@@ -18,9 +18,11 @@ import {
     TableListSee,
     TableListInitiate
 } from '../../components/Form/DesignChange';
+import TreeProjectList from '../../components/TreeProjectList';
 import {
     getUser,
     getAreaTreeData,
+    getDefaultProject,
     getUserIsManager
 } from '_platform/auth';
 const { TabPane } = Tabs;
@@ -60,6 +62,7 @@ export default class DesignChange extends Component {
             flowName: '', // 流程名称
             originNodeID: '' // 节点id
         };
+        this.filterTreeList = this.filterTreeList.bind(this); // 过滤项目
     }
     componentWillMount = async () => {
         const {
@@ -98,6 +101,10 @@ export default class DesignChange extends Component {
                 loading: false
             });
         }
+        let defaultProject = await getDefaultProject();
+        if (defaultProject) {
+            this.onSelect([defaultProject]);
+        }
         this.getAuditor();
     }
     componentDidMount = async () => {
@@ -128,7 +135,6 @@ export default class DesignChange extends Component {
             }
         } = this.props;
         let userInfo = await getUser();
-        console.log('userInfo', userInfo);
         let userRoles = userInfo.roles;
         let userRoleName = (userInfo && userInfo.roles && userRoles.RoleName) || '';
         if (userRoleName) {
@@ -191,6 +197,27 @@ export default class DesignChange extends Component {
             sectionList
         });
     }
+    filterTreeList (treeList) {
+        const {
+            isOwner,
+            leftkeycode
+        } = this.state;
+        let newTreeList = [];
+        if (leftkeycode) {
+            treeList.map(item => {
+                if (item.No === leftkeycode) {
+                    newTreeList.push(item);
+                }
+            });
+        } else {
+            newTreeList = treeList;
+        }
+        // 业主和超管看到所有项目
+        if (isOwner) {
+            newTreeList = treeList;
+        }
+        return newTreeList;
+    }
 
     render () {
         const {
@@ -205,7 +232,6 @@ export default class DesignChange extends Component {
         if (tree.bigTreeList) {
             treeList = tree.bigTreeList;
         }
-        console.log('treeList', treeList);
 
         let html = [];
         if (currentUserRole.indexOf('设计文书') > -1) {
@@ -264,11 +290,10 @@ export default class DesignChange extends Component {
                             ? <Spin spinning={loading} tip='Loading...' />
                             : <div>
                                 <Sidebar>
-                                    <PkCodeTree
-                                        treeData={treeList}
+                                    <TreeProjectList
+                                        treeData={this.filterTreeList(treeList)}
                                         selectedKeys={leftkeycode}
                                         onSelect={this.onSelect.bind(this)}
-                                        // onExpand={this.onExpand.bind(this)}
                                     />
                                 </Sidebar>
                                 <Content>

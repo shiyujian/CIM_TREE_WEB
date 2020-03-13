@@ -102,7 +102,6 @@ class TableListCommission extends Component {
         //     keys = 'Section';
         //     vals = this.props.leftkeycode;
         // }
-        console.log('项目', this.props.leftkeycode);
         let param = {
             workid: '', // 任务ID
             workno: values.workNo || '', // 表单编号

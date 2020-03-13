@@ -85,6 +85,7 @@ class TableList extends Component {
     }
     getWorkList (values = {}) {
         let {
+            leftkeycode,
             actions: { getWorkList }
         } = this.props;
         const { flowID, page } = this.state;
@@ -104,6 +105,7 @@ class TableList extends Component {
             starter = getUser().ID;
         }
         let param = {
+            Section: leftkeycode,
             workid: '', // 任务ID
             workno: values.workNo || '', // 表单编号
             title: values.name || '', // 任务名称
@@ -394,7 +396,6 @@ class TableList extends Component {
             title: '操作',
             dataIndex: 'actions',
             render: (text, record, index) => {
-                console.log('用户', getUser());
                 let user = getUser();
                 let arr = [<a onClick={this.onSee.bind(this, record.ID)}>查看</a>];
                 if (user.username === 'admin') {

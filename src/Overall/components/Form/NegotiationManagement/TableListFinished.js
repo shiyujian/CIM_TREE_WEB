@@ -97,7 +97,6 @@ class TableListFinished extends Component {
             StartTime = moment(values.timeArr[0]).format(dateTimeFormat);
             EndTime = moment(values.timeArr[1]).format(dateTimeFormat);
         }
-        console.log('发起人', values.starter);
         let executor = '';
         if (getUser().ID === 111111) {
             executor = '';
@@ -182,7 +181,6 @@ class TableListFinished extends Component {
             ConstructionList,
             form: { getFieldDecorator }
         } = this.props;
-        console.log('发起人', ConstructionList);
         return (
             <div className='table-level'>
                 <div>

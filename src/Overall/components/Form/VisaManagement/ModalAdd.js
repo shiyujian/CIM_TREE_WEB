@@ -63,8 +63,6 @@ class ModalAdd extends Component {
         this.setStarter();
     }
     setStarter () {
-        console.log('当前用户信息', getUser());
-        console.log('当前用户信息', this.props.sectionList);
         const {
             sectionList,
             form: { setFieldsValue }
