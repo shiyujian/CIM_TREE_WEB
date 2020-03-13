@@ -132,7 +132,6 @@ export default class VisaManagement extends Component {
         let OwnerData = await getUsers({}, postOwnerdata);
         let activeKey = 'initiate';
         let allowKeyArr = ['initiate', 'commission', 'finished'];
-        console.log(userInfo, '用户信息');
         if (userInfo.roles && userInfo.roles.ID === 10) {
             activeKey = 'initiate';
             allowKeyArr = ['initiate'];
@@ -294,7 +293,6 @@ export default class VisaManagement extends Component {
                 sectionList = item.children;
             }
         });
-        console.log('sectionList', sectionList);
         this.setState({
             leftkeycode: keycode,
             sectionList

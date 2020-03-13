@@ -128,7 +128,6 @@ class ModalAdd extends Component {
                     Title: values.Title, // 任务标题
                     WFState: 1 // 流程状态 1运行中
                 };
-                console.log(123, JSON.stringify(params));
                 postStartwork({}, params).then(rep => {
                     if (rep && rep.code === 1) {
                         Notification.success({

@@ -209,7 +209,6 @@ class ModalCheck extends Component {
                     NextExecutor: 0, // 下一节点执行人
                     Executor: getUser().ID // 当前节点执行人
                 };
-                console.log('审核数据', JSON.stringify(params));
                 postSendwork({}, params).then(rep => {
                     if (rep && rep.code === 1) {
                         Notification.success({
@@ -274,7 +273,6 @@ class ModalCheck extends Component {
                     NextExecutor: values.NextPerson || 0, // 下一节点执行人
                     Executor: getUser().ID // 当前节点执行人
                 };
-                console.log('审核数据', JSON.stringify(params));
                 postSendwork({}, params).then(rep => {
                     if (rep && rep.code === 1) {
                         Notification.success({
@@ -372,7 +370,6 @@ class ModalCheck extends Component {
                 const formdata = new FormData();
                 formdata.append('a_file', file);
                 uploadFileHandler({}, formdata).then(rep => {
-                    console.log(rep);
                     this.setState({
                         FileName: file.name,
                         CheckFile: rep

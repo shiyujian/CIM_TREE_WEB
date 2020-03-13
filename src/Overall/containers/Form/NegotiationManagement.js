@@ -85,7 +85,6 @@ class NegotiationManagement extends Component {
         let postConstructionID = ''; // 施工文书ID
         let postSupervisorID = ''; // 监理文书ID
         let postOwnerID = ''; // 业主文书ID
-        console.log('roles', roles);
         roles.map((role) => {
             if (role && role.ID && role.ParentID && role.RoleName === '施工文书') {
                 postConstructionID = role.ID;
