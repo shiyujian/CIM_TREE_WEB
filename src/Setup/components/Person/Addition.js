@@ -207,6 +207,10 @@ class Addition extends Component {
                     });
                     break;
                 default:
+                    systemRoles.push({
+                        name: '施工职务',
+                        children: ['普通员工']
+                    });
                     break;
             }
         }

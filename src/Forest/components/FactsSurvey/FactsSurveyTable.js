@@ -43,7 +43,6 @@ export default class FactsSurveyTable extends Component {
             isSuperAdmin: false,
             section: '',
             areaLayerList: {},
-            createBtnVisible: false,
             loading: false,
             permission: false,
             menuIsExtend: true /* 菜单是否展开 */,
@@ -51,14 +50,11 @@ export default class FactsSurveyTable extends Component {
             pointsData: [],
             linesData: [],
             polygonsData: [],
-            layerList: {},
-            investigationLoading: false
+            investigationLayerList: {},
+            investigationLoading: false,
+            checkedKeys: []
         };
         this.tileTreeLayerBasic = null;
-        this.tileLayerTreeFilter = null;
-        this.tileTreePipeBasic = null;
-        this.tileLayerTreeThinClass = null;
-        this.tileTreePipeNodeBasic = null;
         this.editPolygon = null;
     }
     componentWillMount () {
@@ -122,10 +118,11 @@ export default class FactsSurveyTable extends Component {
         } = this.state;
         if (leftkeycode && leftkeycode !== prevProps.leftkeycode) {
             if (isSuperAdmin || section) {
-                await this.handleGetInvestigationTypes(leftkeycode);
-                await this.handleGetInvestigationPoints(leftkeycode);
-                await this.handleGetInvestigationLines(leftkeycode);
-                await this.handleGetInvestigationPolygons(leftkeycode);
+                await this.handleRemoveAllLayer();
+                await this.handleGetInvestigationTypes(leftkeycode, '');
+                await this.handleGetInvestigationPoints(leftkeycode, '');
+                await this.handleGetInvestigationLines(leftkeycode, '');
+                await this.handleGetInvestigationPolygons(leftkeycode, '');
             }
         }
     }
@@ -167,15 +164,7 @@ export default class FactsSurveyTable extends Component {
             zoomOffset: 1
         }).addTo(this.map);
         // 加载苗木图层
-        // await this.getTileLayerTreeBasic();
-        // 灌溉管网下的树木图层
-        // await this.getTileLayerTreeFilter();
-        // 树种区域图层
-        await this.getTileLayerTreeThinClass();
-        // 加载灌溉管网图层
-        await this.getTreePipeLayer();
-        // 加载灌溉管网图层
-        await this.getTreePipeNodeLayer();
+        await this.getTileLayerTreeBasic();
         if (section || isSuperAdmin) {
             this.editPolygon = this.map.editTools.startPolygon();
         } else {
@@ -207,108 +196,75 @@ export default class FactsSurveyTable extends Component {
             }
         }
     }
-    // 灌溉管网下的树木图层
-    getTileLayerTreeFilter = async => {
-        try {
-            this.tileLayerTreeFilter = L.tileLayer(
-                FOREST_GIS_API +
-                '/geoserver/gwc/service/wmts?layer=xatree%3Aland&style=&tilematrixset=My_EPSG%3A43261&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
-                {
-                    opacity: 1.0,
-                    subdomains: [1, 2, 3],
-                    minZoom: 10,
-                    maxZoom: 21,
-                    storagetype: 0,
-                    tiletype: 'wtms'
-                }
-            ).addTo(this.map);
-        } catch (e) {
-            console.log('getTileLayerTreeFilter', e);
+    handleDrawingQuery = async () => {
+        const {
+            section,
+            isSuperAdmin
+        } = this.state;
+        const {
+            leftkeycode
+        } = this.props;
+        console.log('this.editPolygon', this.editPolygon);
+
+        if (this.editPolygon && (section || isSuperAdmin)) {
+            // this.setState({
+            //     loading: true
+            // });
+            let coordinates = handlePolygonLatLngs(this.editPolygon);
+            console.log('coordinates', coordinates);
+            if (coordinates && coordinates instanceof Array && coordinates.length > 0) {
+                await this.handleRemoveAllLayer();
+                let wkt = 'POLYGON(';
+                // 获取手动框选坐标wkt
+                wkt = wkt + getHandleWktData(coordinates);
+                wkt = wkt + ')';
+                console.log('wkt', wkt);
+                await this.handleGetInvestigationTypes(leftkeycode, wkt);
+                await this.handleGetInvestigationPoints(leftkeycode, wkt);
+                await this.handleGetInvestigationLines(leftkeycode, wkt);
+                await this.handleGetInvestigationPolygons(leftkeycode, wkt);
+            }
+        } else {
+            Notification.error({
+                message: '当前用户未关联标段，请重新切换用户'
+            });
         }
     }
-    // 灌溉管网下的细班图层
-    getTileLayerTreeThinClass = async => {
-        try {
-            this.tileLayerTreeThinClass = L.tileLayer(
-                FOREST_GIS_API +
-                '/geoserver/gwc/service/wmts?layer=xatree%3Athinclass&style=&tilematrixset=My_EPSG%3A43261&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
-                {
-                    opacity: 1.0,
-                    subdomains: [1, 2, 3],
-                    minZoom: 10,
-                    maxZoom: 21,
-                    storagetype: 0,
-                    tiletype: 'wtms'
-                }
-            ).addTo(this.map);
-        } catch (e) {
-            console.log('getTileLayerTreeThinClass', e);
+    handleCreateTaskCancel = async () => {
+        const {
+            section,
+            isSuperAdmin
+        } = this.state;
+        const {
+            leftkeycode
+        } = this.props;
+        if (this.editPolygon) {
+            this.map.removeLayer(this.editPolygon);
+            this.editPolygon = '';
+        }
+        this.editPolygon = this.map.editTools.startPolygon();
+        if ((isSuperAdmin || section) && leftkeycode) {
+            await this.handleRemoveAllLayer();
+            await this.handleGetInvestigationTypes(leftkeycode, '');
+            await this.handleGetInvestigationPoints(leftkeycode, '');
+            await this.handleGetInvestigationLines(leftkeycode, '');
+            await this.handleGetInvestigationPolygons(leftkeycode, '');
         }
     }
-    // 加载灌溉管网图层
-    getTreePipeLayer = async () => {
-        try {
-            // this.tileTreePipeBasic = L.tileLayer(
-            //     FOREST_GIS_API +
-            //     '/geoserver/gwc/service/wmts?layer=xatree%3Apipe&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
-            //     {
-            //         opacity: 1.0,
-            //         subdomains: [1, 2, 3],
-            //         minZoom: 10,
-            //         maxZoom: 21,
-            //         storagetype: 0,
-            //         tiletype: 'wtms'
-            //     }
-            // ).addTo(this.map);
-            this.tileTreePipeBasic = L.tileLayer.wms(
-                FOREST_GIS_API +
-                '/geoserver/xatree/wms?style=',
-                {
-                    layers: 'xatree:pipe',
-                    crs: L.CRS.EPSG4326,
-                    format: 'image/png',
-                    minZoom: 11,
-                    maxZoom: 21,
-                    transparent: true
-                }
-            ).addTo(this.map);
-        } catch (e) {
-            console.log('getTreePipeLayer', e);
+    // 去除全部的现状调查图层
+    handleRemoveAllLayer = async () => {
+        const {
+            investigationLayerList
+        } = this.state;
+        for (let i in investigationLayerList) {
+            this.map.removeLayer(investigationLayerList[i]);
         }
-    }
-    // 加载灌溉管网图层
-    getTreePipeNodeLayer = async () => {
-        try {
-            // this.tileTreePipeNodeBasic = L.tileLayer(
-            //     FOREST_GIS_API +
-            //     '/geoserver/gwc/service/wmts?layer=xatree%3Apipenode&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
-            //     {
-            //         opacity: 1.0,
-            //         subdomains: [1, 2, 3],
-            //         minZoom: 10,
-            //         maxZoom: 21,
-            //         storagetype: 0,
-            //         tiletype: 'wtms'
-            //     }
-            // ).addTo(this.map);
-            this.tileTreePipeNodeBasic = L.tileLayer.wms(
-                FOREST_GIS_API +
-                '/geoserver/xatree/wms?style=',
-                {
-                    layers: 'xatree:pipenode',
-                    crs: L.CRS.EPSG4326,
-                    format: 'image/png',
-                    minZoom: 11,
-                    maxZoom: 21,
-                    transparent: true
-                }
-            ).addTo(this.map);
-        } catch (e) {
-            console.log('getTreePipeNodeLayer', e);
-        }
+        this.setState({
+            checkedKeys: []
+        });
     }
     // 获取调查类型列表
-    handleGetInvestigationTypes = async (eventKey) => {
+    handleGetInvestigationTypes = async (eventKey, wkt = '') => {
         const {
             actions: {
                 getInvestigationTypes
@@ -325,7 +281,7 @@ export default class FactsSurveyTable extends Component {
         }
     }
     // 现状调查查询（点要素）
-    handleGetInvestigationPoints = async (eventKey) => {
+    handleGetInvestigationPoints = async (eventKey, wkt = '') => {
         const {
             actions: {
                 getInvestigationPoints
@@ -333,7 +289,8 @@ export default class FactsSurveyTable extends Component {
         } = this.props;
         try {
             let postData = {
-                land: eventKey
+                land: eventKey,
+                bbox: wkt
             };
             let pointsData = [];
             let data = await getInvestigationPoints({}, postData);
@@ -349,7 +306,7 @@ export default class FactsSurveyTable extends Component {
         }
     }
     // 现状调查查询（线要素）
-    handleGetInvestigationLines = async (eventKey) => {
+    handleGetInvestigationLines = async (eventKey, wkt = '') => {
         const {
             actions: {
                 getInvestigationLines
@@ -357,7 +314,8 @@ export default class FactsSurveyTable extends Component {
         } = this.props;
         try {
             let postData = {
-                land: eventKey
+                land: eventKey,
+                bbox: wkt
             };
             let linesData = [];
             let data = await getInvestigationLines({}, postData);
@@ -373,7 +331,7 @@ export default class FactsSurveyTable extends Component {
         }
     }
     // 现状调查查询（面要素）
-    handleGetInvestigationPolygons = async (eventKey) => {
+    handleGetInvestigationPolygons = async (eventKey, wkt = '') => {
         const {
             actions: {
                 getInvestigationPolygons
@@ -381,7 +339,8 @@ export default class FactsSurveyTable extends Component {
         } = this.props;
         try {
             let postData = {
-                land: eventKey
+                land: eventKey,
+                bbox: wkt
             };
             let polygonsData = [];
             let data = await getInvestigationPolygons({}, postData);
@@ -446,7 +405,7 @@ export default class FactsSurveyTable extends Component {
             if (geo.properties.type === 'area') {
                 // 创建区域图形
                 let polygon = L.polygon(geo.geometry.coordinates, {
-                    color: '#201ffd',
+                    color: 'yellow',
                     fillColor: fillAreaColor(geo.key),
                     fillOpacity: 0.3
                 }).addTo(this.map);
@@ -454,7 +413,7 @@ export default class FactsSurveyTable extends Component {
             } else if (geo.properties.type === 'line') {
                 // 创建区域图形
                 let polyline = L.polyline(geo.geometry.coordinates, {
-                    color: '#201ffd',
+                    color: 'yellow',
                     fillColor: fillAreaColor(geo.key),
                     fillOpacity: 0.3
                 }).addTo(this.map);
@@ -465,94 +424,16 @@ export default class FactsSurveyTable extends Component {
         }
     }
     handleMapMeasureClickFunction = async (e) => {
-        // 测量面积
+        // 获取当前地图上的编辑点
         if (this.editPolygon) {
             let coordinates = handlePolygonLatLngs(this.editPolygon);
             console.log('coordinates', coordinates);
-            if (coordinates.length > 2) {
-                this.setState({
-                    createBtnVisible: true
-                });
-            } else {
-                this.setState({
-                    createBtnVisible: false
-                });
-            }
         }
-    }
-    handleExportPipeDrawingOk = async () => {
-        const {
-            actions: {
-                getExportPipeDrawing
-            }
-        } = this.props;
-        const {
-            section,
-            isSuperAdmin
-        } = this.state;
-        if (this.editPolygon && (section || isSuperAdmin)) {
-            this.setState({
-                loading: true
-            });
-            let coordinates = handlePolygonLatLngs(this.editPolygon);
-            console.log('coordinates', coordinates);
-            let wkt = 'POLYGON(';
-            // 获取手动框选坐标wkt
-            wkt = wkt + getHandleWktData(coordinates);
-            wkt = wkt + ')';
-            console.log('wkt', wkt);
-            // let postData = {
-            //     bbox: wkt
-            // };
-            // await getExportPipeDrawing({}, postData);
-            if (isSuperAdmin) {
-                let downloadUrl = `${DOCEXPORT_API}?action=pipedrawing&bbox=${wkt}`;
-                await this.createLink(this, downloadUrl);
-                this.setState({
-                    loading: false
-                });
-            } else {
-                let downloadUrl = `${DOCEXPORT_API}?action=pipedrawing&bbox=${wkt}&section=${section}`;
-                await this.createLink(this, downloadUrl);
-                this.setState({
-                    loading: false
-                });
-            }
-        } else {
-            Notification.error({
-                message: '当前用户未关联标段，请重新切换用户'
-            });
-        }
-    }
-    createLink = async (name, url) => {
-        // 下载
-        let link = document.createElement('a');
-        link.download = name;
-        link.href = url;
-        await link.setAttribute('download', this);
-        await link.setAttribute('target', '_blank');
-        await document.body.appendChild(link);
-        await link.click();
-        await document.body.removeChild(link);
-    };
-
-    handleCreateTaskCancel = async () => {
-        if (this.editPolygon) {
-            this.map.removeLayer(this.editPolygon);
-            this.editPolygon = '';
-        }
-        this.editPolygon = this.map.editTools.startPolygon();
-        this.setState({
-            createBtnVisible: false
-        });
     }
     // 树节点选中
     handleTreeCheck = async (checkedKeys, e) => {
-        console.log('onCheck', checkedKeys);
-        console.log('e', e);
         let checked = e.checked;
         let node = e && e.node && e.node.props;
-        console.log('node', node);
         if (checked) {
             if (node && node.children && node.children instanceof Array && node.children.length > 0) {
                 let children = node.children;
@@ -583,7 +464,7 @@ export default class FactsSurveyTable extends Component {
     // 在地图上进行标注
     handleDrawMapData = async (node, focus) => {
         const {
-            layerList = {}
+            investigationLayerList = {}
         } = this.state;
         let geom = (node && node.Geom) || '';
         if (geom.indexOf('POINT') !== -1) {
@@ -595,7 +476,7 @@ export default class FactsSurveyTable extends Component {
                     coordinates.push(data[1], data[0]);
                     let marker = L.marker(coordinates, {});
                     marker.addTo(this.map);
-                    layerList[node.ID] = marker;
+                    investigationLayerList[node.ID] = marker;
                     if (focus) {
                         this.map.panTo(coordinates);
                     }
@@ -611,7 +492,7 @@ export default class FactsSurveyTable extends Component {
                 geometry: { type: 'PolyLine', coordinates: coordinates }
             };
             let layer = this._createMarker(message);
-            layerList[node.ID] = layer;
+            investigationLayerList[node.ID] = layer;
             if (focus) {
                 this.map.fitBounds(layer.getBounds());
             }
@@ -625,22 +506,22 @@ export default class FactsSurveyTable extends Component {
                 geometry: { type: 'Polygon', coordinates: coordinates }
             };
             let layer = this._createMarker(message);
-            layerList[node.ID] = layer;
+            investigationLayerList[node.ID] = layer;
             if (focus) {
                 this.map.fitBounds(layer.getBounds());
             }
         }
         this.setState({
-            layerList
+            investigationLayerList
         });
     }
     // 取消地图标注
     handleRemoveMapData = async (node) => {
         const {
-            layerList
+            investigationLayerList
         } = this.state;
-        if (layerList[node.ID]) {
-            this.map.removeLayer(layerList[node.ID]);
+        if (investigationLayerList[node.ID]) {
+            this.map.removeLayer(investigationLayerList[node.ID]);
         }
     }
     /* 菜单展开收起 */
@@ -666,17 +547,15 @@ export default class FactsSurveyTable extends Component {
     }
     render () {
         const {
-            createBtnVisible,
-            isSuperAdmin,
             loading,
             investigationLoading,
-            section,
             permission,
             menuIsExtend,
             menuWidth,
             pointsData = [],
             linesData = [],
-            polygonsData = []
+            polygonsData = [],
+            checkedKeys = []
         } = this.state;
         let treeData = [
             {
@@ -751,9 +630,32 @@ export default class FactsSurveyTable extends Component {
                                     <div className='FactsSurveyTable-asideTree'>
                                         <Spin spinning={investigationLoading}>
                                             <div className='FactsSurveyTable-StatusButton'>
+                                                <a key='查询'
+                                                    title='查询'
+                                                    className={'FactsSurveyTable-button-statusSel'}
+                                                    onClick={this.handleDrawingQuery.bind(this)}
+                                                    style={{marginRight: 8}}
+                                                >
+                                                    <span className={'FactsSurveyTable-button-status-textSel'}>
+                                                    查询
+                                                    </span>
+                                                </a>
+                                                <a key='撤销'
+                                                    title='撤销'
+                                                    className={'FactsSurveyTable-button-statusSel'}
+                                                    onClick={this.handleCreateTaskCancel.bind(this)}
+                                                    style={{marginRight: 8}}
+                                                >
+                                                    <span className={'FactsSurveyTable-button-status-textSel'}>
+                                                    撤销
+                                                    </span>
+                                                </a>
+                                            </div>
+                                            <div className='FactsSurveyTable-tree-layout'>
                                                 <Tree
                                                     onCheck={this.handleTreeCheck.bind(this)}
                                                     selectable={false}
+                                                    checkedKeys={checkedKeys}
                                                     checkable>
                                                     {
                                                         treeData.map(data => {
@@ -771,37 +673,6 @@ export default class FactsSurveyTable extends Component {
                             </div>
                         </div>
                     </div>
-                    {
-                        createBtnVisible ? (
-                            <div className='FactsSurveyTable-button-layout'>
-                                <div>
-                                    {/* {
-                                        isSuperAdmin
-                                            ? <Button
-                                                disabled={loading}
-                                                type='primary'
-                                                style={{marginRight: 10}}
-                                                onClick={this.handleExportPipeDrawingOk.bind(this)}>
-                                                竣工图
-                                            </Button> : ''
-                                    } */}
-                                    <Button
-                                        disabled={loading}
-                                        type='primary'
-                                        style={{marginRight: 10}}
-                                        onClick={this.handleExportPipeDrawingOk.bind(this)}>
-                                                竣工图
-                                    </Button>
-                                    <Button
-                                        disabled={loading}
-                                        type='danger'
-                                        onClick={this.handleCreateTaskCancel.bind(this)}>
-                                                撤销
-                                    </Button>
-                                </div>
-                            </div>
-                        ) : ''
-                    }
                 </div>
             </div>
         );
