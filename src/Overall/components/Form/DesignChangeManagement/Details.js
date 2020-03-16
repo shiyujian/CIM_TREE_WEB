@@ -36,7 +36,6 @@ class Details extends Component {
             CheckFile: '', //  附件地址
             Meeting: '', // 关联会议
             Remark: '', // 备注
-            // CheckStatus: '', // 审核结果
             Works: [], // 流程列表
             CurrentNode: '', // 当前节点ID
             CurrentNodeName: '', // 当前节点名称
@@ -84,6 +83,7 @@ class Details extends Component {
                     }
                 });
             };
+            console.log('当前节点', workDetails.CurrentNode, workDetails.CurrentNodeName);
             this.setState({
                 Title: workDetails.Title,
                 constructionOrg: workDetails.StarterObj.OrgObj && workDetails.StarterObj.OrgObj.OrgName,
@@ -284,9 +284,6 @@ class Details extends Component {
             }
         });
     }
-    // save(){
-    //     this.props.DetailsReturn();
-    // }
 
     cancel () {
         this.props.DetailsReturn();
@@ -300,13 +297,12 @@ class Details extends Component {
             });
         }
     }
-
-    onReturn () {
+    // 不通过
+    onClickNoPass () {
         const {
             flowID,
             flowName,
-            workID,
-            actions: { postSendwork },
+            actions: { postSendwork, postBackwork },
             form: { validateFields },
             detailRow
         } = this.props;
@@ -335,43 +331,61 @@ class Details extends Component {
                         Val: FileName
                     }
                 ];
-                let params = {
-                    FlowID: flowID, // 流程ID
-                    FlowName: flowName, // 流程名称
-                    WorkID: detailRow.ID, // 任务ID
-                    CurrentNode: CurrentNode, // 当前节点
-                    CurrentNodeName: CurrentNodeName, // 当前节点名称
-                    NextNode: noPassNodeID,
-                    NextNodeName: '',
-                    FormValue: {
-                        FormParams: FormParams,
-                        NodeID: '' // 下一节点ID
-                    }, // 表单值
-                    NextExecutor: 0, // 下一节点执行人
-                    Executor: getUser().ID // 当前节点执行人
-                };
-                postSendwork({}, params).then(rep => {
-                    if (rep && rep.code === 1) {
-                        Notification.success({
-                            message: '审核操作成功'
-                        });
-                        this.props.reloadList();
-                        this.props.DetailsReturn();
-                    } else {
-                        Notification.error({
-                            message: `操作失败，${rep.msg}`
-                        });
-                    }
-                });
+                if (CurrentNodeName === '监理和造价咨询') {
+                    let params = {
+                        FlowID: flowID, // 流程ID
+                        FlowName: flowName, // 流程名称
+                        WorkID: detailRow.ID, // 任务ID
+                        CurrentNode: CurrentNode, // 当前节点
+                        CurrentNodeName: CurrentNodeName, // 当前节点名称
+                        FormValue: {
+                            FormParams: FormParams,
+                            NodeID: '' // 下一节点ID
+                        }, // 表单值
+                        Executor: getUser().ID, // 当前节点执行人
+                        BackNode: '52ba8329-c1a1-4e93-b450-5eb017cfe8fe' // 退回到项目技术负责人
+                    };
+                    postBackwork({}, params).then(rep => {
+                        console.log('流程退回到项目技术负责人', rep);
+                    });
+                } else {
+                    let params = {
+                        FlowID: flowID, // 流程ID
+                        FlowName: flowName, // 流程名称
+                        WorkID: detailRow.ID, // 任务ID
+                        CurrentNode: CurrentNode, // 当前节点
+                        CurrentNodeName: CurrentNodeName, // 当前节点名称
+                        NextNode: noPassNodeID,
+                        NextNodeName: '',
+                        FormValue: {
+                            FormParams: FormParams,
+                            NodeID: '' // 下一节点ID
+                        }, // 表单值
+                        NextExecutor: 0, // 下一节点执行人
+                        Executor: getUser().ID // 当前节点执行人
+                    };
+                    postSendwork({}, params).then(rep => {
+                        if (rep && rep.code === 1) {
+                            Notification.success({
+                                message: '审核操作成功'
+                            });
+                            this.props.reloadList();
+                            this.props.DetailsReturn();
+                        } else {
+                            Notification.error({
+                                message: `操作失败，${rep.msg}`
+                            });
+                        }
+                    });
+                }
             }
         });
     }
 
-    onSubmit () {
+    onClickPass () {
         const {
             flowID,
             flowName,
-            workID,
             detailRow,
             actions: { postSendwork },
             form: { validateFields }
@@ -510,6 +524,7 @@ class Details extends Component {
             },
             platform: { tree = {} }
         } = this.props;
+        console.log('标签页', tabs);
         const {
             Title,
             DrawingNo,
@@ -599,7 +614,6 @@ class Details extends Component {
                 width={720}
                 visible={DetailsModalVisible}
                 footer={null}
-                // onOk={this.save.bind(this)}
                 onCancel={this.cancel.bind(this)}
             >
                 <div style={{color: '#ff0000', position: 'absolute', top: '35px', fontSize: '12px'}}>
@@ -960,13 +974,13 @@ class Details extends Component {
                         <Col span={24} style={{textAlign: 'center'}}>
                             <Button
                                 style={{marginRight: 150, cursor: 'pointer'}}
-                                onClick={this.onReturn.bind(this)}>
+                                onClick={this.onClickNoPass.bind(this)}>
                                     不通过
                             </Button>
                             <Button
                                 type='primary'
                                 style={{cursor: 'pointer'}}
-                                onClick={this.onSubmit.bind(this)}>
+                                onClick={this.onClickPass.bind(this)}>
                                     通过
                             </Button>
                         </Col>

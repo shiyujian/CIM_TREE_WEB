@@ -11,13 +11,12 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import { actions } from '../../store/Form/designChange';
+import { actions } from '../../store/Form/designChangeManagement';
 import {
-    TableList,
-    PkCodeTree,
-    TableListSee,
+    TableListCommission,
+    TableListFinished,
     TableListInitiate
-} from '../../components/Form/DesignChange';
+} from '../../components/Form/DesignChangeManagement';
 import TreeProjectList from '../../components/TreeProjectList';
 import {
     getUser,
@@ -30,9 +29,9 @@ const { TabPane } = Tabs;
     state => {
         const {
             platform,
-            overall: { designChange }
+            overall: { designChangeManagement }
         } = state;
-        return { platform, ...designChange };
+        return { platform, ...designChangeManagement };
     },
     dispatch => ({
         actions: bindActionCreators(
@@ -41,7 +40,7 @@ const { TabPane } = Tabs;
         )
     })
 )
-export default class DesignChange extends Component {
+export default class DesignChangeManagement extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -261,7 +260,7 @@ export default class DesignChange extends Component {
                         defaultActiveKey='pending'
                     >
                         <TabPane tab={tab1} key='pending'>
-                            <TableList
+                            <TableListCommission
                                 {...this.props}
                                 {...this.state}
                                 tabs='pending'
@@ -269,7 +268,7 @@ export default class DesignChange extends Component {
                             />
                         </TabPane>
                         <TabPane tab={tab2} key='processed'>
-                            <TableListSee
+                            <TableListFinished
                                 {...this.props}
                                 {...this.state}
                                 tabs='processed'
