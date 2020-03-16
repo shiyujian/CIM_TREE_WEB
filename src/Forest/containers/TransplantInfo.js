@@ -168,21 +168,22 @@ export default class TransplantInfo extends Component {
 
     // 设置树种选项
     setTreeTypeOption (rst) {
+        let treetypeoption = [];
         if (rst instanceof Array) {
-            let treetypeoption = rst.map(item => {
+            treetypeoption = rst.map(item => {
                 return (
                     <Option key={item.ID} value={item.ID} title={item.TreeTypeName}>
                         {item.TreeTypeName}
                     </Option>
                 );
             });
-            treetypeoption.unshift(
-                <Option key={-1} value={''} title={'全部'}>
-                        全部
-                </Option>
-            );
-            this.setState({ treetypeoption, treetypelist: rst });
         }
+        treetypeoption.unshift(
+            <Option key={-1} value={''} title={'全部'}>
+                    全部
+            </Option>
+        );
+        this.setState({ treetypeoption, treetypelist: rst });
     }
 
     // 重置

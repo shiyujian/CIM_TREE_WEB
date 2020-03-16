@@ -29,7 +29,8 @@ export default class Tablelevel extends Component {
             record: {},
             imgvisible: false,
             imgSrc: false,
-            pagination: {}
+            pagination: {},
+            searchTreeName: ''
         };
     }
     columns = [
@@ -340,7 +341,6 @@ export default class Tablelevel extends Component {
             actions: { getTreeTypeList }
         } = this.props;
         try {
-            document.getElementById('TreeData').value = '';
             let treeTypeList = await getTreeTypeList();
             if (treeTypeList && treeTypeList instanceof Array) {
                 let pagination = {};
@@ -439,16 +439,19 @@ export default class Tablelevel extends Component {
         });
     }
 
+    handleSearchTreeNameChange = async (value) => {
+        this.setState({
+            searchTreeName: value.target.value
+        });
+    }
+
     search () {
         const {
-            pagination
+            pagination,
+            searchTreeName
         } = this.state;
-        let text = document.getElementById('TreeData');
         let value = '';
-        if (text && text.value) {
-            value = text.value;
-        }
-        value = trim(value);
+        value = trim(searchTreeName);
         let searchList = [];
         const { treeTypeList = [] } = this.props;
         if (value) {
@@ -494,13 +497,13 @@ export default class Tablelevel extends Component {
             pagination
         } = this.state;
         const { treeTypeList = [] } = this.props;
-        document.getElementById('TreeData').value = '';
         pagination.current = 1;
         pagination.total = treeTypeList && treeTypeList.length;
         pagination.pageSize = 10;
         this.setState({
             searchVisible: false,
-            pagination
+            pagination,
+            searchTreeName: ''
         });
     }
 
@@ -565,7 +568,8 @@ export default class Tablelevel extends Component {
         const { treeTypeList = [], editVisible = false, viewVisible = false } = this.props;
         const {
             searchVisible,
-            searchList
+            searchList,
+            searchTreeName
         } = this.state;
         let dataSource = [];
         if (searchVisible) {
@@ -600,7 +604,11 @@ export default class Tablelevel extends Component {
                             >
                                 树种名称:
                             </label>
-                            <Input id='TreeData' className='search_input' />
+                            <Input
+                                id='TreeData'
+                                value={searchTreeName}
+                                onChange={this.handleSearchTreeNameChange.bind(this)}
+                                className='search_input' />
                             <Button
                                 type='primary'
                                 onClick={this.search.bind(this)}

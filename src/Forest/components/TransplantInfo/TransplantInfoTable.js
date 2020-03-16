@@ -560,12 +560,18 @@ export default class TransplantInfoTable extends Component {
     // 数据展示方式
     onSearchTypeChange = (value) => {
         const {
-            tblData
+            tblData,
+            pagination
         } = this.state;
         this.setState({
             searchType: value
         }, () => {
             if (tblData && tblData instanceof Array && tblData.length > 0) {
+                const pager = { ...this.state.pagination };
+                pager.current = pagination.current;
+                this.setState({
+                    pagination: pager
+                });
                 this.query(1);
             }
         });
@@ -641,15 +647,31 @@ export default class TransplantInfoTable extends Component {
     query = async (page) => {
         const {
             sxm = '',
+            transplantProject = '',
+            transplantSection = '',
+            transplantSmallClass = '',
             transplantThinClass = '',
+            locationProject = '',
+            locationSection = '',
+            locationSmallClass = '',
             locationThinClass = ''
         } = this.state;
         if (transplantThinClass === '' && locationThinClass === '' && sxm === '') {
             message.info('请选择项目，标段，小班及细班信息或输入顺序码');
         } else if (sxm) {
+            if ((transplantThinClass === '' && (transplantProject || transplantSection || transplantSmallClass)) ||
+                (locationThinClass === '' && (locationProject || locationSection || locationSmallClass))
+            ) {
+                message.info('请选择施工包范围至细班');
+            }
             // 如果sxm存在，则用迁移前后细班同时搜索的接口，对数据进行处理
             this.queryBoth(page);
         } else {
+            if ((transplantThinClass === '' && (transplantProject || transplantSection || transplantSmallClass)) ||
+                (locationThinClass === '' && (locationProject || locationSection || locationSmallClass))
+            ) {
+                message.info('请选择施工包范围至细班');
+            }
             if (transplantThinClass && locationThinClass === '') {
                 // 只搜索迁移前的细班
                 this.queryTransplant(page);
@@ -658,7 +680,6 @@ export default class TransplantInfoTable extends Component {
                 this.queryLocation(page);
             } else if (transplantThinClass && locationThinClass) {
                 // 迁移前后的细班同时搜索
-                console.log('aaaaaaaaaaaa');
                 this.queryBoth(page);
             }
         }
@@ -716,21 +737,31 @@ export default class TransplantInfoTable extends Component {
                 let plan = content[i];
                 plan.order = (page - 1) * size + i + 1;
                 plan = await this.handleTransplantDataToTable(plan, userIDList, userDataList);
-                tblData.push(plan);
-                if (searchType === 'both') {
+                if (searchType === 'transplant') {
+                    tblData.push(plan);
+                } else if (searchType === 'both') {
+                    tblData.push(plan);
                     let locationData = await getTreeMess({sxm: plan.ZZBM});
                     if (locationData && locationData.ZZBM) {
-                        let transplantPlan = await this.handleLocationDataToTable(locationData, userIDList, userDataList);
-                        tblData.push(transplantPlan);
+                        let locationPlan = await this.handleLocationDataToTable(locationData, userIDList, userDataList);
+                        tblData.push(locationPlan);
                     }
-                };
+                } else if (searchType === 'location') {
+                    let locationData = await getTreeMess({sxm: plan.ZZBM});
+                    if (locationData && locationData.ZZBM) {
+                        let locationPlan = await this.handleLocationDataToTable(locationData, userIDList, userDataList);
+                        locationPlan.order = (page - 1) * size + i + 1;
+                        tblData.push(locationPlan);
+                    }
+                }
             }
 
             let messageTotalNum = rst.pageinfo.total;
             let treeTotalNum = rst.total;
             const pagination = { ...this.state.pagination };
-            pagination.total = rst.pageinfo.total;
+            pagination.total = rst.pageinfo.total * 2;
             pagination.pageSize = 20;
+            console.log('pagination', pagination);
 
             this.setState({
                 tblData,
@@ -856,11 +887,20 @@ export default class TransplantInfoTable extends Component {
                 let plan = content[i];
                 plan.order = (page - 1) * size + i + 1;
                 plan = await this.handleLocationDataToTable(plan, userIDList, userDataList);
-                tblData.push(plan);
-                if (searchType === 'both') {
+                if (searchType === 'location') {
+                    tblData.push(plan);
+                } else if (searchType === 'both') {
+                    tblData.push(plan);
                     let transplantData = await getTransplantTransMess({}, {sxm: plan.ZZBM});
                     if (transplantData && transplantData.content && transplantData.content.length > 0) {
                         let transplantPlan = await this.handleTransplantDataToTable(transplantData.content[0], userIDList, userDataList);
+                        tblData.push(transplantPlan);
+                    }
+                } else if (searchType === 'transplant') {
+                    let transplantData = await getTransplantTransMess({}, {sxm: plan.ZZBM});
+                    if (transplantData && transplantData.content && transplantData.content.length > 0) {
+                        let transplantPlan = await this.handleTransplantDataToTable(transplantData.content[0], userIDList, userDataList);
+                        transplantPlan.order = (page - 1) * size + i + 1;
                         tblData.push(transplantPlan);
                     }
                 }
@@ -869,7 +909,7 @@ export default class TransplantInfoTable extends Component {
             let messageTotalNum = rst.pageinfo.total;
             let treeTotalNum = rst.total;
             const pagination = { ...this.state.pagination };
-            pagination.total = rst.pageinfo.total;
+            pagination.total = rst.pageinfo.total * 2;
             pagination.pageSize = 20;
 
             this.setState({
@@ -1017,7 +1057,7 @@ export default class TransplantInfoTable extends Component {
             let messageTotalNum = rst.pageinfo.total;
             let treeTotalNum = rst.total;
             const pagination = { ...this.state.pagination };
-            pagination.total = rst.pageinfo.total;
+            pagination.total = rst.pageinfo.total * 2;
             pagination.pageSize = 20;
 
             this.setState({
@@ -1063,7 +1103,8 @@ export default class TransplantInfoTable extends Component {
             locationSmallClass,
             locationThinClass,
             locationSTime,
-            locationETime
+            locationETime,
+            pagination
         } = this.state;
         let header = '';
         let treeList = [];
@@ -1234,14 +1275,14 @@ export default class TransplantInfoTable extends Component {
                         </Select>
                     </div>
                     <div className='forest-mrg-datePicker'>
-                        <span className='forest-search-span'>测量时间：</span>
+                        <span className='forest-search-transplant-span7'>移栽前测量时间：</span>
                         <RangePicker
                             style={{ verticalAlign: 'middle' }}
                             defaultValue={[
                                 moment(transplantSTime, 'YYYY-MM-DD HH:mm:ss'),
                                 moment(transplantETime, 'YYYY-MM-DD HH:mm:ss')
                             ]}
-                            className='forest-forestcalcw4'
+                            className='forest-forestcalcw7'
                             showTime={{ format: 'HH:mm:ss' }}
                             format={'YYYY/MM/DD HH:mm:ss'}
                             onChange={this.transplantDatepick.bind(this)}
@@ -1350,14 +1391,14 @@ export default class TransplantInfoTable extends Component {
                         </Select>
                     </div>
                     <div className='forest-mrg-datePicker'>
-                        <span className='forest-search-span'>移栽时间：</span>
+                        <span className='forest-search-transplant-span7'>移栽后测量时间：</span>
                         <RangePicker
                             style={{ verticalAlign: 'middle' }}
                             defaultValue={[
                                 moment(locationSTime, 'YYYY-MM-DD HH:mm:ss'),
                                 moment(locationETime, 'YYYY-MM-DD HH:mm:ss')
                             ]}
-                            className='forest-forestcalcw4'
+                            className='forest-forestcalcw7'
                             showTime={{ format: 'HH:mm:ss' }}
                             format={'YYYY/MM/DD HH:mm:ss'}
                             onChange={this.locationDatepick.bind(this)}
@@ -1378,7 +1419,14 @@ export default class TransplantInfoTable extends Component {
                         </Button>
                     </Col>
                     <Col span={20} className='forest-quryrstcnt'>
-                        <span>{`此次查询共有数据：${this.state.messageTotalNum}条，  共有苗木：${this.state.treeTotalNum}棵`}</span>
+                        {
+                            details.length > 0
+                                ? <span>
+                                    {`此次查询共有数据：${this.state.messageTotalNum}条，  共有苗木：${this.state.treeTotalNum}棵`}
+                                </span>
+                                : ''
+                        }
+
                     </Col>
                     <Col span={2} >
                         <Button
@@ -1391,6 +1439,8 @@ export default class TransplantInfoTable extends Component {
                 </Row>
             </div>
         );
+        console.log('pagination', pagination);
+
         return (
             <div>
                 <Row>{header}</Row>
@@ -1414,7 +1464,7 @@ export default class TransplantInfoTable extends Component {
                         locale={{ emptyText: '无移植信息' }}
                         dataSource={details}
                         onChange={this.handleTableChange.bind(this)}
-                        pagination={this.state.pagination}
+                        pagination={pagination}
                     />
                 </Row>
             </div>
