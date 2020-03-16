@@ -58,6 +58,7 @@ export const actions = {
     deleteWork,
     postStartwork,
     postSendwork,
+    postBackwork,
     // getNodefieldList,
     // postNodefields,
     // putNodefields,

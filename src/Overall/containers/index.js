@@ -9,6 +9,6 @@ export Redios from './Datum/Redios';
 export Interim from './Datum/Interim';
 
 // 表单管理
-export DesignChange from './Form/DesignChange';
+export DesignChangeManagement from './Form/DesignChangeManagement';
 export NegotiationManagement from './Form/NegotiationManagement';
 export VisaManagement from './Form/VisaManagement';
