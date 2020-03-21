@@ -307,15 +307,24 @@ export default class DegitalAccept extends Component {
         const {
             sectionsData
         } = this.state;
-        sectionsData.map((sectionData) => {
-            if (value === sectionData.No) {
-                let smallClassesData = sectionData.children;
-                this.setState({
-                    smallClassesData
-                });
-                this.setSmallClassOption(smallClassesData);
-            }
-        });
+        if (value) {
+            sectionsData.map((sectionData) => {
+                if (value === sectionData.No) {
+                    let smallClassesData = sectionData.children;
+                    this.setState({
+                        smallClassesData
+                    });
+                    this.setSmallClassOption(smallClassesData);
+                }
+            });
+        } else {
+            this.setState({
+                smallClassesData: [],
+                smallclassoption: [],
+                thinClassesData: [],
+                thinclassoption: []
+            });
+        }
     }
     // 设置小班选项
     setSmallClassOption (rst) {
@@ -342,15 +351,22 @@ export default class DegitalAccept extends Component {
         const {
             smallClassesData
         } = this.state;
-        smallClassesData.map((smallClassData) => {
-            if (value === smallClassData.No) {
-                let thinClassesData = smallClassData.children;
-                this.setState({
-                    thinClassesData
-                });
-                this.setThinClassOption(thinClassesData);
-            }
-        });
+        if (value) {
+            smallClassesData.map((smallClassData) => {
+                if (value === smallClassData.No) {
+                    let thinClassesData = smallClassData.children;
+                    this.setState({
+                        thinClassesData
+                    });
+                    this.setThinClassOption(thinClassesData);
+                }
+            });
+        } else {
+            this.setState({
+                thinClassesData: [],
+                thinclassoption: []
+            });
+        }
     }
 
     // 设置细班选项

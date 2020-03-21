@@ -639,11 +639,13 @@ export default class DegitalAcceptTable extends Component {
         const {
             sectionSelect
         } = this.props;
-        if (!value) {
-            return;
+        let user = getUser();
+        if (!user.section) {
+            if (value) {
+                this.getOwnerInfo(value);
+            }
         }
         sectionSelect(value || '');
-        this.getOwnerInfo(value);
         this.setState({
             section: value || '',
             smallclass: '',
@@ -686,39 +688,39 @@ export default class DegitalAcceptTable extends Component {
             section
         } = this.state;
         console.log('细班选择', value);
-        if (!value) {
-            this.setState({
-                thinclass: ''
-            });
-            return;
-        }
-        let array = value.split('-');
-        let array1 = [];
-        let treetypeoption = [];
-        array.map((item, i) => {
-            if (i !== 2) {
-                array1.push(item);
-            }
-        });
-        getTreetypeByThinclass({}, {
-            section: section,
-            thinclass: array1.join('-')
-        }).then(rst => {
-            if (rst && rst.content && rst.content instanceof Array) {
-                rst.content.map(item => {
-                    treetypeoption.push(<Option value={
-                        item.TreeType
-                    } > {
-                            item.TreeTypeObj.TreeTypeName
-                        } </Option>);
-                });
-            }
-            this.setState({
-                treetypeoption,
-                treeTyepList: rst.content
-            });
-        });
         try {
+            if (!value) {
+                this.setState({
+                    thinclass: ''
+                });
+                return;
+            }
+            let array = value.split('-');
+            let array1 = [];
+            let treetypeoption = [];
+            array.map((item, i) => {
+                if (i !== 2) {
+                    array1.push(item);
+                }
+            });
+            getTreetypeByThinclass({}, {
+                section: section,
+                thinclass: array1.join('-')
+            }).then(rst => {
+                if (rst && rst.content && rst.content instanceof Array) {
+                    rst.content.map(item => {
+                        treetypeoption.push(<Option value={
+                            item.TreeType
+                        } > {
+                                item.TreeTypeObj.TreeTypeName
+                            } </Option>);
+                    });
+                }
+                this.setState({
+                    treetypeoption,
+                    treeTyepList: rst.content
+                });
+            });
             thinClassSelect(value);
             let thinclassData = '';
             if (value) {
@@ -1361,10 +1363,10 @@ export default class DegitalAcceptTable extends Component {
                         filterOption={
                             (input, option) => {
                                 return option.props.children[0]
-                                .toLowerCase()
-                                .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
-                                .toLowerCase()
-                                .indexOf(input.toLowerCase()) >= 0;
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0;
                             }
                         }
                         value={sgy}
@@ -1383,10 +1385,10 @@ export default class DegitalAcceptTable extends Component {
                         filterOption={
                             (input, option) => {
                                 return option.props.children[0]
-                                .toLowerCase()
-                                .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
-                                .toLowerCase()
-                                .indexOf(input.toLowerCase()) >= 0;
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0;
                             }
                         }
                         onChange={this.ysTypeChange.bind(this, 'cly')} >
@@ -1404,10 +1406,10 @@ export default class DegitalAcceptTable extends Component {
                         filterOption={
                             (input, option) => {
                                 return option.props.children[0]
-                                .toLowerCase()
-                                .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
-                                .toLowerCase()
-                                .indexOf(input.toLowerCase()) >= 0;
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0;
                             }
                         }
                         onChange={this.ysTypeChange.bind(this, 'jl')} >
@@ -1435,7 +1437,12 @@ export default class DegitalAcceptTable extends Component {
                     </Button>
                 </Col>
                 <Col span={18} className='forest-quryrstcnt' >
-                    <span > 此次查询共有数据： {this.state.totalNum}条 </span>
+                    {
+                        details.length > 0
+                            ? <span > 此次查询共有数据： {this.state.totalNum}条 </span>
+                            : ''
+                    }
+
                 </Col>
                 <Col span={2} />
                 <Col span={2} >

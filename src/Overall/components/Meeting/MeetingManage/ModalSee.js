@@ -94,17 +94,17 @@ class ModalSee extends Component {
                     Phone: rep.Phone
                 });
                 let dataList = [];
-                if (rep.Persons && rep.Persons instanceof Array) {
-                    dataList = dataList.concat(rep.Persons);
-                }
                 if (rep.Users && rep.Users instanceof Array) {
                     rep.Users.map((user) => {
                         let data = {};
                         data = user;
-                        data.Name = user.Full_Name;
                         data.Unit = '';
+                        data.Name = user.Full_Name;
                         dataList.push(data);
                     });
+                }
+                if (rep.Persons && rep.Persons instanceof Array) {
+                    dataList = dataList.concat(rep.Persons);
                 }
                 this.setState({
                     lat: rep.Y,

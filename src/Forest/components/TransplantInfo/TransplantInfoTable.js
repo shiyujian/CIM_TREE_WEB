@@ -1007,7 +1007,7 @@ export default class TransplantInfoTable extends Component {
             etime: transplantETime && moment(transplantETime).format('YYYY-MM-DD HH:mm:ss'),
             newno: this.handleThinClassNo(locationThinClass),
             newsection: locationSection,
-            tsitme: locationSTime && moment(locationSTime).format('YYYY-MM-DD HH:mm:ss'),
+            tstime: locationSTime && moment(locationSTime).format('YYYY-MM-DD HH:mm:ss'),
             tetime: locationETime && moment(locationETime).format('YYYY-MM-DD HH:mm:ss'),
             page,
             size: size

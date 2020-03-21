@@ -75,7 +75,6 @@ export default class AgainAcceptTable extends Component {
             treetypeoption: [], // 根据小班动态获取的树种列表
             treeTyepList: [], // 树种列表
             unQualifiedList: [], // 不合格记录列表
-            unitMessage: [],
             record: {},
             itemDetail: '',
             againCheckModalVisible: false, // 重新验收
@@ -159,13 +158,14 @@ export default class AgainAcceptTable extends Component {
                         </a>
                     ];
                     let user = getUser();
-                    if (record.Status === 0 && user.roles.ID === 11) {
+                    let roleName = user.roles.RoleName;
+                    if (record.Status === 0 && roleName === '监理文书') {
                         // 监理且状态为施工提交
                         arr.push(
                             <Divider type='vertical' />,
                             <a onClick={this.onCheck.bind(this, record)}>审核</a>
                         );
-                    } else if (record.Status === 1 && user.roles.ID === 9) {
+                    } else if (record.Status === 1 && roleName.indexOf('业主') !== -1) {
                         // 业主且监理通过
                         arr.push(
                             <Divider type='vertical' />,
@@ -188,18 +188,20 @@ export default class AgainAcceptTable extends Component {
     // 获取各个标段对应的公司和项目经理
     componentDidMount = async () => {
         const {
-            actions: {
-                getUnitMessageBySection
-            }
+            sectionSelect
         } = this.props;
-        let unitMessage = await getUnitMessageBySection();
+        let user = getUser();
+        if (user.section) {
+            sectionSelect(user.section);
+            this.setState({
+                section: user.section
+            }, async () => {
+                // 获取所有重新验收记录
+                await this.query(1);
+            });
+        }
         // 获取监理和业主
         await this.getOwnerInfo();
-        // 获取所有重新验收记录
-        await this.query(1);
-        this.setState({
-            unitMessage
-        });
     }
     onDelete (record) {
         const { deleteWfreacceptance } = this.props.actions;
@@ -278,14 +280,7 @@ export default class AgainAcceptTable extends Component {
         });
     }
     async getOwnerInfo (section = '') {
-        let user = getUser();
-        if (section) {
-            // 业主的时候
-        } else {
-            section = user.section;
-        }
         const {
-            sectionSelect,
             actions: {
                 getUsers,
                 getRoles
@@ -294,6 +289,14 @@ export default class AgainAcceptTable extends Component {
                 roles = []
             }
         } = this.props;
+        const {
+            yezhuOptions = []
+        } = this.state;
+        let user = getUser();
+        if (!section) {
+            section = user.section;
+        }
+
         let rolesData = [];
         if (!(roles && roles instanceof Array && roles.length > 0)) {
             rolesData = await getRoles();
@@ -314,27 +317,14 @@ export default class AgainAcceptTable extends Component {
                 }
             }
         });
-        
+        let shigongOptions = [];
+        let jianliOptions = [];
         // only choose the section, you can search the people
         let shigong = await getUsers({}, {
             status: 1,
             section: section,
             role: shigongRole
         });
-        let jianli = await getUsers({}, {
-            status: 1,
-            section: section,
-            role: jianliRole
-        });
-        let yezhu = await getUsers({}, {
-            status: 1,
-            section: '',
-            role: yezhuRole
-        });
-        
-        let shigongOptions = [];
-        let jianliOptions = [];
-        let yezhuOptions = [];
         if (shigong && shigong.content && shigong.content instanceof Array) {
             shigong.content.map(item => {
                 shigongOptions.push(<Option value={item.ID} key={item.ID} title={item.User_Name}>
@@ -342,6 +332,11 @@ export default class AgainAcceptTable extends Component {
                 </Option>);
             });
         }
+        let jianli = await getUsers({}, {
+            status: 1,
+            section: section,
+            role: jianliRole
+        });
         if (jianli && jianli.content && jianli.content instanceof Array) {
             jianli.content.map(item => {
                 jianliOptions.push(<Option value={item.ID} key={item.ID} title={item.User_Name}>
@@ -349,19 +344,29 @@ export default class AgainAcceptTable extends Component {
                 </Option>);
             });
         }
-        if (yezhu && yezhu.content && yezhu.content instanceof Array) {
-            yezhu.content.map(item => {
-                yezhuOptions.push(<Option value={item.ID} key={item.ID} title={item.User_Name}>
-                    {item.Full_Name}（{item.User_Name}）
-                </Option>);
+        // 业主不需要标段，只需要搜索一次，如果已有数据，不需要重新搜索
+        if (!(yezhuOptions && yezhuOptions instanceof Array && yezhuOptions.length > 0)) {
+            let yezhuOptionsNew = [];
+            let yezhu = await getUsers({}, {
+                status: 1,
+                section: '',
+                role: yezhuRole
+            });
+            if (yezhu && yezhu.content && yezhu.content instanceof Array) {
+                yezhu.content.map(item => {
+                    yezhuOptionsNew.push(<Option value={item.ID} key={item.ID} title={item.User_Name}>
+                        {item.Full_Name}（{item.User_Name}）
+                    </Option>);
+                });
+            }
+            this.setState({
+                yezhuOptions: yezhuOptionsNew
             });
         }
-        sectionSelect(section);
+
         this.setState({
-            section,
             shigongOptions,
-            jianliOptions,
-            yezhuOptions
+            jianliOptions
         });
     }
     // 标段选择
@@ -369,17 +374,149 @@ export default class AgainAcceptTable extends Component {
         const {
             sectionSelect
         } = this.props;
-        if (!value) {
-            return;
+        let user = getUser();
+        // 因在componentDidMount中进行了搜索，如果用户存在标段，则不需要重新搜索
+        if (!user.section) {
+            if (value) {
+                this.getOwnerInfo(value);
+            }
         }
         sectionSelect(value || '');
-        this.getOwnerInfo(value);
         this.setState({
             section: value || '',
             smallclass: '',
             thinclass: '',
             smallclassData: '',
             thinclassData: ''
+        });
+    }
+    // 小班选择
+    onSmallClassChange (value) {
+        const {
+            smallClassSelect
+        } = this.props;
+        try {
+            smallClassSelect(value);
+            let smallclassData = '';
+            if (value) {
+                let arr = value.split('-');
+                smallclassData = arr[3];
+            }
+            this.setState({
+                smallclass: value,
+                smallclassData,
+                thinclass: '',
+                thinclassData: ''
+            });
+        } catch (e) {
+            console.log('onSmallClassChange', e);
+        }
+    }
+    // 细班选择
+    onThinClassChange (value) {
+        const {
+            actions: {
+                getTreetypeByThinclass
+            },
+            thinClassSelect
+        } = this.props;
+        const {
+            section
+        } = this.state;
+        console.log('细班选择', value);
+        if (!value) {
+            this.setState({
+                thinclass: ''
+            });
+            return;
+        }
+        let array = value.split('-');
+        let array1 = [];
+        let treetypeoption = [];
+        array.map((item, i) => {
+            if (i !== 2) {
+                array1.push(item);
+            }
+        });
+        getTreetypeByThinclass({}, {
+            section: section,
+            thinclass: array1.join('-')
+        }).then(rst => {
+            if (rst && rst.content && rst.content instanceof Array) {
+                rst.content.map(item => {
+                    treetypeoption.push(<Option value={
+                        item.TreeTypeObj.TreeTypeName
+                    } > {
+                            item.TreeTypeObj.TreeTypeName
+                        } </Option>);
+                });
+            }
+            this.setState({
+                treetypeoption,
+                treeTyepList: rst.content
+            });
+        });
+        try {
+            thinClassSelect(value);
+            let thinclassData = '';
+            if (value) {
+                let arr = value.split('-');
+                thinclassData = arr[4];
+            }
+            this.setState({
+                thinclass: value,
+                thinclassData
+            });
+        } catch (e) {
+            console.log('onThinClassChange', e);
+        }
+    }
+    // 验收类型  状态 施工员 测量员 监理的选择
+    ysTypeChange (type, value) { // 清空select会调用此函数
+        if (type === 'yslx') {
+            this.setState({
+                ystype: value || ''
+            });
+        } else if (type === 'status') {
+            this.setState({
+                status: value || ''
+            });
+        } else if (type === 'sgy') {
+            this.setState({
+                sgy: value || ''
+            });
+        } else if (type === 'cly') {
+            this.setState({
+                cly: value || ''
+            });
+        } else if (type === 'jl') {
+            this.setState({
+                jl: value || ''
+            });
+        } else if (type === 'yz') {
+            this.setState({
+                yz: value || ''
+            });
+        }
+    }
+    // 树种选择
+    onTreeTypeChange (value) {
+        this.setState({
+            treetype: value,
+            treetypename: value
+        });
+    }
+
+    datepick (value) {
+        this.setState({
+            stime1: value[0]
+                ? moment(value[0]).format('YYYY-MM-DD HH:mm:ss')
+                : ''
+        });
+        this.setState({
+            etime1: value[1]
+                ? moment(value[1]).format('YYYY-MM-DD HH:mm:ss')
+                : ''
         });
     }
     // 批量重新验收
@@ -471,135 +608,6 @@ export default class AgainAcceptTable extends Component {
             againCheckModalVisible: false
         });
     }
-    // 验收类型  状态 施工员 测量员 监理的选择
-    ysTypeChange (type, value) { // 清空select会调用此函数
-        if (type === 'yslx') {
-            this.setState({
-                ystype: value || ''
-            });
-        } else if (type === 'status') {
-            this.setState({
-                status: value || ''
-            });
-        } else if (type === 'sgy') {
-            this.setState({
-                sgy: value || ''
-            });
-        } else if (type === 'cly') {
-            this.setState({
-                cly: value || ''
-            });
-        } else if (type === 'jl') {
-            this.setState({
-                jl: value || ''
-            });
-        } else if (type === 'yz') {
-            this.setState({
-                yz: value || ''
-            });
-        }
-    }
-    // 小班选择
-    onSmallClassChange (value) {
-        const {
-            smallClassSelect
-        } = this.props;
-        try {
-            smallClassSelect(value);
-            let smallclassData = '';
-            if (value) {
-                let arr = value.split('-');
-                smallclassData = arr[3];
-            }
-            this.setState({
-                smallclass: value,
-                smallclassData,
-                thinclass: '',
-                thinclassData: ''
-            });
-        } catch (e) {
-            console.log('onSmallClassChange', e);
-        }
-    }
-    // 细班选择
-    onThinClassChange (value) {
-        const {
-            actions: {
-                getTreetypeByThinclass
-            },
-            thinClassSelect
-        } = this.props;
-        const {
-            section
-        } = this.state;
-        console.log('细班选择', value);
-        if (!value) {
-            this.setState({
-                thinclass: ''
-            });
-            return;
-        }
-        let array = value.split('-');
-        let array1 = [];
-        let treetypeoption = [];
-        array.map((item, i) => {
-            if (i !== 2) {
-                array1.push(item);
-            }
-        });
-        getTreetypeByThinclass({}, {
-            section: section,
-            thinclass: array1.join('-')
-        }).then(rst => {
-            if (rst && rst.content && rst.content instanceof Array) {
-                rst.content.map(item => {
-                    treetypeoption.push(<Option value={
-                        item.TreeTypeObj.TreeTypeName
-                    } > {
-                            item.TreeTypeObj.TreeTypeName
-                        } </Option>);
-                });
-            }
-            this.setState({
-                treetypeoption,
-                treeTyepList: rst.content
-            });
-        });
-        try {
-            thinClassSelect(value);
-            let thinclassData = '';
-            if (value) {
-                let arr = value.split('-');
-                thinclassData = arr[4];
-            }
-            this.setState({
-                thinclass: value,
-                thinclassData
-            });
-        } catch (e) {
-            console.log('onThinClassChange', e);
-        }
-    }
-    // 树种选择
-    onTreeTypeChange (value) {
-        this.setState({
-            treetype: value,
-            treetypename: value
-        });
-    }
-
-    datepick (value) {
-        this.setState({
-            stime1: value[0]
-                ? moment(value[0]).format('YYYY-MM-DD HH:mm:ss')
-                : ''
-        });
-        this.setState({
-            etime1: value[1]
-                ? moment(value[1]).format('YYYY-MM-DD HH:mm:ss')
-                : ''
-        });
-    }
     resetinput () {
         const {
             resetinput,
@@ -639,52 +647,99 @@ export default class AgainAcceptTable extends Component {
                 getWfreacceptanceList
             },
             platform: {
-                tree = {}
+                tree = {},
+                roles = []
             }
         } = this.props;
-        let thinClassTree = tree.thinClassTree;
-        let array = thinclass.split('-');
-        let array1 = [];
-        array.map((item, i) => {
-            if (i !== 2) {
-                array1.push(item);
-            }
-        });
-        let user = getUser();
-        // 施工文书可以查看本标段，非施工文书只能查看自己
-        let applier = '', supervisor = '', owner = '';
-        if (user.roles.ID === 10) {
-            applier = '';
-            supervisor = jl;
-            owner = yz;
-        } else if (user.roles.ID === 11) {
-            applier = sgy;
-            supervisor = user.ID;
-            owner = yz;
-        } else if (user.roles.ID === 9) {
-            applier = sgy;
-            supervisor = jl;
-            owner = user.ID;
-        }
-        let postdata = {
-            section,
-            thinClass: array1.join('-'),
-            checktype: ystype,
-            supervisor: supervisor,
-            treetype: treetypename,
-            status: status,
-            applier: applier, // 申请人
-            owner: owner, // 业主
-            stime: stime1 && moment(stime1).format('YYYY-MM-DD HH:mm:ss'),
-            etime: etime1 && moment(etime1).format('YYYY-MM-DD HH:mm:ss'),
-            page,
-            size: size
-        };
-        this.setState({
-            loading: true,
-            percent: 0
-        });
         try {
+            let thinClassTree = tree.thinClassTree;
+            let array1 = [];
+            if (thinclass) {
+                let array = thinclass.split('-');
+                array.map((item, i) => {
+                    if (i !== 2) {
+                        array1.push(item);
+                    }
+                });
+            }
+            let user = getUser();
+            console.log('user', user);
+            let applier = '', supervisor = '', owner = '';
+            let searchSection = section;
+            // 施工文书可以查看本标段，非施工文书只能查看自己
+            // 因业主 监理不限定文书，需要根据ParentID来进行分类
+            if (roles && roles instanceof Array && roles.length > 0) {
+                let jianliRole = '';
+                let yezhuRole = '';
+                roles.map((role) => {
+                    if (role && role.ID && !role.ParentID) {
+                        if (role.RoleName === '监理') {
+                            jianliRole = role.ID;
+                        } else if (role.RoleName === '业主') {
+                            yezhuRole = role.ID;
+                        }
+                    }
+                });
+                if (user.roles && user.roles.ParentID) {
+                    let ParentID = user.roles.ParentID;
+                    let roleName = user.roles.RoleName;
+                    if (roleName === '施工文书') {
+                        applier = '';
+                        supervisor = jl;
+                        owner = yz;
+                        if (user.section) {
+                            searchSection = user.section;
+                        }
+                    } else if (ParentID === jianliRole) {
+                        applier = sgy;
+                        supervisor = user.ID;
+                        owner = yz;
+                    } else if (ParentID === yezhuRole) {
+                        applier = sgy;
+                        supervisor = jl;
+                        owner = user.ID;
+                    }
+                }
+            } else {
+                if (user.roles && user.roles.RoleName) {
+                    let roleName = user.roles.RoleName;
+                    if (roleName === '施工文书') {
+                        applier = '';
+                        supervisor = jl;
+                        owner = yz;
+                        if (user.section) {
+                            searchSection = user.section;
+                        }
+                    } else if (roleName === '监理文书') {
+                        applier = sgy;
+                        supervisor = user.ID;
+                        owner = yz;
+                    } else if (roleName.indexOf('业主') !== -1) {
+                        applier = sgy;
+                        supervisor = jl;
+                        owner = user.ID;
+                    }
+                }
+            }
+
+            let postdata = {
+                section: searchSection,
+                thinClass: array1.join('-'),
+                checktype: ystype,
+                supervisor: supervisor,
+                treetype: treetypename,
+                status: status,
+                applier: applier, // 申请人
+                owner: owner, // 业主
+                stime: stime1 && moment(stime1).format('YYYY-MM-DD HH:mm:ss'),
+                etime: etime1 && moment(etime1).format('YYYY-MM-DD HH:mm:ss'),
+                page,
+                size: size
+            };
+            this.setState({
+                loading: true,
+                percent: 0
+            });
             let rst = await getWfreacceptanceList({}, postdata);
             if (!(rst && rst.content)) {
                 this.setState({
@@ -724,7 +779,7 @@ export default class AgainAcceptTable extends Component {
                 });
             }
         } catch (e) {
-            console.log(e);
+            console.log('query', e);
         }
     }
 
@@ -766,10 +821,10 @@ export default class AgainAcceptTable extends Component {
                 filterOption={
                     (input, option) => {
                         return option.props.children[0]
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0;
+                            .toLowerCase()
+                            .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
+                            .toLowerCase()
+                            .indexOf(input.toLowerCase()) >= 0;
                     }
                 }
                 onChange={this.ysTypeChange.bind(this, 'sgy')} >
@@ -787,10 +842,10 @@ export default class AgainAcceptTable extends Component {
                 filterOption={
                     (input, option) => {
                         return option.props.children[0]
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0;
+                            .toLowerCase()
+                            .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
+                            .toLowerCase()
+                            .indexOf(input.toLowerCase()) >= 0;
                     }
                 }
                 onChange={this.ysTypeChange.bind(this, 'yz')} >
@@ -808,25 +863,29 @@ export default class AgainAcceptTable extends Component {
                 filterOption={
                     (input, option) => {
                         return option.props.children[0]
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0;
+                            .toLowerCase()
+                            .indexOf(input.toLowerCase()) >= 0 || option.props.children[2]
+                            .toLowerCase()
+                            .indexOf(input.toLowerCase()) >= 0;
                     }
                 }
                 onChange={this.ysTypeChange.bind(this, 'jl')} >
                 {jianliOptions}
             </Select>
         </div>;
-        if (user.roles.ID === 9) {
-            // 业主身份
-            queryArr.push(applier, supervisor);
-        } else if (user.roles.ID === 11) {
-            // 监理身份
-            queryArr.push(applier, owner);
-        } else if (user.roles.ID === 10) {
-            // 施工身份
-            queryArr.push(supervisor, owner);
+        let roleName = '';
+        if (user.roles && user.roles.RoleName) {
+            roleName = user.roles.RoleName;
+            if (roleName === '施工文书') {
+                // 施工身份
+                queryArr.push(supervisor, owner);
+            } else if (roleName === '监理文书') {
+                // 监理身份
+                queryArr.push(applier, owner);
+            } else if (roleName.indexOf('业主') !== -1) {
+                // 业主身份
+                queryArr.push(applier, supervisor);
+            }
         }
         header = (<div >
             <Row className='forest-search-layout' >
@@ -924,8 +983,6 @@ export default class AgainAcceptTable extends Component {
                 {
                     queryArr
                 }
-            </Row>
-            <Row className='forest-search-layout' >
                 <div className='forest-mrg20' >
                     <span className='forest-search-span6' > 申请验收日期： </span>
                     <RangePicker style={{verticalAlign: 'middle'}}
@@ -949,7 +1006,7 @@ export default class AgainAcceptTable extends Component {
                 </Col>
                 <Col span={2}>
                     {
-                        user.roles.ID === 10 ? <Button type='primary' onClick={this.onAgainCheck.bind(this)} >
+                        roleName === '施工文书' ? <Button type='primary' onClick={this.onAgainCheck.bind(this)} >
                             重新验收
                         </Button> : ''
                     }

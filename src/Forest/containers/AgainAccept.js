@@ -118,37 +118,37 @@ export default class AgainAccept extends Component {
             <Option key={'全部'} value={''} title={'全部'}>
                 全部
             </Option>,
-            <Option key={'土地整理'} value={'1'} title={'土地整理'}>
+            <Option key={'土地整理'} value={'土地整理'} title={'土地整理'}>
                 土地整理
             </Option>,
-            <Option key={'放样点穴'} value={'2'} title={'放样点穴'}>
+            <Option key={'放样点穴'} value={'放样点穴'} title={'放样点穴'}>
                 放样点穴
             </Option>,
-            <Option key={'挖穴'} value={'3'} title={'挖穴'}>
+            <Option key={'挖穴'} value={'挖穴'} title={'挖穴'}>
                 挖穴
             </Option>,
-            <Option key={'苗木质量'} value={'4'} title={'苗木质量'}>
+            <Option key={'苗木质量'} value={'苗木质量'} title={'苗木质量'}>
                 苗木质量
             </Option>,
-            <Option key={'土球质量'} value={'5'} title={'土球质量'}>
+            <Option key={'土球质量'} value={'土球质量'} title={'土球质量'}>
                 土球质量
             </Option>,
-            <Option key={'苗木栽植'} value={'6'} title={'苗木栽植'}>
+            <Option key={'苗木栽植'} value={'苗木栽植'} title={'苗木栽植'}>
                 苗木栽植
             </Option>,
-            <Option key={'苗木支架'} value={'7'} title={'苗木支架'}>
+            <Option key={'苗木支架'} value={'苗木支架'} title={'苗木支架'}>
                 苗木支架
             </Option>,
-            <Option key={'苗木浇水'} value={'8'} title={'苗木浇水'}>
+            <Option key={'苗木浇水'} value={'苗木浇水'} title={'苗木浇水'}>
                 苗木浇水
             </Option>,
-            <Option key={'大数据'} value={'9'} title={'大数据'}>
+            <Option key={'大数据'} value={'大数据'} title={'大数据'}>
                 大数据
             </Option>,
-            <Option key={'造林面积'} value={'10'} title={'造林面积'}>
+            <Option key={'造林面积'} value={'造林面积'} title={'造林面积'}>
                 造林面积
             </Option>,
-            <Option key={'总体'} value={'11'} title={'总体'}>
+            <Option key={'总体'} value={'总体'} title={'总体'}>
                 总体
             </Option>
         ];
@@ -317,15 +317,24 @@ export default class AgainAccept extends Component {
         const {
             sectionsData
         } = this.state;
-        sectionsData.map((sectionData) => {
-            if (value === sectionData.No) {
-                let smallClassesData = sectionData.children;
-                this.setState({
-                    smallClassesData
-                });
-                this.setSmallClassOption(smallClassesData);
-            }
-        });
+        if (value) {
+            sectionsData.map((sectionData) => {
+                if (value === sectionData.No) {
+                    let smallClassesData = sectionData.children;
+                    this.setState({
+                        smallClassesData
+                    });
+                    this.setSmallClassOption(smallClassesData);
+                }
+            });
+        } else {
+            this.setState({
+                smallClassesData: [],
+                smallclassoption: [],
+                thinClassesData: [],
+                thinclassoption: []
+            });
+        }
     }
     // 设置小班选项
     setSmallClassOption (rst) {
@@ -352,15 +361,22 @@ export default class AgainAccept extends Component {
         const {
             smallClassesData
         } = this.state;
-        smallClassesData.map((smallClassData) => {
-            if (value === smallClassData.No) {
-                let thinClassesData = smallClassData.children;
-                this.setState({
-                    thinClassesData
-                });
-                this.setThinClassOption(thinClassesData);
-            }
-        });
+        if (value) {
+            smallClassesData.map((smallClassData) => {
+                if (value === smallClassData.No) {
+                    let thinClassesData = smallClassData.children;
+                    this.setState({
+                        thinClassesData
+                    });
+                    this.setThinClassOption(thinClassesData);
+                }
+            });
+        } else {
+            this.setState({
+                thinClassesData: [],
+                thinclassoption: []
+            });
+        }
     }
 
     // 设置细班选项

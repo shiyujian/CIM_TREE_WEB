@@ -119,7 +119,7 @@ class AgainCheckModal extends Component {
         let StepArr = [];
         let ApplierFullName = '';
         let ApplierUserName = '';
-        
+
         let SupervisorFullName = '';
         let SupervisorUserName = '';
 
@@ -146,9 +146,19 @@ class AgainCheckModal extends Component {
                 <span>重新申请原因：{DetailsInfo.Reason}</span>
             </div>
             <div style={{marginTop: 10}}>
-                <Button onClick={this.onDownload.bind(this, DetailsInfo.ReasonFile)}><Icon type='download' />查看附件</Button>
                 {
-                    DetailsInfo.ReasonFile ? <span style={{marginLeft: 10}}>{DetailsInfo.ReasonFile.split('_')[1]}</span> : ''
+                    DetailsInfo.ReasonFile
+                        ? <Button
+                            onClick={this.onDownload.bind(this, DetailsInfo.ReasonFile)}>
+                            <Icon type='download' />
+                        查看附件
+                        </Button> : ''
+                }
+                {
+                    DetailsInfo.ReasonFile
+                        ? <span style={{marginLeft: 10}}>
+                            {DetailsInfo.ReasonFile.split('_')[1]}
+                        </span> : ''
                 }
             </div>
         </div>} />;
