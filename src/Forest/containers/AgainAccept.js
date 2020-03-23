@@ -41,6 +41,7 @@ export default class AgainAccept extends Component {
             sectionoption: [],
             smallclassoption: [],
             thinclassoption: [],
+            ysTypeList: [],
             leftkeycode: '',
             resetkey: 0,
             sectionsData: [],
@@ -152,7 +153,57 @@ export default class AgainAccept extends Component {
                 总体
             </Option>
         ];
-        this.setState({ typeoption, zttypeoption, ystypeoption });
+        let ysTypeList = [
+            {
+                label: '全部',
+                value: ''
+            },
+            {
+                label: '土地整理',
+                value: '1'
+            },
+            {
+                label: '放样点穴',
+                value: '2'
+            },
+            {
+                label: '挖穴',
+                value: '3'
+            },
+            {
+                label: '苗木质量',
+                value: '4'
+            },
+            {
+                label: '土球质量',
+                value: '5'
+            },
+            {
+                label: '苗木栽植',
+                value: '6'
+            },
+            {
+                label: '苗木支架',
+                value: '7'
+            },
+            {
+                label: '苗木浇水',
+                value: '8'
+            },
+            {
+                label: '大数据',
+                value: '9'
+            },
+            {
+                label: '造林面积',
+                value: '10'
+            },
+            {
+                label: '总体',
+                value: '11'
+            }
+        ];
+        this.setState({ typeoption, zttypeoption, ystypeoption, ysTypeList });
     }
 
     // 获取监理列表

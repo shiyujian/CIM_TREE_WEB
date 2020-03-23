@@ -86,6 +86,7 @@ class AgainCheckModal extends Component {
                 fileUrl,
                 checkItem: newCheckItem
             };
+            console.log('传递的参数', param);
             this.props.handleOk(param);
         });
     }
@@ -248,7 +249,8 @@ class AgainCheckModal extends Component {
         const {
             form: {
                 getFieldDecorator
-            }
+            },
+            ysTypeList
         } = this.props;
         return (<div>
             <Modal
@@ -274,7 +276,11 @@ class AgainCheckModal extends Component {
                                 style={{ width: 120 }}
                                 onChange={this.handleYsTypeChange.bind(this, -1)}
                             >
-                                {this.props.ystypeoption}
+                                {
+                                    ysTypeList.map(item => {
+                                        return <Option key={item.value} value={item.value}>{item.label}</Option>;
+                                    })
+                                }
                             </Select>
                         </Col>
                         <Col span={1} />
@@ -332,7 +338,11 @@ class AgainCheckModal extends Component {
                                             style={{ width: 120 }}
                                             onChange={this.handleYsTypeChange.bind(this, index)}
                                         >
-                                            {this.props.ystypeoption}
+                                            {
+                                                ysTypeList.map(item => {
+                                                    return <Option key={item.value} value={item.value}>{item.label}</Option>;
+                                                })
+                                            }
                                         </Select>
                                     </Col>
                                     <Col span={1} />

@@ -172,10 +172,10 @@ export default class AgainAcceptTable extends Component {
                             <a onClick={this.onCheck.bind(this, record)}>审核</a>
                         );
                     }
-                    // arr.push(
-                    //     <Divider type='vertical' />,
-                    //     <a onClick={this.onDelete.bind(this, record)}>删除</a>
-                    // );
+                    arr.push(
+                        <Divider type='vertical' />,
+                        <a onClick={this.onDelete.bind(this, record)}>删除</a>
+                    );
                     return (<div>
                         {
                             arr
@@ -563,6 +563,7 @@ export default class AgainAcceptTable extends Component {
                 CheckTypeIDArr.map(item => {
                     CheckTypeArr.push(getYsTypeByID(parseInt(item)));
                 });
+                console.log('数组', CheckTypeArr);
                 let pro = {
                     Applier: user.ID, // 申请人
                     CheckType: CheckTypeArr.toString(), // 验收类型名称，多个逗号隔开

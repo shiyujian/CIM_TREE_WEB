@@ -436,6 +436,7 @@ export default class DegitalAcceptTable extends Component {
                         message: '提示',
                         description: '您的重新发起已提交'
                     });
+                    this.query(1);
                 } else if (rep.code === 2) {
                     Notification.error({
                         message: '提示',
