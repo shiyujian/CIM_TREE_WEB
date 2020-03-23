@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TREETYPENO, NURSERYPARAM, TREEPARAM } from '../../../_platform/api';
+import { TREETYPENO, NURSERYPARAM, TREEPARAM } from '_platform/api';
 import { getForestImgUrl } from '_platform/auth';
 import {
     Form,
@@ -319,16 +319,16 @@ class Addition extends Component {
     checkTreeName = async (rule, value, callback) => {
         if (value) {
             // 匹配中文，英文字母和数字及下划线
-            let reg = /^[\u4e00-\u9fa5_a-zA-Z0-9]+$/;
-            if (reg.test(value)) {
-                if (value.length > 10) {
-                    callback(`请输入10个字以下`);
-                } else {
-                    callback();
-                }
+            // let reg = /^[\u4e00-\u9fa5_a-zA-Z0-9]+$/;
+            // if (reg.test(value)) {
+            if (value.length > 10) {
+                callback(`请输入10个字以下`);
             } else {
-                callback(`请输入正确的树种名称`);
+                callback();
             }
+            // } else {
+            //     callback(`请输入正确的树种名称`);
+            // }
         } else {
             callback();
         }

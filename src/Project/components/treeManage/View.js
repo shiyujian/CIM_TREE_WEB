@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TREETYPENO } from '../../../_platform/api';
+import { TREETYPENO } from '_platform/api';
 import { getForestImgUrl } from '_platform/auth';
 import {
     Form,
