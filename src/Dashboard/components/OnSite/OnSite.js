@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2020-02-12 09:59:48
+ * @Last Modified time: 2020-03-23 18:35:21
  */
 import React, { Component } from 'react';
 import {
@@ -351,7 +351,7 @@ class OnSite extends Component {
                     if (coords && coords instanceof Array && coords.length > 0) {
                         for (let i = 0; i < coords.length; i++) {
                             let str = coords[i];
-                            let treearea = this.handleCoordinates(str);
+                            let treearea = handleCoordinates(str);
                             let message = {
                                 key: 3,
                                 type: 'Feature',
