@@ -1,0 +1,471 @@
+.login-wrap {
+    width: 100%;
+    height: 100%;
+    background: url(./loginImages/bg.png) no-repeat center center;
+    background-size: cover;
+    overflow: hidden;
+    position: relative;
+    left: 0;
+    top: 0;
+
+    .login-footer {
+        width: 100%;
+        height: 40px;
+        position: absolute;
+        bottom: 0;
+        background: unset;
+        padding: 5px 0px;
+        font-size: 12px;
+        color: white;
+        font-family: Arial;
+        text-align: center;
+        line-height: 30px;
+    }
+
+    .main-center {
+      width: 458px;
+      height: 483px;
+      min-height: 483px;
+      // border: 1px solid rgba(25,136,138,1);
+      position: absolute;
+      top: 0;
+      bottom: 0;
+    //   right: 380px;
+      right: 6.7%;
+      margin: auto;
+      background: url(./loginImages/bottom.png);
+    }
+
+    .main-box {
+        float: left;
+        position: relative;
+    }
+    .main-img {
+        // width: 388px;
+        // height: 571px;
+        // background: url(./images/float.png) no-repeat;
+        // background-size: cover;
+        width:440px;
+        height:464px;
+    }
+
+    .login-title {
+      width: 300px;
+      height: 23px;
+      font-size: 24px;
+      font-family: PingFang SC;
+      font-weight: 500;
+      color: rgba(255,255,255,1);
+      line-height: 22px;
+      margin-top: 25px;
+    }
+
+    .picture-box {
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 4%;
+        display: block;
+        text-align: center;
+        height: 200px;
+        background: white;
+    }
+
+    .login-form {
+        width: 100%;
+        height: 540px;
+        // padding: 0 10%;
+        margin-left: 31px;
+        display: table;
+        line-height: 4;
+        .ant-form-item {
+            margin-bottom: 0;
+            width: 85%;
+        }
+
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-transition-delay: 99999s;
+            -webkit-transition: color 99999s ease-out, background-color 99999s ease-out;
+        }
+
+        .login-usernameInput {
+          background-image: url("./loginImages/Input_box.png") !important;
+          background-color: unset !important;
+          border: unset;
+          width:395px;
+          height:50px;
+          font-size:16px;
+          font-family:PingFang SC;
+          font-weight:300;
+          color:rgba(72,132,134,1);
+          line-height:22px;
+
+          &::-moz-placeholder { 
+            color: rgba(72,132,134,1) !important;
+          }
+          &::-webkit-input-placeholder { 
+              color:rgba(72,132,134,1) !important;
+          }
+          &:-ms-input-placeholder {
+              color:rgba(72,132,134,1) !important;
+          }
+        }
+
+        .login-passwordInput {
+            background-image: url("./loginImages/Input_box.png") !important;
+            background-color: unset !important;
+            border: unset;
+            width:395px;
+            height:50px;
+            font-size:16px;
+            font-family:PingFang SC;
+            font-weight:300;
+            color:rgba(72,132,134,1);
+            line-height:22px;
+  
+            &::-moz-placeholder { 
+              color: rgba(72,132,134,1) !important;
+            }
+            &::-webkit-input-placeholder { 
+                color:rgba(72,132,134,1) !important;
+            }
+            &:-ms-input-placeholder {
+                color:rgba(72,132,134,1) !important;
+            }
+        }
+
+        .ant-input-affix-wrapper .ant-input:not(:last-child) {
+          background-image: url("./loginImages/Input_box.png") !important;
+          background-color: unset !important;
+          border: unset;
+          width:395px;
+          height:50px;
+          font-size:16px;
+          font-family:PingFang SC;
+          font-weight:300;
+          color:rgba(72,132,134,1);
+          line-height:22px;
+
+          &::-moz-placeholder { 
+            color: rgba(72,132,134,1) !important;
+          }
+          &::-webkit-input-placeholder { 
+              color:rgba(72,132,134,1) !important;
+          }
+          &:-ms-input-placeholder {
+              color:rgba(72,132,134,1) !important;
+          }
+        }
+
+        i.anticon.anticon-eye-invisible.ant-input-password-icon {
+          cursor: pointer;
+          transition: all 0.3s;
+          color: rgba(72,132,134,1);
+        }
+    }
+
+
+
+    .has-error .ant-input-group-addon {
+        background-color: rgba(255, 255, 255, 0) !important;
+    }
+    .ant-input:focus {
+        box-shadow: none;
+    }
+
+    .ant-checkbox-inner {
+        width: 16px;
+        height: 16px;
+        display: inline-block;
+        vertical-align: middle;
+        background-size: 8px;
+        background-position: center center;
+        background-repeat: no-repeat;
+        // border-radius: 3px;
+        // -webkit-border-radius: 3px;
+        // -moz-border-radius: 3px;
+        margin: 0 0 0 0;
+        background-color: #2C6D68;
+        border: 1px solid rgba(44,109,104,1);
+
+        &:after {
+            left: 3px;
+            top: 6px;
+        }
+    }
+
+    .ant-checkbox-wrapper:hover .ant-checkbox-inner {
+    }
+
+    .btn-change-type {
+        width: 28px;
+        height: 28px;
+        display: block;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+        position: absolute;
+        right: -263px;
+        top: 59%;
+        margin-top: -14px;
+        cursor: pointer;
+        z-index: 5;
+    }
+    .ant-checkbox {
+        margin-top: -3px;
+    }
+
+    .ant-form-explain {
+        font-size: 12px;
+        // line-height: 72px;
+        color: red;
+        //color: #ff7200;
+        // white-space: nowrap;
+        // position: absolute;
+        // left: 18%;
+        // top: 82%;
+        // //left: 100%;
+        // //top: 50%;
+        // margin: -16px 0 0 5px;
+        // padding-left: 20px;
+        // background: url(./images/icon_warn.png) no-repeat left center;
+    }
+    .ant-checkbox-wrapper {
+        display: inline-block;
+        overflow: hidden;
+        font-size: 14px;
+        line-height: 24px;
+        position: relative;
+        float: left;
+    }
+    .forgetPassword {
+        line-height: 24px;
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        top: 0px;
+        float: right;
+        right: -18px;
+
+        font-size:16px;
+        font-family:PingFang SC;
+        font-weight:300;
+        color:rgba(0,255,235,1);
+        line-height:22px;
+    }
+
+    .password-remember-text {
+      display: inline-block;
+      font-size:16px;
+      font-family:PingFang SC;
+      font-weight:300;
+      color:rgba(102,174,174,1);
+      line-height:22px;
+      opacity:0.87;
+    }
+
+    .login-form-button {
+        margin-top: 40px;
+        width: 391px;
+        height: 66px;
+        border: 1px solid rgba(0,255,235,1);
+        background-image: url("./loginImages/sign_in.png");
+        display: block;
+
+        .login-form-button-text {
+          width: 391px;
+          height: 66px;
+          font-size: 30px;
+          font-family: PingFang SC;
+          font-weight: 500;
+          color: rgba(0,255,255,1);
+          line-height: 66px;
+          text-align: center;
+          display: block;
+        }
+    }
+
+    .app-download-button {
+      margin-top: 23px;
+      width:64px;
+      height:16px;
+      font-size:16px;
+      font-family:PingFang SC;
+      font-weight:500;
+      color:rgba(255,255,255,1);
+      line-height:22px;
+    }
+
+    .foot-login {
+        background: none;
+        text-align: center;
+        width: 100%;
+        height: 76px;
+        display: table;
+        padding: 20px 0 16px;
+        z-index: 10;
+        font-size: 12px;
+        line-height: 20px;
+        color: rgba(255, 255, 255, 0.6);
+        position: absolute;
+        left: 0;
+        bottom: 0;
+    }
+
+    .foot-login div:first-child {
+        width: auto;
+        float: none;
+        display: inline-block;
+        vertical-align: middle;
+        font-family: Arial;
+    }
+
+    .foot-login div:last-child {
+        width: auto;
+        float: none;
+        display: inline-block;
+        vertical-align: middle;
+        text-align: left;
+        line-height: 40px;
+        margin-left: 13px;
+    }
+
+    .foot-login a {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .Imgtitle {
+        width: 100%;
+        display: block;
+        overflow: hidden;
+        margin: 50px auto 20px;
+        img {
+            display: block;
+            width: 27.5%;
+            max-width: 50%;
+            margin: 0 auto;
+        }
+    }
+    .froget-password-title {
+        height: 24px;
+        font-size: 24px;
+        font-family: PingFang SC;
+        font-weight: 500;
+        color: rgba(255,255,255,1);
+        line-height: 22px;
+        margin-top: 31px;
+        margin-left: 31px;
+    }
+
+    .security-code-type {
+        width: 70px;
+        text-align: center;
+        height: 50px;
+        display: block;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+        position: absolute;
+        left: 300px;
+        top: 0%;
+        cursor: pointer;
+        z-index: 5;
+        vertical-align: middle;
+        line-height: 50px;
+    }
+    .security-code-status {
+        width: 80px;
+        text-align: center;
+        height: 50px;
+        display: block;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+        position: absolute;
+        left: 300px;
+        top: 0%;
+        cursor: pointer;
+        z-index: 5;
+        vertical-align: middle;
+        line-height: 50px;
+    }
+
+    .froget-password-button {
+        margin-top: 24px;
+        width: 391px;
+        height: 66px;
+        border: 1px solid rgba(0,255,235,1);
+        background-image: url("./loginImages/sign_in.png");
+        display: block;
+
+        .froget-password-button-text {
+          width: 391px;
+          height: 66px;
+          font-size: 30px;
+          font-family: PingFang SC;
+          font-weight: 500;
+          color: rgba(0,255,255,1);
+          line-height: 66px;
+          text-align: center;
+          display: block;
+        }
+    }
+
+    .froget-password-return-button {
+        display: block;
+
+        .froget-password-return-button-text {
+            width:32px;
+            height:22px;
+            font-size:16px;
+            font-family:Microsoft YaHei UI;
+            font-weight:400;
+            color:rgba(255,255,255,1);
+            line-height:22px;
+            margin-right: 5px;
+        }
+    }
+
+    .appDownload-title {
+        height: 24px;
+        font-size: 24px;
+        font-family: PingFang SC;
+        font-weight: 500;
+        color: rgba(255,255,255,1);
+        line-height: 22px;
+        margin-top: 31px;
+    }
+    .appDownloadTips {
+        margin-top: 23px;
+        display: block;
+        width: 396px;
+        text-align: center;
+        height: 56px;
+        font-size: 16px;
+        font-family: Microsoft YaHei UI;
+        font-weight: bold;
+        color: rgba(1,245,245,1);
+        line-height: 56px;
+        background: url('./loginImages/tips.png');
+    }
+
+    .QRCodeLayout {
+        margin: 23px auto 0px;
+        display: block;
+        text-align: center;
+        line-height: 215px;
+    }
+
+    .appDownload-edition {
+        height:22px;
+        font-size:14px;
+        font-family:Microsoft YaHei UI;
+        font-weight:400;
+        color:rgba(255,255,255,1);
+        line-height:22px;
+        margin-top: 22px;
+        text-align: center;
+    }
+}

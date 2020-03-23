@@ -3,9 +3,7 @@ import React, { Component } from 'react';
 import {
     Form,
     Input,
-    Button,
     Checkbox,
-    message,
     Notification
 } from 'antd';
 import {
@@ -13,17 +11,17 @@ import {
     setPermissions,
     removePermissions
 } from '_platform/auth';
-import '../containers/Login.less';
+import './Login.less';
 const FormItem = Form.Item;
 
-class Login extends Component {
+class LoginForm extends Component {
     static propTypes = {};
 
     constructor (props) {
         super(props);
         this.state = {
             forgectState: false,
-            checked: '',
+            checked: false,
             countDown: 60,
             appDownloadVisible: false
         };
@@ -101,13 +99,6 @@ class Login extends Component {
             callback();
         }
     }
-    // 点击下载APP
-    handleAppDownload = () => {
-        this.setState({
-            forgectState: true,
-            appDownloadVisible: true
-        });
-    }
     // 切换记住密码状态
     loginRememberChange (e) {
         this.state.checked = e.target.checked;
@@ -116,18 +107,6 @@ class Login extends Component {
         } else {
             window.localStorage.setItem('QH_LOGIN_REMEMBER', false);
         }
-    }
-    // 忘记密码
-    ForgetPassword () {
-        this.setState({
-            forgectState: true
-        });
-    }
-    // 返回登录
-    backLogin () {
-        this.setState({
-            forgectState: false
-        });
     }
     // 点击登录
     handleSubmit (e) {
@@ -143,7 +122,6 @@ class Login extends Component {
             }
         });
     }
-
     loginFunc = async (data, loginType, values) => {
         const {
             actions: {
@@ -278,6 +256,14 @@ class Login extends Component {
             }
         }
     }
+    // 点击下载APP
+    handleAppDownload = () => {
+        this.props.handleAppDownload();
+    }
+    // 忘记密码
+    ForgetPassword () {
+        this.props.handleForgetPassword();
+    }
     render () {
         const {
             form: {
@@ -292,128 +278,123 @@ class Login extends Component {
         } = this.state;
 
         return (
-            <div className='login-wrap'>
-                <div className='main-center'>
-                    <div className='main-box'>
-                        <div className='main-img'>
-                            <Form
-                                autocomplete='off'
-                                onSubmit={this.handleSubmit.bind(this)}
-                                className='login-form'
-                                id='loginForm'
-                            >
-                                <div className='login-title'>
-                                            森林大数据建设管理平台
-                                </div>
-                                <FormItem
-                                    style={{
-                                        marginTop: '33px'
-                                    }}
-                                >
-                                    {getFieldDecorator('username', {
-                                        rules: [
-                                            {
-                                                required: true,
-                                                message: '请输入用户名(16位以下)'
-                                            },
-                                            {
-                                                validator: this.checkUserName
-                                            }
-                                        ]
-                                    })(
-                                        <Input
-                                            className='login-usernameInput'
-                                            ref={(input) => { this.nameInput = input; }}
-                                            id='username'
-                                            placeholder='请输入用户名(4到16位)'
-                                        />
-                                    )}
-                                </FormItem>
-                                <FormItem
-                                    style={{
-                                        marginTop: '22px'
-                                    }}
-                                >
-                                    {getFieldDecorator('password', {
-                                        rules: [
-                                            {
-                                                required: true,
-                                                message: '6到16位（至少包括字母、数字以及特殊符号中的2种）'
-                                            }
-                                            // {
-                                            //     validator: this.checkPassWord
-                                            // }
-                                        ]
-                                    })(
-                                        <div>
-                                            <Input.Password
-                                                className='login-passwordInput'
-                                                id='pwdInp'
-                                                placeholder='请输入密码'
-                                            />
-                                        </div>
-                                    )}
-                                </FormItem>
-                                <FormItem
-                                    style={{
-                                        marginTop: '21px'
-                                    }}
-                                >
-                                    {getFieldDecorator('remember', {
-                                        valuePropName: 'checked',
-                                        initialValue: false
-                                    })(
-                                        <div style={{display: 'inlineBlock'}}>
-                                            <Checkbox
-                                                className='password-remember-text'
-                                                onChange={this.loginRememberChange.bind(this)}
-                                                checked={this.state.checked}
-                                            >
-                                                        记住密码
-                                            </Checkbox>
-                                            <span
-                                                className='forgetPassword'
-                                                onClick={this.ForgetPassword.bind(this)}
-                                            >
-                                                        忘记密码
-                                            </span>
-                                        </div>
-                                    )}
-                                </FormItem>
-                                {/* <Button
-                                            type='primary'
-                                            htmlType='submit'
-                                            className='login-form-button'
-                                        >
-                                            登录
-                                        </Button> */}
-                                <a key='登录'
-                                    title='登录'
-                                    id='loginButton'
-                                    className='login-form-button'
-                                    onClick={this.handleSubmit.bind(this)}
-                                >
-                                    <span className='login-form-button-text'>
-                                                登录
-                                    </span>
-                                </a>
-                                <div>
-                                    <a
-                                        className='app-download-button'
-                                        disabled={!(APKUpdateInfo && APKUpdateInfo.url)}
-                                        onClick={this.handleAppDownload.bind(this)}>
-                                                    APP下载
-                                    </a>
-                                </div>
-                            </Form>
+            <div className='main-box'>
+                <div className='main-img'>
+                    <Form
+                        autocomplete='off'
+                        onSubmit={this.handleSubmit.bind(this)}
+                        className='login-form'
+                        id='loginForm'
+                    >
+                        <div className='login-title'>
+                                    森林大数据建设管理平台
                         </div>
-                    </div>
-
-                    }
+                        <FormItem
+                            style={{
+                                marginTop: '33px'
+                            }}
+                        >
+                            {getFieldDecorator('username', {
+                                rules: [
+                                    {
+                                        required: true,
+                                        message: '请输入用户名(16位以下)'
+                                    },
+                                    {
+                                        validator: this.checkUserName
+                                    }
+                                ]
+                            })(
+                                <Input
+                                    className='login-usernameInput'
+                                    ref={(input) => { this.nameInput = input; }}
+                                    id='username'
+                                    placeholder='请输入用户名(4到16位)'
+                                />
+                            )}
+                        </FormItem>
+                        <FormItem
+                            style={{
+                                marginTop: '22px'
+                            }}
+                        >
+                            {getFieldDecorator('password', {
+                                rules: [
+                                    {
+                                        required: true,
+                                        message: '6到16位（至少包括字母、数字以及特殊符号中的2种）'
+                                    }
+                                    // {
+                                    //     validator: this.checkPassWord
+                                    // }
+                                ]
+                            })(
+                                <div>
+                                    <Input.Password
+                                        className='login-passwordInput'
+                                        id='pwdInp'
+                                        placeholder='请输入密码'
+                                    />
+                                </div>
+                            )}
+                        </FormItem>
+                        <FormItem
+                            style={{
+                                marginTop: '21px'
+                            }}
+                        >
+                            {getFieldDecorator('remember', {
+                                valuePropName: 'checked',
+                                initialValue: false
+                            })(
+                                <div style={{display: 'inlineBlock'}}>
+                                    <Checkbox
+                                        className='password-remember-text'
+                                        onChange={this.loginRememberChange.bind(this)}
+                                        checked={this.state.checked}
+                                    >
+                                                记住密码
+                                    </Checkbox>
+                                    <span
+                                        className='forgetPassword'
+                                        onClick={this.ForgetPassword.bind(this)}
+                                    >
+                                                忘记密码
+                                    </span>
+                                </div>
+                            )}
+                        </FormItem>
+                        {/* <Button
+                                    type='primary'
+                                    htmlType='submit'
+                                    className='login-form-button'
+                                >
+                                    登录
+                                </Button> */}
+                        <a key='登录'
+                            title='登录'
+                            id='loginButton'
+                            className='login-form-button'
+                            onClick={this.handleSubmit.bind(this)}
+                        >
+                            <span className='login-form-button-text'>
+                                        登录
+                            </span>
+                        </a>
+                        <div>
+                            <a
+                                className='app-download-button'
+                                disabled={!(APKUpdateInfo && APKUpdateInfo.url)}
+                                onClick={this.handleAppDownload.bind(this)}>
+                                            APP下载
+                            </a>
+                        </div>
+                    </Form>
                 </div>
             </div>
+
         );
     }
 }
 
-export default Form.create()(Login);
+export default Form.create()(LoginForm);
