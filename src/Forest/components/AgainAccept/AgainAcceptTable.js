@@ -172,10 +172,10 @@ export default class AgainAcceptTable extends Component {
                             <a onClick={this.onCheck.bind(this, record)}>审核</a>
                         );
                     }
-                    arr.push(
-                        <Divider type='vertical' />,
-                        <a onClick={this.onDelete.bind(this, record)}>删除</a>
-                    );
+                    // arr.push(
+                    //     <Divider type='vertical' />,
+                    //     <a onClick={this.onDelete.bind(this, record)}>删除</a>
+                    // );
                     return (<div>
                         {
                             arr
