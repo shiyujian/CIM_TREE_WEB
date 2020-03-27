@@ -15,6 +15,11 @@ export default (ID, service = '') => {
         `${SYSTEM_API}/orgs?orgtype={{orgtype}}`,
         'GET'
     );
+    // 分类获取组织机构带项目树
+    const getOrgTreeByProjectOrgType = createFetchAction(
+        `${SYSTEM_API}/projectorgs?orgtype={{orgtype}}`,
+        'GET'
+    );
     // 反查
     const getParentOrgTreeByID = createFetchAction(
         `${SYSTEM_API}/revertorgtree?id={{id}}`,
@@ -48,6 +53,7 @@ export default (ID, service = '') => {
     orgReducer[`put${SERVICE}ChangeOrg`] = putChangeOrg;
     orgReducer[`delete${SERVICE}Org`] = deleteOrg;
     orgReducer[`get${SERVICE}OrgTreeByOrgType`] = getOrgTreeByOrgType;
+    orgReducer[`get${SERVICE}OrgTreeByProjectOrgType`] = getOrgTreeByProjectOrgType;
     orgReducer[`get${SERVICE}ParentOrgTreeByID`] = getParentOrgTreeByID;
     orgReducer[`get${SERVICE}ChildOrgTreeByID`] = getChildOrgTreeByID;
 

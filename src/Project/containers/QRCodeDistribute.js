@@ -87,8 +87,6 @@ export default class QRCodeDistribute extends Component {
                 projectList: projectList
             });
         }
-        this.getQrcodes();
-        this.getMmQrcodes();
         this.getQrcodestat('nursery');
         this.getQrcodestatCount('nursery');
         this.getQrcodestores('nursery');
@@ -121,21 +119,27 @@ export default class QRCodeDistribute extends Component {
             userid: userid,
             org: org
         });
+        this.getMmQrcodes();
     }
 
     getMmQrcodes (queryParams) { // 获取二维码申请列表和审核列表
         const {actions: {getQrcodes}} = this.props;
-        let section = this.state.section ? this.state.section : '';
+        let user = getUser();
+        let section = user.section;
         let isgarden = 0;
-        let status = queryParams ? (queryParams.status ? queryParams.status : '') : '';
-        let gardentype = queryParams ? (queryParams.gardentype ? queryParams.gardentype : '') : '';
-        let stime = queryParams ? (queryParams.stime ? queryParams.stime : '') : '';
-        let etime = queryParams ? (queryParams.etime ? queryParams.etime : '') : '';
+        if (queryParams && queryParams.mmProjct && !section) {
+            section = queryParams.mmProjct;
+        }
+        console.log('section', section);
+        console.log('this.state.section', this.state.section);
+
+        let status = queryParams ? (queryParams.mmstatus ? queryParams.mmstatus : '') : '';
+        let stime = queryParams ? (queryParams.mmstime ? queryParams.mmstime : '') : '';
+        let etime = queryParams ? (queryParams.mmetime ? queryParams.mmetime : '') : '';
         let postData = {
             section: section,
             isgarden: isgarden,
             status: status,
-            gardentype: gardentype,
             stime: stime,
             etime: etime
         };
@@ -143,30 +147,6 @@ export default class QRCodeDistribute extends Component {
             .then((data) => {
                 this.setState({
                     mmqrcodelist: data.content
-                });
-            });
-    }
-
-    getQrcodes (queryParams) { // 获取二维码申请列表和审核列表
-        const {actions: {getQrcodes}} = this.props;
-        let section = this.state.section ? this.state.section : '';
-        let isgarden = 1;
-        let status = queryParams ? (queryParams.status ? queryParams.status : '') : '';
-        let gardentype = queryParams ? (queryParams.gardentype ? queryParams.gardentype : '') : '';
-        let stime = queryParams ? (queryParams.stime ? queryParams.stime : '') : '';
-        let etime = queryParams ? (queryParams.etime ? queryParams.etime : '') : '';
-        let postData = {
-            section: section,
-            isgarden: isgarden,
-            status: status,
-            gardentype: gardentype,
-            stime: stime,
-            etime: etime
-        };
-        getQrcodes({}, postData)
-            .then((data) => {
-                this.setState({
-                    qrcodelist: data.content
                 });
             });
     }
@@ -280,7 +260,6 @@ export default class QRCodeDistribute extends Component {
         });
     }
     reloadList () { // 刷新页面
-        this.getQrcodes();
         this.getMmQrcodes();
     }
     changeTabs (key) {
@@ -324,7 +303,6 @@ export default class QRCodeDistribute extends Component {
                                 isadmin={this.state.isadmin}
                                 projectList={this.state.projectList}
                                 reloadList={this.reloadList.bind(this)}
-                                query={this.getQrcodes.bind(this)}
                                 mmquery={this.getMmQrcodes.bind(this)}
                             />
                         }

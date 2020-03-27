@@ -13,6 +13,7 @@ import {
 } from 'antd';
 import MmChartList from './MmChartList';
 import {getFieldValue} from '_platform/store/util';
+import {getProjectNameBySection, getSectionNameBySection} from '_platform/gisAuth';
 import moment from 'moment';
 const { TextArea } = Input;
 const { Option } = Select;
@@ -31,7 +32,6 @@ class TableList extends Component {
             isYlApply: false // 园林二维码申请
         };
         this._mmqueryParams = {};
-        this._queryParams = {};
     }
     componentDidMount () {
 
@@ -56,35 +56,24 @@ class TableList extends Component {
         this.props.mmquery();
         this._mmqueryParams = {};
     }
-    onQuery () {
-        if (this.props.query) {
-            this.props.query(this._queryParams);
-        }
-    }
-    onClean () {
-        this.props.form.resetFields();
-        this.props.query();
-        this._queryParams = {};
-    }
     changeFormField (key, event) {
+        console.log('key', key);
+        console.log('event', event);
+
         let value = getFieldValue(event);
-        if (key === 'status') {
-            this._queryParams['status'] = value;
-        }
+        console.log('value', value);
+
         if (key === 'mmstatus') {
             this._mmqueryParams['mmstatus'] = value;
-        }
-        if (key === 'type') {
-            this._queryParams['gardentype'] = value;
-        }
-        if (key === 'time') {
-            this._queryParams['stime'] = moment(value[0]).format('YYYY-MM-DD HH:mm:ss');
-            this._queryParams['etime'] = moment(value[1]).format('YYYY-MM-DD HH:mm:ss');
         }
         if (key === 'mmtime') {
             this._mmqueryParams['mmstime'] = moment(value[0]).format('YYYY-MM-DD HH:mm:ss');
             this._mmqueryParams['mmetime'] = moment(value[1]).format('YYYY-MM-DD HH:mm:ss');
         }
+        if (key === 'mmProjct') {
+            this._mmqueryParams['mmProjct'] = value;
+        }
+        console.log('this._mmqueryParams', this._mmqueryParams);
     }
     onMmApply () {
         this.setState({
@@ -110,7 +99,8 @@ class TableList extends Component {
                     IsGarden: 0, // 是否园林设施  1是 0否
                     Applier: this.props.userid, // 申请人
                     ConstructUnit: this.props.org, // 申请单位
-                    Section: this.props.section // 标段
+                    Section: this.props.section, // 标段
+                    BelongSystem: '雄安森林大数据平台'
                 };
                 postQrcode({}, data).then((res) => {
                     if (res.code === 1) {
@@ -129,7 +119,14 @@ class TableList extends Component {
         });
     };
     render () {
-        const { getFieldDecorator } = this.props.form;
+        const {
+            platform: { tree = {} },
+            form: {
+                getFieldDecorator
+            },
+            section
+        } = this.props;
+        let bigTreeList = (tree && tree.bigTreeList) || [];
         let qrcodelist = this.props.qrcodelist; // 获取列表数据
         let mmqrcodelist = this.props.mmqrcodelist; // 获取苗木数据
         if (qrcodelist) {
@@ -170,13 +167,47 @@ class TableList extends Component {
                     <div style={{marginTop: 10, height: 32}}>
                         <div style={{float: 'left', marginLeft: 20}}>苗木二维码派发列表</div>
                         {this.props.isApply
-                            ? <Button type='primary' style={{float: 'right', marginRight: 20, marginTop: -10, cursor: 'pointer'}} onClick={this.onMmApply.bind(this)}>申请</Button>
+                            ? <Button
+                                type='primary'
+                                style={{
+                                    float: 'right',
+                                    marginRight: 20,
+                                    marginTop: -10,
+                                    cursor: 'pointer'
+                                }}
+                                onClick={this.onMmApply.bind(this)}>
+                                申请
+                            </Button>
                             : ''
                         }
                     </div>
                     <Form>
                         <Row>
-                            <Col span={8}>
+                            {
+                                !section
+                                    ? <Col span={6}>
+                                        <FormItem {...TableList.layout} label='项目'>
+                                            {
+                                                getFieldDecorator('mmProject', {
+                                                })(
+                                                    <Select
+                                                        placeholder='请选择项目'
+                                                        onChange={this.changeFormField.bind(this,
+                                                            'mmProjct')}
+                                                    >
+                                                        {
+                                                            bigTreeList.map((project) => {
+                                                                return <Option value={project.No} key={project.No} title={project.Name}>
+                                                                    {project.Name}
+                                                                </Option>;
+                                                            })
+                                                        }
+                                                    </Select>
+                                                )}
+                                        </FormItem>
+                                    </Col> : ''
+                            }
+                            <Col span={6}>
                                 <FormItem {...TableList.layout} label='状态'>
                                     {
                                         getFieldDecorator('mmstatus', {
@@ -193,7 +224,7 @@ class TableList extends Component {
                                         )}
                                 </FormItem>
                             </Col>
-                            <Col span={8}>
+                            <Col span={6}>
                                 <FormItem {...TableList.layout} label='申请时间'>
                                     {
                                         getFieldDecorator('mmtime', {
@@ -203,8 +234,8 @@ class TableList extends Component {
                                         )}
                                 </FormItem>
                             </Col>
-                            <Button type='primary' style={{float: 'right', marginRight: 20, cursor: 'pointer'}} onClick={this.onQuery.bind(this)}>查询</Button>
-                            <Button type='primary' style={{float: 'right', marginRight: 10, cursor: 'pointer'}} onClick={this.onClean.bind(this)}>清除</Button>
+                            <Button type='primary' style={{float: 'right', marginRight: 20, cursor: 'pointer'}} onClick={this.onMmQuery.bind(this)}>查询</Button>
+                            <Button type='primary' style={{float: 'right', marginRight: 10, cursor: 'pointer'}} onClick={this.onMmClean.bind(this)}>清除</Button>
                         </Row>
                     </Form>
                     <Table
@@ -241,8 +272,10 @@ class TableList extends Component {
                                         getFieldDecorator('PlanNum', {
                                             rules: [{ required: true, message: '请填写计划栽植量!' }]
                                         })(
-                                            <InputNumber min={1} max={1000000} onChange={this.changeFormField.bind(this,
-                                                'PlanNum')} />
+                                            <InputNumber
+                                                min={1}
+                                                max={1000000}
+                                                onChange={this.changeFormField.bind(this, 'PlanNum')} />
                                         )}
                                 </FormItem>
                             </Col>
@@ -253,8 +286,13 @@ class TableList extends Component {
                                     {
                                         getFieldDecorator('Remark', {
                                         })(
-                                            <TextArea onChange={this.changeFormField.bind(this,
-                                                'Remark')} rows={4} style={{width: 'calc(100% * 4 - 50px)', maxWidth: 'calc(100% * 4 - 50px)'}} />
+                                            <TextArea
+                                                onChange={this.changeFormField.bind(this, 'Remark')}
+                                                rows={4}
+                                                style={{
+                                                    width: 'calc(100% * 4 - 50px)',
+                                                    maxWidth: 'calc(100% * 4 - 50px)'
+                                                }} />
                                         )}
                                 </FormItem>
                             </Col>
@@ -285,17 +323,32 @@ class TableList extends Component {
             dataIndex: 'Section',
             key: 'dk',
             render: text => {
-                let projectList = this.props.projectList;
-                if (text) {
-                    if (projectList.length > 0) {
-                        for (let i = 0; i < projectList.length; i++) {
-                            if (projectList[i].No === text.split('-')[0]) {
-                                text = projectList[i].Name;
+                const {
+                    platform: { tree = {} }
+                } = this.props;
+                let thinClassTree = [];
+                if (tree && tree.thinClassTree) {
+                    thinClassTree = tree.thinClassTree;
+                    let projectName = getProjectNameBySection(text, thinClassTree);
+                    console.log('projectName', projectName);
+                    if (projectName) {
+                        return projectName;
+                    } else {
+                        return text;
+                    }
+                } else {
+                    let projectList = this.props.projectList;
+                    if (text) {
+                        if (projectList.length > 0) {
+                            for (let i = 0; i < projectList.length; i++) {
+                                if (projectList[i].No === text.split('-')[0]) {
+                                    text = projectList[i].Name;
+                                }
                             }
                         }
                     }
+                    return text;
                 }
-                return text;
             }
         },
         {
@@ -303,22 +356,37 @@ class TableList extends Component {
             dataIndex: 'Section',
             key: 'bd',
             render: text => {
-                let projectList = this.props.projectList;
-                if (text) {
-                    if (projectList.length > 0) {
-                        for (let i = 0; i < projectList.length; i++) {
-                            if (projectList[i].No === text.split('-')[0]) {
-                                let list = projectList[i].children;
-                                for (let j = 0; j < list.length; j++) {
-                                    if (list[j].No === text) {
-                                        text = list[j].Name;
+                const {
+                    platform: { tree = {} }
+                } = this.props;
+                let thinClassTree = [];
+                if (tree && tree.thinClassTree) {
+                    thinClassTree = tree.thinClassTree;
+                    let sectionName = getSectionNameBySection(text, thinClassTree);
+                    console.log('sectionName', sectionName);
+                    if (sectionName) {
+                        return sectionName;
+                    } else {
+                        return text;
+                    }
+                } else {
+                    let projectList = this.props.projectList;
+                    if (text) {
+                        if (projectList.length > 0) {
+                            for (let i = 0; i < projectList.length; i++) {
+                                if (projectList[i].No === text.split('-')[0]) {
+                                    let list = projectList[i].children;
+                                    for (let j = 0; j < list.length; j++) {
+                                        if (list[j].No === text) {
+                                            text = list[j].Name;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                    return text;
                 }
-                return text;
             }
         },
         {
@@ -361,10 +429,6 @@ class TableList extends Component {
             title: '操作',
             dataIndex: 'active',
             render: (text, record, index) => {
-                console.log('record.Status', record.Status);
-                console.log('record.Section', record.Section);
-                console.log('this.props.section', this.props.section);
-                console.log('this.props.isExamine', this.props.isExamine);
                 return (<div>
                     <span style={{color: '#1890ff', marginRight: 10, cursor: 'pointer'}} onClick={this.onMmDetails.bind(this, record)}>详情</span>
                     {
@@ -389,7 +453,6 @@ class TableList extends Component {
     }
     activeKeyChange (key) {
         this.props.changeTabs(key);
-        this.onClean();
         this.onMmClean();
     }
 };

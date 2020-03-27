@@ -17,7 +17,8 @@ import {
     INITLEAFLET_API,
     DOCEXPORT_API,
     TREEPIPEEXPORTSECTIONS,
-    TREEPIPEEXPORTPERSONS
+    TREEPIPEEXPORTPERSONS,
+    INVESTIGATIONEXPORT_API
 } from '_platform/api';
 import {
     handleAreaLayerData,
@@ -52,10 +53,12 @@ export default class FactsSurveyTable extends Component {
             polygonsData: [],
             investigationLayerList: {},
             investigationLoading: false,
-            checkedKeys: []
+            checkedKeys: [],
+            exportBtnVisible: false
         };
         this.tileTreeLayerBasic = null;
         this.editPolygon = null;
+        this.layerName = ['point', 'line', 'polygon'];
     }
     componentWillMount () {
         let userData = getUser();
@@ -243,6 +246,9 @@ export default class FactsSurveyTable extends Component {
             this.editPolygon = '';
         }
         this.editPolygon = this.map.editTools.startPolygon();
+        this.setState({
+            exportBtnVisible: false
+        });
         if ((isSuperAdmin || section) && leftkeycode) {
             await this.handleRemoveAllLayer();
             await this.handleGetInvestigationTypes(leftkeycode, '');
@@ -428,6 +434,15 @@ export default class FactsSurveyTable extends Component {
         if (this.editPolygon) {
             let coordinates = handlePolygonLatLngs(this.editPolygon);
             console.log('coordinates', coordinates);
+            if (coordinates.length > 2) {
+                this.setState({
+                    exportBtnVisible: true
+                });
+            } else {
+                this.setState({
+                    exportBtnVisible: false
+                });
+            }
         }
     }
     // 树节点选中
@@ -545,6 +560,123 @@ export default class FactsSurveyTable extends Component {
             );
         }
     }
+    // 导出SHP格式
+    handleExportSHP = async () => {
+        const {
+            actions: {
+                getInvestigationExportSHP
+            },
+            leftkeycode
+        } = this.props;
+        if (this.editPolygon) {
+            this.setState({
+                loading: true,
+                investigationLoading: true
+            });
+            let coordinates = handlePolygonLatLngs(this.editPolygon);
+            console.log('coordinates', coordinates);
+            let wkt = 'POLYGON(';
+            // 获取手动框选坐标wkt
+            wkt = wkt + getHandleWktData(coordinates);
+            wkt = wkt + ')';
+            console.log('wkt', wkt);
+            let requestList = [];
+            this.layerName.map((layername) => {
+                let postData = {
+                    layername: layername,
+                    land: leftkeycode,
+                    bbox: wkt
+                };
+                requestList.push(getInvestigationExportSHP({}, postData));
+            });
+            let dataSource = [];
+            if (requestList && requestList.length > 0) {
+                dataSource = await Promise.all(requestList);
+            }
+            console.log('dataSource', dataSource);
+            if (dataSource && dataSource instanceof Array && dataSource.length > 0) {
+                dataSource.map((data) => {
+                    console.log('data', data);
+                    if (data) {
+                        let downloadUrl = `${INVESTIGATIONEXPORT_API}/${data}.zip`;
+                        this.createLink(this, downloadUrl);
+                    }
+                });
+            } else {
+                Notification.error({
+                    message: '获取数据失败'
+                });
+            }
+            this.setState({
+                loading: false,
+                investigationLoading: false
+            });
+        }
+    }
+    // 导出DXF格式
+    handleExportDXF = async () => {
+        const {
+            actions: {
+                getInvestigationExportDXF
+            },
+            leftkeycode
+        } = this.props;
+        if (this.editPolygon) {
+            this.setState({
+                loading: true,
+                investigationLoading: true
+            });
+            let coordinates = handlePolygonLatLngs(this.editPolygon);
+            console.log('coordinates', coordinates);
+            let wkt = 'POLYGON(';
+            // 获取手动框选坐标wkt
+            wkt = wkt + getHandleWktData(coordinates);
+            wkt = wkt + ')';
+            console.log('wkt', wkt);
+            let requestList = [];
+            this.layerName.map((layername) => {
+                let postData = {
+                    layername: layername,
+                    land: leftkeycode,
+                    bbox: wkt
+                };
+                requestList.push(getInvestigationExportDXF({}, postData));
+            });
+            let dataSource = [];
+            if (requestList && requestList.length > 0) {
+                dataSource = await Promise.all(requestList);
+            }
+            console.log('dataSource', dataSource);
+            if (dataSource && dataSource instanceof Array && dataSource.length > 0) {
+                dataSource.map((data) => {
+                    console.log('data', data);
+                    if (data) {
+                        let downloadUrl = `${INVESTIGATIONEXPORT_API}/${data}.dxf`;
+                        this.createLink(this, downloadUrl);
+                    }
+                });
+            } else {
+                Notification.error({
+                    message: '获取数据失败'
+                });
+            }
+            this.setState({
+                loading: false,
+                investigationLoading: false
+            });
+        }
+    }
+    createLink = async (name, url) => {
+        // 下载
+        let link = document.createElement('a');
+        link.download = name;
+        link.href = url;
+        await link.setAttribute('download', this);
+        await link.setAttribute('target', '_blank');
+        await document.body.appendChild(link);
+        await link.click();
+        await document.body.removeChild(link);
+    };
     render () {
         const {
             loading,
@@ -555,7 +687,8 @@ export default class FactsSurveyTable extends Component {
             pointsData = [],
             linesData = [],
             polygonsData = [],
-            checkedKeys = []
+            checkedKeys = [],
+            exportBtnVisible
         } = this.state;
         let treeData = [
             {
@@ -650,6 +783,26 @@ export default class FactsSurveyTable extends Component {
                                                     撤销
                                                     </span>
                                                 </a>
+                                                <a key='SHP导出'
+                                                    title='SHP导出'
+                                                    className={exportBtnVisible ? 'FactsSurveyTable-button-statusSel' : 'FactsSurveyTable-button-status'}
+                                                    onClick={this.handleExportSHP.bind(this)}
+                                                    style={{marginRight: 40, float: 'right'}}
+                                                >
+                                                    <span className={exportBtnVisible ? 'FactsSurveyTable-button-status-textSel' : 'FactsSurveyTable-button-status-text'}>
+                                                        SHP导出
+                                                    </span>
+                                                </a>
+                                                <a key='DXF导出'
+                                                    title='DXF导出'
+                                                    className={exportBtnVisible ? 'FactsSurveyTable-button-statusSel' : 'FactsSurveyTable-button-status'}
+                                                    onClick={this.handleExportDXF.bind(this)}
+                                                    style={{marginRight: 40, float: 'right'}}
+                                                >
+                                                    <span className={exportBtnVisible ? 'FactsSurveyTable-button-status-textSel' : 'FactsSurveyTable-button-status-text'}>
+                                                    DXF导出
+                                                    </span>
+                                                </a>
                                             </div>
                                             <div className='FactsSurveyTable-tree-layout'>
                                                 <Tree
@@ -663,9 +816,6 @@ export default class FactsSurveyTable extends Component {
                                                         })
                                                     }
                                                 </Tree>
-                                                {/* <div>
-                                                    导出
-                                                </div> */}
                                             </div>
                                         </Spin>
                                     </div>

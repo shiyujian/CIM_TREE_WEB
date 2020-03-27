@@ -69,9 +69,8 @@ export default class FactsSurvey extends Component {
         console.log('keys', keys);
         console.log('info', info);
         this.setState({
-            areaEventKey: keys[0],
-            // leftkeycode: keys[0]
-            leftkeycode: '2020年春季造林项目'
+            leftkeycode: keys[0]
+            // leftkeycode: '2020年春季造林项目'
         });
     }
 

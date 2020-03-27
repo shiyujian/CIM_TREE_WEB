@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2020-03-21 13:05:37
+ * @Last Modified time: 2020-03-25 15:53:50
  */
 /**
  *
@@ -111,6 +111,8 @@ export const VALIDATE_API = `${DOMAIN}/ValidateHandler.ashx`;
 export const OSSUPLOAD_API = `${DOMAIN}/OSSUploadHandler.ashx`;
 export const UPLOAD_API = `${DOMAIN}/UploadHandler.ashx`;
 export const SHAPEUPLOAD_API = `${DOMAIN}/ShapeUploadHandler.ashx`;
+// 现状调查导出
+export const INVESTIGATIONEXPORT_API = `${DOMAIN}:810/upload/Data`;
 
 // 高德地图逆坐标查询
 export const LBSAMAP_API = window.config.LBSAMAP;
@@ -128,12 +130,12 @@ export const SYSTEM_API_GARDEN = `${SDOMAIN}/system`;
 
 /** *********************静态常量**************************/
 export const ORGTYPE = [
-    '业主单位',
     '施工单位',
     '监理单位',
     '设计单位',
     '造价单位',
-    '养护单位'
+    '养护单位',
+    '业主单位'
 ];
 // 当前执行的项目
 export const DEFAULT_PROJECT = 'P193';

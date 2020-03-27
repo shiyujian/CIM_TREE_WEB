@@ -264,6 +264,10 @@ class LoginForm extends Component {
     ForgetPassword () {
         this.props.handleForgetPassword();
     }
+    // 用户注册
+    handleUserRegister = () => {
+        this.props.handleUserRegister();
+    }
     render () {
         const {
             form: {
@@ -388,6 +392,11 @@ class LoginForm extends Component {
                                 onClick={this.handleAppDownload.bind(this)}>
                                             APP下载
                             </a>
+                            {/* <a
+                                className='user-register-button'
+                                onClick={this.handleUserRegister.bind(this)}>
+                                            用户注册
+                            </a> */}
                         </div>
                     </Form>
                 </div>

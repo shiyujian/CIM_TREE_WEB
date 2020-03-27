@@ -4,21 +4,15 @@ import { bindActionCreators } from 'redux';
 import { actions } from '../store/login';
 import { actions as platformActions } from '_platform/store/global';
 import {loadFooterYear, loadFooterCompany} from 'APP/api';
-import {
-    Form,
-    Input,
-    Button,
-    Checkbox,
-    message,
-    Notification
-} from 'antd';
+import {ORGTYPE} from '_platform/api';
 import {
     clearUser
 } from '_platform/auth';
 import {
     LoginForm,
     AppDownload,
-    ForgetPassword
+    ForgetPassword,
+    UserRegister
 } from '../components';
 import './Login.less';
 
@@ -43,7 +37,14 @@ export default class Login extends Component {
             forgectState: false,
             countDown: 60,
             appDownloadVisible: false,
-            APKUpdateInfo: ''
+            APKUpdateInfo: '',
+            ownerCompanyList: [],
+            constructionCompanyList: [],
+            supervisorCompanyList: [],
+            designCompanyList: [],
+            costCompanyList: [],
+            curingCompanyList: [],
+            registerVisible: false
         };
         clearUser();
     }
@@ -51,42 +52,112 @@ export default class Login extends Component {
     componentDidMount = async () => {
         const {
             actions: {
-                getAPKUpdateInfo
+                getAPKUpdateInfo,
+                getLoginTreeNodeList,
+                getOrgTreeByProjectOrgType
             }
         } = this.props;
         let APKUpdateInfo = await getAPKUpdateInfo();
         console.log('APKUpdateInfo', APKUpdateInfo);
+        let wpunit = await getLoginTreeNodeList();
+        console.log('wpunit', wpunit);
+        let ownerCompanyList = [];
+        let constructionCompanyList = [];
+        let supervisorCompanyList = [];
+        let designCompanyList = [];
+        let costCompanyList = [];
+        let curingCompanyList = [];
+        for (let i = 0; i < ORGTYPE.length; i++) {
+            console.log('ORGTYPE', ORGTYPE);
+            let type = ORGTYPE[i];
+            let orgDatas = await getOrgTreeByProjectOrgType({orgtype: type});
+            if (orgDatas && orgDatas instanceof Array && orgDatas.length > 0) {
+                let companyList = [];
+                for (let i = 0; i < orgDatas.length; i++) {
+                    let orgData = orgDatas[i];
+                    if (orgData.Orgs && orgData.Orgs instanceof Array && orgData.Orgs.length > 0) {
+                        let list = await this.getCompanyList(orgData.Orgs, orgData);
+                        companyList = companyList.concat(list);
+                    }
+                }
+                switch (type) {
+                    case '业主单位':
+                        ownerCompanyList = companyList;
+                        break;
+                    case '施工单位':
+                        constructionCompanyList = companyList;
+                        break;
+                    case '监理单位':
+                        supervisorCompanyList = companyList;
+                        break;
+                    case '设计单位':
+                        designCompanyList = companyList;
+                        break;
+                    case '造价单位':
+                        costCompanyList = companyList;
+                        break;
+                    case '养护单位':
+                        curingCompanyList = companyList;
+                        break;
+                }
+            }
+        }
+        console.log('ownerCompanyList', ownerCompanyList);
+        console.log('constructionCompanyList', constructionCompanyList);
+        console.log('supervisorCompanyList', supervisorCompanyList);
+        console.log('designCompanyList', designCompanyList);
+        console.log('costCompanyList', costCompanyList);
+        console.log('curingCompanyList', curingCompanyList);
         this.setState({
-            APKUpdateInfo
+            APKUpdateInfo,
+            ownerCompanyList,
+            constructionCompanyList,
+            supervisorCompanyList,
+            designCompanyList,
+            costCompanyList,
+            curingCompanyList
         });
+    }
+
+    // 查找所有的公司的List
+    getCompanyList = async (list, orgData) => {
+        list.map((data) => {
+            data.ProjectName = orgData.ProjectName;
+        });
+        console.log('list', list);
+        return list;
     }
 
     // 忘记密码
     handleForgetPassword () {
         this.setState({
             forgectState: true,
-            appDownloadVisible: false
+            appDownloadVisible: false,
+            registerVisible: false
         });
     }
     // 从忘记密码页面返回
     handleForgetPasswordCancel () {
         this.setState({
             forgectState: false,
-            appDownloadVisible: false
+            appDownloadVisible: false,
+            registerVisible: false
         });
     }
     // 点击下载APP
     handleAppDownload = () => {
         this.setState({
             forgectState: false,
-            appDownloadVisible: true
+            appDownloadVisible: true,
+            registerVisible: false
         });
     }
     // 从下载APP页面返回
     handleAppDownloadCancel = () => {
         this.setState({
             forgectState: false,
-            appDownloadVisible: false
+            appDownloadVisible: false,
+            registerVisible: false
         });
     }
     // 获取二维码计时
@@ -110,25 +181,44 @@ export default class Login extends Component {
         this.setState({
             countDown: 60,
             forgectState: false,
+            appDownloadVisible: false,
+            registerVisible: false
+        });
+    }
+    // 用户注册
+    handleUserRegister = () => {
+        this.setState({
+            registerVisible: true,
+            forgectState: false,
+            appDownloadVisible: false
+        });
+    }
+    // 取消用户注册
+    handleUserRegisterCancel = () => {
+        this.setState({
+            registerVisible: false,
+            forgectState: false,
             appDownloadVisible: false
         });
     }
     render () {
         const {
             forgectState,
-            appDownloadVisible
+            appDownloadVisible,
+            registerVisible
         } = this.state;
 
         return (
             <div className='login-wrap'>
                 <div className='main-center'>
                     {
-                        !forgectState && !appDownloadVisible
+                        !forgectState && !appDownloadVisible && !registerVisible
                             ? <LoginForm
                                 {...this.props}
                                 {...this.state}
                                 handleForgetPassword={this.handleForgetPassword.bind(this)}
                                 handleAppDownload={this.handleAppDownload.bind(this)}
+                                handleUserRegister={this.handleUserRegister.bind(this)}
                             /> : ''
                     }
                     {
@@ -147,6 +237,14 @@ export default class Login extends Component {
                                 {...this.props}
                                 {...this.state}
                                 handleAppDownloadCancel={this.handleAppDownloadCancel.bind(this)}
+                            /> : ''
+                    }
+                    {
+                        registerVisible
+                            ? <UserRegister
+                                {...this.props}
+                                {...this.state}
+                                handleUserRegisterCancel={this.handleUserRegisterCancel.bind(this)}
                             /> : ''
                     }
                 </div>

@@ -500,6 +500,10 @@ export const getInvestigationPoints = createFetchAction(`${TREEPIPE_API}/investi
 export const getInvestigationLines = createFetchAction(`${TREEPIPE_API}/investigation/investigationlines`, [], 'GET', []);
 // 现状调查查询（面要素）
 export const getInvestigationPolygons = createFetchAction(`${TREEPIPE_API}/investigation/investigationpolygons`, [], 'GET', []);
+// 现状调查导出(DXF)
+export const getInvestigationExportDXF = createFetchAction(`${TREEPIPE_API}/DataExport.ashx?action=investigationdxfexport`, [], 'GET', []);
+// 现状调查导出(SHP)
+export const getInvestigationExportSHP = createFetchAction(`${TREEPIPE_API}/DataExport.ashx?action=investigationexport`, [], 'GET', []);
 export const actions = {
     exportEcporttreestatuss,
     getTotalSat,
@@ -627,7 +631,9 @@ export const actions = {
     getInvestigationTypes,
     getInvestigationPoints,
     getInvestigationLines,
-    getInvestigationPolygons
+    getInvestigationPolygons,
+    getInvestigationExportDXF,
+    getInvestigationExportSHP
 };
 export default handleActions({
     [getTreeOK]: (state, {
