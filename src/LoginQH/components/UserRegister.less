@@ -18,8 +18,8 @@
         // background-image: url('./AdoptImg/pop-ups2.png');
         // background-size: 900px 450px;
         background-color: rgba(5,15,13,1);
-        width: 840px;
-        height: 560px;
+        width: 814px;
+        height: 600px;
         opacity:0.96;
         border-radius:2px;
     }
@@ -29,7 +29,8 @@
     }
     .UserRegister-modal-closeImg {
         cursor: pointer;
-        // padding-top: 35px;
+        float: right;
+        margin-right: 26px;
     }
     .UserRegister-modal-title {
         // width:64px;
@@ -41,6 +42,13 @@
         line-height:22px;
         margin-left: 24px;
         margin-top: 15px;
+    }
+    .UserRegister-top-line {
+        width: 764px;
+        height: 1px;
+        border: solid #2c6d68 1px;
+        margin-left: 24px;
+        margin-top: 16px;
     }
     .UserRegister-stepOrder {
         width:6px;
@@ -83,6 +91,24 @@
         color:rgba(1,232,214,1);
         line-height:22px;
         margin-left: 8px;
+    }
+    .UserRegister-step-line {
+        width: 75px;
+        height: 1px;
+        border: solid #999999 1px;
+        opacity: 0.3;
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 11px;
+    }
+    .UserRegister-step-line-select {
+        width: 75px;
+        height: 1px;
+        border: solid rgba(2,234,216,1) 1px;
+        opacity: 0.3;
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 11px;
     }
     .UserRegister-step-content {
         text-align: center;
@@ -154,7 +180,14 @@
             background-color: #132224;
             user-select: none;
         }
-
+        .ant-select-selection-selected-value{
+            float: left;
+            max-width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            color: rgba(135,155,166,1);
+        }
         &::-moz-placeholder { 
             color: rgba(135,155,166,1) !important;
         }
@@ -186,6 +219,168 @@
         color:rgba(2,234,216,1);
         line-height:40px;
         display: block;
+    }
+    
+    .UserRegister-realNameAuthentication-layout {
+        margin-top: 29px;
+
+        .ant-form-item-label > label {
+            font-size: 14px;
+            font-family: Microsoft YaHei;
+            font-weight: 400;
+            color: #879ba6;
+            height: 40px;
+            line-height: 31px;
+            vertical-align: top;
+        }
+
+        .UserRegister-realNameAuthentication-input {
+            width: 320px;
+            float: left;
+            color: rgba(135,155,166,1);
+        }
+        
+        .ant-input {
+            background: rgba(19,34,36,1);
+            opacity: 0.96;
+            font-size:14px;
+            font-family:Microsoft YaHei;
+            font-weight:400;
+            color:rgba(135,155,166,1);
+        }
+        .UserRegister-realNameAuthentication-stepChange-button {
+            width:216px;
+            height:40px;
+            // background:rgba(2,234,216,0);
+            // border:1px solid rgba(2,234,216,1);
+            opacity:0.3;
+            background-image: url("./UserRegisterImg/按钮框3_点击.png");
+            display: inline-block;
+            opacity: 0.8;
+            margin-top: 170px;
+        }
+        .UserRegister-realNameAuthentication-stepChange-button-text {
+            width:216px;
+            height:40px;
+            font-size:14px;
+            font-family:Microsoft YaHei;
+            font-weight:400;
+            color:rgba(2,234,216,1);
+            line-height:40px;
+            display: block;
+        }
+    }
+
+    .UserRegister-accountInformation-layout {
+        margin-top: 0px;
+        
+        .ant-form-item-label > label {
+            font-size: 14px;
+            font-family: Microsoft YaHei;
+            font-weight: 400;
+            color: #879ba6;
+            height: 40px;
+            line-height: 31px;
+            vertical-align: top;
+        }
+
+        .ant-input {
+            background: rgba(19,34,36,1);
+            opacity: 0.96;
+            font-size:14px;
+            font-family:Microsoft YaHei;
+            font-weight:400;
+            color:rgba(135,155,166,1);
+        }
+
+        .UserRegister-accountInformation-input {
+            width: 320px;
+            float: left;
+            color: rgba(135,155,166,1);
+        }
+        .UserRegister-accountInformation-input-SecurityCode {
+            width: 216px;
+            float: left;
+            color: rgba(135,155,166,1);
+        }
+
+        .UserRegister-accountInformation-stepChange-button {
+            width:216px;
+            height:40px;
+            // background:rgba(2,234,216,0);
+            // border:1px solid rgba(2,234,216,1);
+            opacity:0.3;
+            background-image: url("./UserRegisterImg/按钮框3_点击.png");
+            display: inline-block;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+        .UserRegister-accountInformation-stepChange-button-text {
+            width:216px;
+            height:40px;
+            font-size:14px;
+            font-family:Microsoft YaHei;
+            font-weight:400;
+            color:rgba(2,234,216,1);
+            line-height:40px;
+            display: block;
+        }
+    }
+   
+    .UserRegister-SubmitSuccess-layout {
+        margin-top: 22px;
+
+        .UserRegister-SubmitSuccess-submitState {
+            width:128px;
+            height:128px;
+            border-radius:50%;
+            margin-bottom: 29px;
+            display: inline-block;
+        }
+
+        .UserRegister-SubmitSuccess-text-layout {
+            text-align: center;
+
+            .UserRegister-SubmitSuccess-text-first {
+                height:18px;
+                font-size:18px;
+                font-family:Microsoft YaHei;
+                font-weight:bold;
+                color:rgba(255,255,255,1);
+                line-height:18px;
+                margin-bottom: 16px;
+            }
+
+            .UserRegister-SubmitSuccess-text-second {
+                height:14px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:400;
+                color:rgba(135,155,166,1);
+                line-height:14px;
+            }
+        }
+        .UserRegister-SubmitSuccess-stepChange-button {
+            width:216px;
+            height:40px;
+            // background:rgba(2,234,216,0);
+            // border:1px solid rgba(2,234,216,1);
+            opacity:0.3;
+            background-image: url("./UserRegisterImg/按钮框3_点击.png");
+            display: inline-block;
+            opacity: 0.8;
+            margin-top: 95px;
+        }
+        .UserRegister-SubmitSuccess-stepChange-button-text {
+            width:216px;
+            height:40px;
+            font-size:14px;
+            font-family:Microsoft YaHei;
+            font-weight:400;
+            color:rgba(2,234,216,1);
+            line-height:40px;
+            display: block;
+        }
     }
     
 }

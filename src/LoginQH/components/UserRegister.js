@@ -1,5 +1,14 @@
 import React, { Component } from 'react';
-import { TreeSelect, Modal, Form, Row, Col, Spin } from 'antd';
+import {
+    TreeSelect,
+    Modal,
+    Form,
+    Row,
+    Col,
+    Spin,
+    Notification,
+    Input
+} from 'antd';
 import './UserRegister.less';
 import moment from 'moment';
 import closeImg from './UserRegisterImg/close.png';
@@ -11,109 +20,111 @@ import constructionImg from './UserRegisterImg/施工.png';
 import supervisorImg from './UserRegisterImg/监理.png';
 import designImg from './UserRegisterImg/设计.png';
 import costImg from './UserRegisterImg/造价.png';
+import returnImg from './UserRegisterImg/返回3.png';
+import stepSuccessImg from './UserRegisterImg/步骤成功.png';
+import submitSuccessImg from './UserRegisterImg/提交成功.png';
+import submitFailImg from './UserRegisterImg/提交失败.png';
 
+const FormItem = Form.Item;
 class UserRegister extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            stepState: 'roleSelect',
-            roleType: 'construction'
+            stepState: 1,
+            roleType: 'construction',
+            selectCompany: ''
         };
     }
+    static layout = {
+        labelCol: { span: 8 },
+        wrapperCol: { span: 16 }
+    };
 
     componentDidMount = async () => {
 
     };
 
     handleTreeModalCancel = async () => {
-        await this.props.onCancel();
+        await this.props.handleUserRegisterCancel();
     }
 
-    handleTypeData = (type, curingTypeData) => {
-        let times = 0;
-        for (let i in curingTypeData) {
-            if (i === type && curingTypeData[i]) {
-                times = curingTypeData[i];
-            }
-        }
-        return times;
-    }
-
-    handleCuringMess = () => {
-        const {
-            curingMess
-        } = this.props;
-        if (curingMess && curingMess instanceof Array && curingMess.length > 0) {
-            let curingType = [];
-            let curingTimes = [];
-            let curingData = [];
-            let curingTypeData = {};
-            for (let i = 0; i < curingMess.length; i++) {
-                let data = curingMess[i];
-                let typeName = data.typeName;
-                if (curingType.indexOf(typeName) === -1) {
-                    curingType.push(typeName);
-                    curingTimes[typeName] = 1;
-
-                    curingTypeData[typeName] = curingTimes[typeName];
-                } else {
-                    curingTimes[typeName] = curingTimes[typeName] + 1;
-                    curingTypeData[typeName] = curingTimes[typeName];
-                }
-                if (i < 3) {
-                    curingData.push(data);
-                }
-            }
-            let curingObject = {
-                curingTypeData,
-                curingData
-            };
-            return curingObject;
-        }
-    }
     handleChangeRoleType = (value) => {
         this.setState({
-            roleType: value
+            roleType: value,
+            selectCompany: ''
         });
     }
+    // 切换注册步骤
     handleChangeStepState = (value) => {
+        const {
+            selectCompany,
+            stepState
+        } = this.state;
+        if (stepState === 1) {
+            if (selectCompany) {
+                this.setState({
+                    stepState: value
+                });
+            } else {
+                Notification.error({
+                    message: '请选择单位'
+                });
+            }
+        } else {
+            this.setState({
+                stepState: value
+            });
+        }
+    }
+    // 公司选中
+    handleChangeCompany = (value) => {
+        console.log('value', value);
         this.setState({
-            stepState: value
+            selectCompany: value
         });
     }
     render () {
         const {
-            seedlingMess = '',
-            treeMess = '',
-            UserRegister = '',
             adoptTreeModalLoading = false,
-            curingMess = ''
+            ownerCompanyList,
+            constructionCompanyList,
+            supervisorCompanyList,
+            designCompanyList,
+            costCompanyList,
+            form: {
+                getFieldDecorator
+            }
         } = this.props;
         const {
             stepState,
-            roleType
+            roleType,
+            selectCompany
         } = this.state;
-        let curingObject = this.handleCuringMess();
-        let curingTypeData = (curingObject && curingObject.curingTypeData) || {};
-        let curingData = (curingObject && curingObject.curingData) || [];
         let roleImg = ownerImg;
+        let companyList = constructionCompanyList;
         switch (roleType) {
             case 'construction':
                 roleImg = constructionImg;
+                companyList = constructionCompanyList;
                 break;
             case 'supervisor':
                 roleImg = supervisorImg;
+                companyList = supervisorCompanyList;
                 break;
             case 'design':
                 roleImg = designImg;
+                companyList = designCompanyList;
                 break;
             case 'cost':
                 roleImg = costImg;
+                companyList = costCompanyList;
                 break;
             case 'owner':
                 roleImg = ownerImg;
+                companyList = ownerCompanyList;
                 break;
         }
+
         return (
             <Modal
                 title={null}
@@ -129,53 +140,72 @@ class UserRegister extends Component {
                 <Spin spinning={adoptTreeModalLoading}>
                     <div className='UserRegister-background'>
                         <img src={topImg}
-                            onClick={this.handleTreeModalCancel.bind(this)}
                             className='UserRegister-modal-topImg' />
-                        <img src={closeImg}
-                            onClick={this.handleTreeModalCancel.bind(this)}
-                            className='UserRegister-modal-closeImg' />
                         <Row className='UserRegister-modal-title'>
                             个人注册
+                            <img src={closeImg}
+                                onClick={this.handleTreeModalCancel.bind(this)}
+                                className='UserRegister-modal-closeImg' />
                         </Row>
+                        <div className='UserRegister-top-line' />
                         <Row style={{paddingLeft: 24, paddingTop: 41}}>
                             {
-                                stepState === 'roleSelect'
+                                stepState === 1
                                     ? <Col span={6}>
                                         <img src={stepSelectImg} />
                                         <span className='UserRegister-stepOrder-select'>1</span>
                                         <span className='UserRegister-stepName-select'>角色选择</span>
+                                        <span className='UserRegister-step-line' />
                                     </Col> : <Col span={6}>
-                                        <img src={stepImg} />
-                                        <span className='UserRegister-stepOrder'>1</span>
+                                        <img src={stepSuccessImg} />
                                         <span className='UserRegister-stepName'>角色选择</span>
+                                        <span className='UserRegister-step-line-select' />
                                     </Col>
                             }
                             {
-                                stepState === 'realNameAuthentication'
+                                stepState === 2
                                     ? <Col span={6}>
                                         <img src={stepSelectImg} />
                                         <span className='UserRegister-stepOrder-select'>2</span>
                                         <span className='UserRegister-stepName-select'>实名认证</span>
-                                    </Col> : <Col span={6}>
-                                        <img src={stepImg} />
-                                        <span className='UserRegister-stepOrder'>2</span>
-                                        <span className='UserRegister-stepName'>实名认证</span>
-                                    </Col>
+                                        <span className='UserRegister-step-line' />
+                                    </Col> : (
+                                        stepState > 2
+                                            ? <Col span={6}>
+                                                <img src={stepSuccessImg} />
+                                                <span className='UserRegister-stepName'>实名认证</span>
+                                                <span className='UserRegister-step-line-select' />
+                                            </Col> : <Col span={6}>
+                                                <img src={stepImg} />
+                                                <span className='UserRegister-stepOrder'>2</span>
+                                                <span className='UserRegister-stepName'>实名认证</span>
+                                                <span className='UserRegister-step-line' />
+                                            </Col>
+                                    )
                             }
                             {
-                                stepState === 'accountInformation'
+                                stepState === 3
                                     ? <Col span={6}>
                                         <img src={stepSelectImg} />
                                         <span className='UserRegister-stepOrder-select'>3</span>
                                         <span className='UserRegister-stepName-select'>账户信息</span>
-                                    </Col> : <Col span={6}>
-                                        <img src={stepImg} />
-                                        <span className='UserRegister-stepOrder'>3</span>
-                                        <span className='UserRegister-stepName'>账户信息</span>
-                                    </Col>
+                                        <span className='UserRegister-step-line' />
+                                    </Col> : (
+                                        stepState > 3
+                                            ? <Col span={6}>
+                                                <img src={stepSuccessImg} />
+                                                <span className='UserRegister-stepName'>账户信息</span>
+                                                <span className='UserRegister-step-line-select' />
+                                            </Col> : <Col span={6}>
+                                                <img src={stepImg} />
+                                                <span className='UserRegister-stepOrder'>2</span>
+                                                <span className='UserRegister-stepName'>账户信息</span>
+                                                <span className='UserRegister-step-line' />
+                                            </Col>
+                                    )
                             }
                             {
-                                stepState === 'submitSuccessfully'
+                                stepState === 4
                                     ? <Col span={6}>
                                         <img src={stepSelectImg} />
                                         <span className='UserRegister-stepOrder-select'>4</span>
@@ -189,7 +219,7 @@ class UserRegister extends Component {
                         </Row>
                         <Row className='UserRegister-step-content'>
                             {
-                                stepState === 'roleSelect'
+                                stepState === 1
                                     ? <Row>
                                         <div>
                                             <div className='UserRegister-roleImg-layout'>
@@ -269,16 +299,227 @@ class UserRegister extends Component {
                                                 <TreeSelect
                                                     style={{width: '100%'}}
                                                     placeholder='请选择单位'
+                                                    treeData={companyList}
+                                                    value={selectCompany}
+                                                    onSelect={this.handleChangeCompany.bind(this)}
                                                 />
                                             </div>
                                         </div>
 
                                         <div className='UserRegister-stepChange-button'>
-                                            <a onClick={this.handleChangeStepState.bind(this, 'realNameAuthentication')}>
+                                            <a onClick={this.handleChangeStepState.bind(this, 2)}>
                                                 <span className='UserRegister-stepChange-button-text'>
                                                     下一步
                                                 </span>
                                             </a>
+                                        </div>
+                                    </Row> : ''
+                            }
+                            {
+                                stepState === 2
+                                    ? <Row className='UserRegister-realNameAuthentication-layout'>
+                                        <Form>
+                                            <FormItem
+                                                {...UserRegister.layout}
+                                                label='真实姓名:'
+                                            >
+                                                {getFieldDecorator('RealName', {
+                                                    rules: [
+                                                        {
+                                                            required: true,
+                                                            message: '请输入真实姓名'
+                                                        }
+                                                    ]
+                                                })(
+                                                    <Input
+                                                        className='UserRegister-realNameAuthentication-input'
+                                                        placeholder='请输入真实姓名' />
+                                                )}
+                                            </FormItem>
+                                            <FormItem
+                                                {...UserRegister.layout}
+                                                label='身份证号码:'
+                                            >
+                                                {getFieldDecorator('idNum', {
+                                                    rules: [
+                                                        {
+                                                            required: true,
+                                                            message: '请输入身份证号码'
+                                                        }
+                                                    ]
+                                                })(
+                                                    <Input
+                                                        className='UserRegister-realNameAuthentication-input'
+                                                        placeholder='请输入身份证号码'
+                                                    />
+                                                )}
+                                            </FormItem>
+                                        </Form>
+                                        <div>
+                                            <a
+                                                style={{marginRight: 12}}
+                                                onClick={this.handleChangeStepState.bind(this, 1)}>
+                                                <img src={returnImg} />
+                                            </a>
+                                            <div className='UserRegister-realNameAuthentication-stepChange-button'>
+                                                <a onClick={this.handleChangeStepState.bind(this, 3)}>
+                                                    <span className='UserRegister-realNameAuthentication-stepChange-button-text'>
+                                                    下一步
+                                                    </span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </Row> : ''
+                            }
+                            {
+                                stepState === 3
+                                    ? <Row className='UserRegister-accountInformation-layout'>
+                                        <Form>
+                                            <FormItem
+                                                {...UserRegister.layout}
+                                                label='用户名:'
+                                            >
+                                                {getFieldDecorator('RealName', {
+                                                    rules: [
+                                                        {
+                                                            required: true,
+                                                            message: '请输入用户名'
+                                                        }
+                                                    ]
+                                                })(
+                                                    <Input
+                                                        className='UserRegister-accountInformation-input'
+                                                        placeholder='请输入用户名' />
+                                                )}
+                                            </FormItem>
+                                            <FormItem
+                                                {...UserRegister.layout}
+                                                label='手机号码:'
+                                            >
+                                                {getFieldDecorator('idNum', {
+                                                    rules: [
+                                                        {
+                                                            required: true,
+                                                            message: '请输入手机号码'
+                                                        }
+                                                    ]
+                                                })(
+                                                    <Input
+                                                        className='UserRegister-accountInformation-input'
+                                                        placeholder='请输入手机号码'
+                                                    />
+                                                )}
+                                            </FormItem>
+                                            <FormItem
+                                                {...UserRegister.layout}
+                                                label='验证码:'
+                                            >
+                                                {getFieldDecorator('idNum', {
+                                                    rules: [
+                                                        {
+                                                            required: true,
+                                                            message: '请输入验证码'
+                                                        }
+                                                    ]
+                                                })(
+                                                    <div>
+                                                        <Input
+                                                            id='securityCode'
+                                                            className='UserRegister-accountInformation-input-SecurityCode'
+                                                            placeholder='请输入验证码'
+                                                        />
+                                                        {/* {
+                                                            (getSecurityCodeStatus && setUserStatus) || countDown !== 60
+                                                                ? <a
+                                                                    className='security-code-status'
+                                                                >{`${countDown}秒后重发`}</a>
+                                                                : <a
+                                                                    className='security-code-type'
+                                                                    onClick={this.handleGetSecurityCode.bind(
+                                                                        this
+                                                                    )}
+                                                                >获取验证码</a>
+                                                        } */}
+                                                    </div>
+                                                )}
+                                            </FormItem>
+                                            <FormItem
+                                                {...UserRegister.layout}
+                                                label='密码:'
+                                            >
+                                                {getFieldDecorator('idNum', {
+                                                    rules: [
+                                                        {
+                                                            required: true,
+                                                            message: '请输入密码'
+                                                        }
+                                                    ]
+                                                })(
+                                                    <Input
+                                                        className='UserRegister-accountInformation-input'
+                                                        placeholder='请输入密码'
+                                                    />
+                                                )}
+                                            </FormItem>
+                                            <FormItem
+                                                {...UserRegister.layout}
+                                                label='密码确认:'
+                                            >
+                                                {getFieldDecorator('idNum', {
+                                                    rules: [
+                                                        {
+                                                            required: true,
+                                                            message: '请确认密码'
+                                                        }
+                                                    ]
+                                                })(
+                                                    <Input
+                                                        className='UserRegister-accountInformation-input'
+                                                        placeholder='请确认密码'
+                                                    />
+                                                )}
+                                            </FormItem>
+                                        </Form>
+                                        <div>
+                                            <a
+                                                style={{marginRight: 12}}
+                                                onClick={this.handleChangeStepState.bind(this, 2)}>
+                                                <img src={returnImg} />
+                                            </a>
+                                            <div className='UserRegister-accountInformation-stepChange-button'>
+                                                <a onClick={this.handleChangeStepState.bind(this, 4)}>
+                                                    <span className='UserRegister-accountInformation-stepChange-button-text'>
+                                                    下一步
+                                                    </span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </Row> : ''
+                            }
+                            {
+                                stepState === 4
+                                    ? <Row className='UserRegister-SubmitSuccess-layout'>
+                                        <div>
+                                            <div className='UserRegister-SubmitSuccess-submitState'>
+                                                <img src={submitSuccessImg} />
+                                            </div>
+                                        </div>
+                                        <div className='UserRegister-SubmitSuccess-text-layout'>
+                                            <div className='UserRegister-SubmitSuccess-text-first'>
+                                                提交成功
+                                            </div>
+                                            <div className='UserRegister-SubmitSuccess-text-second'>
+                                                请通知本单位文书进行账号审核
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div className='UserRegister-SubmitSuccess-stepChange-button'>
+                                                <a onClick={this.handleChangeStepState.bind(this, 3)}>
+                                                    <span className='UserRegister-SubmitSuccess-stepChange-button-text'>
+                                                    确认
+                                                    </span>
+                                                </a>
+                                            </div>
                                         </div>
                                     </Row> : ''
                             }

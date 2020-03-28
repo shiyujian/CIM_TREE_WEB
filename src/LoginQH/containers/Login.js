@@ -77,7 +77,14 @@ export default class Login extends Component {
                     let orgData = orgDatas[i];
                     if (orgData.Orgs && orgData.Orgs instanceof Array && orgData.Orgs.length > 0) {
                         let list = await this.getCompanyList(orgData.Orgs, orgData);
-                        companyList = companyList.concat(list);
+                        let treeData = {
+                            title: orgData.ProjectName,
+                            value: orgData.ID,
+                            key: orgData.ID,
+                            children: list,
+                            selectable: false
+                        };
+                        companyList.push(treeData);
                     }
                 }
                 switch (type) {
@@ -123,6 +130,9 @@ export default class Login extends Component {
     getCompanyList = async (list, orgData) => {
         list.map((data) => {
             data.ProjectName = orgData.ProjectName;
+            data.title = data.OrgName;
+            data.value = data.ID;
+            data.key = data.ID;
         });
         console.log('list', list);
         return list;
@@ -132,32 +142,28 @@ export default class Login extends Component {
     handleForgetPassword () {
         this.setState({
             forgectState: true,
-            appDownloadVisible: false,
-            registerVisible: false
+            appDownloadVisible: false
         });
     }
     // 从忘记密码页面返回
     handleForgetPasswordCancel () {
         this.setState({
             forgectState: false,
-            appDownloadVisible: false,
-            registerVisible: false
+            appDownloadVisible: false
         });
     }
     // 点击下载APP
     handleAppDownload = () => {
         this.setState({
             forgectState: false,
-            appDownloadVisible: true,
-            registerVisible: false
+            appDownloadVisible: true
         });
     }
     // 从下载APP页面返回
     handleAppDownloadCancel = () => {
         this.setState({
             forgectState: false,
-            appDownloadVisible: false,
-            registerVisible: false
+            appDownloadVisible: false
         });
     }
     // 获取二维码计时
@@ -181,24 +187,19 @@ export default class Login extends Component {
         this.setState({
             countDown: 60,
             forgectState: false,
-            appDownloadVisible: false,
-            registerVisible: false
+            appDownloadVisible: false
         });
     }
     // 用户注册
     handleUserRegister = () => {
         this.setState({
-            registerVisible: true,
-            forgectState: false,
-            appDownloadVisible: false
+            registerVisible: true
         });
     }
     // 取消用户注册
     handleUserRegisterCancel = () => {
         this.setState({
-            registerVisible: false,
-            forgectState: false,
-            appDownloadVisible: false
+            registerVisible: false
         });
     }
     render () {
@@ -212,7 +213,7 @@ export default class Login extends Component {
             <div className='login-wrap'>
                 <div className='main-center'>
                     {
-                        !forgectState && !appDownloadVisible && !registerVisible
+                        !forgectState && !appDownloadVisible
                             ? <LoginForm
                                 {...this.props}
                                 {...this.state}
