@@ -53,7 +53,10 @@ export default class ConstructionPackageTable extends Component {
                     let smallClassNo = '/';
                     smallCalssPackageList.map((smallClassData) => {
                         if (smallclass === smallClassData.No) {
-                            smallClassNo = smallClassData.No;
+                            let smallClassNoList = smallClassData.No.split('-');
+                            if (smallClassNoList && smallClassNoList instanceof Array && smallClassNoList.length === 4) {
+                                smallClassNo = smallClassNoList[0] + '-' + smallClassNoList[1] + '-' + smallClassNoList[3];
+                            }
                         }
                     });
                     return <span>{smallClassNo}</span>;
@@ -61,7 +64,15 @@ export default class ConstructionPackageTable extends Component {
             },
             {
                 title: '细班号',
-                dataIndex: 'No'
+                dataIndex: 'No',
+                render: (text, record) => {
+                    let thinClassNo = '/';
+                    let thinClassNoList = text.split('-');
+                    if (thinClassNoList && thinClassNoList instanceof Array && thinClassNoList.length === 5) {
+                        thinClassNo = thinClassNoList[0] + '-' + thinClassNoList[1] + '-' + thinClassNoList[3] + '-' + thinClassNoList[4];
+                    }
+                    return <span>{thinClassNo}</span>;
+                }
             },
             {
                 title: '操作',
