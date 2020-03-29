@@ -85,7 +85,7 @@ class Tablelevel extends Component {
         this.tileLayer = L.tileLayer(TILEURLS[1], {
             // subdomains: [3],
             subdomains: [0, 1, 2, 3, 4, 5, 6, 7], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
-            minZoom: 10,
+            minZoom: 12,
             maxZoom: 17,
             zoomOffset: 1
         }).addTo(this.map);
@@ -93,7 +93,7 @@ class Tablelevel extends Component {
         L.tileLayer(WMSTILELAYERURL, {
             // subdomains: [3],
             subdomains: [0, 1, 2, 3, 4, 5, 6, 7],
-            minZoom: 10,
+            minZoom: 12,
             maxZoom: 17,
             zoomOffset: 1
         }).addTo(this.map);
@@ -102,7 +102,7 @@ class Tablelevel extends Component {
             FOREST_GIS_API + '/geoserver/gwc/service/wmts?layer=xatree%3Anewtreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}', {
                 opacity: 1.0,
                 subdomains: [1, 2, 3],
-                minZoom: 10,
+                minZoom: 12,
                 maxZoom: 21,
                 storagetype: 0,
                 tiletype: 'wtms'

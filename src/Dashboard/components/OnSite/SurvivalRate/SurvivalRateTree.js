@@ -144,7 +144,7 @@ export default class SurvivalRateTree extends Component {
                 {
                     opacity: 1.0,
                     subdomains: [1, 2, 3],
-                    minZoom: 10,
+                    minZoom: 12,
                     maxZoom: 21,
                     storagetype: 0,
                     tiletype: 'wtms'

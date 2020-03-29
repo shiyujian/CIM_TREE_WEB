@@ -195,7 +195,7 @@ export default class TreePipePage extends Component {
                 {
                     opacity: 1.0,
                     subdomains: [1, 2, 3],
-                    minZoom: 10,
+                    minZoom: 12,
                     maxZoom: 21,
                     storagetype: 0,
                     tiletype: 'wtms'
@@ -217,7 +217,7 @@ export default class TreePipePage extends Component {
                 {
                     opacity: 1.0,
                     subdomains: [1, 2, 3],
-                    minZoom: 10,
+                    minZoom: 12,
                     maxZoom: 21,
                     storagetype: 0,
                     tiletype: 'wtms'
@@ -239,7 +239,7 @@ export default class TreePipePage extends Component {
                 {
                     opacity: 1.0,
                     subdomains: [1, 2, 3],
-                    minZoom: 10,
+                    minZoom: 12,
                     maxZoom: 21,
                     storagetype: 0,
                     tiletype: 'wtms'
@@ -261,7 +261,7 @@ export default class TreePipePage extends Component {
                 {
                     opacity: 1.0,
                     subdomains: [1, 2, 3],
-                    minZoom: 10,
+                    minZoom: 12,
                     maxZoom: 21,
                     storagetype: 0,
                     tiletype: 'wtms'
@@ -705,9 +705,9 @@ export default class TreePipePage extends Component {
                                                     测试鼠标拖拽移动
                                                 </div> */}
                                                 <div
-                                                onMouseUp={this.stopResize}
-                                                onMouseLeave={this.stopResize}
-                                                className='TreePipePageTest-asideTree'>
+                                                    onMouseUp={this.stopResize}
+                                                    onMouseLeave={this.stopResize}
+                                                    className='TreePipePageTest-asideTree'>
                                                     <Spin spinning={treePipeLoading}>
                                                         <div className='TreePipePage-button'>
                                                             <div className='TreePipePage-GisQueryBorder'>

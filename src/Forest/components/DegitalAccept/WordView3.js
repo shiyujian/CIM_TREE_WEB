@@ -62,7 +62,7 @@ export default class WordView1 extends Component {
             this.tileLayer = L.tileLayer(TILEURLS[1], {
                 // subdomains: [3],
                 subdomains: [0, 1, 2, 3, 4, 5, 6, 7], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
-                minZoom: 10,
+                minZoom: 12,
                 maxZoom: 17,
                 zoomOffset: 1
             }).addTo(this.map);
@@ -70,7 +70,7 @@ export default class WordView1 extends Component {
             L.tileLayer(WMSTILELAYERURL, {
                 // subdomains: [3],
                 subdomains: [0, 1, 2, 3, 4, 5, 6, 7],
-                minZoom: 10,
+                minZoom: 12,
                 maxZoom: 17,
                 zoomOffset: 1
             }).addTo(this.map);
@@ -319,197 +319,197 @@ export default class WordView1 extends Component {
                                         tab={(item && item.TreeTypeObj && item.TreeTypeObj.TreeTypeName) || '树种'}
                                         key={index}>
                                         <div>
-                                        <div className='trrdd'>
-                                            <table style={{ border: 1 }}>
-                                                <tbody>
-                                                    <tr>
-                                                        <td height='60;' colSpan='1' width='118px'>单位工程名称</td>
-                                                        <td colSpan='3'> {handleDetail.unit}</td>
-                                                        <td colSpan='1' width='118px'>细班（小班）</td>
-                                                        <td colSpan='1'>{`${array[2]}小班${array[3]}细班`}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td height='60;' align='center'>施工单位</td>
-                                                        <td colSpan='3'>{unitName}</td>
-                                                        <td >项目经理</td>
-                                                        <td >{leader}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td height='60;' align='center'>施工员</td>
-                                                        <td colSpan='1'>{handleDetail.shigong}</td>
-                                                        <td>苗木品种及规格</td>
-                                                        <td colSpan='1'>{handleDetail.treetypename}</td>
-                                                        <td>土球规格</td>
-                                                        <td > / </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td className='hei60' >施工执行标准名称及编号</td>
-                                                        <td colSpan='5'> 《雄安新区造林工作手册》</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colSpan='6' style={{height: 200}}>
-                                                            <div style={{textAlign: 'left'}}>
-                                                                <span style={{display: 'block'}}>验收要点：以细班或小班为单位，对挖穴进行验收。按照不低于设计数量的5%进行抽检，对挖穴直径和深度进行打分。挖穴直径比土球直径大于40厘米，底部平整，深比土球高10～20厘米。</span>
-                                                                <span style={{display: 'block'}}>①挖穴规格不小于上述要求即为合格，合格率达到90%以上，计90分以上，通过检验；</span>
-                                                                <span style={{display: 'block'}}>②挖穴直径未超过土球直径40厘米，或过于随意，大小不均，即不合格，须整改。</span>
-                                                                <span style={{display: 'block'}}>挖穴合格率=抽检合格数量/抽检数量。</span>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style={{ height: 300 }} colSpan='6'>
-                                                            <div
-                                                                id={item.ID}
-                                                                // id='mapID'
-                                                                style={{
-                                                                    height: 300,
-                                                                    borderLeft: '1px solid #ccc'
-                                                                }}
-                                                            />
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td height='60;'width='118px'>挖穴标准</td>
-                                                        <td colSpan='1'> / </td>
-                                                        <td height='60;'width='118px'>设计数量</td>
-                                                        <td colSpan='1'>{`${handleDetail.designNum} (个)`}</td>
-                                                        <td colSpan='1' width='118px'>实际数量</td>
-                                                        <td colSpan='1'>{`${handleDetail.actualNum} (个)`}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td height='60;'width='118px'>抽检数量</td>
-                                                        <td colSpan='1'>{`${handleDetail.checkNum} (个)`}</td>
-                                                        <td height='60;'width='118px'>抽检合格数量</td>
-                                                        <td colSpan='1'>{`${handleDetail.hgl} (个)`}</td>
-                                                        <td colSpan='1' width='118px'>合格率</td>
-                                                        <td colSpan='1'>{`${handleDetail.score}%`}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colSpan='6'>
-                                                            <Row>
-                                                                <Col span={3} style={{ width: 116 }}>
-                                                                    <div style={{ width: 116, marginTop: 20 }}>验收记录
+                                            <div className='trrdd'>
+                                                <table style={{ border: 1 }}>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td height='60;' colSpan='1' width='118px'>单位工程名称</td>
+                                                            <td colSpan='3'> {handleDetail.unit}</td>
+                                                            <td colSpan='1' width='118px'>细班（小班）</td>
+                                                            <td colSpan='1'>{`${array[2]}小班${array[3]}细班`}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td height='60;' align='center'>施工单位</td>
+                                                            <td colSpan='3'>{unitName}</td>
+                                                            <td >项目经理</td>
+                                                            <td >{leader}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td height='60;' align='center'>施工员</td>
+                                                            <td colSpan='1'>{handleDetail.shigong}</td>
+                                                            <td>苗木品种及规格</td>
+                                                            <td colSpan='1'>{handleDetail.treetypename}</td>
+                                                            <td>土球规格</td>
+                                                            <td > / </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td className='hei60' >施工执行标准名称及编号</td>
+                                                            <td colSpan='5'> 《雄安新区造林工作手册》</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colSpan='6' style={{height: 200}}>
+                                                                <div style={{textAlign: 'left'}}>
+                                                                    <span style={{display: 'block'}}>验收要点：以细班或小班为单位，对挖穴进行验收。按照不低于设计数量的5%进行抽检，对挖穴直径和深度进行打分。挖穴直径比土球直径大于40厘米，底部平整，深比土球高10～20厘米。</span>
+                                                                    <span style={{display: 'block'}}>①挖穴规格不小于上述要求即为合格，合格率达到90%以上，计90分以上，通过检验；</span>
+                                                                    <span style={{display: 'block'}}>②挖穴直径未超过土球直径40厘米，或过于随意，大小不均，即不合格，须整改。</span>
+                                                                    <span style={{display: 'block'}}>挖穴合格率=抽检合格数量/抽检数量。</span>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style={{ height: 300 }} colSpan='6'>
+                                                                <div
+                                                                    id={item.ID}
+                                                                    // id='mapID'
+                                                                    style={{
+                                                                        height: 300,
+                                                                        borderLeft: '1px solid #ccc'
+                                                                    }}
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td height='60;'width='118px'>挖穴标准</td>
+                                                            <td colSpan='1'> / </td>
+                                                            <td height='60;'width='118px'>设计数量</td>
+                                                            <td colSpan='1'>{`${handleDetail.designNum} (个)`}</td>
+                                                            <td colSpan='1' width='118px'>实际数量</td>
+                                                            <td colSpan='1'>{`${handleDetail.actualNum} (个)`}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td height='60;'width='118px'>抽检数量</td>
+                                                            <td colSpan='1'>{`${handleDetail.checkNum} (个)`}</td>
+                                                            <td height='60;'width='118px'>抽检合格数量</td>
+                                                            <td colSpan='1'>{`${handleDetail.hgl} (个)`}</td>
+                                                            <td colSpan='1' width='118px'>合格率</td>
+                                                            <td colSpan='1'>{`${handleDetail.score}%`}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colSpan='6'>
+                                                                <Row>
+                                                                    <Col span={3} style={{ width: 116 }}>
+                                                                        <div style={{ width: 116, marginTop: 20 }}>验收记录
                                                 合格(√)
                                         不合格(×)</div>
-                                                                </Col>
-                                                                <Col span={21} style={{ width: 630 }}>
-                                                                    {
-                                                                        handleDetail.rowList
-                                                                    }
-                                                                </Col>
-                                                            </Row>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td className='hei110' >施工单位质量专检结果</td>
-                                                        <td colSpan='5'>
-                                                            <div>
-                                                                <div style={{ float: 'left', marginLeft: 10 }}>
-                                                                    <p >项目专业质量检查员：</p><p>{handleDetail.checker}</p>
+                                                                    </Col>
+                                                                    <Col span={21} style={{ width: 630 }}>
+                                                                        {
+                                                                            handleDetail.rowList
+                                                                        }
+                                                                    </Col>
+                                                                </Row>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td className='hei110' >施工单位质量专检结果</td>
+                                                            <td colSpan='5'>
+                                                                <div>
+                                                                    <div style={{ float: 'left', marginLeft: 10 }}>
+                                                                        <p >项目专业质量检查员：</p><p>{handleDetail.checker}</p>
+                                                                    </div>
+                                                                    <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.applyTime}</p>
                                                                 </div>
-                                                                <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.applyTime}</p>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td className='hei110' >监理（建设）单位验收记录</td>
-                                                        <td colSpan='5'>
-                                                            <div>
-                                                                <div style={{ float: 'left', marginLeft: 10 }}>
-                                                                    <p>监理工程师：</p><p>{handleDetail.jianli}</p>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td className='hei110' >监理（建设）单位验收记录</td>
+                                                            <td colSpan='5'>
+                                                                <div>
+                                                                    <div style={{ float: 'left', marginLeft: 10 }}>
+                                                                        <p>监理工程师：</p><p>{handleDetail.jianli}</p>
+                                                                    </div>
+                                                                    <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.createTime}</p>
                                                                 </div>
-                                                                <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.createTime}</p>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <div>
-                                                <p>注：1.挖穴验收记录可另附表。2.附验收过程照片及说明。 </p>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <div>
+                                                    <p>注：1.挖穴验收记录可另附表。2.附验收过程照片及说明。 </p>
+                                                </div>
                                             </div>
-                                        </div>
-                                        {
-                                            handleDetail.AllViewPic || handleDetail.LocalPic
-                                                ? (
-                                                    <h1>附件：</h1>
-                                                ) : ''
-                                        }
-                                        {
-                                            handleDetail.AllViewPic
-                                                ? (
-                                                    <Row gutter={10}>
-                                                        <h2 style={{marginLeft: 5}}>全景照片</h2>
-                                                        <div style={{marginLeft: 5, marginBottom: 5}}>
-                                                            <span style={{fontSize: 15, fontWeight: 'bold'}}>
+                                            {
+                                                handleDetail.AllViewPic || handleDetail.LocalPic
+                                                    ? (
+                                                        <h1>附件：</h1>
+                                                    ) : ''
+                                            }
+                                            {
+                                                handleDetail.AllViewPic
+                                                    ? (
+                                                        <Row gutter={10}>
+                                                            <h2 style={{marginLeft: 5}}>全景照片</h2>
+                                                            <div style={{marginLeft: 5, marginBottom: 5}}>
+                                                                <span style={{fontSize: 15, fontWeight: 'bold'}}>
                                                                 验收说明：
-                                                            </span>
-                                                            <span>
-                                                                {handleDetail.AllViewDescribe || '无'}
-                                                            </span>
-                                                        </div>
-                                                        {
-                                                            handleDetail.AllViewPic.map((src) => {
-                                                                if (handleDetail.AllViewPic.length === 1) {
-                                                                    return (
-                                                                        <Row>
-                                                                            <Col span={6} />
+                                                                </span>
+                                                                <span>
+                                                                    {handleDetail.AllViewDescribe || '无'}
+                                                                </span>
+                                                            </div>
+                                                            {
+                                                                handleDetail.AllViewPic.map((src) => {
+                                                                    if (handleDetail.AllViewPic.length === 1) {
+                                                                        return (
+                                                                            <Row>
+                                                                                <Col span={6} />
+                                                                                <Col span={12}>
+                                                                                    <img style={{ width: '100%' }} src={src} alt='图片' />
+                                                                                </Col>
+                                                                                <Col span={6} />
+                                                                            </Row>
+                                                                        );
+                                                                    } else {
+                                                                        return (
                                                                             <Col span={12}>
                                                                                 <img style={{ width: '100%' }} src={src} alt='图片' />
                                                                             </Col>
-                                                                            <Col span={6} />
-                                                                        </Row>
-                                                                    );
-                                                                } else {
-                                                                    return (
-                                                                        <Col span={12}>
-                                                                            <img style={{ width: '100%' }} src={src} alt='图片' />
-                                                                        </Col>
-                                                                    );
-                                                                }
-                                                            })
-                                                        }
-                                                    </Row>
-                                                ) : ''
-                                        }
-                                        {
-                                            handleDetail.LocalPic
-                                                ? (
-                                                    <Row gutter={10}>
-                                                        <h2 style={{marginLeft: 5}}>局部照片</h2>
-                                                        <div style={{marginLeft: 5, marginBottom: 5}}>
-                                                            <span style={{fontSize: 15, fontWeight: 'bold'}}>
+                                                                        );
+                                                                    }
+                                                                })
+                                                            }
+                                                        </Row>
+                                                    ) : ''
+                                            }
+                                            {
+                                                handleDetail.LocalPic
+                                                    ? (
+                                                        <Row gutter={10}>
+                                                            <h2 style={{marginLeft: 5}}>局部照片</h2>
+                                                            <div style={{marginLeft: 5, marginBottom: 5}}>
+                                                                <span style={{fontSize: 15, fontWeight: 'bold'}}>
                                                                 验收说明：
-                                                            </span>
-                                                            <span>
-                                                                {handleDetail.LocalDescribe || '无'}
-                                                            </span>
-                                                        </div>
-                                                        {
-                                                            handleDetail.LocalPic.map((src) => {
-                                                                if (handleDetail.LocalPic.length === 1) {
-                                                                    return (
-                                                                        <Row>
-                                                                            <Col span={6} />
+                                                                </span>
+                                                                <span>
+                                                                    {handleDetail.LocalDescribe || '无'}
+                                                                </span>
+                                                            </div>
+                                                            {
+                                                                handleDetail.LocalPic.map((src) => {
+                                                                    if (handleDetail.LocalPic.length === 1) {
+                                                                        return (
+                                                                            <Row>
+                                                                                <Col span={6} />
+                                                                                <Col span={12}>
+                                                                                    <img style={{ width: '100%' }} src={src} alt='图片' />
+                                                                                </Col>
+                                                                                <Col span={6} />
+                                                                            </Row>
+                                                                        );
+                                                                    } else {
+                                                                        return (
                                                                             <Col span={12}>
                                                                                 <img style={{ width: '100%' }} src={src} alt='图片' />
                                                                             </Col>
-                                                                            <Col span={6} />
-                                                                        </Row>
-                                                                    );
-                                                                } else {
-                                                                    return (
-                                                                        <Col span={12}>
-                                                                            <img style={{ width: '100%' }} src={src} alt='图片' />
-                                                                        </Col>
-                                                                    );
-                                                                }
-                                                            })
-                                                        }
-                                                    </Row>
-                                                ) : ''
-                                        }
+                                                                        );
+                                                                    }
+                                                                })
+                                                            }
+                                                        </Row>
+                                                    ) : ''
+                                            }
                                         </div>
-                                       
+
                                     </TabPane>
                                 );
                             })
