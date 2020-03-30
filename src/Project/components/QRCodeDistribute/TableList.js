@@ -7,13 +7,18 @@ import {
     Input,
     Select,
     Form,
+    Popconfirm,
     InputNumber,
     Notification,
+    Divider,
     DatePicker
 } from 'antd';
 import MmChartList from './MmChartList';
 import {getFieldValue} from '_platform/store/util';
 import {getProjectNameBySection, getSectionNameBySection} from '_platform/gisAuth';
+import {
+    getUser
+} from '_platform/auth';
 import moment from 'moment';
 const { TextArea } = Input;
 const { Option } = Select;
@@ -57,11 +62,7 @@ class TableList extends Component {
         this._mmqueryParams = {};
     }
     changeFormField (key, event) {
-        console.log('key', key);
-        console.log('event', event);
-
         let value = getFieldValue(event);
-        console.log('value', value);
 
         if (key === 'mmstatus') {
             this._mmqueryParams['mmstatus'] = value;
@@ -73,7 +74,6 @@ class TableList extends Component {
         if (key === 'mmProjct') {
             this._mmqueryParams['mmProjct'] = value;
         }
-        console.log('this._mmqueryParams', this._mmqueryParams);
     }
     onMmApply () {
         this.setState({
@@ -330,7 +330,6 @@ class TableList extends Component {
                 if (tree && tree.thinClassTree) {
                     thinClassTree = tree.thinClassTree;
                     let projectName = getProjectNameBySection(text, thinClassTree);
-                    console.log('projectName', projectName);
                     if (projectName) {
                         return projectName;
                     } else {
@@ -363,7 +362,6 @@ class TableList extends Component {
                 if (tree && tree.thinClassTree) {
                     thinClassTree = tree.thinClassTree;
                     let sectionName = getSectionNameBySection(text, thinClassTree);
-                    console.log('sectionName', sectionName);
                     if (sectionName) {
                         return sectionName;
                     } else {
@@ -429,22 +427,58 @@ class TableList extends Component {
             title: '操作',
             dataIndex: 'active',
             render: (text, record, index) => {
-                return (<div>
-                    <span style={{color: '#1890ff', marginRight: 10, cursor: 'pointer'}} onClick={this.onMmDetails.bind(this, record)}>详情</span>
-                    {
-                        record.Status === -1 &&
-                        ((
-                            this.props.isExamine) || this.props.isadmin)
-                            ? <span
-                                style={{color: '#1890ff', cursor: 'pointer'}}
-                                onClick={this.onMmCheck.bind(this, record)}>
+                let userInfo = getUser();
+                let arr = [<a onClick={this.onMmDetails.bind(this, record)}>详情</a>];
+                if (record.Status === -1 && ((this.props.isExamine) || this.props.isadmin)) {
+                    arr.push(
+                        <Divider type='vertical' />,
+                        <a
+                            onClick={this.onMmCheck.bind(this, record)}
+                        >
                             审核
-                            </span> : ''
-                    }
+                        </a>
+                    );
+                }
+                if (userInfo.username === 'admin') {
+                    arr.push(
+                        <Divider type='vertical' />,
+                        <Popconfirm
+                            title='请确认是否删除？'
+                            onConfirm={this.handleDelete.bind(this, record.ID)}
+                            okText='是'
+                            cancelText='否'
+                        >
+                            <a>
+                                删除
+                            </a>
+                        </Popconfirm>
+                    );
+                }
+                return (<div>
+                    {arr}
                 </div>);
             }
         }
     ];
+    handleDelete (ID) {
+        const {
+            actions: { deleteQrcode }
+        } = this.props;
+        deleteQrcode({
+            ID: ID
+        }).then(rep => {
+            if (rep.code === 1) {
+                Notification.success({
+                    message: '删除成功'
+                });
+                this.props.mmquery();
+            } else {
+                Notification.error({
+                    message: '删除失败，请联系管理员解决'
+                });
+            }
+        });
+    }
     onMmDetails (record) {
         this.props.onVisibleView('mmxq', record.ID);
     }

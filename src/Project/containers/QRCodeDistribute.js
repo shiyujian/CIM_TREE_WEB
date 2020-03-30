@@ -130,9 +130,10 @@ export default class QRCodeDistribute extends Component {
         if (queryParams && queryParams.mmProjct && !section) {
             section = queryParams.mmProjct;
         }
-        console.log('section', section);
-        console.log('this.state.section', this.state.section);
-
+        // 业主文书，业主标段不限制
+        if (user.roles.ID === 13 || user.roles.ID === 9 || user.username === 'admin') {
+            section = '';
+        }
         let status = queryParams ? (queryParams.mmstatus ? queryParams.mmstatus : '') : '';
         let stime = queryParams ? (queryParams.mmstime ? queryParams.mmstime : '') : '';
         let etime = queryParams ? (queryParams.mmetime ? queryParams.mmetime : '') : '';
@@ -220,7 +221,6 @@ export default class QRCodeDistribute extends Component {
         };
         getQrcodestores({}, params)
             .then((data) => {
-                console.log('data', data);
                 if (data && data.content && data.content.length > 0) {
                     let count = 0;
                     for (let i = 0; i < data.content.length; i++) {

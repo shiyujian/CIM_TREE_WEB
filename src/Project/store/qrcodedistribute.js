@@ -11,6 +11,8 @@ const getQrcodes = createFetchAction(`${QRCODE_API}/qrcodes`, [], 'GET');
 const getQrcodeDetail = createFetchAction(`${QRCODE_API}/qrcode/{{ID}}`, [], 'GET');
 // 二维码申请
 const postQrcode = createFetchAction(`${QRCODE_API}/qrcode`, [], 'POST');
+// 删除二维码申请列表数据
+const deleteQrcode = createFetchAction(`${QRCODE_API}/qrcode/{{ID}}`, [], 'DELETE');
 // 二维码审核
 const postQrcodeCheck = createFetchAction(`${QRCODE_API}/qrcodecheck`, [], 'POST');
 // 二维码库存查询
@@ -28,6 +30,7 @@ export const actions = {
     getQrcodes,
     getQrcodeDetail,
     postQrcode,
+    deleteQrcode,
     postQrcodeCheck,
     getQrcodestores,
     getQrcodestat,
