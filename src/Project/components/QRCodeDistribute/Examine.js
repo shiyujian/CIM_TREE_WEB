@@ -48,7 +48,8 @@ class Examine extends Component {
         let section = detailRow.Section;
         let isgarden = detailRow.IsGarden;
         let gardentype = detailRow.GardenType;
-        let distributeNum = detailRow.PlanNum * 2; // 实际派发量默认为申请量的2倍
+        //let distributeNum = detailRow.PlanNum * 2; // 实际派发量默认为申请量的2倍
+        let distributeNum = detailRow.PlanNum;
         if (gardentype === 0) { // 苗木不需要考虑标段
             params = {
                 isgarden: isgarden
@@ -106,6 +107,7 @@ class Examine extends Component {
 
     getCalqrcode (qrcode, step) { // 根据起始编码和派发量计算截止编码
         const {actions: {getCalqrcode}} = this.props;
+        step = step - 1;
         let params = {
             qrcode: qrcode,
             step: step
