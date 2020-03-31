@@ -144,12 +144,27 @@ export default class QRCodeDistribute extends Component {
             stime: stime,
             etime: etime
         };
-        getQrcodes({}, postData)
-            .then((data) => {
-                this.setState({
-                    mmqrcodelist: data.content
-                });
+        getQrcodes({}, postData).then((data) => {
+            let mmqrcodelist = [];
+            let mmylcodelist = [];
+            let mmcodelist = [];
+            data.content.map(item => {
+                let arr = item.Section.split('-');
+                if (arr[0].length === 4) {
+                    mmqrcodelist.push(item);
+                } else if (arr[0].length === 5) {
+                    mmylcodelist.push(item);
+                } else {
+                    mmcodelist.push(item);
+                }
             });
+            console.log('所有森林列表数据', mmqrcodelist);
+            console.log('所有园林列表数据', mmylcodelist);
+            console.log('其他列表数据', mmcodelist);
+            this.setState({
+                mmqrcodelist
+            });
+        });
     }
 
     getQrcodeDetail (id) { // 根据详情id获取二维码申请
