@@ -109,12 +109,6 @@ export default class Login extends Component {
                 }
             }
         }
-        console.log('ownerCompanyList', ownerCompanyList);
-        console.log('constructionCompanyList', constructionCompanyList);
-        console.log('supervisorCompanyList', supervisorCompanyList);
-        console.log('designCompanyList', designCompanyList);
-        console.log('costCompanyList', costCompanyList);
-        console.log('curingCompanyList', curingCompanyList);
         this.setState({
             APKUpdateInfo,
             ownerCompanyList,

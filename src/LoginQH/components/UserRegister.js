@@ -7,7 +7,8 @@ import {
     Col,
     Spin,
     Notification,
-    Input
+    Input,
+    Select
 } from 'antd';
 import './UserRegister.less';
 import moment from 'moment';
@@ -24,7 +25,29 @@ import returnImg from './UserRegisterImg/返回3.png';
 import stepSuccessImg from './UserRegisterImg/步骤成功.png';
 import submitSuccessImg from './UserRegisterImg/提交成功.png';
 import submitFailImg from './UserRegisterImg/提交失败.png';
-
+const Option = Select.Option;
+const RealNameAuthentication = (addition) => {
+    return new Promise((resolve) => {
+        fetch(`https://idcert.market.alicloudapi.com/idcard?idCard=${addition.idNum}&name=${addition.FullName}`, {
+            headers: {
+                'Authorization': 'APPCODE ' + 'c091fa7360bc48ff87a3471f028d5645'
+            }
+        }).then(rep => {
+            return rep.json();
+        }).then(rst => {
+            if (rst.status === '01') {
+                Notification.success({
+                    message: '实名认证通过'
+                });
+                resolve();
+            } else {
+                Notification.warning({
+                    message: '实名认证失败，请确认信息是否正确'
+                });
+            }
+        });
+    });
+};
 const FormItem = Form.Item;
 class UserRegister extends Component {
     constructor (props) {
@@ -32,7 +55,12 @@ class UserRegister extends Component {
         this.state = {
             stepState: 1,
             roleType: 'construction',
-            selectCompany: ''
+            selectCompany: '',
+            getSecurityCodeStatus: false,
+            setUserStatus: false,
+            countDown: 60,
+            companyList: [],
+            sectionList: []
         };
     }
     static layout = {
@@ -41,7 +69,21 @@ class UserRegister extends Component {
     };
 
     componentDidMount = async () => {
-
+        const {
+            actions: {
+                getRoles
+            },
+            platform: {
+                roles = []
+            }
+        } = this.props;
+        const {
+            roleType
+        } = this.state;
+        if (!(roles && roles instanceof Array && roles.length > 0)) {
+            await getRoles();
+        }
+        this.handleChangeRoleType(roleType);
     };
 
     handleTreeModalCancel = async () => {
@@ -49,13 +91,243 @@ class UserRegister extends Component {
     }
 
     handleChangeRoleType = (value) => {
+        const {
+            ownerCompanyList,
+            constructionCompanyList,
+            supervisorCompanyList,
+            designCompanyList,
+            costCompanyList
+        } = this.props;
+        let companyList = constructionCompanyList;
+        switch (value) {
+            case 'construction':
+                companyList = constructionCompanyList;
+                break;
+            case 'supervisor':
+                companyList = supervisorCompanyList;
+                break;
+            case 'design':
+                companyList = designCompanyList;
+                break;
+            case 'cost':
+                companyList = costCompanyList;
+                break;
+            case 'owner':
+                companyList = ownerCompanyList;
+                break;
+        }
         this.setState({
             roleType: value,
-            selectCompany: ''
+            selectCompany: '',
+            companyList,
+            sectionList: []
         });
     }
+    // 公司选中
+    handleChangeCompany = (value, node) => {
+        console.log('value', value);
+        console.log('node', node);
+        let sectionList = [];
+        if (node && node.props && node.props.Section) {
+            console.log('node.Section', node.props.Section);
+            let sectionData = node.props.Section;
+            if (sectionData instanceof Array) {
+                sectionList = sectionData;
+            } else {
+                sectionList = sectionData.split(',');
+            }
+        }
+        this.setState({
+            selectCompany: value,
+            sectionList
+        });
+    }
+    // 身份证号校验
+    checkIdNum = async (rule, value, callback) => {
+        if (value) {
+            // 身份证正则
+            let reg = /(^\d{8}(0\d|10|11|12)([0-2]\d|30|31)\d{3}$)|(^\d{6}(18|19|20)\d{2}(0\d|10|11|12)([0-2]\d|30|31)\d{3}(\d|X|x)$)/;
+            console.log('reg.test(value)', reg.test(value));
+            if (reg.test(value)) {
+                callback();
+            } else {
+                callback(`请输入正确的身份证号码`);
+            }
+        } else {
+            callback();
+        }
+    }
+    // 用户名校验
+    checkUserName = async (rule, value, callback) => {
+        if (value) {
+            // 手机号正则
+            let reg = /^[a-zA-Z0-9]{4,16}$/;
+            console.log('reg.test(value)', reg.test(value));
+            // isNaN(value);
+            if (reg.test(value)) {
+                callback();
+            } else {
+                callback(`请输入4到16位（字母，数字）用户名`);
+            }
+        } else {
+            callback();
+        }
+    }
+    // 手机号校验
+    checkPersonTelephone = async (rule, value, callback) => {
+        if (value) {
+            // 手机号正则
+            let reg = /^[1]([3-9])[0-9]{9}$/;
+            console.log('reg.test(value)', reg.test(value));
+            // isNaN(value);
+            if (!isNaN(value) && reg.test(value)) {
+                callback();
+            } else {
+                callback(`请输入正确的手机号`);
+            }
+        } else {
+            callback();
+        }
+    }
+    // 密码输入校验
+    checkPassWord = async (rule, value, callback) => {
+        if (value) {
+            let reg = /^(?![\d]+$)(?![a-zA-Z]+$)(?![^\da-zA-Z]+$).{6,16}$/;
+            if (reg.test(value)) {
+                if (value) {
+                    if (value.length >= 6 && value.length <= 16) {
+                        callback();
+                    } else {
+                        callback('6到16位（至少包括字母、数字以及特殊符号中的2种）');
+                    }
+                } else {
+                    callback(`6到16位（至少包括字母、数字以及特殊符号中的2种）`);
+                }
+            } else {
+                callback(`6到16位（至少包括字母、数字以及特殊符号中的2种）`);
+            }
+        } else {
+            callback();
+        }
+    }
+    //
+    checkRepeatPassWord = (rule, value, callback) => {
+        const {
+            form: {
+                getFieldValue
+            }
+        } = this.props;
+        let password = getFieldValue('passwordUserRegister');
+        if (value) {
+            if (!password) {
+                callback('请输入密码');
+            } else {
+                if (value !== password) {
+                    callback('密码输入不一致，请确认');
+                } else {
+                    callback();
+                }
+            }
+        } else {
+            callback();
+        }
+    }
+    // 获取验证码
+    handleGetSecurityCode = async () => {
+        const {
+            actions: {
+                getSecurityCode,
+                getUsers
+            },
+            form: {
+                getFieldValue
+            }
+        } = this.props;
+        try {
+            let phone = getFieldValue('phoneNumUserRegister');
+            let username = getFieldValue('userNameUserRegister');
+            if (!username) {
+                Notification.error({
+                    message: '请输入用户名',
+                    duration: 2
+                });
+                return;
+            }
+            if (!phone) {
+                Notification.error({
+                    message: '请输入手机号',
+                    duration: 2
+                });
+                return;
+            }
+            let partn = /^[1]([3-9])[0-9]{9}$/;
+            if (!partn.exec(phone)) {
+                Notification.error({
+                    message: '手机号格式输入错误！',
+                    duration: 2
+                });
+                return;
+            }
+            let userData = await getUsers({}, {username: username});
+            console.log('nickname', userData);
+            this.setState({
+                getSecurityCodeStatus: true
+            });
+            const data = {
+                action: 'vcode',
+                phone: phone
+            };
+            let rst = await getSecurityCode({}, data);
+            let status = false;
+            if (rst.indexOf('code') !== -1) {
+                let handleData = rst.substring(1, rst.length - 1);
+                let handleDataArr = handleData.split(',');
+                if (handleDataArr && handleDataArr instanceof Array && handleDataArr.length > 0) {
+                    let codeArr = handleDataArr[0].split(':');
+                    if (codeArr && codeArr instanceof Array && codeArr.length === 2) {
+                        if (codeArr[1] === '1') {
+                            status = true;
+                        }
+                    }
+                };
+            }
+            if (status) {
+                Notification.success({
+                    message: '验证码发送成功',
+                    duration: 3
+                });
+            } else {
+                Notification.error({
+                    message: '验证码发送失败',
+                    duration: 3
+                });
+            }
+            this.handleSecurityCodeStatus();
+        } catch (e) {
+            console.log('handleGetSecurityCode', e);
+        }
+    }
+    handleSecurityCodeStatus = () => {
+        const {
+            countDown
+        } = this.state;
+        if (countDown === 1) {
+            this.setState({
+                countDown: 60,
+                getSecurityCodeStatus: false
+            });
+        } else {
+            this.setState({
+                countDown: countDown - 1,
+                getSecurityCodeStatus: true
+            });
+            setTimeout(async () => {
+                await this.handleSecurityCodeStatus();
+            }, 1000);
+        }
+    }
     // 切换注册步骤
-    handleChangeStepState = (value) => {
+    handleChangeStepState = async (value) => {
         const {
             selectCompany,
             stepState
@@ -70,27 +342,212 @@ class UserRegister extends Component {
                     message: '请选择单位'
                 });
             }
+        } else if (stepState === 2) {
+            this.props.form.validateFields(async (err, values) => {
+                if (!err) {
+                    console.log('values', values);
+                    let realNameValues = {
+                        idNum: values.idNumUserRegister,
+                        FullName: values.realNameUserRegister
+                    };
+                    let data = await RealNameAuthentication(realNameValues);
+                    console.log('data', data);
+                    this.setState({
+                        stepState: value,
+                        idNum: values.idNumUserRegister,
+                        FullName: values.realNameUserRegister
+                    });
+                }
+            });
+        } else if (stepState === 3) {
+            this.handleUserRegister();
+        } else if (stepState === 4) {
+            this.setState({
+                stepState: value
+            });
         } else {
             this.setState({
                 stepState: value
             });
         }
     }
-    // 公司选中
-    handleChangeCompany = (value) => {
-        console.log('value', value);
+    getRoleByCompanyType = (type) => {
+        const {
+            platform: {
+                roles = []
+            }
+        } = this.props;
+        console.log('roles', roles);
+
+        let roleID = '';
+        let parentRoleTypeID = '';
+        roles.map((role) => {
+            if (role && role.ID && role.ParentID === 0 && role.RoleName.indexOf(type) !== -1) {
+                parentRoleTypeID = role.ID;
+            }
+        });
+        roles.map((role) => {
+            if (role && role.ID && role.ParentID === parentRoleTypeID && role.RoleName.indexOf('普通') !== -1) {
+                roleID = role.ID;
+            }
+        });
+        return roleID;
+    }
+    handleUserRegister = () => {
+        const {
+            actions: {
+                postForestUser,
+                getSecurityCode
+            }
+        } = this.props;
+        const {
+            roleType,
+            idNum,
+            FullName,
+            selectCompany,
+            sectionList
+        } = this.state;
+        try {
+            this.props.form.validateFields(async (err, values) => {
+                console.log('values', values);
+
+                if (!err) {
+                    const data = {
+                        action: 'checkvcode',
+                        phone: values.phoneNumUserRegister,
+                        vcode: values.checkCodeUserRegister
+                    };
+                    let rst = await getSecurityCode({}, data);
+                    console.log('rest', rst);
+                    let status = false;
+                    if (rst.indexOf('code') !== -1) {
+                        let handleData = rst.substring(1, rst.length - 1);
+                        let handleDataArr = handleData.split(',');
+                        if (handleDataArr && handleDataArr instanceof Array && handleDataArr.length > 0) {
+                            let codeArr = handleDataArr[0].split(':');
+                            if (codeArr && codeArr instanceof Array && codeArr.length === 2) {
+                                if (codeArr[1] === '1') {
+                                    status = true;
+                                }
+                            }
+                        };
+                    }
+                    if (status) {
+                        Notification.success({
+                            message: '验证码校验成功',
+                            duration: 3
+                        });
+                    } else {
+                        Notification.error({
+                            message: '验证码校验失败，请重新输入验证码',
+                            duration: 3
+                        });
+                        return;
+                    }
+                    let sction = '';
+                    if (sectionList && sectionList instanceof Array && sectionList.length > 0) {
+                        sction = sectionList[0];
+                    }
+                    let duty = '普通施工';
+                    let roleID = '';
+                    switch (roleType) {
+                        case 'construction':
+                            duty = '普通施工';
+                            roleID = this.getRoleByCompanyType('施工');
+                            break;
+                        case 'supervisor':
+                            duty = '普通监理';
+                            roleID = this.getRoleByCompanyType('监理');
+                            break;
+                        case 'design':
+                            duty = '普通设计';
+                            roleID = this.getRoleByCompanyType('设计');
+                            break;
+                        case 'cost':
+                            duty = '普通造价';
+                            roleID = this.getRoleByCompanyType('造价');
+                            break;
+                        case 'owner':
+                            duty = '业主';
+                            roleID = this.getRoleByCompanyType('业主');
+                            break;
+                    }
+                    console.log('roleID', roleID);
+
+                    let postUserPostData = {
+                        Full_Name: FullName, // 姓名
+                        User_Name: values.userNameUserRegister, // 用户名
+                        Org: selectCompany, // 组织机构
+                        Phone: values.phoneNumUserRegister, // 电话
+                        Password: values.passwordUserRegister, // 密码
+                        Duty: duty || '', // 职务
+                        EMail: '',
+                        Sex: 0, // 性别
+                        Status: 0, // 状态
+                        Section: sction, // 标段
+                        Number: idNum, // 身份证号码
+                        Card: '', // 身份证正面照片
+                        CardBack: '', // 身份证背面照片
+                        Face: '',
+                        Roles: [{
+                            ID: Number(roleID) // 角色ID
+                            // ID: 8
+                        }]
+                    };
+                    let userData = await postForestUser({}, postUserPostData);
+                    console.log('userData', userData);
+                    if (userData && userData.code === 1) {
+                        const msgs = JSON.parse(userData.msg);
+                        if (msgs && msgs.status && msgs.status === 400 && msgs.error &&
+                                msgs.error === 'This id_num is blacklist'
+                        ) {
+                            Notification.warning({
+                                message: '身份证号已经加入黑名单'
+                            });
+                        } else {
+                            Notification.success({
+                                message: '新增人员成功'
+                            });
+                            this.setState({
+                                stepState: 4
+                            });
+                        }
+                    } else {
+                        if (userData.code === 2) {
+                            Notification.warning({
+                                message: '用户名已存在！'
+                            });
+                        } else if (userData.code === 0) {
+                            if (userData.msg === '账户注册的苗圃基地已被拉黑！') {
+                                Notification.error({
+                                    message: '账户注册的苗圃基地已被拉黑！'
+                                });
+                            } else {
+                                Notification.error({
+                                    message: '新增人员失败'
+                                });
+                            }
+                        } else {
+                            Notification.error({
+                                message: '新增人员失败'
+                            });
+                        }
+                    }
+                }
+            });
+        } catch (e) {
+            console.log('handleUserRegister', e);
+        }
+    }
+    // 返回
+    handleChangeBackStepState = (value) => {
         this.setState({
-            selectCompany: value
+            stepState: value
         });
     }
     render () {
         const {
             adoptTreeModalLoading = false,
-            ownerCompanyList,
-            constructionCompanyList,
-            supervisorCompanyList,
-            designCompanyList,
-            costCompanyList,
             form: {
                 getFieldDecorator
             }
@@ -98,30 +555,29 @@ class UserRegister extends Component {
         const {
             stepState,
             roleType,
-            selectCompany
+            selectCompany,
+            getSecurityCodeStatus,
+            setUserStatus,
+            countDown,
+            companyList,
+            sectionList
         } = this.state;
         let roleImg = ownerImg;
-        let companyList = constructionCompanyList;
         switch (roleType) {
             case 'construction':
                 roleImg = constructionImg;
-                companyList = constructionCompanyList;
                 break;
             case 'supervisor':
                 roleImg = supervisorImg;
-                companyList = supervisorCompanyList;
                 break;
             case 'design':
                 roleImg = designImg;
-                companyList = designCompanyList;
                 break;
             case 'cost':
                 roleImg = costImg;
-                companyList = costCompanyList;
                 break;
             case 'owner':
                 roleImg = ownerImg;
-                companyList = ownerCompanyList;
                 break;
         }
 
@@ -305,7 +761,6 @@ class UserRegister extends Component {
                                                 />
                                             </div>
                                         </div>
-
                                         <div className='UserRegister-stepChange-button'>
                                             <a onClick={this.handleChangeStepState.bind(this, 2)}>
                                                 <span className='UserRegister-stepChange-button-text'>
@@ -323,7 +778,7 @@ class UserRegister extends Component {
                                                 {...UserRegister.layout}
                                                 label='真实姓名:'
                                             >
-                                                {getFieldDecorator('RealName', {
+                                                {getFieldDecorator('realNameUserRegister', {
                                                     rules: [
                                                         {
                                                             required: true,
@@ -340,11 +795,14 @@ class UserRegister extends Component {
                                                 {...UserRegister.layout}
                                                 label='身份证号码:'
                                             >
-                                                {getFieldDecorator('idNum', {
+                                                {getFieldDecorator('idNumUserRegister', {
                                                     rules: [
                                                         {
                                                             required: true,
                                                             message: '请输入身份证号码'
+                                                        },
+                                                        {
+                                                            validator: this.checkIdNum
                                                         }
                                                     ]
                                                 })(
@@ -358,7 +816,7 @@ class UserRegister extends Component {
                                         <div>
                                             <a
                                                 style={{marginRight: 12}}
-                                                onClick={this.handleChangeStepState.bind(this, 1)}>
+                                                onClick={this.handleChangeBackStepState.bind(this, 1)}>
                                                 <img src={returnImg} />
                                             </a>
                                             <div className='UserRegister-realNameAuthentication-stepChange-button'>
@@ -379,28 +837,34 @@ class UserRegister extends Component {
                                                 {...UserRegister.layout}
                                                 label='用户名:'
                                             >
-                                                {getFieldDecorator('RealName', {
+                                                {getFieldDecorator('userNameUserRegister', {
                                                     rules: [
                                                         {
                                                             required: true,
-                                                            message: '请输入用户名'
+                                                            message: '请输入4到16位（字母，数字）用户名'
+                                                        },
+                                                        {
+                                                            validator: this.checkUserName
                                                         }
                                                     ]
                                                 })(
                                                     <Input
                                                         className='UserRegister-accountInformation-input'
-                                                        placeholder='请输入用户名' />
+                                                        placeholder='请输入用户名（不区分大小写）' />
                                                 )}
                                             </FormItem>
                                             <FormItem
                                                 {...UserRegister.layout}
                                                 label='手机号码:'
                                             >
-                                                {getFieldDecorator('idNum', {
+                                                {getFieldDecorator('phoneNumUserRegister', {
                                                     rules: [
                                                         {
                                                             required: true,
                                                             message: '请输入手机号码'
+                                                        },
+                                                        {
+                                                            validator: this.checkPersonTelephone
                                                         }
                                                     ]
                                                 })(
@@ -414,7 +878,7 @@ class UserRegister extends Component {
                                                 {...UserRegister.layout}
                                                 label='验证码:'
                                             >
-                                                {getFieldDecorator('idNum', {
+                                                {getFieldDecorator('checkCodeUserRegister', {
                                                     rules: [
                                                         {
                                                             required: true,
@@ -425,21 +889,21 @@ class UserRegister extends Component {
                                                     <div>
                                                         <Input
                                                             id='securityCode'
-                                                            className='UserRegister-accountInformation-input-SecurityCode'
+                                                            className='UserRegister-accountInformation-input'
                                                             placeholder='请输入验证码'
                                                         />
-                                                        {/* {
+                                                        {
                                                             (getSecurityCodeStatus && setUserStatus) || countDown !== 60
                                                                 ? <a
-                                                                    className='security-code-status'
+                                                                    className='UserRegister-accountInformation-security-code-status'
                                                                 >{`${countDown}秒后重发`}</a>
                                                                 : <a
-                                                                    className='security-code-type'
+                                                                    className='UserRegister-accountInformation-security-code-type'
                                                                     onClick={this.handleGetSecurityCode.bind(
                                                                         this
                                                                     )}
                                                                 >获取验证码</a>
-                                                        } */}
+                                                        }
                                                     </div>
                                                 )}
                                             </FormItem>
@@ -447,17 +911,20 @@ class UserRegister extends Component {
                                                 {...UserRegister.layout}
                                                 label='密码:'
                                             >
-                                                {getFieldDecorator('idNum', {
+                                                {getFieldDecorator('passwordUserRegister', {
                                                     rules: [
                                                         {
                                                             required: true,
-                                                            message: '请输入密码'
+                                                            message: '6到16位（至少包括字母、数字以及特殊符号中的2种）'
+                                                        },
+                                                        {
+                                                            validator: this.checkPassWord
                                                         }
                                                     ]
                                                 })(
-                                                    <Input
+                                                    <Input.Password
                                                         className='UserRegister-accountInformation-input'
-                                                        placeholder='请输入密码'
+                                                        placeholder='请输入6到16位密码（至少包括字母、数字以及特殊符号中的2种）'
                                                     />
                                                 )}
                                             </FormItem>
@@ -465,15 +932,18 @@ class UserRegister extends Component {
                                                 {...UserRegister.layout}
                                                 label='密码确认:'
                                             >
-                                                {getFieldDecorator('idNum', {
+                                                {getFieldDecorator('passwordCheckUserRegister', {
                                                     rules: [
                                                         {
                                                             required: true,
                                                             message: '请确认密码'
+                                                        },
+                                                        {
+                                                            validator: this.checkRepeatPassWord
                                                         }
                                                     ]
                                                 })(
-                                                    <Input
+                                                    <Input.Password
                                                         className='UserRegister-accountInformation-input'
                                                         placeholder='请确认密码'
                                                     />
@@ -483,7 +953,7 @@ class UserRegister extends Component {
                                         <div>
                                             <a
                                                 style={{marginRight: 12}}
-                                                onClick={this.handleChangeStepState.bind(this, 2)}>
+                                                onClick={this.handleChangeBackStepState.bind(this, 2)}>
                                                 <img src={returnImg} />
                                             </a>
                                             <div className='UserRegister-accountInformation-stepChange-button'>
@@ -514,7 +984,7 @@ class UserRegister extends Component {
                                         </div>
                                         <div>
                                             <div className='UserRegister-SubmitSuccess-stepChange-button'>
-                                                <a onClick={this.handleChangeStepState.bind(this, 3)}>
+                                                <a onClick={this.handleTreeModalCancel.bind(this)}>
                                                     <span className='UserRegister-SubmitSuccess-stepChange-button-text'>
                                                     确认
                                                     </span>

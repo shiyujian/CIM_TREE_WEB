@@ -273,7 +273,8 @@ class LoginForm extends Component {
             form: {
                 getFieldDecorator
             },
-            APKUpdateInfo
+            APKUpdateInfo,
+            constructionCompanyList
         } = this.props;
         const {
             forgectState,
@@ -392,11 +393,12 @@ class LoginForm extends Component {
                                 onClick={this.handleAppDownload.bind(this)}>
                                             APP下载
                             </a>
-                            {/* <a
+                            <a
                                 className='user-register-button'
+                                disabled={!(constructionCompanyList.length > 0)}
                                 onClick={this.handleUserRegister.bind(this)}>
                                             用户注册
-                            </a> */}
+                            </a>
                         </div>
                     </Form>
                 </div>

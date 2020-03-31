@@ -401,8 +401,12 @@ class Users extends Component {
         const {
             selectedRowKeys = []
         } = this.state;
+        console.log('node', node);
+
         let QRCodeRegisterDisabled = true;
         if (node && node.OrgType && node.OrgType.indexOf('单位') !== -1) {
+            QRCodeRegisterDisabled = false;
+        } else if (node && node.OrgPK) {
             QRCodeRegisterDisabled = false;
         }
         const user = getUser();

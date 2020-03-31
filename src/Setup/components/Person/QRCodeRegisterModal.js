@@ -31,7 +31,7 @@ export default class QRCodeRegisterModal extends Component {
             >
                 <div className='QRCodeRegisterModal-layout'>
                     <div className='QRCodeRegisterModal-title'>
-                        请用雄安森林APP打开:
+                    请在雄安森林app注册界面扫码注册模块打开:
                     </div>
                     <div id='qrcode' />
                 </div>
