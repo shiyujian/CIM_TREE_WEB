@@ -392,11 +392,11 @@ class LoginForm extends Component {
                                 onClick={this.handleAppDownload.bind(this)}>
                                             APP下载
                             </a>
-                            <a
+                            {/* <a
                                 className='user-register-button'
                                 onClick={this.handleUserRegister.bind(this)}>
                                             用户注册
-                            </a>
+                            </a> */}
                         </div>
                     </Form>
                 </div>

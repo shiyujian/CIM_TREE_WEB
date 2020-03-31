@@ -17,6 +17,7 @@ import {
 import Addition from './Addition';
 import Edit from './Edit';
 import CheckUserModal from './CheckUserModal';
+import QRCodeRegisterModal from './QRCodeRegisterModal';
 import {getSectionNameBySection} from '_platform/gisAuth';
 import { getUser } from '_platform/auth';
 import './index.less';
@@ -42,7 +43,9 @@ class Users extends Component {
             additionVisible: false,
             editVisible: false,
             editUserRecord: '',
-            queryUserPostData: {}
+            queryUserPostData: {},
+            QRCodeRegisterVisible: false,
+            QRCodeRegisterValue: ''
         };
     }
     static layout = {
@@ -349,6 +352,47 @@ class Users extends Component {
             console.log('Table-compare', e);
         }
     }
+    handleRegisterByQRCode = () => {
+        const {
+            sidebar: { node } = {}
+        } = this.props;
+        let orgID = '';
+        let orgType = '';
+        if (node && node.OrgPK) {
+            orgID = node.OrgPK;
+            orgType = '苗圃单位';
+        } else {
+            orgID = node.ID;
+            if (node && node.OrgType) {
+                orgType = node.OrgType;
+            }
+        }
+        if (node && node.OrgName) {
+            let orgName = node.OrgName;
+            let QRCodeRegisterValue = orgType + '^' + orgName + '^' + orgID + '^' + 'QRRegister^forest';
+            console.log('QRCodeRegisterValue', QRCodeRegisterValue);
+            this.setState({
+                QRCodeRegisterVisible: true,
+                QRCodeRegisterValue
+            });
+        } else {
+            message.warn('请选择公司');
+        }
+    }
+    handleCloseQRCodeRegisterModal = () => {
+        this.setState({
+            QRCodeRegisterVisible: false,
+            QRCodeRegisterValue: ''
+        });
+    }
+    // 设置拉入黑名单的背景颜色
+    setBlackListColor (record, i) {
+        if (record && record.IsBlack && (record.IsBlack === 1)) {
+            return 'background';
+        } else {
+            return '';
+        }
+    }
     // 添加和删除用户的按钮
     confirms () {
         const {
@@ -357,6 +401,10 @@ class Users extends Component {
         const {
             selectedRowKeys = []
         } = this.state;
+        let QRCodeRegisterDisabled = true;
+        if (node && node.OrgType && node.OrgType.indexOf('单位') !== -1) {
+            QRCodeRegisterDisabled = false;
+        }
         const user = getUser();
         if (user.username === 'admin') {
             return (<div>
@@ -366,6 +414,14 @@ class Users extends Component {
                         disabled={!(node && node.ID)}
                         onClick={this.append.bind(this)}>
                             添加用户
+                    </Button>
+                </Col>
+                <Col span={3}>
+                    <Button
+                        type='primary'
+                        disabled={QRCodeRegisterDisabled}
+                        onClick={this.handleRegisterByQRCode.bind(this, node)}>
+                                二维码注册
                     </Button>
                 </Col>
                 <Col span={3}>
@@ -389,24 +445,26 @@ class Users extends Component {
             </div>);
         } else {
             return (
-                <Col span={3}>
-                    <Button
-                        onClick={this.append.bind(this)}
-                        disabled={!(node && node.ID)}
-                        // disabled
-                    >
-                        添加用户
-                    </Button>
-                </Col>
+                <div>
+                    <Col span={3}>
+                        <Button
+                            onClick={this.append.bind(this)}
+                            disabled={!(node && node.ID)}
+                            // disabled
+                        >
+                            添加用户
+                        </Button>
+                    </Col>
+                    {/* <Col span={3}>
+                        <Button
+                            type='primary'
+                            disabled={QRCodeRegisterDisabled}
+                            onClick={this.handleRegisterByQRCode.bind(this, node)}>
+                                二维码注册
+                        </Button>
+                    </Col> */}
+                </div>
             );
-        }
-    }
-    // 设置拉入黑名单的背景颜色
-    setBlackListColor (record, i) {
-        if (record && record.IsBlack && (record.IsBlack === 1)) {
-            return 'background';
-        } else {
-            return '';
         }
     }
     render () {
@@ -420,7 +478,8 @@ class Users extends Component {
             dataList,
             searchKeyword,
             additionVisible,
-            editVisible
+            editVisible,
+            QRCodeRegisterVisible
         } = this.state;
         // 用户的查看权限
         const user = getUser();
@@ -555,7 +614,16 @@ class Users extends Component {
                             handleCloseEditModal={this.handleCloseEditModal.bind(this)}
                             {...this.props}
                             {...this.state} />
-                        : ''}
+                        : ''
+                }
+                {
+                    QRCodeRegisterVisible
+                        ? <QRCodeRegisterModal
+                            handleCloseQRCodeRegisterModal={this.handleCloseQRCodeRegisterModal.bind(this)}
+                            {...this.props}
+                            {...this.state} />
+                        : ''
+                }
             </div>
         ) : (
             <h3>{'没有权限'}</h3>
