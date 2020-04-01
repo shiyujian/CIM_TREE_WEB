@@ -8,6 +8,7 @@ import {
     Carousel
 } from 'antd';
 import './Details.css';
+import mmewm from './img/mmewm.jpg';
 const { TextArea } = Input;
 const FormItem = Form.Item;
 export default class Details extends Component {
@@ -151,7 +152,7 @@ export default class Details extends Component {
                             <Col span={24}>
                                 <div style={{width: '80%', margin: 'auto'}}>
                                     <div style={{width: '50%', float: 'left', height: '300px'}}>
-                                        <img src='' style={{width: '80%', height: '80%', textAlign: 'center'}} />
+                                        <img src={mmewm} style={{width: '80%', height: '80%', textAlign: 'center'}} />
                                     </div>
                                     <div style={{width: '50%', float: 'left', height: '300px', lineHeight: '20px'}}>
                                         <div style={{marginBottom: '20px'}}>制作: 不可擅自更改电子版铭牌外观，按照电子铭牌样式制作成金属铭牌，铭牌成品须达到字迹清晰、二维码可快速识别、色彩靓丽；铭牌表层无法黏贴小广告、无法用马克笔类物品涂写；材质耐氧化，耐紫外线，不易变色、褪色。</div>
