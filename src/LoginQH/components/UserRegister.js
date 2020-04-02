@@ -506,7 +506,7 @@ class UserRegister extends Component {
                             });
                         } else {
                             Notification.success({
-                                message: '新增人员成功'
+                                message: '信息已提交成功，请等待审核'
                             });
                             this.setState({
                                 stepState: 4

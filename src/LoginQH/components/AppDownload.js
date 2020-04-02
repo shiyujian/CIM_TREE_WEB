@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {
     Form
 } from 'antd';
-import QRCode from 'qrcode.react';
+import QRCode from 'qrcodejs2';
 import {
     clearUser
 } from '_platform/auth';
@@ -16,7 +16,20 @@ class AppDownload extends Component {
         super(props);
         this.state = {
         };
-        clearUser();
+    }
+    componentDidMount () {
+        const {
+            APKUpdateInfo
+        } = this.props;
+        let qrcode = new QRCode(document.getElementById('qrcode'), {
+            text: APKUpdateInfo.url,
+            width: 210,
+            height: 210,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+        });
+        console.log('qrcode', qrcode);
     }
     // 返回登录
     handleAppDownloadCancel = () => {
@@ -39,15 +52,7 @@ class AppDownload extends Component {
                                 请用浏览器打开
                             </span>
                         </div>
-                        <QRCode
-                            style={{
-                                width: 215,
-                                height: 215
-                            }}
-                            className='QRCodeLayout'
-                            key={APKUpdateInfo.url}
-                            id={APKUpdateInfo.url}
-                            value={APKUpdateInfo.url} />
+                        <div id='qrcode' className='QRCodeLayout' />
                         <div className='appDownload-edition'>
                             {APKUpdateInfo.versionName}版本
                         </div>
