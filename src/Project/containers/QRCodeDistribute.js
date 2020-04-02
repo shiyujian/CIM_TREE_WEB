@@ -86,6 +86,10 @@ export default class QRCodeDistribute extends Component {
             this.setState({
                 projectList: projectList
             });
+        }else{
+            this.setState({
+                projectList: tree.thinClassTree
+            });
         }
         this.getQrcodestat('nursery');
         this.getQrcodestatCount('nursery');

@@ -79,8 +79,11 @@ class ChartList extends Component {
                 let linedatax = [];
                 if (qrcodestatcount.length > 0) {
                     for (let i = 0; i < qrcodestatcount.length; i++) {
-                        linedata.push(qrcodestatcount[i].Sum);
-                        linedatax.push(qrcodestatcount[i].Label);
+                        let arr = qrcodestatcount[i].Label.split('-');
+                        if(arr[0].length === 4){
+                            linedata.push(qrcodestatcount[i].Sum);
+                            linedatax.push(qrcodestatcount[i].Label);
+                        }
                     }
                 }
                 if (linedatax.length > 0) {
@@ -92,7 +95,7 @@ class ChartList extends Component {
                                     let list = projectList[l].children;
                                     for (let k = 0; k < list.length; k++) {
                                         if (list[k].No === linedatax[j]) {
-                                            linedatax[j] = list[k].Name;
+                                            linedatax[j] = projectList[l].Name + list[k].Name;
                                         }
                                     }
                                 }
