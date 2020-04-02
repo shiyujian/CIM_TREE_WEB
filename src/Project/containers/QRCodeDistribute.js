@@ -130,10 +130,7 @@ export default class QRCodeDistribute extends Component {
         if (queryParams && queryParams.mmProjct && !section) {
             section = queryParams.mmProjct;
         }
-        // 业主文书，业主标段不限制
-        if (user.roles.ID === 13 || user.roles.ID === 9 || user.username === 'admin') {
-            section = '';
-        }
+        section = section || '';
         let status = queryParams ? (queryParams.mmstatus ? queryParams.mmstatus : '') : '';
         let stime = queryParams ? (queryParams.mmstime ? queryParams.mmstime : '') : '';
         let etime = queryParams ? (queryParams.mmetime ? queryParams.mmetime : '') : '';
