@@ -11,7 +11,8 @@ import {
     InputNumber,
     Notification,
     Divider,
-    DatePicker
+    DatePicker,
+    Modal
 } from 'antd';
 import MmChartList from './MmChartList';
 import {getFieldValue} from '_platform/store/util';
@@ -20,6 +21,10 @@ import {
     getUser
 } from '_platform/auth';
 import moment from 'moment';
+import './distribute.less';
+import mmewm from './img/mmewm.jpg';
+import down from './img/down.png';
+import close from './img/close.png';
 const { TextArea } = Input;
 const { Option } = Select;
 const FormItem = Form.Item;
@@ -34,7 +39,19 @@ class TableList extends Component {
         this.state = {
             dataListFacility: [], // 设施列表
             isMmApply: false, // 苗木二维码申请
-            isYlApply: false // 园林二维码申请
+            isYlApply: false, // 园林二维码申请
+            DistributeVisible: false,   //派发单弹出框
+            distributeRow:{
+                proj: '',   //项目
+                section: '',//标段
+                num: '',    //生产数量
+                no: '',     //派发号段
+                unit: '',   //申请单位
+                user: '',   //申请人
+                time: '',   //申请时间
+                url: '',    //标牌照片
+                isgarden: '', //苗木还是园林设施
+            }, //派发单相关数据
         };
         this._mmqueryParams = {};
     }
@@ -308,6 +325,71 @@ class TableList extends Component {
                     </Form>
                 </div>
             }
+            <Modal
+                    title=""
+                    width='720px'
+                    visible={this.state.DistributeVisible}
+                    footer={null}
+                    wrapClassName={'distribute'}
+                    closable = {false}
+                    onCancel={this.handleCancel.bind(this)}
+                >
+                    <div>
+                        <h1 style={{ textAlign: 'center' }}>派发单</h1>
+                        <a title="下载派发单" onClick={this.onDowm.bind(this)} style={{position:'absolute',top:'30px',right:'20px'}}><img src={down}></img></a>
+                        {/*<a title="关闭" onClick={this.handleCancel.bind(this)} style={{position:'absolute',top:'470px',left:'270px'}}><img src={close}></img></a>*/}
+                        <Form style={{marginTop: '60px'}}>
+                            <Row>
+                                <Col span={12}>
+                                    <FormItem label='项目名称' {...TableList.layout}>
+                                        {this.state.distributeRow.proj}
+                                    </FormItem>
+                                </Col>
+                                <Col span={12}>
+                                    <FormItem label='申请单位' {...TableList.layout}>
+                                        {this.state.distributeRow.unit}
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span={12}>
+                                    <FormItem label='标&nbsp;&nbsp;&nbsp;&nbsp;段&nbsp;&nbsp;&nbsp;' {...TableList.layout}>
+                                        {this.state.distributeRow.section}
+                                    </FormItem>
+                                </Col>
+                                <Col span={12}>
+                                    <FormItem label='申&nbsp;请&nbsp;人&nbsp;' {...TableList.layout}>
+                                        {this.state.distributeRow.user}
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span={12}>
+                                    <FormItem label='生产数量' {...TableList.layout}>
+                                        {this.state.distributeRow.num}
+                                    </FormItem>
+                                </Col>
+                                <Col span={12}>
+                                    <FormItem label='申请时间' {...TableList.layout}>
+                                        {this.state.distributeRow.time}
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span={12}>
+                                    <FormItem label='派发号段' {...TableList.layout}>
+                                        {this.state.distributeRow.no}
+                                    </FormItem>
+                                </Col>
+                                <Col span={12}>
+                                    <FormItem label='标牌照片' {...TableList.layout}>
+                                        <img src={this.state.distributeRow.url} style={{width: '161px', height: '117px', textAlign: 'center'}} />
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                        </Form>
+                    </div>
+                </Modal>
         </div>;
     }
     columnsNursery = [
@@ -429,6 +511,16 @@ class TableList extends Component {
             render: (text, record, index) => {
                 let userInfo = getUser();
                 let arr = [<a onClick={this.onMmDetails.bind(this, record)}>详情</a>];
+                if (record.Status === 1) {
+                    arr.push(
+                        <Divider type='vertical' />,
+                        <a
+                            onClick={this.onDistribute.bind(this, record.ID)}
+                        >
+                            派发单
+                        </a>
+                    );
+                }
                 if (record.Status === -1 && ((this.props.isExamine) || this.props.isadmin)) {
                     arr.push(
                         <Divider type='vertical' />,
@@ -488,6 +580,50 @@ class TableList extends Component {
     activeKeyChange (key) {
         this.props.changeTabs(key);
         this.onMmClean();
+    }
+    onDistribute (ID) {   //派发单弹出框
+        const {actions: {getQrcodeDetail}} = this.props;
+        getQrcodeDetail({ID: ID})
+            .then((data) => {
+                let projectList = this.props.projectList;
+                let distributeRow = this.state.distributeRow;
+                if (data.Section) {
+                    if (projectList.length > 0) {
+                        for (let i = 0; i < projectList.length; i++) {
+                            if (projectList[i].No === data.Section.split('-')[0]) {
+                                distributeRow.proj = projectList[i].Name;
+                                let list = projectList[i].children;
+                                for (let j = 0; j < list.length; j++) {
+                                    if (list[j].No === data.Section) {
+                                        distributeRow.section = list[j].Name;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } 
+                distributeRow.num = data.PlanNum;
+                distributeRow.no = data.Distributes ? data.Distributes[0].StartNo + ' - ' + data.Distributes[0].EndNo : '';
+                distributeRow.unit = data.ConstructUnit;
+                distributeRow.user = data.ApplierObj ? data.ApplierObj.Full_Name : '';
+                distributeRow.time = data.ApplyTime;
+                distributeRow.isgarden = data.IsGarden;  //用来区分园林设施和苗木照片缩放大小
+                distributeRow.url = mmewm;
+                
+                this.setState({
+                    DistributeVisible:true,
+                    distributeRow: distributeRow
+                })
+            });
+    }
+    handleCancel(){
+        this.setState({
+            DistributeVisible:false,
+            distributeRow: {}
+        })
+    }
+    onDowm(){  //下载派发单
+
     }
 };
 export default Form.create()(TableList);
