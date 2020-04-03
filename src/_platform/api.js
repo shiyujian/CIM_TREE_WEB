@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2020-03-25 15:53:50
+ * @Last Modified time: 2020-04-03 16:10:09
  */
 /**
  *
@@ -403,6 +403,10 @@ export const TREEPIPEEXPORTSECTIONS = [
     {
         section: 'P193-01-02',
         name: '中铁一局大千生态联合体'
+    },
+    {
+        section: 'P194-02-07',
+        name: '红谷滩园林建设集团有限公司/中铁北京工程局集团有限公司'
     }
 ];
 // 灌溉竣工图可导出个人
@@ -410,6 +414,10 @@ export const TREEPIPEEXPORTPERSONS = [
     {
         username: 'lw2019',
         name: '柳旺'
+    },
+    {
+        username: 'zhangbowen9903',
+        name: '张博文'
     }
 ];
 
