@@ -144,83 +144,117 @@ class Tablelevel extends Component {
         } = this.state;
         console.log('record', record);
         console.log('dataListPlan', dataListPlan);
-        let childPermissionColumns = [{
-            title: '树种',
-            key: '1',
-            dataIndex: 'treeType',
-            render: (text, rec, index) => {
-                let disabled = true;
-                if (index === 0) {
-                    disabled = false;
-                }
-                return (
-                    <Select
-                        showSearch
-                        filterOption={false}
-                        style={{width: 150}}
-                        value={text}
-                        disabled={disabled}
-                        placeholder='请输入树木类型名称'
-                        onChange={this.handleTreeType.bind(this, index)}
-                        onSearch={this.handleSearch.bind(this)}>
-                        {
-                            treeTypeList.length > 0
-                                ? treeTypeList.map(item => {
-                                    return <Option
-                                        value={item.ID}
-                                        key={item.ID}>
-                                        {item.TreeTypeName}
-                                    </Option>;
-                                }) : []
-                        }
-                    </Select>
-                );
-            }
-        }, {
-            title: '设计量',
-            key: '2',
-            dataIndex: 'Num',
-            render: (text, rec, index) => {
-                return (
-                    <InputNumber
-                        min={1}
-                        value={text}
-                        onChange={this.handleNum.bind(this, index)} />
-                );
-            }
-        }, {
-            title: '设计面积',
-            key: '3',
-            dataIndex: 'Area',
-            render: (text, rec, index) => {
-                return (
-                    <InputNumber
-                        min={0}
-                        max={record.Area}
-                        value={text}
-                        onChange={this.handleArea.bind(this, index)} />
-                );
-            }
-        }, {
-            title: '操作',
-            key: '4',
-            render: (text, record, index) => {
-                if (this.userSection === record.Section || this.state.isSuperAdmin) {
-                    // 可编辑
+        let childPermissionColumns = [
+            {
+                title: '树种ID',
+                key: '树种ID',
+                dataIndex: 'treeType',
+                render: (text, rec, index) => {
+                    let disabled = true;
                     if (index === 0) {
-                        return <a onClick={this.onSavePlan.bind(this, record)}>保存</a>;
-                    } else {
-                        return <span>
-                            <a onClick={this.onUpdatePlan.bind(this, record)}>更新</a>
-                            <a onClick={this.onDeletePlan.bind(this, record)} style={{marginLeft: 10}}>删除</a>
-                        </span>;
+                        disabled = false;
                     }
-                } else {
-                    // 不可编辑
-                    return '';
+                    return (
+                        <Select
+                            showSearch
+                            filterOption={false}
+                            style={{width: 150}}
+                            value={text}
+                            disabled={disabled}
+                            placeholder='请输入树木类型名称'
+                            onChange={this.handleTreeTypeID.bind(this, index)}
+                            onSearch={this.handleTreeTypeIDSearch.bind(this)}>
+                            {
+                                treeTypeList.length > 0
+                                    ? treeTypeList.map(item => {
+                                        return <Option
+                                            value={item.ID}
+                                            key={item.ID}>
+                                            {item.ID}
+                                        </Option>;
+                                    }) : []
+                            }
+                        </Select>
+                    );
+                }
+            }, {
+                title: '树种',
+                key: '1',
+                dataIndex: 'treeType',
+                render: (text, rec, index) => {
+                    let disabled = true;
+                    if (index === 0) {
+                        disabled = false;
+                    }
+                    return (
+                        <Select
+                            showSearch
+                            filterOption={false}
+                            style={{width: 150}}
+                            value={text}
+                            disabled={disabled}
+                            placeholder='请输入树木类型名称'
+                            onChange={this.handleTreeType.bind(this, index)}
+                            onSearch={this.handleTreeTypeSearch.bind(this)}>
+                            {
+                                treeTypeList.length > 0
+                                    ? treeTypeList.map(item => {
+                                        return <Option
+                                            value={item.ID}
+                                            key={item.ID}>
+                                            {item.TreeTypeName}
+                                        </Option>;
+                                    }) : []
+                            }
+                        </Select>
+                    );
+                }
+            }, {
+                title: '设计量',
+                key: '2',
+                dataIndex: 'Num',
+                render: (text, rec, index) => {
+                    return (
+                        <InputNumber
+                            min={1}
+                            value={text}
+                            onChange={this.handleNum.bind(this, index)} />
+                    );
+                }
+            }, {
+                title: '设计面积',
+                key: '3',
+                dataIndex: 'Area',
+                render: (text, rec, index) => {
+                    return (
+                        <InputNumber
+                            min={0}
+                            max={record.Area}
+                            value={text}
+                            onChange={this.handleArea.bind(this, index)} />
+                    );
+                }
+            }, {
+                title: '操作',
+                key: '4',
+                render: (text, record, index) => {
+                    if (this.userSection === record.Section || this.state.isSuperAdmin) {
+                        // 可编辑
+                        if (index === 0) {
+                            return <a onClick={this.onSavePlan.bind(this, record)}>保存</a>;
+                        } else {
+                            return <span>
+                                <a onClick={this.onUpdatePlan.bind(this, record)}>更新</a>
+                                <a onClick={this.onDeletePlan.bind(this, record)} style={{marginLeft: 10}}>删除</a>
+                            </span>;
+                        }
+                    } else {
+                        // 不可编辑
+                        return '';
+                    }
                 }
             }
-        }];
+        ];
         return (
             <Table
                 columns={childPermissionColumns}
@@ -624,6 +658,29 @@ class Tablelevel extends Component {
             dataListPlan
         });
     }
+    handleTreeTypeID (index, value) {
+        let { dataListPlan } = this.state;
+        dataListPlan.map((item, ind) => {
+            if (index === ind) {
+                item.treeType = value;
+            }
+        });
+        this.setState({
+            treeTypeList: this.treeTypeList,
+            dataListPlan
+        });
+    };
+    handleTreeTypeIDSearch (value) {
+        let treeTypeList = [];
+        this.treeTypeList.map(item => {
+            if (String(item.ID).includes(String(value))) {
+                treeTypeList.push(item);
+            }
+        });
+        this.setState({
+            treeTypeList
+        });
+    };
     handleTreeType (index, value) {
         let { dataListPlan } = this.state;
         dataListPlan.map((item, ind) => {
@@ -636,7 +693,7 @@ class Tablelevel extends Component {
             dataListPlan
         });
     };
-    handleSearch (value) {
+    handleTreeTypeSearch (value) {
         let treeTypeList = [];
         this.treeTypeList.map(item => {
             if (item.TreeTypeName.includes(value)) {
@@ -964,7 +1021,7 @@ class Tablelevel extends Component {
                                 value={treetype}
                                 placeholder='请输入树木类型名称'
                                 onChange={this.handleTreeTypeForm.bind(this)}
-                                onSearch={this.handleSearch.bind(this)}>
+                                onSearch={this.handleTreeTypeSearch.bind(this)}>
                                 {
                                     treeTypeList.length > 0
                                         ? treeTypeList.map(item => {
