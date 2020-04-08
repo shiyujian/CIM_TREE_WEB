@@ -15,7 +15,8 @@ import {
 } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import QRCode from 'qrcode.react';
+import QRCode from 'qrcodejs2';
+// import QRCode from 'qrcode.react';
 import {getLodop} from '_platform/LodopFuncs';
 import {trim} from '_platform/auth';
 import '../index.less';
@@ -200,7 +201,6 @@ export default class MachineQRCodePrintTable extends Component {
             percent: 0
         });
         let rst = await getLocationDevices({}, postdata);
-        console.log('rst', rst);
         if (!(rst && rst.content)) {
             this.setState({
                 loading: false,
@@ -257,11 +257,36 @@ export default class MachineQRCodePrintTable extends Component {
             } = this.state;
             for (let t = 0; t < tblData.length; t++) {
                 let data = tblData[t];
-                if (data.QRCode) {
-                    var canvas = document.getElementById(`${data.ID}`);
-                    console.log('canvas', canvas);
-                    var strDataURI = canvas.toDataURL('image/png');
-                    data.src = strDataURI;
+                if (data && data.QRCode && data.ID) {
+                    // var canvas = document.getElementById(`${data.ID}`);
+                    // var strDataURI = canvas.toDataURL('image/png');
+                    // data.src = strDataURI;
+                    let qrcode = new QRCode(document.getElementById(data.ID), {
+                        text: data.QRCode,
+                        width: 210,
+                        height: 210,
+                        colorDark: '#000000',
+                        colorLight: '#ffffff',
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                    setTimeout(() => {
+                        let img = document.getElementById(data.ID).getElementsByTagName('img')[0];
+                        let attrs = img.attributes; // 得到所有属性
+                        let attrsArray = Array.prototype.slice.call(attrs); // 转换为数组形式
+                        console.log('attrsArray', attrsArray); // [class,id]
+
+                        data.img = img;
+                        // 构建画布
+                        let canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        canvas.getContext('2d').drawImage(img, 0, 0);
+
+                        // 构造url
+                        let strDataURI = canvas.toDataURL('image/png');
+
+                        data.src = strDataURI;
+                    }, 100);
                 }
             }
             this.setState({
@@ -522,13 +547,20 @@ export default class MachineQRCodePrintTable extends Component {
                 }
                 {
                     tblData.map((data) => {
-                        if (data && data.QRCode) {
-                            // SIM卡号-设备ID-顺序码
-                            return <QRCode
-                                key={data.ID}
+                        if (data && data.QRCode && data.ID) {
+                            return <div
                                 id={data.ID}
-                                style={{display: 'none'}}
-                                value={data.QRCode} />;
+                                style={{
+                                    display: 'none',
+                                    marginBottom: 5
+                                }}
+                            />;
+                            // SIM卡号-设备ID-顺序码
+                            // return <QRCode
+                            //     key={data.ID}
+                            //     id={data.ID}
+                            //     style={{display: 'none'}}
+                            //     value={data.QRCode} />;
                         }
                     })
                 }
@@ -546,7 +578,7 @@ export default class MachineQRCodePrintTable extends Component {
                                     key={`print${printData.ID}`}
                                     id={`print${printData.ID}`}
                                     style={{
-                                        display: 'none',
+                                        // display: 'none',
                                         width: '8cm',
                                         height: '6cm',
                                         fontSize: '12.5'
