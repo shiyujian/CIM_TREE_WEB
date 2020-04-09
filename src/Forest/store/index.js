@@ -504,6 +504,12 @@ export const getInvestigationPolygons = createFetchAction(`${TREEPIPE_API}/inves
 export const getInvestigationExportDXF = createFetchAction(`${TREEPIPE_API}/DataExport.ashx?action=investigationdxfexport`, [], 'GET', []);
 // 现状调查导出(SHP)
 export const getInvestigationExportSHP = createFetchAction(`${TREEPIPE_API}/DataExport.ashx?action=investigationexport`, [], 'GET', []);
+
+/**
+ * 义务植树信息
+ */
+// 查看义务植树信息
+export const getVolunteerTrees = forestFetchAction(`${TREE_API}/volunteertrees`, [], 'GET', []);
 export const actions = {
     exportEcporttreestatuss,
     getTotalSat,
@@ -633,7 +639,8 @@ export const actions = {
     getInvestigationLines,
     getInvestigationPolygons,
     getInvestigationExportDXF,
-    getInvestigationExportSHP
+    getInvestigationExportSHP,
+    getVolunteerTrees
 };
 export default handleActions({
     [getTreeOK]: (state, {

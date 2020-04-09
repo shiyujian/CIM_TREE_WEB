@@ -201,6 +201,12 @@ export const ForestMenu = [
                 id: 'FOREST.TRANSPLANTINFO',
                 path: '/forest/transplantinfo',
                 name: '移植信息'
+            },
+            {
+                key: 'VolunteerTree',
+                id: 'FOREST.VOLUNTEERTREE',
+                path: '/forest/volunteertree',
+                name: '义务植树信息'
             }
         ]
     },

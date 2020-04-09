@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2020-04-03 16:10:09
+ * @Last Modified time: 2020-04-09 15:04:50
  */
 /**
  *
@@ -572,6 +572,10 @@ export const MODULES = [
                     {
                         id: 'FOREST.TRANSPLANTINFO',
                         name: '移植信息'
+                    },
+                    {
+                        id: 'FOREST.VOLUNTEERTREE',
+                        name: '义务植树信息'
                     }
                 ]
             },

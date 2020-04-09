@@ -135,9 +135,9 @@ export default class MachineEntranceAndDepartureTable extends Component {
     componentDidMount () {
     }
 
-    handleDeviceNameChange (value) {
+    handleDeviceNameChange (e) {
         this.setState({
-            deviceName: value.target.value
+            deviceName: e.target.value
         });
     }
     onSectionChange (value) {
@@ -146,9 +146,9 @@ export default class MachineEntranceAndDepartureTable extends Component {
         });
     }
 
-    handleIndexNumChange (value) {
+    handleIndexNumChange (e) {
         this.setState({
-            indexNum: value
+            indexNum: e.target.value
         });
     }
 

@@ -23,3 +23,4 @@ export DieTrees from './DieTrees';
 export CompletionPlan from './CompletionPlan';
 export TransplantInfo from './TransplantInfo';
 export FactsSurvey from './FactsSurvey';
+export VolunteerTree from './VolunteerTree';
