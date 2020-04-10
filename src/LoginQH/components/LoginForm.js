@@ -175,7 +175,13 @@ class LoginForm extends Component {
                 });
                 return;
             }
-            if (forestLoginUserData.IsBlack === 1) {
+            if (forestLoginUserData.Status === 0) {
+                Notification.error({
+                    message: '该用户未经过审核，不能登录',
+                    duration: 2
+                });
+                return;
+            } else if (forestLoginUserData.IsBlack === 1) {
                 Notification.error({
                     message: '该用户已被拉黑，不能登录',
                     duration: 2
@@ -184,12 +190,6 @@ class LoginForm extends Component {
             } else if (forestLoginUserData.IsForbidden === 1) {
                 Notification.error({
                     message: '该用户已被禁用，不能登录',
-                    duration: 2
-                });
-                return;
-            } else if (forestLoginUserData.Status === 0) {
-                Notification.error({
-                    message: '该用户未经过审核，不能登录',
                     duration: 2
                 });
                 return;
@@ -244,10 +244,35 @@ class LoginForm extends Component {
             let userData = await getUsers({}, {username: data.username});
             console.log('nickname', userData);
             if (userData && userData.content && userData.content instanceof Array && userData.content.length > 0) {
-                Notification.error({
-                    message: '密码错误！',
-                    duration: 2
-                });
+                let userMess = userData.content[0];
+                if (!userMess.Number && userMess.User_Name !== 'admin') {
+                    Notification.error({
+                        message: '该用户未进行实名认证，不能登录',
+                        duration: 2
+                    });
+                    return;
+                }
+                if (userMess.Status === 0) {
+                    Notification.error({
+                        message: '该用户未经过审核，不能登录',
+                        duration: 2
+                    });
+                } else if (userMess.IsBlack === 1) {
+                    Notification.error({
+                        message: '该用户已被拉黑，不能登录',
+                        duration: 2
+                    });
+                } else if (userMess.IsForbidden === 1) {
+                    Notification.error({
+                        message: '该用户已被禁用，不能登录',
+                        duration: 2
+                    });
+                } else {
+                    Notification.error({
+                        message: '密码错误！',
+                        duration: 2
+                    });
+                }
             } else {
                 Notification.error({
                     message: '用户名不存在！',

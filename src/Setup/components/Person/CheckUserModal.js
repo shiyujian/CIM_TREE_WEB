@@ -26,6 +26,18 @@ class CheckUserModal extends Component {
         };
     }
 
+    checkCheckInfo = async (rule, value, callback) => {
+        if (value) {
+            if (value.length > 30) {
+                callback(`请输入少于20个字`);
+            } else {
+                callback();
+            }
+        } else {
+            callback();
+        }
+    }
+
     render () {
         const {
             form: {
@@ -68,6 +80,15 @@ class CheckUserModal extends Component {
                         label='审核备注'
                     >
                         {getFieldDecorator('CheckInfo', {
+                            rules: [
+                                {
+                                    required: false,
+                                    message: '请输入少于20个字'
+                                },
+                                {
+                                    validator: this.checkCheckInfo
+                                }
+                            ]
                         })(
                             <TextArea rows={4} />
                         )}

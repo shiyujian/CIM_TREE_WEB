@@ -53,7 +53,7 @@ class UserRegister extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            stepState: 1,
+            stepState: 3,
             roleType: 'construction',
             selectCompany: '',
             getSecurityCodeStatus: false,
@@ -473,7 +473,22 @@ class UserRegister extends Component {
                             break;
                     }
                     console.log('roleID', roleID);
-
+                    let sex = 0;
+                    let sexNum = 0;
+                    if (idNum) {
+                        if (idNum.length === 18) {
+                            sexNum = idNum.substring(17, 18);
+                            console.log('sexNum', sexNum);
+                        } else if (idNum.length === 15) {
+                            sexNum = idNum.substring(15);
+                            console.log('sexNum', sexNum);
+                        }
+                    }
+                    if (Number(sexNum) % 2 === 0) {
+                        sex = 1;
+                    } else {
+                        sex = 0;
+                    }
                     let postUserPostData = {
                         Full_Name: FullName, // 姓名
                         User_Name: values.userNameUserRegister, // 用户名
@@ -482,7 +497,7 @@ class UserRegister extends Component {
                         Password: values.passwordUserRegister, // 密码
                         Duty: duty || '', // 职务
                         EMail: '',
-                        Sex: 0, // 性别
+                        Sex: sex, // 性别
                         Status: 0, // 状态
                         Section: sction, // 标段
                         Number: idNum, // 身份证号码
@@ -654,7 +669,7 @@ class UserRegister extends Component {
                                                 <span className='UserRegister-step-line-select' />
                                             </Col> : <Col span={6}>
                                                 <img src={stepImg} />
-                                                <span className='UserRegister-stepOrder'>2</span>
+                                                <span className='UserRegister-stepOrder'>3</span>
                                                 <span className='UserRegister-stepName'>账户信息</span>
                                                 <span className='UserRegister-step-line' />
                                             </Col>
