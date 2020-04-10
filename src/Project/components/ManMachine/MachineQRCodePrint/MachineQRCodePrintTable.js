@@ -46,6 +46,7 @@ export default class MachineQRCodePrintTable extends Component {
             locationDeviceDetailVisible: false,
             handleLocationDeviceDetail: ''
         };
+        this.qrcode = '';
     }
     columns = [
         {
@@ -134,8 +135,8 @@ export default class MachineQRCodePrintTable extends Component {
             }
         }
     ];
-    componentDidMount () {
-        this.query(1);
+    componentDidMount = async () => {
+        await this.query(1);
     }
     // 车牌号
     handleMachineQRCodeIndexChange (value) {
@@ -251,7 +252,7 @@ export default class MachineQRCodePrintTable extends Component {
             pagination,
             selectedRowKeys: [],
             dataSourceSelected: []
-        }, () => {
+        }, async () => {
             const {
                 tblData
             } = this.state;
@@ -261,32 +262,30 @@ export default class MachineQRCodePrintTable extends Component {
                     // var canvas = document.getElementById(`${data.ID}`);
                     // var strDataURI = canvas.toDataURL('image/png');
                     // data.src = strDataURI;
-                    let qrcode = new QRCode(document.getElementById(data.ID), {
-                        text: data.QRCode,
-                        width: 210,
-                        height: 210,
-                        colorDark: '#000000',
-                        colorLight: '#ffffff',
-                        correctLevel: QRCode.CorrectLevel.H
-                    });
-                    setTimeout(() => {
-                        let img = document.getElementById(data.ID).getElementsByTagName('img')[0];
-                        let attrs = img.attributes; // 得到所有属性
-                        let attrsArray = Array.prototype.slice.call(attrs); // 转换为数组形式
-                        console.log('attrsArray', attrsArray); // [class,id]
+                    if (this.qrcode) {
+                        this.qrcode.clear();
+                        this.qrcode.makeCode(data.QRCode);
+                    } else {
+                        this.qrcode = await new QRCode(document.getElementById(data.ID), {
+                            text: data.QRCode,
+                            width: 210,
+                            height: 210,
+                            colorDark: '#000000',
+                            colorLight: '#ffffff',
+                            correctLevel: QRCode.CorrectLevel.H
+                        });
+                    }
 
-                        data.img = img;
-                        // 构建画布
-                        let canvas = document.createElement('canvas');
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        canvas.getContext('2d').drawImage(img, 0, 0);
-
-                        // 构造url
-                        let strDataURI = canvas.toDataURL('image/png');
-
-                        data.src = strDataURI;
-                    }, 100);
+                    console.log('this.qrcode', this.qrcode);
+                    console.log('QRCode', data.QRCode);
+                    if (this.qrcode && this.qrcode._oDrawing && this.qrcode._oDrawing._elImage && this.qrcode._oDrawing._elImage.src) {
+                        let img = this.qrcode._oDrawing._elImage.src;
+                        console.log('img', img);
+                        data.src = img;
+                    } else {
+                        this.query(page);
+                        return;
+                    }
                 }
             }
             this.setState({
@@ -578,7 +577,7 @@ export default class MachineQRCodePrintTable extends Component {
                                     key={`print${printData.ID}`}
                                     id={`print${printData.ID}`}
                                     style={{
-                                        // display: 'none',
+                                        display: 'none',
                                         width: '8cm',
                                         height: '6cm',
                                         fontSize: '12.5'

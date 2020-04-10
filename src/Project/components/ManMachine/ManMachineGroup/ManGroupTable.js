@@ -53,6 +53,7 @@ export default class ManGroupTable extends Component {
             editPersonVisible: false,
             editPersonRecord: ''
         };
+        this.qrcode = '';
     }
 
     columns = [
@@ -371,7 +372,7 @@ export default class ManGroupTable extends Component {
                 pagination,
                 selectedRowKeys: [],
                 dataSourceSelected: []
-            }, () => {
+            }, async () => {
                 const {
                     tblData
                 } = this.state;
@@ -381,31 +382,30 @@ export default class ManGroupTable extends Component {
                         // let canvas = document.getElementById(`${data.ID}`);
                         // let strDataURI = canvas.toDataURL('image/png');
                         // data.src = strDataURI;
-                        let qrcode = new QRCode(document.getElementById(data.ID), {
-                            text: data.ID,
-                            width: 210,
-                            height: 210,
-                            colorDark: '#000000',
-                            colorLight: '#ffffff',
-                            correctLevel: QRCode.CorrectLevel.H
-                        });
-                        setTimeout(() => {
-                            let img = document.getElementById(data.ID).getElementsByTagName('img')[0];
-                            let attrs = img.attributes; // 得到所有属性
-                            let attrsArray = Array.prototype.slice.call(attrs); // 转换为数组形式
-                            console.log('attrsArray', attrsArray); // [class,id]
+                        if (this.qrcode) {
+                            this.qrcode.clear();
+                            this.qrcode.makeCode(data.ID);
+                        } else {
+                            this.qrcode = await new QRCode(document.getElementById(data.ID), {
+                                text: data.ID,
+                                width: 210,
+                                height: 210,
+                                colorDark: '#000000',
+                                colorLight: '#ffffff',
+                                correctLevel: QRCode.CorrectLevel.H
+                            });
+                        }
+                        console.log('this.qrcode', this.qrcode);
+                        console.log('data.ID', data.ID);
 
-                            data.img = img;
-                            // 构建画布
-                            let canvas = document.createElement('canvas');
-                            canvas.width = img.width;
-                            canvas.height = img.height;
-                            canvas.getContext('2d').drawImage(img, 0, 0);
-
-                            // 构造url
-                            let strDataURI = canvas.toDataURL('image/png');
-                            data.src = strDataURI;
-                        }, 100);
+                        if (this.qrcode && this.qrcode._oDrawing && this.qrcode._oDrawing._elImage && this.qrcode._oDrawing._elImage.src) {
+                            let img = this.qrcode._oDrawing._elImage.src;
+                            console.log('img', img);
+                            data.src = img;
+                        } else {
+                            this.query(page);
+                            return;
+                        }
                     }
                 }
                 this.setState({
