@@ -53,7 +53,7 @@ class UserRegister extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            stepState: 3,
+            stepState: 1,
             roleType: 'construction',
             selectCompany: '',
             getSecurityCodeStatus: false,
@@ -118,7 +118,7 @@ class UserRegister extends Component {
         }
         this.setState({
             roleType: value,
-            selectCompany: '',
+            selectCompany: null,
             companyList,
             sectionList: []
         });
@@ -330,12 +330,21 @@ class UserRegister extends Component {
     handleChangeStepState = async (value) => {
         const {
             selectCompany,
-            stepState
+            stepState,
+            idNum,
+            FullName
         } = this.state;
         if (stepState === 1) {
             if (selectCompany) {
                 this.setState({
                     stepState: value
+                }, () => {
+                    if (idNum && FullName) {
+                        this.props.form.setFieldsValue({
+                            idNumUserRegister: idNum,
+                            realNameUserRegister: FullName
+                        });
+                    }
                 });
             } else {
                 Notification.error({
@@ -556,9 +565,26 @@ class UserRegister extends Component {
     }
     // 返回
     handleChangeBackStepState = (value) => {
-        this.setState({
-            stepState: value
-        });
+        const {
+            idNum,
+            FullName
+        } = this.state;
+        if (value === 2) {
+            this.setState({
+                stepState: value
+            }, () => {
+                if (idNum && FullName) {
+                    this.props.form.setFieldsValue({
+                        idNumUserRegister: idNum,
+                        realNameUserRegister: FullName
+                    });
+                }
+            });
+        } else {
+            this.setState({
+                stepState: value
+            });
+        }
     }
     render () {
         const {
@@ -864,6 +890,7 @@ class UserRegister extends Component {
                                                     ]
                                                 })(
                                                     <Input
+                                                        title='请输入用户名（不区分大小写）'
                                                         className='UserRegister-accountInformation-input'
                                                         placeholder='请输入用户名（不区分大小写）' />
                                                 )}
@@ -884,6 +911,7 @@ class UserRegister extends Component {
                                                     ]
                                                 })(
                                                     <Input
+                                                        title='请输入手机号码'
                                                         className='UserRegister-accountInformation-input'
                                                         placeholder='请输入手机号码'
                                                     />
@@ -903,6 +931,7 @@ class UserRegister extends Component {
                                                 })(
                                                     <div>
                                                         <Input
+                                                            title='请输入验证码'
                                                             id='securityCode'
                                                             className='UserRegister-accountInformation-input'
                                                             placeholder='请输入验证码'
@@ -938,6 +967,7 @@ class UserRegister extends Component {
                                                     ]
                                                 })(
                                                     <Input.Password
+                                                        title='请输入6到16位密码（至少包括字母、数字以及特殊符号中的2种）'
                                                         className='UserRegister-accountInformation-input'
                                                         placeholder='请输入6到16位密码（至少包括字母、数字以及特殊符号中的2种）'
                                                     />
@@ -959,6 +989,7 @@ class UserRegister extends Component {
                                                     ]
                                                 })(
                                                     <Input.Password
+                                                        title='请确认密码'
                                                         className='UserRegister-accountInformation-input'
                                                         placeholder='请确认密码'
                                                     />

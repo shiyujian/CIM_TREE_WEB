@@ -512,7 +512,7 @@ class Users extends Component {
                         <Row className='setup-person-search-layout'>
                             <div className='setup-person-mrg20'>
                                 <Input
-                                    placeholder='请输入关键字'
+                                    placeholder='请输入用户名或姓名'
                                     style={{ width: '100%' }}
                                     value={searchKeyword}
                                     onChange={this.handleChangeKeyword.bind(this)}
