@@ -841,10 +841,64 @@ class Users extends Component {
     }
     // 打开审核的弹窗
     toAudit (record) {
-        this.setState({
-            showModal: true,
-            record
-        });
+        const {
+            sidebar: { node } = {}
+        } = this.props;
+        console.log('node', node);
+        console.log('record', record);
+
+        if (node && node.Section) {
+            if (record && record.Section) {
+                if (record.Section.indexOf(',') !== -1 || record.Section.indexOf('，') !== -1) {
+                    console.log('aaaaaaaa');
+                    Notification.info({
+                        message: '请编辑人员，选择标段'
+                    });
+                    if (record.IsBlack === 1) {
+                        message.warn('用户已加入黑名单,不可编辑');
+                        return;
+                    }
+                    if (record && record.ID) {
+                        this.setState({
+                            editVisible: true,
+                            editUserRecord: record
+                        });
+                    } else {
+                        Notification.warning({
+                            message: '当前用户不可编辑'
+                        });
+                    }
+                } else {
+                    this.setState({
+                        showModal: true,
+                        record
+                    });
+                }
+            } else {
+                Notification.info({
+                    message: '请编辑人员，选择标段'
+                });
+                if (record.IsBlack === 1) {
+                    message.warn('用户已加入黑名单,不可编辑');
+                    return;
+                }
+                if (record && record.ID) {
+                    this.setState({
+                        editVisible: true,
+                        editUserRecord: record
+                    });
+                } else {
+                    Notification.warning({
+                        message: '当前用户不可编辑'
+                    });
+                }
+            }
+        } else {
+            this.setState({
+                showModal: true,
+                record
+            });
+        }
     }
     // 表格多选
     rowSelection = {
