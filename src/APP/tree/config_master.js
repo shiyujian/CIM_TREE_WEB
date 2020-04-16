@@ -63,7 +63,7 @@ window.config = {
         // center: [30.2528290000, 120.0177300000], // 华东院
         zoomControl: false,
         zoom: 13,
-        minZoom: 12,
+        minZoom: 15,
         editable: true
     },
     XACompanyInitLeaflet: {
@@ -72,7 +72,7 @@ window.config = {
         // center: [39.048904, 115.884522],
         zoomControl: false,
         zoom: 15,
-        minZoom: 12,
+        minZoom: 15,
         editable: true
     },
     // 个人考勤的上下班时间，如果当前的部门未配置的话拿此上下班时间，用[--]分开，此处必须配置

@@ -70,7 +70,7 @@ export default class ProjectImageGis extends Component {
         this.imgTileLayer = L.tileLayer(TILEURLS[1], {
             // subdomains: [3],
             subdomains: [0, 1, 2, 3, 4, 5, 6, 7], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
-            minZoom: 12,
+            minZoom: 15,
             maxZoom: 17,
             zoomOffset: 1
         }).addTo(this.map);
@@ -78,7 +78,7 @@ export default class ProjectImageGis extends Component {
         this.cvaTileLayer = L.tileLayer(`${WMSTILELAYERURL}`, {
             // subdomains: [3],
             subdomains: [0, 1, 2, 3, 4, 5, 6, 7],
-            minZoom: 12,
+            minZoom: 15,
             maxZoom: 17,
             zoomOffset: 1
         }).addTo(this.map);
@@ -86,7 +86,7 @@ export default class ProjectImageGis extends Component {
         this.tileLayer = L.tileLayer(this.tileUrls[1], {
             opacity: 1.0,
             subdomains: [1, 2, 3],
-            minZoom: 12,
+            minZoom: 15,
             maxZoom: 20,
             storagetype: 0,
             tiletype: 'arcgis'
@@ -101,7 +101,7 @@ export default class ProjectImageGis extends Component {
         this.imgTileLayer = L.tileLayer(TILEURLS[1], {
             // subdomains: [3],
             subdomains: [0, 1, 2, 3, 4, 5, 6, 7], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
-            minZoom: 12,
+            minZoom: 15,
             maxZoom: 17,
             zoomOffset: 1
         }).addTo(this.map2);
@@ -109,7 +109,7 @@ export default class ProjectImageGis extends Component {
         this.cvaTileLayer = L.tileLayer(`${WMSTILELAYERURL}`, {
             // subdomains: [3],
             subdomains: [0, 1, 2, 3, 4, 5, 6, 7],
-            minZoom: 12,
+            minZoom: 15,
             maxZoom: 17,
             zoomOffset: 1
         }).addTo(this.map2);
@@ -117,7 +117,7 @@ export default class ProjectImageGis extends Component {
         this.tileTreeLayerBasic = L.tileLayer(this.tileUrls[1], {
             opacity: 1.0,
             subdomains: [1, 2, 3],
-            minZoom: 12,
+            minZoom: 15,
             maxZoom: 20,
             storagetype: 0,
             tiletype: 'arcgis'

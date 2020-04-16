@@ -189,7 +189,7 @@ export default class TreePipePage extends Component {
                 {
                     opacity: 1.0,
                     subdomains: [1, 2, 3],
-                    minZoom: 12,
+                    minZoom: 15,
                     maxZoom: 21,
                     storagetype: 0,
                     tiletype: 'wtms'
@@ -211,7 +211,7 @@ export default class TreePipePage extends Component {
                 {
                     opacity: 1.0,
                     subdomains: [1, 2, 3],
-                    minZoom: 12,
+                    minZoom: 15,
                     maxZoom: 21,
                     storagetype: 0,
                     tiletype: 'wtms'
@@ -233,7 +233,7 @@ export default class TreePipePage extends Component {
             //     {
             //         opacity: 1.0,
             //         subdomains: [1, 2, 3],
-            //         minZoom: 12,
+            //         minZoom: 15,
             //         maxZoom: 21,
             //         storagetype: 0,
             //         tiletype: 'wtms'
@@ -246,7 +246,7 @@ export default class TreePipePage extends Component {
                     layers: 'xatree:pipe',
                     crs: L.CRS.EPSG4326,
                     format: 'image/png',
-                    minZoom: 12,
+                    minZoom: 15,
                     maxZoom: 21,
                     transparent: true
                 }
@@ -267,7 +267,7 @@ export default class TreePipePage extends Component {
             //     {
             //         opacity: 1.0,
             //         subdomains: [1, 2, 3],
-            //         minZoom: 12,
+            //         minZoom: 15,
             //         maxZoom: 21,
             //         storagetype: 0,
             //         tiletype: 'wtms'
@@ -280,7 +280,7 @@ export default class TreePipePage extends Component {
                     layers: 'xatree:pipenode',
                     crs: L.CRS.EPSG4326,
                     format: 'image/png',
-                    minZoom: 12,
+                    minZoom: 15,
                     maxZoom: 21,
                     transparent: true
                 }

@@ -195,7 +195,7 @@ export default class TreePipePage extends Component {
                 {
                     opacity: 1.0,
                     subdomains: [1, 2, 3],
-                    minZoom: 12,
+                    minZoom: 15,
                     maxZoom: 21,
                     storagetype: 0,
                     tiletype: 'wtms'
@@ -217,7 +217,7 @@ export default class TreePipePage extends Component {
                 {
                     opacity: 1.0,
                     subdomains: [1, 2, 3],
-                    minZoom: 12,
+                    minZoom: 15,
                     maxZoom: 21,
                     storagetype: 0,
                     tiletype: 'wtms'
@@ -239,7 +239,7 @@ export default class TreePipePage extends Component {
                 {
                     opacity: 1.0,
                     subdomains: [1, 2, 3],
-                    minZoom: 12,
+                    minZoom: 15,
                     maxZoom: 21,
                     storagetype: 0,
                     tiletype: 'wtms'
@@ -261,7 +261,7 @@ export default class TreePipePage extends Component {
                 {
                     opacity: 1.0,
                     subdomains: [1, 2, 3],
-                    minZoom: 12,
+                    minZoom: 15,
                     maxZoom: 21,
                     storagetype: 0,
                     tiletype: 'wtms'
