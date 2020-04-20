@@ -645,8 +645,9 @@ export default class Tablelevel extends Component {
                             }
                         </Col>
                         <Col span={6}>
-
-                            <Addition {...this.props} {...this.state} />
+                            {
+                                superUser || permission ? <Addition {...this.props} {...this.state} /> : ''
+                            }
                         </Col>
                     </Row>
                     <Row style={{ marginTop: 5 }}>
