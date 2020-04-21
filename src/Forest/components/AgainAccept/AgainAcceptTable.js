@@ -19,6 +19,7 @@ import {
 } from '_platform/api';
 import moment from 'moment';
 import AgainCheckModal from './AgainCheckModal';
+import EditCheckModal from './EditCheckModal';
 import DetailsModal from './DetailsModal';
 import CheckModal from './CheckModal';
 
@@ -71,6 +72,7 @@ export default class AgainAcceptTable extends Component {
             yz: '', // 业主
             shigongOptions: [],
             jianliOptions: [],
+            yezhuOptions: [],
             itemDetailList: {}, // 数字化验收详情
             treetypeoption: [], // 根据小班动态获取的树种列表
             treeTyepList: [], // 树种列表
@@ -79,6 +81,7 @@ export default class AgainAcceptTable extends Component {
             itemDetail: '',
             againCheckModalVisible: false, // 重新验收
             detailsModalVisible: false, // 查看详情
+            editModalVisible: false, // 修改审核人
             checkModalVisible: false, // 审核
             DetailsInfo: '', // 详情信息
             thinClassDesignData: [],
@@ -158,8 +161,13 @@ export default class AgainAcceptTable extends Component {
                         </a>
                     ];
                     let user = getUser();
-                    let roleName = user.roles.RoleName;
-                    if (record.Status === 0 && roleName === '监理文书') {
+                    let roleName = user.roles && user.roles.RoleName;
+                    if (record.Status === 0 && roleName === '施工文书') {
+                        arr.push(
+                            <Divider type='vertical' />,
+                            <a onClick={this.onEdit.bind(this, record)}>修改审核人</a>
+                        );
+                    } else if (record.Status === 0 && roleName === '监理文书') {
                         // 监理且状态为施工提交
                         arr.push(
                             <Divider type='vertical' />,
@@ -172,10 +180,12 @@ export default class AgainAcceptTable extends Component {
                             <a onClick={this.onCheck.bind(this, record)}>审核</a>
                         );
                     }
-                    // arr.push(
-                    //     <Divider type='vertical' />,
-                    //     <a onClick={this.onDelete.bind(this, record)}>删除</a>
-                    // );
+                    if (user.username === 'admin') {
+                        arr.push(
+                            <Divider type='vertical' />,
+                            <a onClick={this.onDelete.bind(this, record)}>删除</a>
+                        );
+                    }
                     return (<div>
                         {
                             arr
@@ -220,13 +230,6 @@ export default class AgainAcceptTable extends Component {
                     description: '删除重新验收申请失败'
                 });
             }
-        });
-    }
-    // 审核
-    onCheck (record) {
-        this.setState({
-            record,
-            checkModalVisible: true
         });
     }
     async handleOkCheck (param) {
@@ -423,7 +426,6 @@ export default class AgainAcceptTable extends Component {
         const {
             section
         } = this.state;
-        console.log('细班选择', value);
         if (!value) {
             this.setState({
                 thinclass: ''
@@ -540,7 +542,6 @@ export default class AgainAcceptTable extends Component {
                 let CheckTypeIDArr = [];
                 let CheckTypeArr = [];
                 let ThinClassArr = [];
-                console.log('参数', param.checkItem);
                 let sectionArr = param.section.split('-');
                 param.checkItem.map(item => {
                     if (!CheckTypeIDArr.includes(item.CheckType)) {
@@ -558,12 +559,10 @@ export default class AgainAcceptTable extends Component {
                         });
                     });
                 });
-                console.log('数组', CheckTypeIDArr);
                 // 得到验收类型数组
                 CheckTypeIDArr.map(item => {
                     CheckTypeArr.push(getYsTypeByID(parseInt(item)));
                 });
-                console.log('数组', CheckTypeArr);
                 let pro = {
                     Applier: user.ID, // 申请人
                     CheckType: CheckTypeArr.toString(), // 验收类型名称，多个逗号隔开
@@ -627,6 +626,19 @@ export default class AgainAcceptTable extends Component {
         });
         this.query(pagination.current);
     }
+    onEdit (record) {
+        this.setState({
+            record,
+            editModalVisible: true
+        });
+    }
+    // 审核
+    onCheck (record) {
+        this.setState({
+            record,
+            checkModalVisible: true
+        });
+    }
     // 查询
     query = async (page) => {
         let {
@@ -664,7 +676,6 @@ export default class AgainAcceptTable extends Component {
                 });
             }
             let user = getUser();
-            console.log('user', user);
             let applier = '', supervisor = '', owner = '';
             let searchSection = section;
             // 施工文书可以查看本标段，非施工文书只能查看自己
@@ -782,6 +793,11 @@ export default class AgainAcceptTable extends Component {
         } catch (e) {
             console.log('query', e);
         }
+    }
+    handleCancelEditCheck () {
+        this.setState({
+            editModalVisible: false
+        });
     }
 
     // 搜索栏
@@ -1051,15 +1067,29 @@ export default class AgainAcceptTable extends Component {
     }
     render () {
         const {
+            record,
+            yezhuOptions,
+            jianliOptions,
             curingTreeData,
             againCheckModalVisible,
             detailsModalVisible,
-            checkModalVisible
+            checkModalVisible,
+            editModalVisible
         } = this.state;
         return (
             <div>
                 {
                     this.treeTable(curingTreeData)
+                }
+                {
+                    editModalVisible ? <EditCheckModal
+                        query={this.query.bind(this)}
+                        handleCancel={this.handleCancelEditCheck.bind(this)}
+                        {...this.props}
+                        record={record}
+                        jianliOptions={jianliOptions}
+                        yezhuOptions={yezhuOptions}
+                    /> : ''
                 }
                 {
                     againCheckModalVisible

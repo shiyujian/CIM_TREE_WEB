@@ -402,6 +402,23 @@ export const deleteWfreacceptance = forestFetchAction(
     `${TREE_API}/wfreacceptance/{{id}}`,
     [], 'DELETE'
 );
+
+// 数字化验收重新发起验收流程申请
+export const postWfreAcceptance = forestFetchAction(
+    `${TREE_API}/wfreacceptance`,
+    [], 'POST'
+);
+
+// 数字化验收重新发起验收流程申请修改审核人
+export const putWfreAcceptance = forestFetchAction(
+    `${TREE_API}/wfreacceptance`,
+    [], 'PUT'
+);
+// 数字化验收重新发起验收流程监理、业主审核
+export const postCheckWfreAcceptance = forestFetchAction(
+    `${TREE_API}/checkwfreacceptance`,
+    [], 'POST'
+);
 // 获取数字化验收详情
 export const getDigitalAcceptDetail = forestFetchAction(
     `${TREE_API}/acceptancedetails`,
@@ -453,17 +470,6 @@ export const getSupervisorUsersOK = createAction(`${ID}获取监理用户列表`
 export const getSupervisorUsers = createFetchAction(`${SYSTEM_API}/users`, [getSupervisorUsersOK], 'GET');
 // 面积验收施工提交
 export const postAreaAccept = forestFetchAction(`${ROUTE_API}/acceptancethinclass`, [], 'POST', []);
-
-// 数字化验收重新发起验收流程申请
-export const postWfreAcceptance = forestFetchAction(
-    `${TREE_API}/wfreacceptance`,
-    [], 'POST'
-);
-// 数字化验收重新发起验收流程监理、业主审核
-export const postCheckWfreAcceptance = forestFetchAction(
-    `${TREE_API}/checkwfreacceptance`,
-    [], 'POST'
-);
 
 // 死亡苗木信息
 // 获取死亡苗木信息
@@ -590,6 +596,7 @@ export const actions = {
     getWfreacceptanceByID,
     deleteWfreacceptance,
     postWfreAcceptance,
+    putWfreAcceptance,
     postCheckWfreAcceptance,
 
     getDigitalAcceptDetail,
