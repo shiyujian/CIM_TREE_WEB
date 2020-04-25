@@ -540,12 +540,8 @@ export default class NursOverallTable extends Component {
             {
                 title: '起苗地点',
                 dataIndex: 'location'
-            }
-        ];
-
-        let seedling = seedlingMess[0];
-        if (seedling.GD) {
-            this.seedlingColumns.push({
+            },
+            {
                 title: '高度(cm)',
                 render: (text, record) => {
                     if (record.GD) {
@@ -564,10 +560,8 @@ export default class NursOverallTable extends Component {
                         return <span>/</span>;
                     }
                 }
-            });
-        }
-        if (seedling.GF) {
-            this.seedlingColumns.push({
+            },
+            {
                 title: '冠幅(cm)',
                 render: (text, record) => {
                     if (record.GF) {
@@ -586,10 +580,8 @@ export default class NursOverallTable extends Component {
                         return <span>/</span>;
                     }
                 }
-            });
-        }
-        if (seedling.XJ) {
-            this.seedlingColumns.push({
+            },
+            {
                 title: '胸径(cm)',
                 render: (text, record) => {
                     if (record.XJ) {
@@ -608,10 +600,8 @@ export default class NursOverallTable extends Component {
                         return <span>/</span>;
                     }
                 }
-            });
-        }
-        if (seedling.DJ) {
-            this.seedlingColumns.push({
+            },
+            {
                 title: '地径(cm)',
                 render: (text, record) => {
                     if (record.DJ) {
@@ -630,10 +620,8 @@ export default class NursOverallTable extends Component {
                         return <span>/</span>;
                     }
                 }
-            });
-        }
-        if (seedling.TQHD) {
-            this.seedlingColumns.push({
+            },
+            {
                 title: '土球厚度(cm)',
                 render: (text, record) => {
                     if (record.TQHD) {
@@ -652,10 +640,8 @@ export default class NursOverallTable extends Component {
                         return <span>/</span>;
                     }
                 }
-            });
-        }
-        if (seedling.TQZJ) {
-            this.seedlingColumns.push({
+            },
+            {
                 title: '土球直径(cm)',
                 render: (text, record) => {
                     if (record.TQZJ) {
@@ -674,8 +660,164 @@ export default class NursOverallTable extends Component {
                         return <span>/</span>;
                     }
                 }
-            });
-        }
+            },
+            {
+                title: (
+                    <div>
+                        <div>条长</div>
+                        <div>(cm)</div>
+                    </div>
+                ),
+                dataIndex: 'TC',
+                render: (text, record) => {
+                    if (record.TC !== 0) {
+                        return (
+                            <a
+                                disabled={!record.TCFJ}
+                                onClick={this.onImgClick.bind(
+                                    this,
+                                    record.TCFJ
+                                )}
+                            >
+                                {record.TC}
+                            </a>
+                        );
+                    } else {
+                        return <span>/</span>;
+                    }
+                }
+            },
+            {
+                title: (
+                    <div>
+                        <div>分枝数量</div>
+                        <div>(个)</div>
+                    </div>
+                ),
+                dataIndex: 'FZS',
+                render: (text, record) => {
+                    if (record.FZS !== 0) {
+                        return (
+                            <a
+                                disabled={!record.FZSFJ}
+                                onClick={this.onImgClick.bind(
+                                    this,
+                                    record.FZSFJ
+                                )}
+                            >
+                                {record.FZS}
+                            </a>
+                        );
+                    } else {
+                        return <span>/</span>;
+                    }
+                }
+            },
+            {
+                title: (
+                    <div>
+                        <div>分支点</div>
+                        <div>(个)</div>
+                    </div>
+                ),
+                dataIndex: 'FZSGD',
+                render: (text, record) => {
+                    if (record.FZSGD !== 0) {
+                        return (
+                            <a
+                                disabled={!record.FZSGDFJ}
+                                onClick={this.onImgClick.bind(
+                                    this,
+                                    record.FZSGDFJ
+                                )}
+                            >
+                                {record.FZSGD}
+                            </a>
+                        );
+                    } else {
+                        return <span>/</span>;
+                    }
+                }
+            },
+            {
+                title: (
+                    <div>
+                        <div>地径超过0.5厘米分支数量</div>
+                        <div>(个)</div>
+                    </div>
+                ),
+                dataIndex: 'SMALLFZS',
+                render: (text, record) => {
+                    if (record.SMALLFZS !== 0) {
+                        return (
+                            <a
+                                disabled={!record.SMALLFZSFJ}
+                                onClick={this.onImgClick.bind(
+                                    this,
+                                    record.SMALLFZSFJ
+                                )}
+                            >
+                                {record.SMALLFZS}
+                            </a>
+                        );
+                    } else {
+                        return <span>/</span>;
+                    }
+                }
+            },
+            {
+                title: (
+                    <div>
+                        <div>地径超过1cm分枝数量</div>
+                        <div>(个)</div>
+                    </div>
+                ),
+                dataIndex: 'DBFZS',
+                render: (text, record) => {
+                    if (record.DBFZS !== 0) {
+                        return (
+                            <a
+                                disabled={!record.DBFZSFJ}
+                                onClick={this.onImgClick.bind(
+                                    this,
+                                    record.DBFZSFJ
+                                )}
+                            >
+                                {record.DBFZS}
+                            </a>
+                        );
+                    } else {
+                        return <span>/</span>;
+                    }
+                }
+            },
+            {
+                title: (
+                    <div>
+                        <div>地径超过3厘米分支数量</div>
+                        <div>(个)</div>
+                    </div>
+                ),
+                dataIndex: 'BIGFZS',
+                render: (text, record) => {
+                    if (record.BIGFZS !== 0) {
+                        return (
+                            <a
+                                disabled={!record.BIGFZSFJ}
+                                onClick={this.onImgClick.bind(
+                                    this,
+                                    record.BIGFZSFJ
+                                )}
+                            >
+                                {record.BIGFZS}
+                            </a>
+                        );
+                    } else {
+                        return <span>/</span>;
+                    }
+                }
+            }
+        ];
 
         this.treeColumns = [
             {
@@ -721,181 +863,360 @@ export default class NursOverallTable extends Component {
         ];
 
         let tree = treeMess[0];
-        if (tree.GD) {
-            this.treeColumns.push({
-                title: '高度(cm)',
-                render: (text, record) => {
-                    if (record.GD) {
-                        return (
-                            <a
-                                disabled={!record.GDFJ}
-                                onClick={this.onImgClick.bind(
-                                    this,
-                                    record.GDFJ
-                                )}
-                            >
-                                {record.GD}
-                            </a>
-                        );
-                    } else {
-                        return <span>/</span>;
-                    }
-                }
-            });
-        }
-        if (tree.GF) {
-            this.treeColumns.push({
-                title: '冠幅(cm)',
-                render: (text, record) => {
-                    if (record.GF) {
-                        return (
-                            <a
-                                disabled={!record.GFFJ}
-                                onClick={this.onImgClick.bind(
-                                    this,
-                                    record.GFFJ
-                                )}
-                            >
-                                {record.GF}
-                            </a>
-                        );
-                    } else {
-                        return <span>/</span>;
-                    }
-                }
-            });
-        }
-        if (tree.XJ) {
-            this.treeColumns.push({
-                title: '胸径(cm)',
-                render: (text, record) => {
-                    if (record.XJ) {
-                        return (
-                            <a
-                                disabled={!record.XJFJ}
-                                onClick={this.onImgClick.bind(
-                                    this,
-                                    record.XJFJ
-                                )}
-                            >
-                                {record.XJ}
-                            </a>
-                        );
-                    } else {
-                        return <span>/</span>;
-                    }
-                }
-            });
-        }
-        if (tree.DJ) {
-            this.treeColumns.push({
-                title: '地径(cm)',
-                render: (text, record) => {
-                    if (record.DJ) {
-                        return (
-                            <a
-                                disabled={!record.DJFJ}
-                                onClick={this.onImgClick.bind(
-                                    this,
-                                    record.DJFJ
-                                )}
-                            >
-                                {record.DJ}
-                            </a>
-                        );
-                    } else {
-                        return <span>/</span>;
-                    }
-                }
-            });
-        }
         if (tree.MD) {
-            this.treeColumns.push({
-                title: '密度(棵/m^3)',
-                render: (text, record) => {
-                    if (record.MD) {
-                        return (
-                            <a
-                                disabled={!record.MDFJ}
-                                onClick={this.onImgClick.bind(
-                                    this,
-                                    record.MDFJ
-                                )}
-                            >
-                                {record.MD}
-                            </a>
-                        );
-                    } else {
-                        return <span>/</span>;
+            this.treeColumns.push(
+                {
+                    title: '密度(棵/m^3)',
+                    render: (text, record) => {
+                        if (record.MD) {
+                            return (
+                                <a
+                                    disabled={!record.MDFJ}
+                                    onClick={this.onImgClick.bind(
+                                        this,
+                                        record.MDFJ
+                                    )}
+                                >
+                                    {record.MD}
+                                </a>
+                            );
+                        } else {
+                            return <span>/</span>;
+                        }
+                    }
+                },
+                {
+                    title: '面积(m^2)',
+                    render: (text, record) => {
+                        if (record.MJ) {
+                            return (
+                                <a
+                                    disabled={!record.MJFJ}
+                                    onClick={this.onImgClick.bind(
+                                        this,
+                                        record.MJFJ
+                                    )}
+                                >
+                                    {record.MJ}
+                                </a>
+                            );
+                        } else {
+                            return <span>/</span>;
+                        }
                     }
                 }
-            });
-        }
-        if (tree.MJ) {
-            this.treeColumns.push({
-                title: '面积(m^2)',
-                render: (text, record) => {
-                    if (record.MJ) {
-                        return (
-                            <a
-                                disabled={!record.MJFJ}
-                                onClick={this.onImgClick.bind(
-                                    this,
-                                    record.MJFJ
-                                )}
-                            >
-                                {record.MJ}
-                            </a>
-                        );
-                    } else {
-                        return <span>/</span>;
+            );
+        } else {
+            this.treeColumns.push(
+                {
+                    title: (
+                        <div>
+                            <div>高度</div>
+                            <div>(cm)</div>
+                        </div>
+                    ),
+                    render: (text, record) => {
+                        if (record.GD != 0) {
+                            return (
+                                <a
+                                    disabled={!record.GDFJ}
+                                    onClick={this.onImgClick.bind(
+                                        this,
+                                        record.GDFJ
+                                    )}
+                                >
+                                    {record.GD}
+                                </a>
+                            );
+                        } else {
+                            return <span>/</span>;
+                        }
+                    }
+                },
+                {
+                    title: (
+                        <div>
+                            <div>冠幅</div>
+                            <div>(cm)</div>
+                        </div>
+                    ),
+                    render: (text, record) => {
+                        if (record.GF != 0) {
+                            return (
+                                <a
+                                    disabled={!record.GFFJ}
+                                    onClick={this.onImgClick.bind(
+                                        this,
+                                        record.GFFJ
+                                    )}
+                                >
+                                    {record.GF}
+                                </a>
+                            );
+                        } else {
+                            return <span>/</span>;
+                        }
+                    }
+                },
+                {
+                    title: (
+                        <div>
+                            <div>胸径</div>
+                            <div>(cm)</div>
+                        </div>
+                    ),
+                    render: (text, record) => {
+                        if (record.XJ != 0) {
+                            return (
+                                <a
+                                    disabled={!record.XJFJ}
+                                    onClick={this.onImgClick.bind(
+                                        this,
+                                        record.XJFJ
+                                    )}
+                                >
+                                    {record.XJ}
+                                </a>
+                            );
+                        } else {
+                            return <span>/</span>;
+                        }
+                    }
+                },
+                {
+                    title: (
+                        <div>
+                            <div>地径</div>
+                            <div>(cm)</div>
+                        </div>
+                    ),
+                    render: (text, record) => {
+                        if (record.DJ != 0) {
+                            return (
+                                <a
+                                    disabled={!record.DJFJ}
+                                    onClick={this.onImgClick.bind(
+                                        this,
+                                        record.DJFJ
+                                    )}
+                                >
+                                    {record.DJ}
+                                </a>
+                            );
+                        } else {
+                            return <span>/</span>;
+                        }
+                    }
+                },
+                {
+                    title: (
+                        <div>
+                            <div>土球厚度</div>
+                            <div>(cm)</div>
+                        </div>
+                    ),
+                    dataIndex: 'tqhd',
+                    render: (text, record) => {
+                        if (record.TQHD != 0) {
+                            return (
+                                <a
+                                    disabled={!record.TQHDFJ}
+                                    onClick={this.onImgClick.bind(
+                                        this,
+                                        record.TQHDFJ
+                                    )}
+                                >
+                                    {record.TQHD}
+                                </a>
+                            );
+                        } else {
+                            return <span>/</span>;
+                        }
+                    }
+                },
+                {
+                    title: (
+                        <div>
+                            <div>土球直径</div>
+                            <div>(cm)</div>
+                        </div>
+                    ),
+                    dataIndex: 'tqzj',
+                    render: (text, record) => {
+                        if (record.TQZJ !== 0) {
+                            return (
+                                <a
+                                    disabled={!record.TQHDFJ}
+                                    onClick={this.onImgClick.bind(
+                                        this,
+                                        record.TQHDFJ
+                                    )}
+                                >
+                                    {record.TQZJ}
+                                </a>
+                            );
+                        } else {
+                            return <span>/</span>;
+                        }
+                    }
+                },
+                {
+                    title: (
+                        <div>
+                            <div>条长</div>
+                            <div>(cm)</div>
+                        </div>
+                    ),
+                    dataIndex: 'TC',
+                    render: (text, record) => {
+                        if (record.TC !== 0) {
+                            return (
+                                <a
+                                    disabled={!record.TCFJ}
+                                    onClick={this.onImgClick.bind(
+                                        this,
+                                        record.TCFJ
+                                    )}
+                                >
+                                    {record.TC}
+                                </a>
+                            );
+                        } else {
+                            return <span>/</span>;
+                        }
+                    }
+                },
+                {
+                    title: (
+                        <div>
+                            <div>分枝数量</div>
+                            <div>(个)</div>
+                        </div>
+                    ),
+                    dataIndex: 'FZS',
+                    render: (text, record) => {
+                        if (record.FZS !== 0) {
+                            return (
+                                <a
+                                    disabled={!record.FZSFJ}
+                                    onClick={this.onImgClick.bind(
+                                        this,
+                                        record.FZSFJ
+                                    )}
+                                >
+                                    {record.FZS}
+                                </a>
+                            );
+                        } else {
+                            return <span>/</span>;
+                        }
+                    }
+                },
+                {
+                    title: (
+                        <div>
+                            <div>分支点</div>
+                            <div>(个)</div>
+                        </div>
+                    ),
+                    dataIndex: 'FZSGD',
+                    render: (text, record) => {
+                        if (record.FZSGD !== 0) {
+                            return (
+                                <a
+                                    disabled={!record.FZSGDFJ}
+                                    onClick={this.onImgClick.bind(
+                                        this,
+                                        record.FZSGDFJ
+                                    )}
+                                >
+                                    {record.FZSGD}
+                                </a>
+                            );
+                        } else {
+                            return <span>/</span>;
+                        }
+                    }
+                },
+                {
+                    title: (
+                        <div>
+                            <div>地径超过0.5厘米分支数量</div>
+                            <div>(个)</div>
+                        </div>
+                    ),
+                    dataIndex: 'SMALLFZS',
+                    render: (text, record) => {
+                        if (record.SMALLFZS !== 0) {
+                            return (
+                                <a
+                                    disabled={!record.SMALLFZSFJ}
+                                    onClick={this.onImgClick.bind(
+                                        this,
+                                        record.SMALLFZSFJ
+                                    )}
+                                >
+                                    {record.SMALLFZS}
+                                </a>
+                            );
+                        } else {
+                            return <span>/</span>;
+                        }
+                    }
+                },
+                {
+                    title: (
+                        <div>
+                            <div>地径超过1cm分枝数量</div>
+                            <div>(个)</div>
+                        </div>
+                    ),
+                    dataIndex: 'DBFZS',
+                    render: (text, record) => {
+                        if (record.DBFZS !== 0) {
+                            return (
+                                <a
+                                    disabled={!record.DBFZSFJ}
+                                    onClick={this.onImgClick.bind(
+                                        this,
+                                        record.DBFZSFJ
+                                    )}
+                                >
+                                    {record.DBFZS}
+                                </a>
+                            );
+                        } else {
+                            return <span>/</span>;
+                        }
+                    }
+                },
+                {
+                    title: (
+                        <div>
+                            <div>地径超过3厘米分支数量</div>
+                            <div>(个)</div>
+                        </div>
+                    ),
+                    dataIndex: 'BIGFZS',
+                    render: (text, record) => {
+                        if (record.BIGFZS !== 0) {
+                            return (
+                                <a
+                                    disabled={!record.BIGFZSFJ}
+                                    onClick={this.onImgClick.bind(
+                                        this,
+                                        record.BIGFZSFJ
+                                    )}
+                                >
+                                    {record.BIGFZS}
+                                </a>
+                            );
+                        } else {
+                            return <span>/</span>;
+                        }
                     }
                 }
-            });
-        }
-        if (tree.TQHD) {
-            this.treeColumns.push({
-                title: '土球厚度(cm)',
-                render: (text, record) => {
-                    if (record.TQHD) {
-                        return (
-                            <a
-                                disabled={!record.TQHDFJ}
-                                onClick={this.onImgClick.bind(
-                                    this,
-                                    record.TQHDFJ
-                                )}
-                            >
-                                {record.TQHD}
-                            </a>
-                        );
-                    } else {
-                        return <span>/</span>;
-                    }
-                }
-            });
-        }
-        if (tree.TQZJ) {
-            this.treeColumns.push({
-                title: '土球直径(cm)',
-                render: (text, record) => {
-                    if (record.TQZJ) {
-                        return (
-                            <a
-                                disabled={!record.TQZJFJ}
-                                onClick={this.onImgClick.bind(
-                                    this,
-                                    record.TQZJFJ
-                                )}
-                            >
-                                {record.TQZJ}
-                            </a>
-                        );
-                    } else {
-                        return <span>/</span>;
-                    }
-                }
-            });
+            );
         }
 
         this.setState({
