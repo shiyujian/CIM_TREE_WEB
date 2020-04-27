@@ -670,7 +670,7 @@ export default class NursOverallTable extends Component {
                 ),
                 dataIndex: 'TC',
                 render: (text, record) => {
-                    if (record.TC !== 0) {
+                    if (record.TC) {
                         return (
                             <a
                                 disabled={!record.TCFJ}
@@ -696,7 +696,7 @@ export default class NursOverallTable extends Component {
                 ),
                 dataIndex: 'FZS',
                 render: (text, record) => {
-                    if (record.FZS !== 0) {
+                    if (record.FZS) {
                         return (
                             <a
                                 disabled={!record.FZSFJ}
@@ -722,7 +722,7 @@ export default class NursOverallTable extends Component {
                 ),
                 dataIndex: 'FZSGD',
                 render: (text, record) => {
-                    if (record.FZSGD !== 0) {
+                    if (record.FZSGD) {
                         return (
                             <a
                                 disabled={!record.FZSGDFJ}
@@ -748,7 +748,7 @@ export default class NursOverallTable extends Component {
                 ),
                 dataIndex: 'SMALLFZS',
                 render: (text, record) => {
-                    if (record.SMALLFZS !== 0) {
+                    if (record.SMALLFZS) {
                         return (
                             <a
                                 disabled={!record.SMALLFZSFJ}
@@ -774,7 +774,7 @@ export default class NursOverallTable extends Component {
                 ),
                 dataIndex: 'DBFZS',
                 render: (text, record) => {
-                    if (record.DBFZS !== 0) {
+                    if (record.DBFZS) {
                         return (
                             <a
                                 disabled={!record.DBFZSFJ}
@@ -800,7 +800,7 @@ export default class NursOverallTable extends Component {
                 ),
                 dataIndex: 'BIGFZS',
                 render: (text, record) => {
-                    if (record.BIGFZS !== 0) {
+                    if (record.BIGFZS) {
                         return (
                             <a
                                 disabled={!record.BIGFZSFJ}
@@ -916,7 +916,7 @@ export default class NursOverallTable extends Component {
                         </div>
                     ),
                     render: (text, record) => {
-                        if (record.GD != 0) {
+                        if (record.GD) {
                             return (
                                 <a
                                     disabled={!record.GDFJ}
@@ -941,7 +941,7 @@ export default class NursOverallTable extends Component {
                         </div>
                     ),
                     render: (text, record) => {
-                        if (record.GF != 0) {
+                        if (record.GF) {
                             return (
                                 <a
                                     disabled={!record.GFFJ}
@@ -966,7 +966,7 @@ export default class NursOverallTable extends Component {
                         </div>
                     ),
                     render: (text, record) => {
-                        if (record.XJ != 0) {
+                        if (record.XJ) {
                             return (
                                 <a
                                     disabled={!record.XJFJ}
@@ -991,7 +991,7 @@ export default class NursOverallTable extends Component {
                         </div>
                     ),
                     render: (text, record) => {
-                        if (record.DJ != 0) {
+                        if (record.DJ) {
                             return (
                                 <a
                                     disabled={!record.DJFJ}
@@ -1017,7 +1017,7 @@ export default class NursOverallTable extends Component {
                     ),
                     dataIndex: 'tqhd',
                     render: (text, record) => {
-                        if (record.TQHD != 0) {
+                        if (record.TQHD) {
                             return (
                                 <a
                                     disabled={!record.TQHDFJ}
@@ -1043,7 +1043,7 @@ export default class NursOverallTable extends Component {
                     ),
                     dataIndex: 'tqzj',
                     render: (text, record) => {
-                        if (record.TQZJ !== 0) {
+                        if (record.TQZJ) {
                             return (
                                 <a
                                     disabled={!record.TQHDFJ}
@@ -1069,7 +1069,7 @@ export default class NursOverallTable extends Component {
                     ),
                     dataIndex: 'TC',
                     render: (text, record) => {
-                        if (record.TC !== 0) {
+                        if (record.TC) {
                             return (
                                 <a
                                     disabled={!record.TCFJ}
@@ -1095,7 +1095,7 @@ export default class NursOverallTable extends Component {
                     ),
                     dataIndex: 'FZS',
                     render: (text, record) => {
-                        if (record.FZS !== 0) {
+                        if (record.FZS) {
                             return (
                                 <a
                                     disabled={!record.FZSFJ}
@@ -1121,7 +1121,7 @@ export default class NursOverallTable extends Component {
                     ),
                     dataIndex: 'FZSGD',
                     render: (text, record) => {
-                        if (record.FZSGD !== 0) {
+                        if (record.FZSGD) {
                             return (
                                 <a
                                     disabled={!record.FZSGDFJ}
@@ -1147,7 +1147,7 @@ export default class NursOverallTable extends Component {
                     ),
                     dataIndex: 'SMALLFZS',
                     render: (text, record) => {
-                        if (record.SMALLFZS !== 0) {
+                        if (record.SMALLFZS) {
                             return (
                                 <a
                                     disabled={!record.SMALLFZSFJ}
@@ -1173,7 +1173,7 @@ export default class NursOverallTable extends Component {
                     ),
                     dataIndex: 'DBFZS',
                     render: (text, record) => {
-                        if (record.DBFZS !== 0) {
+                        if (record.DBFZS) {
                             return (
                                 <a
                                     disabled={!record.DBFZSFJ}
@@ -1199,7 +1199,7 @@ export default class NursOverallTable extends Component {
                     ),
                     dataIndex: 'BIGFZS',
                     render: (text, record) => {
-                        if (record.BIGFZS !== 0) {
+                        if (record.BIGFZS) {
                             return (
                                 <a
                                     disabled={!record.BIGFZSFJ}

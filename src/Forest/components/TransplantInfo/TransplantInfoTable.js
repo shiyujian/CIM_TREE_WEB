@@ -358,6 +358,162 @@ export default class TransplantInfoTable extends Component {
                         return <span>/</span>;
                     }
                 }
+            },
+            {
+                title: (
+                    <div>
+                        <div>条长</div>
+                        <div>(cm)</div>
+                    </div>
+                ),
+                dataIndex: 'TC',
+                render: (text, record) => {
+                    if (record.TC) {
+                        return (
+                            <a
+                                disabled={!record.TCFJ}
+                                onClick={this.onImgClick.bind(
+                                    this,
+                                    record.TCFJ
+                                )}
+                            >
+                                {record.TC}
+                            </a>
+                        );
+                    } else {
+                        return <span>/</span>;
+                    }
+                }
+            },
+            {
+                title: (
+                    <div>
+                        <div>分枝数量</div>
+                        <div>(个)</div>
+                    </div>
+                ),
+                dataIndex: 'FZS',
+                render: (text, record) => {
+                    if (record.FZS) {
+                        return (
+                            <a
+                                disabled={!record.FZSFJ}
+                                onClick={this.onImgClick.bind(
+                                    this,
+                                    record.FZSFJ
+                                )}
+                            >
+                                {record.FZS}
+                            </a>
+                        );
+                    } else {
+                        return <span>/</span>;
+                    }
+                }
+            },
+            {
+                title: (
+                    <div>
+                        <div>分支点</div>
+                        <div>(个)</div>
+                    </div>
+                ),
+                dataIndex: 'FZSGD',
+                render: (text, record) => {
+                    if (record.FZSGD) {
+                        return (
+                            <a
+                                disabled={!record.FZSGDFJ}
+                                onClick={this.onImgClick.bind(
+                                    this,
+                                    record.FZSGDFJ
+                                )}
+                            >
+                                {record.FZSGD}
+                            </a>
+                        );
+                    } else {
+                        return <span>/</span>;
+                    }
+                }
+            },
+            {
+                title: (
+                    <div>
+                        <div>地径超过0.5厘米分支数量</div>
+                        <div>(个)</div>
+                    </div>
+                ),
+                dataIndex: 'SMALLFZS',
+                render: (text, record) => {
+                    if (record.SMALLFZS) {
+                        return (
+                            <a
+                                disabled={!record.SMALLFZSFJ}
+                                onClick={this.onImgClick.bind(
+                                    this,
+                                    record.SMALLFZSFJ
+                                )}
+                            >
+                                {record.SMALLFZS}
+                            </a>
+                        );
+                    } else {
+                        return <span>/</span>;
+                    }
+                }
+            },
+            {
+                title: (
+                    <div>
+                        <div>地径超过1cm分枝数量</div>
+                        <div>(个)</div>
+                    </div>
+                ),
+                dataIndex: 'DBFZS',
+                render: (text, record) => {
+                    if (record.DBFZS) {
+                        return (
+                            <a
+                                disabled={!record.DBFZSFJ}
+                                onClick={this.onImgClick.bind(
+                                    this,
+                                    record.DBFZSFJ
+                                )}
+                            >
+                                {record.DBFZS}
+                            </a>
+                        );
+                    } else {
+                        return <span>/</span>;
+                    }
+                }
+            },
+            {
+                title: (
+                    <div>
+                        <div>地径超过3厘米分支数量</div>
+                        <div>(个)</div>
+                    </div>
+                ),
+                dataIndex: 'BIGFZS',
+                render: (text, record) => {
+                    if (record.BIGFZS) {
+                        return (
+                            <a
+                                disabled={!record.BIGFZSFJ}
+                                onClick={this.onImgClick.bind(
+                                    this,
+                                    record.BIGFZSFJ
+                                )}
+                            >
+                                {record.BIGFZS}
+                            </a>
+                        );
+                    } else {
+                        return <span>/</span>;
+                    }
+                }
             }
         ];
     }
