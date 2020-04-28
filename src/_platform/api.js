@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2020-04-09 15:04:50
+ * @Last Modified time: 2020-04-28 14:23:33
  */
 /**
  *
@@ -149,42 +149,42 @@ export const PROJECTPOSITIONCENTER = [
     {
         Name: '九号地块',
         center: [38.99042701799772, 116.0396146774292],
-        Zoom: 14
+        Zoom: 15
     },
     {
         Name: '苗景兼用林项目',
         center: [39.02511978201801, 116.25842285575345],
-        Zoom: 13
+        Zoom: 15
     },
     {
         Name: '市民中心景观项目',
         center: [39.04825544272171, 115.90770578315642],
-        Zoom: 16
+        Zoom: 15
     },
     {
         Name: '2018年秋季造林',
         center: [38.784605024411576, 115.73293304652907],
-        Zoom: 13
+        Zoom: 15
     },
     {
         Name: '2019年春季造林',
         center: [39.068756148044486, 115.92073061387055],
-        Zoom: 12
+        Zoom: 15
     },
     {
         Name: '2019年秋季造林',
         center: [38.967432975769, 116.212756633759],
-        Zoom: 12
+        Zoom: 15
     },
     {
         Name: '2019年雄县秋季造林',
         center: [39.1029167175293, 116.223292350769],
-        Zoom: 12
+        Zoom: 15
     },
     {
         Name: '2019年秋季雄安市场化造林',
         center: [39.0806865692139, 116.174374222755],
-        Zoom: 12
+        Zoom: 15
     },
     {
         Name: '唐河入淀口湿地生态保护项目',
@@ -194,7 +194,7 @@ export const PROJECTPOSITIONCENTER = [
     {
         Name: '截洪渠景观一期工程',
         center: [39.04217004776, 115.882244110107],
-        Zoom: 14
+        Zoom: 15
     }
 ];
 // 树种大类

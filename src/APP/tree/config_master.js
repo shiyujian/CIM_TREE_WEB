@@ -62,7 +62,7 @@ window.config = {
         center: [38.99042701799772, 116.0396146774292],
         // center: [30.2528290000, 120.0177300000], // 华东院
         zoomControl: false,
-        zoom: 13,
+        zoom: 15,
         minZoom: 15,
         editable: true
     },

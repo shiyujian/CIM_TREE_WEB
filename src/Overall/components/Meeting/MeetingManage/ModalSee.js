@@ -50,7 +50,7 @@ class ModalSee extends Component {
         let mapInitialization = {
             center: [this.state.lat || 38.99042701799772, this.state.lng || 116.0396146774292],
             zoomControl: false,
-            zoom: 13,
+            zoom: 15,
             minZoom: 15
         };
         mapInitialization.crs = L.CRS.EPSG4326;
