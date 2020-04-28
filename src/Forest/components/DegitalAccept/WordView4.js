@@ -4,6 +4,7 @@ import {getForestImgUrl} from '_platform/auth';
 import './index.less';
 import moment from 'moment';
 const { TabPane } = Tabs;
+const DateTimeFormat = 'YYYY-MM-DD HH:mm:ss';
 export default class WordView1 extends Component {
     static propTypes = {};
     constructor (props) {
@@ -51,7 +52,13 @@ export default class WordView1 extends Component {
             loading: true
         });
         let unQualifiedList = [];
+        let etime = '';
+        if (detail.Status === 2) {
+            // 验收完成
+            etime = moment(detail.CreateTime).format(DateTimeFormat);
+        }
         let postdata1 = {
+            etime,
             section: section,
             thinclass: detail.ThinClass,
             treetype: detail.TreeType,
