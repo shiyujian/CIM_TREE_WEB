@@ -50,7 +50,13 @@ export default class WordView1 extends Component {
             loading: true
         });
         let unQualifiedList = [];
+        let etime = '';
+        if (detail.Status === 2) {
+            // 验收完成
+            etime = moment(detail.CreateTime).format('YYYY-MM-DD HH:mm:ss');
+        }
         let postdata = {
+            etime,
             section: detail.Section,
             no: detail.ThinClass,
             treetype: detail.TreeType,
@@ -200,181 +206,181 @@ export default class WordView1 extends Component {
                                         tab={(item && item.TreeTypeObj && item.TreeTypeObj.TreeTypeName) || '树种'}
                                         key={index}>
                                         <div>
-                                        <div className='trrdd'>
-                                            <table style={{ border: 1 }}>
-                                                <tbody>
-                                                    <tr>
-                                                        <td height='60;' colSpan='1' width='118px'>单位工程名称</td>
-                                                        <td colSpan='3'> {handleDetail.unit}</td>
-                                                        <td colSpan='1' width='118px'>细班（小班）</td>
-                                                        <td colSpan='1'>{`${array[2]}小班${array[3]}细班`}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td height='60;' align='center'>施工单位</td>
-                                                        <td colSpan='3'>{unitName}</td>
-                                                        <td >项目经理</td>
-                                                        <td >{leader}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td height='60;' align='center'>施工员</td>
-                                                        <td colSpan='1'>{handleDetail.shigong}</td>
-                                                        <td>苗木品种</td>
-                                                        <td colSpan='1'>{handleDetail.treetypename}</td>
-                                                        <td>苗木规格</td>
-                                                        <td > / </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td className='hei60' >施工执行标准名称及编号</td>
-                                                        <td colSpan='5'> 《雄安新区造林工作手册》</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colSpan='6' style={{height: 200}}>
-                                                            <div style={{textAlign: 'left'}}>
-                                                                <span style={{display: 'block'}}>验收要点：以细班或小班为单位，对大数据进行验收。按照不低于设计数量的20%进行抽检，对大数据情况进行打分。要求二维码牌绑扎在北侧，落叶乔木距离树干1.5米，其他植物距离树干1～1.3米，绑扎需要给苗木留足生长空间；大数据测量项数值准确、照片清晰、定位准确。</span>
-                                                                <span style={{display: 'block'}}>①二维码牌绑扎正确，大数据测量项数值准确、照片清晰、定位准确，即为合格，抽检合格率达到90%以上，计90分以上，通过检验；</span>
-                                                                <span style={{display: 'block'}}>②二维码牌绑扎不正确，大数据测量项数值不准确或照片不清晰或定位不准确，即为不合格，须整改。</span>
-                                                                <span style={{display: 'block'}}>大数据合格率=抽检合格数量/抽检数量。</span>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td height='60;' align='center'>设计数量</td>
-                                                        <td colSpan='1'>{`${handleDetail.designNum} (个)`}</td>
-                                                        <td>实际栽植数量</td>
-                                                        <td colSpan='1'>{`${handleDetail.actualNum} (个)`}</td>
-                                                        <td>大数据定位量</td>
-                                                        <td >{`${handleDetail.locationNum} (个)`}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td height='60;' align='center'>抽检数量</td>
-                                                        <td colSpan='1'>{`${handleDetail.checkNum} (个)`}</td>
-                                                        <td>抽检不合格数量</td>
-                                                        <td colSpan='1'>{`${handleDetail.failedNum} (个)`}</td>
-                                                        <td>合格率</td>
-                                                        <td colSpan='1'>{`${handleDetail.score}%`}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colSpan='6' height='60;'>不合格记录</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td height='60;'>二维码号牌</td>
-                                                        <td colSpan='2'>不合格原因</td>
-                                                        <td>二维码号牌</td>
-                                                        <td colSpan='2'>不合格原因</td>
-                                                    </tr>
-                                                    {
-                                                        this.setTableData()
-                                                    }
-                                                    <tr>
-                                                        <td className='hei110' >施工单位质量专检结果</td>
-                                                        <td colSpan='5'>
-                                                            <div>
-                                                                <div style={{ float: 'left', marginLeft: 10 }}>
-                                                                    <p >项目专业质量检查员：</p><p>{handleDetail.checker}</p>
+                                            <div className='trrdd'>
+                                                <table style={{ border: 1 }}>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td height='60;' colSpan='1' width='118px'>单位工程名称</td>
+                                                            <td colSpan='3'> {handleDetail.unit}</td>
+                                                            <td colSpan='1' width='118px'>细班（小班）</td>
+                                                            <td colSpan='1'>{`${array[2]}小班${array[3]}细班`}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td height='60;' align='center'>施工单位</td>
+                                                            <td colSpan='3'>{unitName}</td>
+                                                            <td >项目经理</td>
+                                                            <td >{leader}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td height='60;' align='center'>施工员</td>
+                                                            <td colSpan='1'>{handleDetail.shigong}</td>
+                                                            <td>苗木品种</td>
+                                                            <td colSpan='1'>{handleDetail.treetypename}</td>
+                                                            <td>苗木规格</td>
+                                                            <td > / </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td className='hei60' >施工执行标准名称及编号</td>
+                                                            <td colSpan='5'> 《雄安新区造林工作手册》</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colSpan='6' style={{height: 200}}>
+                                                                <div style={{textAlign: 'left'}}>
+                                                                    <span style={{display: 'block'}}>验收要点：以细班或小班为单位，对大数据进行验收。按照不低于设计数量的20%进行抽检，对大数据情况进行打分。要求二维码牌绑扎在北侧，落叶乔木距离树干1.5米，其他植物距离树干1～1.3米，绑扎需要给苗木留足生长空间；大数据测量项数值准确、照片清晰、定位准确。</span>
+                                                                    <span style={{display: 'block'}}>①二维码牌绑扎正确，大数据测量项数值准确、照片清晰、定位准确，即为合格，抽检合格率达到90%以上，计90分以上，通过检验；</span>
+                                                                    <span style={{display: 'block'}}>②二维码牌绑扎不正确，大数据测量项数值不准确或照片不清晰或定位不准确，即为不合格，须整改。</span>
+                                                                    <span style={{display: 'block'}}>大数据合格率=抽检合格数量/抽检数量。</span>
                                                                 </div>
-                                                                <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.applyTime}</p>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td className='hei110' >监理（建设）单位验收记录</td>
-                                                        <td colSpan='5'>
-                                                            <div>
-                                                                <div style={{ float: 'left', marginLeft: 10 }}>
-                                                                    <p>监理工程师：</p><p>{handleDetail.jianli}</p>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td height='60;' align='center'>设计数量</td>
+                                                            <td colSpan='1'>{`${handleDetail.designNum} (个)`}</td>
+                                                            <td>实际栽植数量</td>
+                                                            <td colSpan='1'>{`${handleDetail.actualNum} (个)`}</td>
+                                                            <td>大数据定位量</td>
+                                                            <td >{`${handleDetail.locationNum} (个)`}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td height='60;' align='center'>抽检数量</td>
+                                                            <td colSpan='1'>{`${handleDetail.checkNum} (个)`}</td>
+                                                            <td>抽检不合格数量</td>
+                                                            <td colSpan='1'>{`${handleDetail.failedNum} (个)`}</td>
+                                                            <td>合格率</td>
+                                                            <td colSpan='1'>{`${handleDetail.score}%`}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colSpan='6' height='60;'>不合格记录</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td height='60;'>二维码号牌</td>
+                                                            <td colSpan='2'>不合格原因</td>
+                                                            <td>二维码号牌</td>
+                                                            <td colSpan='2'>不合格原因</td>
+                                                        </tr>
+                                                        {
+                                                            this.setTableData()
+                                                        }
+                                                        <tr>
+                                                            <td className='hei110' >施工单位质量专检结果</td>
+                                                            <td colSpan='5'>
+                                                                <div>
+                                                                    <div style={{ float: 'left', marginLeft: 10 }}>
+                                                                        <p >项目专业质量检查员：</p><p>{handleDetail.checker}</p>
+                                                                    </div>
+                                                                    <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.applyTime}</p>
                                                                 </div>
-                                                                <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.createTime}</p>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <div>
-                                                <p>注：1.大数据验收不合格记录可另附表。2.附验收过程照片及说明。</p>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td className='hei110' >监理（建设）单位验收记录</td>
+                                                            <td colSpan='5'>
+                                                                <div>
+                                                                    <div style={{ float: 'left', marginLeft: 10 }}>
+                                                                        <p>监理工程师：</p><p>{handleDetail.jianli}</p>
+                                                                    </div>
+                                                                    <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.createTime}</p>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <div>
+                                                    <p>注：1.大数据验收不合格记录可另附表。2.附验收过程照片及说明。</p>
+                                                </div>
                                             </div>
-                                        </div>
-                                        {
-                                            handleDetail.AllViewPic || handleDetail.LocalPic
-                                                ? (
-                                                    <h1>附件：</h1>
-                                                ) : ''
-                                        }
-                                        {
-                                            handleDetail.AllViewPic
-                                                ? (
-                                                    <Row gutter={10}>
-                                                        <h2 style={{marginLeft: 5}}>全景照片</h2>
-                                                        <div style={{marginLeft: 5, marginBottom: 5}}>
-                                                            <span style={{fontSize: 15, fontWeight: 'bold'}}>
+                                            {
+                                                handleDetail.AllViewPic || handleDetail.LocalPic
+                                                    ? (
+                                                        <h1>附件：</h1>
+                                                    ) : ''
+                                            }
+                                            {
+                                                handleDetail.AllViewPic
+                                                    ? (
+                                                        <Row gutter={10}>
+                                                            <h2 style={{marginLeft: 5}}>全景照片</h2>
+                                                            <div style={{marginLeft: 5, marginBottom: 5}}>
+                                                                <span style={{fontSize: 15, fontWeight: 'bold'}}>
                                                                 验收说明：
-                                                            </span>
-                                                            <span>
-                                                                {handleDetail.AllViewDescribe || '无'}
-                                                            </span>
-                                                        </div>
-                                                        {
-                                                            handleDetail.AllViewPic.map((src) => {
-                                                                if (handleDetail.AllViewPic.length === 1) {
-                                                                    return (
-                                                                        <Row>
-                                                                            <Col span={6} />
+                                                                </span>
+                                                                <span>
+                                                                    {handleDetail.AllViewDescribe || '无'}
+                                                                </span>
+                                                            </div>
+                                                            {
+                                                                handleDetail.AllViewPic.map((src) => {
+                                                                    if (handleDetail.AllViewPic.length === 1) {
+                                                                        return (
+                                                                            <Row>
+                                                                                <Col span={6} />
+                                                                                <Col span={12}>
+                                                                                    <img style={{ width: '100%' }} src={src} alt='图片' />
+                                                                                </Col>
+                                                                                <Col span={6} />
+                                                                            </Row>
+                                                                        );
+                                                                    } else {
+                                                                        return (
                                                                             <Col span={12}>
                                                                                 <img style={{ width: '100%' }} src={src} alt='图片' />
                                                                             </Col>
-                                                                            <Col span={6} />
-                                                                        </Row>
-                                                                    );
-                                                                } else {
-                                                                    return (
-                                                                        <Col span={12}>
-                                                                            <img style={{ width: '100%' }} src={src} alt='图片' />
-                                                                        </Col>
-                                                                    );
-                                                                }
-                                                            })
-                                                        }
-                                                    </Row>
-                                                ) : ''
-                                        }
-                                        {
-                                            handleDetail.LocalPic
-                                                ? (
-                                                    <Row gutter={10}>
-                                                        <h2 style={{marginLeft: 5}}>局部照片</h2>
-                                                        <div style={{marginLeft: 5, marginBottom: 5}}>
-                                                            <span style={{fontSize: 15, fontWeight: 'bold'}}>
+                                                                        );
+                                                                    }
+                                                                })
+                                                            }
+                                                        </Row>
+                                                    ) : ''
+                                            }
+                                            {
+                                                handleDetail.LocalPic
+                                                    ? (
+                                                        <Row gutter={10}>
+                                                            <h2 style={{marginLeft: 5}}>局部照片</h2>
+                                                            <div style={{marginLeft: 5, marginBottom: 5}}>
+                                                                <span style={{fontSize: 15, fontWeight: 'bold'}}>
                                                                 验收说明：
-                                                            </span>
-                                                            <span>
-                                                                {handleDetail.LocalDescribe || '无'}
-                                                            </span>
-                                                        </div>
-                                                        {
-                                                            handleDetail.LocalPic.map((src) => {
-                                                                if (handleDetail.LocalPic.length === 1) {
-                                                                    return (
-                                                                        <Row>
-                                                                            <Col span={6} />
+                                                                </span>
+                                                                <span>
+                                                                    {handleDetail.LocalDescribe || '无'}
+                                                                </span>
+                                                            </div>
+                                                            {
+                                                                handleDetail.LocalPic.map((src) => {
+                                                                    if (handleDetail.LocalPic.length === 1) {
+                                                                        return (
+                                                                            <Row>
+                                                                                <Col span={6} />
+                                                                                <Col span={12}>
+                                                                                    <img style={{ width: '100%' }} src={src} alt='图片' />
+                                                                                </Col>
+                                                                                <Col span={6} />
+                                                                            </Row>
+                                                                        );
+                                                                    } else {
+                                                                        return (
                                                                             <Col span={12}>
                                                                                 <img style={{ width: '100%' }} src={src} alt='图片' />
                                                                             </Col>
-                                                                            <Col span={6} />
-                                                                        </Row>
-                                                                    );
-                                                                } else {
-                                                                    return (
-                                                                        <Col span={12}>
-                                                                            <img style={{ width: '100%' }} src={src} alt='图片' />
-                                                                        </Col>
-                                                                    );
-                                                                }
-                                                            })
-                                                        }
-                                                    </Row>
-                                                ) : ''
-                                        }
+                                                                        );
+                                                                    }
+                                                                })
+                                                            }
+                                                        </Row>
+                                                    ) : ''
+                                            }
                                         </div>
-                                        
+
                                     </TabPane>
                                 );
                             })
