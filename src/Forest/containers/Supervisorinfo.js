@@ -97,40 +97,33 @@ export default class Supervisorinfo extends Component {
                 地被
             </Option>
         ];
-        // // 状态
-        // let statusoption = [
-        //     <Option key={'-1'} value={''} title={'全部'}>
-        //         全部
-        //     </Option>,
-        //     <Option key={'1'} value={'-1'} title={'未抽查'}>
-        //         未抽查
-        //     </Option>,
-        //     <Option key={'2'} value={'0'} title={'监理抽查通过'}>
-        //         监理抽查通过
-        //     </Option>,
-        //     <Option key={'3'} value={'1'} title={'监理抽查退回'}>
-        //         监理抽查退回
-        //     </Option>
-        // ];
         // 状态
         let statusoption = [
-            <Option key={'-1'} value={''} title={'全部'}>
+            <Option key={'全部'} value={''} title={'全部'}>
                 全部
             </Option>,
-            <Option key={'1'} value={'未抽查'} title={'未抽查'}>
+            <Option key={'监理未抽查'} value={'监理未抽查'} title={'监理未抽查'}>
                 未抽查
             </Option>,
-            <Option key={'2'} value={'0'} title={'监理抽查通过'}>
-                监理抽查通过
+            <Option key={'监理抽查合格'} value={'监理抽查合格'} title={'监理抽查合格'}>
+                监理抽查合格
             </Option>,
-            <Option key={'3'} value={'1'} title={'监理抽查退回'}>
+            <Option key={'监理抽查退回'} value={'监理抽查退回'} title={'监理抽查退回'}>
                 监理抽查退回
             </Option>,
-            <Option key={'4'} value={'不合格'} title={'不合格'}>
-                不合格
+            <Option key={'监理退回后整改'} value={'监理退回后整改'} title={'监理退回后整改'}>
+                监理退回后整改
+            </Option>,
+            <Option key={'监理抽查不合格'} value={'监理抽查不合格'} title={'监理抽查不合格'}>
+                监理抽查不合格
+            </Option>,
+            <Option key={'业主抽查合格'} value={'业主抽查合格'} title={'业主抽查合格'}>
+                业主抽查合格
+            </Option>,
+            <Option key={'业主退苗'} value={'业主退苗'} title={'业主退苗'}>
+                业主退苗
             </Option>
         ];
-        this.setState({ statusoption });
         this.setState({ statusoption, typeoption });
     }
 
@@ -157,7 +150,7 @@ export default class Supervisorinfo extends Component {
         return (
             <Body>
                 <Main>
-                    <DynamicTitle title='监理验收信息' {...this.props} />
+                    <DynamicTitle title='栽植抽查信息' {...this.props} />
                     <Sidebar>
                         <PkCodeTree
                             treeData={treeList}

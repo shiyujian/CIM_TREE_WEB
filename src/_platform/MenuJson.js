@@ -163,14 +163,14 @@ export const ForestMenu = [
                 key: 'Supervisorinfo',
                 id: 'FOREST.SUPERVISORINFO',
                 path: '/forest/supervisorinfo',
-                name: '监理抽查信息'
-            },
-            {
-                key: 'Checkerinfo',
-                id: 'FOREST.OWNERINFO',
-                path: '/forest/checkerinfo',
-                name: '业主抽查信息'
+                name: '栽植抽查信息'
             }
+            // {
+            //     key: 'Checkerinfo',
+            //     id: 'FOREST.OWNERINFO',
+            //     path: '/forest/checkerinfo',
+            //     name: '业主抽查信息'
+            // }
         ]
     },
     {

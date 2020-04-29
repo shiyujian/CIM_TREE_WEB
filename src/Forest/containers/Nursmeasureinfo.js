@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import { Select } from 'antd';
 import * as actions from '../store';
 import { PkCodeTree } from '../components';
-import { NursmeasureTable } from '../components/Nursmeasureinfo';
+import { NursmeasureTable } from '../components/NursMeasureInfo';
 import { actions as platformActions } from '_platform/store/global';
 import {
     Main,

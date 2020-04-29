@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actions from '../store';
-import { NursOverallTable } from '../components/Nursoverallinfo';
+import { NursOverallTable } from '../components/NurSoverAllInfo';
 import { actions as platformActions } from '_platform/store/global';
 import {
     Main,

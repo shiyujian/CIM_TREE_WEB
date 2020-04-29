@@ -12,7 +12,7 @@ import {
     DynamicTitle,
     Sidebar
 } from '_platform/components/layout';
-import { NurseryFrom, NurseryGlobal } from '../components/NurserySourseAna';
+import { NurseryFrom, NurseryGlobal } from '../components/NurserySourseAnalysi';
 import { getDefaultProject } from '_platform/auth';
 const TabPane = Tabs.TabPane;
 @connect(

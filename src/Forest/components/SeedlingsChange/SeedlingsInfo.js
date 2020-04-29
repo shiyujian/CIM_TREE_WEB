@@ -269,8 +269,53 @@ export default class SeedlingsChange extends Component {
                 dataIndex: 'TreeTypeObj.TreeTypeName'
             },
             {
-                title: '状态',
-                dataIndex: 'statusname'
+                title: '监理抽查状态',
+                dataIndex: 'SupervisorCheck',
+                render: (text, record) => {
+                    let statusname = '/';
+                    if (record.SupervisorCheck === -1) {
+                        statusname = '监理未抽查';
+                    } else if (record.SupervisorCheck === 0) {
+                        statusname = '监理未通过';
+                    } else if (record.SupervisorCheck === 1) {
+                        statusname = '监理抽查合格';
+                    } else if (record.SupervisorCheck === 2) {
+                        statusname = '监理退回后整改';
+                    } else if (record.SupervisorCheck === 3) {
+                        statusname = '苗木质量合格';
+                    }
+                    return <span>{statusname}</span>;
+                }
+            },
+            {
+                title: '监理人',
+                dataIndex: 'SupervisorName',
+                render: (text, record) => {
+                    if (record.SupervisorUserName && record.SupervisorName) {
+                        return <p>{record.SupervisorName + '(' + record.SupervisorUserName + ')'}</p>;
+                    } else if (record.SupervisorName && !record.SupervisorUserName) {
+                        return <p>{record.SupervisorName}</p>;
+                    } else {
+                        return <p> / </p>;
+                    }
+                }
+            },
+            {
+                title: '业主抽查状态',
+                dataIndex: 'CheckStatus',
+                render: (text, record) => {
+                    let statusname = '/';
+                    if (record.CheckStatus === -1) {
+                        statusname = '业主未抽查';
+                    } else if (record.CheckStatus === 0) {
+                        statusname = '业主未通过';
+                    } else if (record.CheckStatus === 1) {
+                        statusname = '业主抽查合格';
+                    } else if (record.CheckStatus === 2) {
+                        statusname = '业主退回后整改';
+                    }
+                    return <span>{statusname}</span>;
+                }
             },
             {
                 title: '定位',
@@ -648,7 +693,7 @@ export default class SeedlingsChange extends Component {
                             id='remarkValueID'
                         />
                     </div>
-                    <div className='forest-mrg10'>
+                    <div className='forest-mrg-datePicker'>
                         <span className='forest-search-span'>时间选择：</span>
                         <RangePicker
                             style={{ verticalAlign: 'middle' }}
@@ -913,12 +958,6 @@ export default class SeedlingsChange extends Component {
                 plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
                 plan.place = getSmallThinNameByPlaceData(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
 
-                let statusname = '';
-                if (plan.SupervisorCheck == -1) statusname = '未抽查';
-                else if (plan.SupervisorCheck == 0) { statusname = '抽查未通过'; } else if (plan.SupervisorCheck === 1) {
-                    statusname = '抽查通过';
-                }
-                plan.statusname = statusname;
                 let islocation = plan.LocationTime ? '已定位' : '未定位';
                 plan.islocation = islocation;
                 let createtime1 = plan.CreateTime

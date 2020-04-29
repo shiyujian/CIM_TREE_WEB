@@ -157,23 +157,50 @@ export default class TransplantInfoTable extends Component {
                 }
             },
             {
-                title: '状态',
-                dataIndex: 'statusname',
+                title: '监理抽查状态',
+                dataIndex: 'SupervisorCheck',
                 render: (text, record) => {
-                    let statusname = '';
-                    if (record.Status === 2) {
-                        statusname = '不合格';
-                    } else if (
-                        record.SupervisorCheck === -1 &&
-                        record.CheckStatus === -1
-                    ) {
-                        statusname = '未抽查';
-                    } else {
-                        if (record.SupervisorCheck === 0 || record.CheckStatus === 0) {
-                            statusname = '抽查退回';
-                        } else if (record.SupervisorCheck === 1 || record.CheckStatus === 1) {
-                            statusname = '抽查通过';
-                        }
+                    let statusname = '/';
+                    if (record.SupervisorCheck === -1) {
+                        statusname = '监理未抽查';
+                    } else if (record.SupervisorCheck === 0) {
+                        statusname = '监理未通过';
+                    } else if (record.SupervisorCheck === 1) {
+                        statusname = '监理抽查合格';
+                    } else if (record.SupervisorCheck === 2) {
+                        statusname = '监理退回后整改';
+                    } else if (record.SupervisorCheck === 3) {
+                        statusname = '苗木质量合格';
+                    }
+                    return <span>{statusname}</span>;
+                }
+            },
+            // {
+            //     title: '监理人',
+            //     dataIndex: 'SupervisorName',
+            //     render: (text, record) => {
+            //         if (record.SupervisorUserName && record.SupervisorName) {
+            //             return <p>{record.SupervisorName + '(' + record.SupervisorUserName + ')'}</p>;
+            //         } else if (record.SupervisorName && !record.SupervisorUserName) {
+            //             return <p>{record.SupervisorName}</p>;
+            //         } else {
+            //             return <p> / </p>;
+            //         }
+            //     }
+            // },
+            {
+                title: '业主抽查状态',
+                dataIndex: 'CheckStatus',
+                render: (text, record) => {
+                    let statusname = '/';
+                    if (record.CheckStatus === -1) {
+                        statusname = '业主未抽查';
+                    } else if (record.CheckStatus === 0) {
+                        statusname = '业主未通过';
+                    } else if (record.CheckStatus === 1) {
+                        statusname = '业主抽查合格';
+                    } else if (record.CheckStatus === 2) {
+                        statusname = '业主退回后整改';
                     }
                     return <span>{statusname}</span>;
                 }
@@ -889,23 +916,25 @@ export default class TransplantInfoTable extends Component {
         if (content instanceof Array) {
             let userIDList = [];
             let userDataList = {};
+            let supervisorUserIDList = [];
+            let supervisorUserDataList = {};
             for (let i = 0; i < content.length; i++) {
                 let plan = content[i];
                 plan.order = (page - 1) * size + i + 1;
-                plan = await this.handleTransplantDataToTable(plan, userIDList, userDataList);
+                plan = await this.handleTransplantDataToTable(plan, userIDList, userDataList, supervisorUserIDList, supervisorUserDataList);
                 if (searchType === 'transplant') {
                     tblData.push(plan);
                 } else if (searchType === 'both') {
                     tblData.push(plan);
                     let locationData = await getTreeMess({sxm: plan.ZZBM});
                     if (locationData && locationData.ZZBM) {
-                        let locationPlan = await this.handleLocationDataToTable(locationData, userIDList, userDataList);
+                        let locationPlan = await this.handleLocationDataToTable(locationData, userIDList, userDataList, supervisorUserIDList, supervisorUserDataList);
                         tblData.push(locationPlan);
                     }
                 } else if (searchType === 'location') {
                     let locationData = await getTreeMess({sxm: plan.ZZBM});
                     if (locationData && locationData.ZZBM) {
-                        let locationPlan = await this.handleLocationDataToTable(locationData, userIDList, userDataList);
+                        let locationPlan = await this.handleLocationDataToTable(locationData, userIDList, userDataList, supervisorUserIDList, supervisorUserDataList);
                         locationPlan.order = (page - 1) * size + i + 1;
                         tblData.push(locationPlan);
                     }
@@ -929,7 +958,7 @@ export default class TransplantInfoTable extends Component {
             });
         }
     }
-    handleTransplantDataToTable = async (plan, userIDList, userDataList) => {
+    handleTransplantDataToTable = async (plan, userIDList, userDataList, supervisorUserIDList, supervisorUserDataList) => {
         const {
             actions: {
                 getUserDetail
@@ -970,6 +999,19 @@ export default class TransplantInfoTable extends Component {
             plan.createtime2 = createtime2;
             plan.createtime3 = createtime3;
             plan.createtime4 = createtime4;
+            // 因接口返回数据中不存在监理ID，故注释
+            // let supervisorUserData = '';
+            // if (supervisorUserIDList.indexOf(Number(plan.Supervisor)) === -1) {
+            //     supervisorUserData = await getUserDetail({id: plan.Supervisor});
+            // } else {
+            //     supervisorUserData = supervisorUserDataList[Number(plan.Supervisor)];
+            // }
+            // if (supervisorUserData && supervisorUserData.ID) {
+            //     supervisorUserIDList.push(supervisorUserData.ID);
+            //     supervisorUserDataList[supervisorUserData.ID] = supervisorUserData;
+            // }
+            // plan.SupervisorName = (supervisorUserData && supervisorUserData.Full_Name) || '';
+            // plan.SupervisorUserName = (supervisorUserData && supervisorUserData.User_Name) || '';
             let userData = '';
             if (userIDList.indexOf(Number(plan.Inputer)) === -1) {
                 userData = await getUserDetail({id: plan.Inputer});
@@ -1004,7 +1046,7 @@ export default class TransplantInfoTable extends Component {
         }
         const {
             actions: {
-                getTransplantLocMess,
+                getTreesInfo,
                 getTransplantTransMess
             }
         } = this.props;
@@ -1024,7 +1066,7 @@ export default class TransplantInfoTable extends Component {
             loading: true,
             percent: 0
         });
-        let rst = await getTransplantLocMess({}, postData);
+        let rst = await getTreesInfo({}, postData);
         console.log('rst', rst);
 
         if (!(rst && rst.content)) {
@@ -1039,23 +1081,25 @@ export default class TransplantInfoTable extends Component {
         if (content instanceof Array) {
             let userIDList = [];
             let userDataList = {};
+            let supervisorUserIDList = [];
+            let supervisorUserDataList = {};
             for (let i = 0; i < content.length; i++) {
                 let plan = content[i];
                 plan.order = (page - 1) * size + i + 1;
-                plan = await this.handleLocationDataToTable(plan, userIDList, userDataList);
+                plan = await this.handleLocationDataToTable(plan, userIDList, userDataList, supervisorUserIDList, supervisorUserDataList);
                 if (searchType === 'location') {
                     tblData.push(plan);
                 } else if (searchType === 'both') {
                     tblData.push(plan);
                     let transplantData = await getTransplantTransMess({}, {sxm: plan.ZZBM});
                     if (transplantData && transplantData.content && transplantData.content.length > 0) {
-                        let transplantPlan = await this.handleTransplantDataToTable(transplantData.content[0], userIDList, userDataList);
+                        let transplantPlan = await this.handleTransplantDataToTable(transplantData.content[0], userIDList, userDataList, supervisorUserIDList, supervisorUserDataList);
                         tblData.push(transplantPlan);
                     }
                 } else if (searchType === 'transplant') {
                     let transplantData = await getTransplantTransMess({}, {sxm: plan.ZZBM});
                     if (transplantData && transplantData.content && transplantData.content.length > 0) {
-                        let transplantPlan = await this.handleTransplantDataToTable(transplantData.content[0], userIDList, userDataList);
+                        let transplantPlan = await this.handleTransplantDataToTable(transplantData.content[0], userIDList, userDataList, supervisorUserIDList, supervisorUserDataList);
                         transplantPlan.order = (page - 1) * size + i + 1;
                         tblData.push(transplantPlan);
                     }
@@ -1078,7 +1122,7 @@ export default class TransplantInfoTable extends Component {
             });
         }
     }
-    handleLocationDataToTable = async (plan, userIDList, userDataList) => {
+    handleLocationDataToTable = async (plan, userIDList, userDataList, supervisorUserIDList, supervisorUserDataList) => {
         const {
             actions: {
                 getUserDetail
@@ -1111,6 +1155,19 @@ export default class TransplantInfoTable extends Component {
             plan.createtime2 = createtime2;
             plan.createtime3 = createtime3;
             plan.createtime4 = createtime4;
+            // 因接口返回数据中不存在监理ID，故注释
+            // let supervisorUserData = '';
+            // if (supervisorUserIDList.indexOf(Number(plan.Supervisor)) === -1) {
+            //     supervisorUserData = await getUserDetail({id: plan.Supervisor});
+            // } else {
+            //     supervisorUserData = supervisorUserDataList[Number(plan.Supervisor)];
+            // }
+            // if (supervisorUserData && supervisorUserData.ID) {
+            //     supervisorUserIDList.push(supervisorUserData.ID);
+            //     supervisorUserDataList[supervisorUserData.ID] = supervisorUserData;
+            // }
+            // plan.SupervisorName = (supervisorUserData && supervisorUserData.Full_Name) || '';
+            // plan.SupervisorUserName = (supervisorUserData && supervisorUserData.User_Name) || '';
             let userData = '';
             if (userIDList.indexOf(Number(plan.Inputer)) === -1) {
                 userData = await getUserDetail({id: plan.Inputer});
@@ -1185,26 +1242,28 @@ export default class TransplantInfoTable extends Component {
         if (content instanceof Array) {
             let userIDList = [];
             let userDataList = {};
+            let supervisorUserIDList = [];
+            let supervisorUserDataList = {};
             for (let i = 0; i < content.length; i++) {
                 let plan = content[i];
                 if (searchType === 'location') {
                     let locationData = await getTreeMess({sxm: plan.ZZBM});
                     if (locationData && locationData.ZZBM) {
-                        let transplantPlan = await this.handleLocationDataToTable(locationData, userIDList, userDataList);
+                        let transplantPlan = await this.handleLocationDataToTable(locationData, userIDList, userDataList, supervisorUserIDList, supervisorUserDataList);
                         transplantPlan.order = (page - 1) * size + i + 1;
                         tblData.push(transplantPlan);
                     }
                 } else if (searchType === 'transplant') {
                     plan.order = (page - 1) * size + i + 1;
-                    plan = await this.handleTransplantDataToTable(plan, userIDList, userDataList);
+                    plan = await this.handleTransplantDataToTable(plan, userIDList, userDataList, supervisorUserIDList, supervisorUserDataList);
                     tblData.push(plan);
                 } else if (searchType === 'both') {
                     plan.order = (page - 1) * size + i + 1;
-                    plan = await this.handleTransplantDataToTable(plan, userIDList, userDataList);
+                    plan = await this.handleTransplantDataToTable(plan, userIDList, userDataList, supervisorUserIDList, supervisorUserDataList);
                     tblData.push(plan);
                     let locationData = await getTreeMess({sxm: plan.ZZBM});
                     if (locationData && locationData.ZZBM) {
-                        let transplantPlan = await this.handleLocationDataToTable(locationData, userIDList, userDataList);
+                        let transplantPlan = await this.handleLocationDataToTable(locationData, userIDList, userDataList, supervisorUserIDList, supervisorUserDataList);
                         tblData.push(transplantPlan);
                     }
                 }
