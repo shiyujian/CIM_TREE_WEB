@@ -170,7 +170,7 @@ export default class TransplantInfoTable extends Component {
                     } else if (record.SupervisorCheck === 2) {
                         statusname = '监理退回后整改';
                     } else if (record.SupervisorCheck === 3) {
-                        statusname = '苗木质量合格';
+                        statusname = '监理抽查合格';
                     }
                     return <span>{statusname}</span>;
                 }
