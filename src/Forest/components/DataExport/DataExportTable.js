@@ -46,8 +46,6 @@ export default class LocmeasureTable extends Component {
             treetypename: '',
             positiontypename: '',
             status: '',
-            SupervisorCheck: '',
-            CheckStatus: '',
             islocation: '',
             role: 'inputer',
             rolename: '',

@@ -102,26 +102,26 @@ export default class Supervisorinfo extends Component {
             <Option key={'全部'} value={''} title={'全部'}>
                 全部
             </Option>,
-            <Option key={'监理未抽查'} value={'监理未抽查'} title={'监理未抽查'}>
+            <Option key={'未抽查'} value={'未抽查'} title={'未抽查'}>
                 未抽查
             </Option>,
             <Option key={'监理抽查合格'} value={'监理抽查合格'} title={'监理抽查合格'}>
                 监理抽查合格
             </Option>,
-            <Option key={'监理抽查退回'} value={'监理抽查退回'} title={'监理抽查退回'}>
-                监理抽查退回
+            <Option key={'大数据不合格'} value={'大数据不合格'} title={'大数据不合格'}>
+                大数据不合格
             </Option>,
-            <Option key={'监理退回后整改'} value={'监理退回后整改'} title={'监理退回后整改'}>
-                监理退回后整改
+            <Option key={'大数据不合格整改后待审核'} value={'大数据不合格整改后待审核'} title={'大数据不合格整改后待审核'}>
+                大数据不合格整改后待审核
             </Option>,
-            <Option key={'监理抽查不合格'} value={'监理抽查不合格'} title={'监理抽查不合格'}>
-                监理抽查不合格
+            <Option key={'质量不合格'} value={'质量不合格'} title={'质量不合格'}>
+                质量不合格
             </Option>,
             <Option key={'业主抽查合格'} value={'业主抽查合格'} title={'业主抽查合格'}>
                 业主抽查合格
             </Option>,
-            <Option key={'业主退苗'} value={'业主退苗'} title={'业主退苗'}>
-                业主退苗
+            <Option key={'业主抽查不合格'} value={'业主抽查不合格'} title={'业主抽查不合格'}>
+                业主抽查不合格
             </Option>
         ];
         this.setState({ statusoption, typeoption });

@@ -164,13 +164,15 @@ export default class TransplantInfoTable extends Component {
                     if (record.SupervisorCheck === -1) {
                         statusname = '监理未抽查';
                     } else if (record.SupervisorCheck === 0) {
-                        statusname = '监理未通过';
+                        statusname = '大数据不合格';
                     } else if (record.SupervisorCheck === 1) {
                         statusname = '监理抽查合格';
                     } else if (record.SupervisorCheck === 2) {
-                        statusname = '监理退回后整改';
+                        statusname = '大数据不合格整改后待审核';
                     } else if (record.SupervisorCheck === 3) {
                         statusname = '监理抽查合格';
+                    } else if (record.SupervisorCheck === 4) {
+                        statusname = '质量不合格';
                     }
                     return <span>{statusname}</span>;
                 }
@@ -196,7 +198,7 @@ export default class TransplantInfoTable extends Component {
                     if (record.CheckStatus === -1) {
                         statusname = '业主未抽查';
                     } else if (record.CheckStatus === 0) {
-                        statusname = '业主未通过';
+                        statusname = '业主抽查不合格';
                     } else if (record.CheckStatus === 1) {
                         statusname = '业主抽查合格';
                     } else if (record.CheckStatus === 2) {

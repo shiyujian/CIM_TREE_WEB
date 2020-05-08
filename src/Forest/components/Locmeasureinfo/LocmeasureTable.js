@@ -114,13 +114,15 @@ export default class LocmeasureTable extends Component {
                     if (record.SupervisorCheck === -1) {
                         statusname = '监理未抽查';
                     } else if (record.SupervisorCheck === 0) {
-                        statusname = '监理未通过';
+                        statusname = '大数据不合格';
                     } else if (record.SupervisorCheck === 1) {
                         statusname = '监理抽查合格';
                     } else if (record.SupervisorCheck === 2) {
-                        statusname = '监理退回后整改';
+                        statusname = '大数据不合格整改后待审核';
                     } else if (record.SupervisorCheck === 3) {
                         statusname = '监理抽查合格';
+                    } else if (record.SupervisorCheck === 4) {
+                        statusname = '质量不合格';
                     }
                     return <span>{statusname}</span>;
                 }
@@ -133,7 +135,7 @@ export default class LocmeasureTable extends Component {
                     if (record.CheckStatus === -1) {
                         statusname = '业主未抽查';
                     } else if (record.CheckStatus === 0) {
-                        statusname = '业主未通过';
+                        statusname = '业主抽查不合格';
                     } else if (record.CheckStatus === 1) {
                         statusname = '业主抽查合格';
                     } else if (record.CheckStatus === 2) {
@@ -1008,13 +1010,35 @@ export default class LocmeasureTable extends Component {
             tqzj = TQZJFirst;
         }
         let searchStatus = '';
-        let searchSamplingStatus = '';
-        if (status === '未抽查') {
-            searchSamplingStatus = -1;
-        } else if (status === '不合格') {
-            searchSamplingStatus = 2;
-        } else {
-            searchStatus = status;
+        let checkstatus = '';
+        let samplingstatus = '';
+        switch (status) {
+            case '':
+                searchStatus = '';
+                checkstatus = '';
+                samplingstatus = '';
+                break;
+            case '未抽查':
+                samplingstatus = -1;
+                break;
+            case '监理抽查合格':
+                samplingstatus = 1;
+                break;
+            case '大数据不合格':
+                searchStatus = 0;
+                break;
+            case '大数据不合格整改后待审核':
+                searchStatus = 2;
+                break;
+            case '质量不合格':
+                searchStatus = 4;
+                break;
+            case '业主抽查合格':
+                checkstatus = 1;
+                break;
+            case '业主抽查不合格':
+                checkstatus = 0;
+                break;
         }
         let postData = {
             no: keycode,
@@ -1022,8 +1046,8 @@ export default class LocmeasureTable extends Component {
             section,
             treetype,
             status: searchStatus,
-            samplingStatus: searchSamplingStatus,
-            // locationstatus,
+            samplingStatus: samplingstatus,
+            checkstatus,
             stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
             lstime: lstime && moment(lstime).format('YYYY-MM-DD HH:mm:ss'),
             etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
@@ -1185,13 +1209,35 @@ export default class LocmeasureTable extends Component {
             tqzj = TQZJFirst;
         }
         let searchStatus = '';
-        let searchSamplingStatus = '';
-        if (status === '未抽查') {
-            searchSamplingStatus = -1;
-        } else if (status === '不合格') {
-            searchSamplingStatus = 2;
-        } else {
-            searchStatus = status;
+        let checkstatus = '';
+        let samplingstatus = '';
+        switch (status) {
+            case '':
+                searchStatus = '';
+                checkstatus = '';
+                samplingstatus = '';
+                break;
+            case '未抽查':
+                samplingstatus = -1;
+                break;
+            case '监理抽查合格':
+                samplingstatus = 1;
+                break;
+            case '大数据不合格':
+                searchStatus = 0;
+                break;
+            case '大数据不合格整改后待审核':
+                searchStatus = 2;
+                break;
+            case '质量不合格':
+                searchStatus = 4;
+                break;
+            case '业主抽查合格':
+                checkstatus = 1;
+                break;
+            case '业主抽查不合格':
+                checkstatus = 0;
+                break;
         }
         let postData = {
             no: keycode,
@@ -1205,7 +1251,8 @@ export default class LocmeasureTable extends Component {
             etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
             letime: letime && moment(letime).format('YYYY-MM-DD HH:mm:ss'),
             status: searchStatus,
-            samplingStatus: searchSamplingStatus,
+            samplingStatus: samplingstatus,
+            checkstatus,
             page,
             size: size,
             smallclass: smallclassData,
@@ -1318,13 +1365,15 @@ export default class LocmeasureTable extends Component {
                             if (record.SupervisorCheck === -1) {
                                 statusname = '监理未抽查';
                             } else if (record.SupervisorCheck === 0) {
-                                statusname = '监理未通过';
+                                statusname = '大数据不合格';
                             } else if (record.SupervisorCheck === 1) {
                                 statusname = '监理抽查合格';
                             } else if (record.SupervisorCheck === 2) {
-                                statusname = '监理退回后整改';
+                                statusname = '大数据不合格整改后待审核';
                             } else if (record.SupervisorCheck === 3) {
                                 statusname = '监理抽查合格';
+                            } else if (record.SupervisorCheck === 4) {
+                                statusname = '质量不合格';
                             }
                             return <span>{statusname}</span>;
                         }
@@ -1350,7 +1399,7 @@ export default class LocmeasureTable extends Component {
                             if (record.CheckStatus === -1) {
                                 statusname = '业主未抽查';
                             } else if (record.CheckStatus === 0) {
-                                statusname = '业主未通过';
+                                statusname = '业主抽查不合格';
                             } else if (record.CheckStatus === 1) {
                                 statusname = '业主抽查合格';
                             } else if (record.CheckStatus === 2) {
@@ -1426,13 +1475,15 @@ export default class LocmeasureTable extends Component {
                             if (record.SupervisorCheck === -1) {
                                 statusname = '监理未抽查';
                             } else if (record.SupervisorCheck === 0) {
-                                statusname = '监理未通过';
+                                statusname = '大数据不合格';
                             } else if (record.SupervisorCheck === 1) {
                                 statusname = '监理抽查合格';
                             } else if (record.SupervisorCheck === 2) {
-                                statusname = '监理退回后整改';
+                                statusname = '大数据不合格整改后待审核';
                             } else if (record.SupervisorCheck === 3) {
                                 statusname = '监理抽查合格';
+                            } else if (record.SupervisorCheck === 4) {
+                                statusname = '质量不合格';
                             }
                             return <span>{statusname}</span>;
                         }
@@ -1458,7 +1509,7 @@ export default class LocmeasureTable extends Component {
                             if (record.CheckStatus === -1) {
                                 statusname = '业主未抽查';
                             } else if (record.CheckStatus === 0) {
-                                statusname = '业主未通过';
+                                statusname = '业主抽查不合格';
                             } else if (record.CheckStatus === 1) {
                                 statusname = '业主抽查合格';
                             } else if (record.CheckStatus === 2) {
@@ -1959,7 +2010,7 @@ export default class LocmeasureTable extends Component {
                             {treetypeoption}
                         </Select>
                     </div>
-                    <div className='forest-mrg10'>
+                    <div className='forest-unique-select'>
                         <span className='forest-search-span'>状态：</span>
                         <Select
                             allowClear

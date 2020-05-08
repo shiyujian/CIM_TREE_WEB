@@ -39,14 +39,13 @@ export default class SupervisorTable extends Component {
             exportsize: 100,
             treetypename: '',
             leftkeycode: '',
-            sstime: moment().format('YYYY-MM-DD 00:00:00'),
-            setime: moment().format('YYYY-MM-DD 23:59:59'),
+            stime: moment().format('YYYY-MM-DD 00:00:00'),
+            etime: moment().format('YYYY-MM-DD 23:59:59'),
             sxm: '',
             section: '',
             smallclass: '',
             thinclass: '',
             status: '',
-            supervisor: '',
             percent: 0,
             messageTotalNum: '',
             treeTotalNum: '',
@@ -91,13 +90,15 @@ export default class SupervisorTable extends Component {
                 if (record.SupervisorCheck === -1) {
                     statusname = '监理未抽查';
                 } else if (record.SupervisorCheck === 0) {
-                    statusname = '监理未通过';
+                    statusname = '大数据不合格';
                 } else if (record.SupervisorCheck === 1) {
                     statusname = '监理抽查合格';
                 } else if (record.SupervisorCheck === 2) {
-                    statusname = '监理退回后整改';
+                    statusname = '大数据不合格整改后待审核';
                 } else if (record.SupervisorCheck === 3) {
                     statusname = '监理抽查合格';
+                } else if (record.SupervisorCheck === 4) {
+                    statusname = '质量不合格';
                 }
                 return <span>{statusname}</span>;
             }
@@ -123,7 +124,7 @@ export default class SupervisorTable extends Component {
                 if (record.CheckStatus === -1) {
                     statusname = '业主未抽查';
                 } else if (record.CheckStatus === 0) {
-                    statusname = '业主未通过';
+                    statusname = '业主抽查不合格';
                 } else if (record.CheckStatus === 1) {
                     statusname = '业主抽查合格';
                 } else if (record.CheckStatus === 2) {
@@ -180,11 +181,11 @@ export default class SupervisorTable extends Component {
             render: (text, record) => {
                 let statusname = '/';
                 if (record.Status === 0) {
-                    statusname = '监理抽查不合格';
+                    statusname = '质量不合格';
                 } else if (record.Status === 1) {
                     statusname = '整改后合格';
                 } else if (record.Status === 2) {
-                    statusname = '整改后待审核';
+                    statusname = '质量不合格整改后待审核';
                 }
                 return <span>{statusname}</span>;
             }
@@ -295,52 +296,14 @@ export default class SupervisorTable extends Component {
         });
     }
 
-    handleUserSearch = async (value) => {
-        const {
-            actions: {
-                getUsers
-            }
-        } = this.props;
-        let userList = [];
-        let userOptions = [];
-        if (value.length >= 2) {
-            let postData = {
-                fullname: value
-            };
-            let userData = await getUsers({}, postData);
-            if (userData && userData.content && userData.content instanceof Array) {
-                userList = userData.content;
-                userList.map((user) => {
-                    userOptions.push(
-                        <Option
-                            key={user.ID}
-                            title={`${user.Full_Name}(${user.User_Name})`}
-                            value={user.ID}>
-                            {`${user.Full_Name}(${user.User_Name})`}
-                        </Option>
-                    );
-                });
-            }
-            this.setState({
-                userOptions
-            });
-        }
-    }
-    onRoleNameChange (value) {
-        console.log('value', value);
-        this.setState({
-            supervisor: value
-        });
-    }
-
     datepick (value) {
         this.setState({
-            sstime: value[0]
+            stime: value[0]
                 ? moment(value[0]).format('YYYY-MM-DD HH:mm:ss')
                 : ''
         });
         this.setState({
-            setime: value[1]
+            etime: value[1]
                 ? moment(value[1]).format('YYYY-MM-DD HH:mm:ss')
                 : ''
         });
@@ -401,44 +364,51 @@ export default class SupervisorTable extends Component {
             return;
         }
         /**
-         * 未抽查：samplingstatus  -1
-         * 监理抽查合格：status:1
-         * 监理退回  status:0
-         * 监理退回后整改 status:2
-         * 不合格:质量接口查询
-         * 业主抽查合格：checkstatus  1
-         * 业主退苗：checkstatus  0
+         * 全部
+            未抽查          samplingstatus  -1  未抽查
+            监理抽查合格    samplingstatus  1  抽查合格
+            大数据不合格    status:0  大数据不合格
+            质量不合格      tree/qualitytrees
+                            inputer
+                            status   0,2
+                            section
+            业主抽查合格    checkstatus   0  业主不合格
+            业主抽查不合格  checkstatus  1业主合格
          */
 
         /**
           * 响应返回：
-          * SupervisorCheck：监理确认，-1未确认  0：未通过 1：通过,2:退回后整改，即待审核，3：苗木质量合格
-          * Status:-1  未抽检或为一期或待审核    0：抽检未通过  1：抽检通过
-          * CheckStatus:1 未抽查 0：抽查不通过  1：抽查通过 2：抽查不通过后修改
+          * SupervisorCheck：监理确认，
+          * 0  大数据不合格，退回
+            1  通过 （新的接口中已不使用，但是需要对老数据进行兼容）
+            2  大数据不合格，修改小班细班并整改，待审核
+            3  APP点合格  大数据合格  质量合格
+            4  苗木质量不合格
+          * CheckStatus: 业主抽查状态：-1:未确认 0：业主通过  1：业主不通过
           */
         switch (status) {
             case '':
                 this.queryTreesInfoData(page, '', '');
                 break;
-            case '监理未抽查':
+            case '未抽查':
                 this.queryTreesInfoData(page, -1, '');
                 break;
             case '监理抽查合格':
-                this.queryTreesInfoData(page, '', 1);
+                this.queryTreesInfoData(page, 1);
                 break;
-            case '监理抽查退回':
+            case '大数据不合格':
                 this.queryTreesInfoData(page, '', 0);
                 break;
-            case '监理退回后整改':
+            case '大数据不合格整改后待审核':
                 this.queryTreesInfoData(page, '', 2);
                 break;
-            case '监理抽查不合格':
-                this.queryQualityInfoData(page, 0);
+            case '质量不合格':
+                this.queryQualityInfoData(page);
                 break;
             case '业主抽查合格':
                 this.queryTreesInfoData(page, '', '', 1);
                 break;
-            case '业主退苗':
+            case '业主抽查不合格':
                 this.queryTreesInfoData(page, '', '', 0);
                 break;
         }
@@ -450,9 +420,8 @@ export default class SupervisorTable extends Component {
             section = '',
             smallclass = '',
             thinclass = '',
-            supervisor = '',
-            sstime = '',
-            setime = '',
+            stime = '',
+            etime = '',
             size,
             treetype = ''
         } = this.state;
@@ -487,9 +456,8 @@ export default class SupervisorTable extends Component {
             samplingstatus,
             checkstatus,
             treetype,
-            supervisor: supervisor,
-            stime: sstime && moment(sstime).format('YYYY-MM-DD HH:mm:ss'),
-            etime: setime && moment(setime).format('YYYY-MM-DD HH:mm:ss'),
+            stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+            etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
             page,
             size
         };
@@ -565,15 +533,13 @@ export default class SupervisorTable extends Component {
         }
     }
 
-    queryQualityInfoData = async (page, status) => {
+    queryQualityInfoData = async (page) => {
         const {
-            sxm = '',
             section = '',
             smallclass = '',
             thinclass = '',
-            supervisor = '',
-            sstime = '',
-            setime = '',
+            stime = '',
+            etime = '',
             size,
             treetype = ''
         } = this.state;
@@ -603,15 +569,13 @@ export default class SupervisorTable extends Component {
         let postdata = {
             thinClass: no,
             section,
-            status,
+            status: '0,2',
             treetype,
-            Supervisor: supervisor,
-            stime: sstime && moment(sstime).format('YYYY-MM-DD HH:mm:ss'),
-            etime: setime && moment(setime).format('YYYY-MM-DD HH:mm:ss'),
+            stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+            etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
             page,
             size
         };
-        console.log('aaaa', this.qualityColumns);
         this.setState({
             loading: true,
             percent: 0
@@ -634,11 +598,8 @@ export default class SupervisorTable extends Component {
                 plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
                 plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
                 let thinClassArr = plan.ThinClass.split('-');
-                console.log('thinClassArr', thinClassArr);
 
                 if (thinClassArr && thinClassArr instanceof Array && thinClassArr.length === 4) {
-                    console.log('thinClassArr[2]', thinClassArr[2]);
-                    console.log('thinClassArr[3]', thinClassArr[3]);
                     plan.place = getSmallThinNameByPlaceData(plan.Section, thinClassArr[2], thinClassArr[3], thinClassTree);
                 }
                 let statusname = '';
@@ -689,41 +650,137 @@ export default class SupervisorTable extends Component {
     exportexcel () {
         const {
             sxm = '',
-            section = '',
-            supervisor = '',
-            sstime = '',
-            setime = '',
-            exportsize,
-            bigType = '',
-            treetype = ''
+            thinclass = '',
+            status = ''
         } = this.state;
-        if (this.section) {
-            // 不是admin，要做查询判断了
-            if (section === '') {
-                message.info('请选择标段信息');
-                return;
-            }
+
+        if (thinclass === '' && sxm === '') {
+            message.info('请选择项目，标段，小班及细班信息或输入顺序码');
+            return;
         }
+        switch (status) {
+            case '':
+                this.handleExportTreesInfoData('', '');
+                break;
+            case '未抽查':
+                this.handleExportTreesInfoData(-1, '');
+                break;
+            case '监理抽查合格':
+                this.handleExportTreesInfoData(1);
+                break;
+            case '大数据不合格':
+                this.handleExportTreesInfoData('', 0);
+                break;
+            case '大数据不合格整改后待审核':
+                this.handleExportTreesInfoData('', 2);
+                break;
+            case '质量不合格':
+                this.handleExportQualityInfoData();
+                break;
+            case '业主抽查合格':
+                this.handleExportTreesInfoData('', '', 1);
+                break;
+            case '业主抽查不合格':
+                this.handleExportTreesInfoData('', '', 0);
+                break;
+        }
+    }
+    handleExportTreesInfoData = async (samplingstatus = '', status = '', checkstatus = '') => {
         const {
-            actions: { getexportTree4Supervisor },
-            keycode = ''
+            sxm = '',
+            section = '',
+            stime = '',
+            etime = '',
+            treetype = '',
+            smallclassData,
+            thinclassData
+        } = this.state;
+        const {
+            actions: {
+                getexportTree
+            },
+            leftkeycode
         } = this.props;
-        let postdata = {
-            no: keycode,
+        let postData = {
+            no: leftkeycode,
             sxm,
             section,
-            sstime: sstime && moment(sstime).format('YYYY-MM-DD HH:mm:ss'),
-            setime: setime && moment(setime).format('YYYY-MM-DD HH:mm:ss'),
-            page: 1,
-            size: exportsize,
-            bigType,
             treetype,
-            supervisor: supervisor
+            status: status,
+            samplingStatus: samplingstatus,
+            checkstatus,
+            stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+            etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
+            smallclass: smallclassData, // 小班
+            thinclass: thinclassData
         };
-        this.setState({ loading: true, percent: 0 });
-        getexportTree4Supervisor({}, postdata).then(rst3 => {
-            this.setState({ loading: false });
-            this.createLink(this, `${FOREST_API}/${rst3}`);
+        this.setState({
+            loading: true,
+            percent: 0
+        });
+        getexportTree({}, postData).then(rst3 => {
+            if (rst3 === '') {
+                message.info('没有符合条件的信息');
+            } else {
+                window.open(`${FOREST_API}/${rst3}`);
+            }
+            this.setState({
+                loading: false,
+                percent: 100
+            });
+        });
+    }
+    handleExportQualityInfoData = async () => {
+        const {
+            section = '',
+            stime = '',
+            etime = '',
+            treetype = '',
+            thinclass,
+            smallclass
+        } = this.state;
+        const {
+            actions: {
+                getExportQualityTrees
+            },
+            leftkeycode
+        } = this.props;
+        let no = '';
+        if (thinclass) {
+            let thinClassArr = thinclass.split('-');
+            if (thinClassArr && thinClassArr instanceof Array && thinClassArr.length === 5) {
+                no = thinClassArr[0] + '-' + thinClassArr[1] + '-' + thinClassArr[3] + '-' + thinClassArr[4];
+            }
+        } else if (smallclass) {
+            let smallclassArr = smallclass.split('-');
+            if (smallclassArr && smallclassArr instanceof Array && smallclassArr.length === 4) {
+                no = smallclassArr[0] + '-' + smallclassArr[1] + '-' + smallclassArr[3];
+            }
+        } else if (leftkeycode) {
+            no = leftkeycode;
+        }
+        let postData = {
+            thinclass: no,
+            section,
+            treetype,
+            status: '0,2',
+            stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+            etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss')
+        };
+        this.setState({
+            loading: true,
+            percent: 0
+        });
+        getExportQualityTrees({}, postData).then(rst3 => {
+            if (rst3 === '') {
+                message.info('没有符合条件的信息');
+            } else {
+                window.open(`${FOREST_API}/${rst3}`);
+            }
+            this.setState({
+                loading: false,
+                percent: 100
+            });
         });
     }
     createLink (name, url) {
@@ -747,7 +804,6 @@ export default class SupervisorTable extends Component {
         } = this.props;
         const {
             sxm,
-            supervisor,
             section,
             smallclass,
             thinclass,
@@ -763,7 +819,7 @@ export default class SupervisorTable extends Component {
             <div>
                 <Row className='forest-search-layout'>
                     {
-                        status !== '监理抽查不合格'
+                        status !== '质量不合格'
                             ? <div className='forest-mrg10'>
                                 <span className='forest-search-span'>顺序码：</span>
                                 <Input
@@ -857,7 +913,7 @@ export default class SupervisorTable extends Component {
                             {treetypeoption}
                         </Select>
                     </div>
-                    <div className='forest-mrg10'>
+                    <div className='forest-unique-select'>
                         <span className='forest-search-span'>状态：</span>
                         <Select
                             allowClear
@@ -869,38 +925,18 @@ export default class SupervisorTable extends Component {
                             {statusoption}
                         </Select>
                     </div>
-                    {
-                        status !== '监理抽查不合格'
-                            ? <div className='forest-mrg10'>
-                                <span className='forest-search-span'>监理人：</span>
-                                <Select
-                                    allowClear
-                                    showSearch
-                                    className='forest-forestcalcw4'
-                                    placeholder={'请输入姓名搜索'}
-                                    onSearch={this.handleUserSearch.bind(this)}
-                                    onChange={this.onRoleNameChange.bind(this)}
-                                    showArrow={false}
-                                    filterOption={false}
-                                    notFoundContent={null}
-                                    value={supervisor || undefined}
-                                >
-                                    {userOptions}
-                                </Select>
-                            </div> : ''
-                    }
                     <div className='forest-mrg-datePicker'>
                         <span className='forest-search-span'>
-                            {status !== '监理抽查不合格' ? '栽植时间：' : '抽查时间'}
+                            {status !== '质量不合格' ? '栽植时间：' : '抽查时间'}
                         </span>
                         <RangePicker
                             style={{ verticalAlign: 'middle' }}
                             defaultValue={[
                                 moment(
-                                    this.state.sstime,
+                                    this.state.stime,
                                     'YYYY-MM-DD HH:mm:ss'
                                 ),
-                                moment(this.state.setime, 'YYYY-MM-DD HH:mm:ss')
+                                moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')
                             ]}
                             className='forest-forestcalcw4'
                             showTime={{ format: 'HH:mm:ss' }}
@@ -928,7 +964,7 @@ export default class SupervisorTable extends Component {
                     <Col span={2}>
                         <Button
                             type='primary'
-                            style={{ display: 'none' }}
+                            // style={{ display: 'none' }}
                             onClick={this.exportexcel.bind(this)}
                         >
                             导出

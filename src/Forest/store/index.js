@@ -104,6 +104,10 @@ export const getexportTree = forestFetchAction(
     `${TREE_API}/exportTree`,
     []
 );
+export const getExportQualityTrees = forestFetchAction(
+    `${TREE_API}/exportqualitytrees`,
+    []
+);
 export const getexportNurserys = forestFetchAction(
     `${TREE_API}/exportNurserys`,
     []
@@ -538,6 +542,7 @@ export const actions = {
     getqueryTree,
     getNurserysTree,
     getexportTree,
+    getExportQualityTrees,
     getexportFactoryAnalyseInfo,
     getexportFactoryAnalyseDetailInfo,
     getexportFactoryAnalyse,

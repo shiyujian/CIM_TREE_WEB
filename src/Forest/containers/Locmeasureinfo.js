@@ -118,43 +118,31 @@ export default class Locmeasureinfo extends Component {
             </Option>
         ];
         this.setState({ typeoption });
-        // // 状态
-        // let statusoption = [
-        //     <Option key={'-1'} value={''} title={'全部'}>
-        //         全部
-        //     </Option>,
-        //     <Option key={'1'} value={'-1'} title={'未确认'}>
-        //         未确认
-        //     </Option>,
-        //     <Option key={'2'} value={'0'} title={'监理抽查通过'}>
-        //         监理抽查通过
-        //     </Option>,
-        //     <Option key={'3'} value={'1'} title={'监理抽查退回'}>
-        //         监理抽查退回
-        //     </Option>,
-        //     <Option key={'4'} value={'2'} title={'业主抽查退回'}>
-        //         业主抽查退回
-        //     </Option>,
-        //     <Option key={'5'} value={'3'} title={'业主抽查通过'}>
-        //         业主抽查通过
-        //     </Option>
-        // ];
         // 状态
         let statusoption = [
-            <Option key={'-1'} value={''} title={'全部'}>
+            <Option key={'全部'} value={''} title={'全部'}>
                 全部
             </Option>,
-            <Option key={'1'} value={'未抽查'} title={'未抽查'}>
+            <Option key={'未抽查'} value={'未抽查'} title={'未抽查'}>
                 未抽查
             </Option>,
-            <Option key={'2'} value={'0,3'} title={'抽查通过'}>
-                抽查通过
+            <Option key={'监理抽查合格'} value={'监理抽查合格'} title={'监理抽查合格'}>
+                监理抽查合格
             </Option>,
-            <Option key={'3'} value={'1,2'} title={'抽查退回'}>
-                抽查退回
+            <Option key={'大数据不合格'} value={'大数据不合格'} title={'大数据不合格'}>
+                大数据不合格
             </Option>,
-            <Option key={'4'} value={'不合格'} title={'不合格'}>
-                不合格
+            <Option key={'大数据不合格整改后待审核'} value={'大数据不合格整改后待审核'} title={'大数据不合格整改后待审核'}>
+                大数据不合格整改后待审核
+            </Option>,
+            <Option key={'质量不合格'} value={'质量不合格'} title={'质量不合格'}>
+                质量不合格
+            </Option>,
+            <Option key={'业主抽查合格'} value={'业主抽查合格'} title={'业主抽查合格'}>
+                业主抽查合格
+            </Option>,
+            <Option key={'业主抽查不合格'} value={'业主抽查不合格'} title={'业主抽查不合格'}>
+                业主抽查不合格
             </Option>
         ];
         this.setState({ statusoption });

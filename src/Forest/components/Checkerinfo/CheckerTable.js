@@ -133,40 +133,41 @@ export default class CheckerTable extends Component {
                 dataIndex: 'TreeTypeObj.TreeTypeName'
             },
             {
-                title: '状态',
-                dataIndex: 'statusname',
+                title: '监理抽查状态',
+                dataIndex: 'SupervisorCheck',
                 render: (text, record) => {
-                    let superName = '';
-                    let ownerName = '';
-                    if (
-                        record.SupervisorCheck == -1 &&
-                        record.CheckStatus == -1
-                    ) {
-                        return <span>未抽查</span>;
-                    } else {
-                        if (record.SupervisorCheck == 0) { superName = '监理抽查退回'; } else if (record.SupervisorCheck === 1) {
-                            superName = '监理抽查通过';
-                        }
-
-                        if (record.CheckStatus == 0) ownerName = '业主抽查退回';
-                        else if (record.CheckStatus == 1) {
-                            ownerName = '业主抽查通过';
-                        } else if (record.CheckStatus == 2) {
-                            ownerName = '业主抽查退回后修改';
-                        }
-                        if (superName && ownerName) {
-                            return (
-                                <div>
-                                    <div>{superName}</div>
-                                    <div>{ownerName}</div>
-                                </div>
-                            );
-                        } else if (superName) {
-                            return <span>{superName}</span>;
-                        } else {
-                            return <span>{ownerName}</span>;
-                        }
+                    let statusname = '/';
+                    if (record.SupervisorCheck === -1) {
+                        statusname = '监理未抽查';
+                    } else if (record.SupervisorCheck === 0) {
+                        statusname = '大数据不合格';
+                    } else if (record.SupervisorCheck === 1) {
+                        statusname = '监理抽查合格';
+                    } else if (record.SupervisorCheck === 2) {
+                        statusname = '大数据不合格整改后待审核';
+                    } else if (record.SupervisorCheck === 3) {
+                        statusname = '监理抽查合格';
+                    } else if (record.SupervisorCheck === 4) {
+                        statusname = '质量不合格';
                     }
+                    return <span>{statusname}</span>;
+                }
+            },
+            {
+                title: '业主抽查状态',
+                dataIndex: 'CheckStatus',
+                render: (text, record) => {
+                    let statusname = '/';
+                    if (record.CheckStatus === -1) {
+                        statusname = '业主未抽查';
+                    } else if (record.CheckStatus === 0) {
+                        statusname = '业主抽查不合格';
+                    } else if (record.CheckStatus === 1) {
+                        statusname = '业主抽查合格';
+                    } else if (record.CheckStatus === 2) {
+                        statusname = '业主退回后整改';
+                    }
+                    return <span>{statusname}</span>;
                 }
             },
             {
