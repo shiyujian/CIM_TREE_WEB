@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2020-05-08 15:53:06
+ * @Last Modified time: 2020-05-08 16:38:56
  */
 /**
  *
@@ -407,11 +407,11 @@ export const TREEPIPEEXPORTSECTIONS = [
     {
         section: 'P194-02-07',
         name: '红谷滩园林建设集团有限公司/中铁北京工程局集团有限公司'
+    },
+    {
+        section: 'P194-02-08',
+        name: '江西景观建设集团有限公司 /保定市绿叶园林绿化有限公司'
     }
-    // {
-    //     section: 'P194-02-08',
-    //     name: '江西景观建设集团有限公司 /保定市绿叶园林绿化有限公司'
-    // }
 ];
 // 灌溉竣工图可导出个人
 export const TREEPIPEEXPORTPERSONS = [
@@ -422,11 +422,11 @@ export const TREEPIPEEXPORTPERSONS = [
     {
         username: 'zhangbowen9903',
         name: '张博文'
+    },
+    {
+        username: 'wangmengnan4',
+        name: '王梦楠'
     }
-    // {
-    //     username: 'wangmengnan4',
-    //     name: '王梦楠'
-    // }
 ];
 
 export const MODULES = [
