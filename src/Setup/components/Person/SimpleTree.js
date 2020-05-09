@@ -11,7 +11,7 @@ export default class SimpleTree extends Component {
         onSelect: PropTypes.func
     };
     // 如果父级为公司，则可以呗选中，如果为项目，不能呗选中
-    static loop (data = [], companyStatus = false) {
+    static loop (data = [], companyStatus = false, orgType = '') {
         return data.map(item => {
             if (item && item.OrgCode) {
                 if (item.OrgType) {
@@ -24,6 +24,9 @@ export default class SimpleTree extends Component {
                 if (item && item.OrgPK) {
                     companyStatus = true;
                 }
+                if (companyStatus && !item.OrgType) {
+                    item.OrgType = orgType;
+                }
                 if (item.children && item.children.length > 0) {
                     return (
                         <TreeNode
@@ -31,7 +34,7 @@ export default class SimpleTree extends Component {
                             disabled={!companyStatus}
                             title={`${item.OrgName}`}
                         >
-                            {SimpleTree.loop(item.children, companyStatus)}
+                            {SimpleTree.loop(item.children, companyStatus, item.OrgType)}
                         </TreeNode>
                     );
                 } else {
@@ -57,6 +60,9 @@ export default class SimpleTree extends Component {
                         </TreeNode>
                     );
                 } else {
+                    if (item && item.NurseryName) {
+                        item.OrgType = '苗圃';
+                    }
                     return (
                         <TreeNode
                             key={`${item.ID}`}

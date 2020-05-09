@@ -785,6 +785,7 @@ export default class FactsSurveyTable extends Component {
                                                 </a>
                                                 <a key='SHP导出'
                                                     title='SHP导出'
+                                                    disabled={!exportBtnVisible}
                                                     className={exportBtnVisible ? 'FactsSurveyTable-button-statusSel' : 'FactsSurveyTable-button-status'}
                                                     onClick={this.handleExportSHP.bind(this)}
                                                     style={{marginRight: 40, float: 'right'}}
@@ -795,6 +796,7 @@ export default class FactsSurveyTable extends Component {
                                                 </a>
                                                 <a key='DXF导出'
                                                     title='DXF导出'
+                                                    disabled={!exportBtnVisible}
                                                     className={exportBtnVisible ? 'FactsSurveyTable-button-statusSel' : 'FactsSurveyTable-button-status'}
                                                     onClick={this.handleExportDXF.bind(this)}
                                                     style={{marginRight: 40, float: 'right'}}

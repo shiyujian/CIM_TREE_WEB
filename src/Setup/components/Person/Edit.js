@@ -98,6 +98,9 @@ class Edit extends Component {
         const {
             platform: {
                 roles = []
+            },
+            sidebar: {
+                node = {}
             }
         } = this.props;
         const user = getUser();
@@ -128,22 +131,27 @@ class Edit extends Component {
                 }
             });
             if (roleName === '施工文书') {
-                parentRoleType.map((type) => {
-                    if (type.RoleName === '苗圃') {
-                        systemRoles.push({
-                            name: type && type.RoleName,
-                            value: roles.filter(role => role.ParentID === type.ID)
-                        });
-                    }
-                });
-                parentRoleType.map((type) => {
-                    if (type.RoleName === '养护') {
-                        systemRoles.push({
-                            name: type && type.RoleName,
-                            value: roles.filter(role => role.ParentID === type.ID)
-                        });
-                    }
-                });
+                if (node.OrgPK) {
+                    systemRoles = [];
+                    parentRoleType.map((type) => {
+                        // 获取到苗圃类型下的角色
+                        if (type.RoleName === '苗圃') {
+                            systemRoles.push({
+                                name: type && type.RoleName,
+                                value: roles.filter(role => role.ParentID === type.ID)
+                            });
+                        }
+                    });
+                } else {
+                    parentRoleType.map((type) => {
+                        if (type.RoleName === '养护') {
+                            systemRoles.push({
+                                name: type && type.RoleName,
+                                value: roles.filter(role => role.ParentID === type.ID)
+                            });
+                        }
+                    });
+                }
             }
         }
         const objs = systemRoles.map(roless => {
@@ -162,6 +170,11 @@ class Edit extends Component {
         return objs;
     }
     renderTitle () {
+        const {
+            sidebar: {
+                node = {}
+            }
+        } = this.props;
         let user = getUser();
         let userRoles = user.roles || '';
         var systemRoles = [];
@@ -206,24 +219,27 @@ class Edit extends Component {
                     });
                     break;
                 case 1:
-                    systemRoles.push({
-                        name: '苗圃职务',
-                        children: ['苗圃']
-                    });
-                    systemRoles.push({
-                        name: '施工职务',
-                        children: [
-                            '施工领导',
-                            '协调调度人',
-                            '质量负责人',
-                            '安全负责人',
-                            '文明负责人',
-                            '普通员工',
-                            '施工文书',
-                            '测量员',
-                            '施工整改人'
-                        ]
-                    });
+                    if (node.OrgPK) {
+                        systemRoles.push({
+                            name: '苗圃职务',
+                            children: ['苗圃']
+                        });
+                    } else if (node.OrgType === '施工单位') {
+                        systemRoles.push({
+                            name: '施工职务',
+                            children: [
+                                '施工领导',
+                                '协调调度人',
+                                '质量负责人',
+                                '安全负责人',
+                                '文明负责人',
+                                '普通员工',
+                                '施工文书',
+                                '测量员',
+                                '施工整改人'
+                            ]
+                        });
+                    }
                     break;
                 case 2:
                     systemRoles.push({
