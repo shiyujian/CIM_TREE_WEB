@@ -56,21 +56,30 @@ export const OverallMenu = [
                 id: 'OVERALL.STANDARD',
                 path: '/overall/standard',
                 name: '制度标准'
-            }, {
+            },
+            {
                 key: 'engineering',
                 id: 'OVERALL.ENGINEERING',
                 path: '/overall/engineering',
                 name: '工程文档'
-            }, {
+            },
+            {
                 key: 'redios',
                 id: 'OVERALL.REDIOS',
                 path: '/overall/redios',
                 name: '会议记录'
-            }, {
+            },
+            {
                 key: 'interim',
                 id: 'OVERALL.INTERIM',
                 path: '/overall/interim',
                 name: '过程资料'
+            },
+            {
+                key: 'TrainingDocuments',
+                id: 'OVERALL.TRAININGDOCUMENTS',
+                path: '/overall/trainingdocuments',
+                name: '培训文档'
             }
         ]
     }

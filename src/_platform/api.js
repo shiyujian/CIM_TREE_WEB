@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2020-05-08 16:38:56
+ * @Last Modified time: 2020-05-13 15:24:11
  */
 /**
  *
@@ -479,15 +479,22 @@ export const MODULES = [
                     {
                         id: 'OVERALL.STANDARD',
                         name: '制度标准'
-                    }, {
+                    },
+                    {
                         id: 'OVERALL.ENGINEERING',
                         name: '工程文档'
-                    }, {
+                    },
+                    {
                         id: 'OVERALL.REDIOS',
                         name: '会议记录'
-                    }, {
+                    },
+                    {
                         id: 'OVERALL.INTERIM',
                         name: '过程资料'
+                    },
+                    {
+                        id: 'OVERALL.TRAININGDOCUMENTS',
+                        name: '培训文档'
                     }
                 ]
             }
