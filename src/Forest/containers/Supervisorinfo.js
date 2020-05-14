@@ -46,7 +46,8 @@ export default class Supervisorinfo extends Component {
             resetkey: 0,
             treetypeoption: [],
             sectionsData: [],
-            smallClassesData: []
+            smallClassesData: [],
+            loading: false
         };
     }
     componentDidMount = async () => {
@@ -68,6 +69,9 @@ export default class Supervisorinfo extends Component {
             getTreeList();
         }
         if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
+            this.setState({
+                loading: true
+            });
             let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
             let totalThinClass = data.totalThinClass || [];
             let projectList = data.projectList || [];
@@ -75,6 +79,9 @@ export default class Supervisorinfo extends Component {
             await getTotalThinClass(totalThinClass);
             // 区域地块树
             await getThinClassTree(projectList);
+            this.setState({
+                loading: false
+            });
         }
         // 类型
         let typeoption = [
@@ -154,6 +161,8 @@ export default class Supervisorinfo extends Component {
                     <Sidebar>
                         <PkCodeTree
                             treeData={treeList}
+                            {...this.props}
+                            {...this.state}
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}
                         />
@@ -162,19 +171,10 @@ export default class Supervisorinfo extends Component {
                         <SupervisorTable
                             key={resetkey}
                             {...this.props}
-                            sectionoption={sectionoption}
                             sectionSelect={this.sectionSelect.bind(this)}
-                            smallclassoption={smallclassoption}
                             smallClassSelect={this.smallClassSelect.bind(this)}
-                            thinclassoption={thinclassoption}
                             typeselect={this.typeselect.bind(this)}
-                            bigType={bigType}
-                            typeoption={typeoption}
-                            treetypeoption={treetypeoption}
                             thinClassSelect={this.thinClassSelect.bind(this)}
-                            statusoption={statusoption}
-                            leftkeycode={leftkeycode}
-                            keycode={keycode}
                             resetinput={this.resetinput.bind(this)}
                         />
                     </Content>

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2020-05-13 15:24:11
+ * @Last Modified time: 2020-05-14 09:58:21
  */
 /**
  *
@@ -102,7 +102,7 @@ export const DB_API = `${DOMAIN}/db`;
 // 二维码分发
 export const QRCODE_API = `${DOMAIN}/qrcode`;
 // 会议服务
-export const MEETING_API = `${SDOMAIN}/meeting`;
+export const MEETING_API = `${DOMAIN}/meeting`;
 // 文件导出服务
 export const DOCEXPORT_API = `${DOMAIN}/DocExport.ashx`;
 // 验证码服务

@@ -46,7 +46,8 @@ export default class CarPackage extends Component {
             leftkeycode: '',
             resetkey: 0,
             mmtypeoption: [],
-            sectionsData: []
+            sectionsData: [],
+            loading: false
         };
     }
     componentDidMount = async () => {
@@ -87,6 +88,9 @@ export default class CarPackage extends Component {
             getTreeList();
         }
         if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
+            this.setState({
+                loading: true
+            });
             let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
             let totalThinClass = data.totalThinClass || [];
             let projectList = data.projectList || [];
@@ -94,6 +98,9 @@ export default class CarPackage extends Component {
             await getTotalThinClass(totalThinClass);
             // 区域地块树
             await getThinClassTree(projectList);
+            this.setState({
+                loading: false
+            });
         }
         let defaultProject = await getDefaultProject();
         if (defaultProject) {
@@ -172,6 +179,8 @@ export default class CarPackage extends Component {
                     <Sidebar>
                         <PkCodeTree
                             treeData={treeList}
+                            {...this.props}
+                            {...this.state}
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}
                         />
@@ -180,12 +189,8 @@ export default class CarPackage extends Component {
                         <CarPackageTable
                             key={resetkey}
                             {...this.props}
-                            sectionoption={sectionoption}
+                            {...this.state}
                             sectionSelect={this.sectionSelect.bind(this)}
-                            statusoption={statusoption}
-                            mmtypeoption={mmtypeoption}
-                            leftkeycode={leftkeycode}
-                            keycode={keycode}
                             resetinput={this.resetinput.bind(this)}
                         />
                     </Content>

@@ -43,7 +43,8 @@ export default class DegitalAccept extends Component {
             leftkeycode: '',
             resetkey: 0,
             sectionsData: [],
-            smallClassesData: []
+            smallClassesData: [],
+            loading: false
         };
     }
     componentDidMount = async () => {
@@ -58,6 +59,9 @@ export default class DegitalAccept extends Component {
             supervisorUsersList
         } = this.props;
         if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
+            this.setState({
+                loading: true
+            });
             let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
             let totalThinClass = data.totalThinClass || [];
             let projectList = data.projectList || [];
@@ -65,6 +69,9 @@ export default class DegitalAccept extends Component {
             await getTotalThinClass(totalThinClass);
             // 区域地块树
             await getThinClassTree(projectList);
+            this.setState({
+                loading: false
+            });
         }
         if (!(supervisorUsersList && supervisorUsersList.length > 0)) {
             await this.getSupervisorUsersList();
@@ -210,6 +217,8 @@ export default class DegitalAccept extends Component {
                     <Sidebar>
                         <PkCodeTree
                             treeData={treeList}
+                            {...this.props}
+                            {...this.state}
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}
                         />
@@ -219,14 +228,9 @@ export default class DegitalAccept extends Component {
                             key={resetkey}
                             {...this.props}
                             {...this.state}
-                            sectionoption={sectionoption}
                             sectionSelect={this.sectionSelect.bind(this)}
-                            smallclassoption={smallclassoption}
                             smallClassSelect={this.smallClassSelect.bind(this)}
-                            thinclassoption={thinclassoption}
                             thinClassSelect={this.thinClassSelect.bind(this)}
-                            leftkeycode={leftkeycode}
-                            keycode={keycode}
                             resetinput={this.resetinput.bind(this)}
                         />
                     </Content>

@@ -36,7 +36,8 @@ class PlantStrengthAnalysi extends Component {
             tabPane: '1', // 该次标签
             sectionList: [], // 标段列表
             treeTypeList: [], // 树种类型
-            treeKindList: [] // 树种大类
+            treeKindList: [], // 树种大类
+            loading: false
         };
     }
 
@@ -58,11 +59,17 @@ class PlantStrengthAnalysi extends Component {
             this.setTreeTypeOption(treetypes);
         }
         if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
+            this.setState({
+                loading: true
+            });
             let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
             let totalThinClass = data.totalThinClass || [];
             let projectList = data.projectList || [];
             await getTotalThinClass(totalThinClass); // 获取所有的小班数据，用来计算养护任务的位置
             await getThinClassTree(projectList); // 区域地块树
+            this.setState({
+                loading: false
+            });
         }
         let defaultProject = await getDefaultProject();
         if (defaultProject) {
@@ -108,6 +115,8 @@ class PlantStrengthAnalysi extends Component {
                     <Sidebar>
                         <PkCodeTree
                             treeData={treeList}
+                            {...this.props}
+                            {...this.state}
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}
                         />

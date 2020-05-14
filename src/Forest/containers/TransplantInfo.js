@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Select } from 'antd';
 import * as actions from '../store';
-import { PkCodeTree } from '../components';
 import { TransplantInfoTable } from '../components/TransplantInfo';
 import { actions as platformActions } from '_platform/store/global';
 import {

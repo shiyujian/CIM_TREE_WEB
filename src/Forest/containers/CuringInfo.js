@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Select } from 'antd';
 import * as actions from '../store';
-import { PkCodeTree } from '../components';
 import { CuringTable } from '../components/CuringInfo';
 import { actions as platformActions } from '_platform/store/global';
 import {
@@ -106,27 +105,15 @@ export default class CuringInfo extends Component {
             <Body>
                 <Main>
                     <DynamicTitle title='养护信息' {...this.props} />
-                    {/* <Sidebar>
-                        <PkCodeTree
-                            treeData={treeList}
-                            selectedKeys={leftkeycode}
-                            onSelect={this.onSelect.bind(this)}
-                        />
-                    </Sidebar> */}
                     <Content>
                         <CuringTable
                             key={resetkey}
                             {...this.props}
-                            sectionoption={sectionoption}
+                            {...this.state}
                             sectionSelect={this.sectionSelect.bind(this)}
-                            smallclassoption={smallclassoption}
                             smallClassSelect={this.smallClassSelect.bind(this)}
-                            thinclassoption={thinclassoption}
                             thinClassSelect={this.thinClassSelect.bind(this)}
-                            leftkeycode={leftkeycode}
-                            keycode={keycode}
                             resetinput={this.resetinput.bind(this)}
-                            curingTypesOption={curingTypesOption}
                         />
                     </Content>
                 </Main>
