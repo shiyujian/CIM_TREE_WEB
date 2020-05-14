@@ -99,6 +99,17 @@ export default class VolunteerTreeTable extends Component {
                         </div>
                     );
                 }
+            },
+            {
+                title: '植树照片',
+                dataIndex: 'Photo',
+                render: (text, record) => {
+                    if (text) {
+                        return <a onClick={this.onImgClick.bind(this, text)}>查看</a>;
+                    } else {
+                        return '/';
+                    }
+                }
             }
         ];
     }
@@ -301,6 +312,30 @@ export default class VolunteerTreeTable extends Component {
                 percent: 100
             });
         }
+    }
+    onImgClick (data) {
+        let srcs = [];
+        try {
+            let arr = data.split(',');
+            arr.map(rst => {
+                let src = getForestImgUrl(rst);
+                srcs.push(src);
+            });
+        } catch (e) {
+            console.log('处理图片', e);
+        }
+
+        let imgArr = [];
+        srcs.map(src => {
+            imgArr.push(
+                <img style={{ width: '490px' }} src={src} alt='图片' />
+            );
+        });
+
+        this.setState({
+            imgvisible: true,
+            imgArr: imgArr
+        });
     }
     render () {
         const {
