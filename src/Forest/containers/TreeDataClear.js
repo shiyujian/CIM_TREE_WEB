@@ -64,6 +64,7 @@ export default class TreeDataClear extends Component {
                         <TreeDataClearTable
                             key={resetkey}
                             {...this.props}
+                            {...this.state}
                             resetinput={this.resetinput.bind(this)}
                         />
                     </Content>
