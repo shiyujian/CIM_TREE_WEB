@@ -173,6 +173,12 @@ export const ForestMenu = [
                 id: 'FOREST.SUPERVISORINFO',
                 path: '/forest/supervisorinfo',
                 name: '栽植抽查信息'
+            },
+            {
+                key: 'QualityDefects',
+                id: 'FOREST.QUALITYDEFECTS',
+                path: '/forest/qualitydefects',
+                name: '质量缺陷信息'
             }
             // {
             //     key: 'Checkerinfo',

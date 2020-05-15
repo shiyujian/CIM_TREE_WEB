@@ -1,0 +1,2 @@
+export QualityDefectsTable from './QualityDefectsTable'
+;

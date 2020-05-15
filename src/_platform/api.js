@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2020-05-14 09:58:21
+ * @Last Modified time: 2020-05-15 16:51:40
  */
 /**
  *
@@ -585,12 +585,8 @@ export const MODULES = [
                     //     name: '业主抽查信息'
                     // },
                     {
-                        id: 'FOREST.TRANSPLANTINFO',
-                        name: '移植信息'
-                    },
-                    {
-                        id: 'FOREST.VOLUNTEERTREE',
-                        name: '义务植树信息'
+                        id: 'FOREST.QUALITYDEFECTS',
+                        name: '质量缺陷信息'
                     }
                 ]
             },
@@ -609,6 +605,14 @@ export const MODULES = [
                     {
                         id: 'FOREST.DIETREES',
                         name: '苗木死亡信息'
+                    },
+                    {
+                        id: 'FOREST.TRANSPLANTINFO',
+                        name: '移植信息'
+                    },
+                    {
+                        id: 'FOREST.VOLUNTEERTREE',
+                        name: '义务植树信息'
                     }
                 ]
             },
