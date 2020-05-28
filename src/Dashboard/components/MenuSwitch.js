@@ -742,7 +742,10 @@ export default class MenuSwitch extends Component {
                                 autoComplete='off'
                                 onPressEnter={this.handleSearchTreeLocation.bind(this)}
                                 className='menuSwitch-searchInputLayout' />
-                            <img src={searchRightImg} className='menuSwitch-searchInputRightLayout' />
+                            <img
+                                onClick={this.handleSearchTreeLocation.bind(this)}
+                                src={searchRightImg}
+                                className='menuSwitch-searchInputRightLayout' />
                         </div> : ''
                 }
                 <div className='menuSwitch-menuSwitchRightLayout'>

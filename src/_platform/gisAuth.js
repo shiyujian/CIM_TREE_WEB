@@ -345,3 +345,56 @@ export const handleAreaLayerData = async (eventKey, getTreearea) => {
         console.log('handleAreaLayerData', e);
     }
 };
+// 根据标段的No获取标段名称
+export const getSectionNameByBigTreeListSection = (section, bigTreeList) => {
+    try {
+        let sectionArr = section.split('-');
+        let sectionName = '';
+        if (sectionArr instanceof Array && sectionArr.length === 3) {
+            bigTreeList.map((projectData) => {
+                if (sectionArr[0] === projectData.No) {
+                    let sectionData = projectData.children;
+                    sectionData.map((child) => {
+                        if (section === child.No) {
+                            sectionName = child.Name;
+                        }
+                    });
+                }
+            });
+        }
+        return sectionName;
+    } catch (e) {
+        console.log('getSectionNameBySection', e);
+    }
+};
+// 根据标段的No获取项目名称
+export const getProjectNameByBigTreeListSection = (section, bigTreeList) => {
+    try {
+        let projectName = '';
+        let sectionArr = section.split('-');
+        if (sectionArr instanceof Array && sectionArr.length === 3) {
+            bigTreeList.map((projectData) => {
+                if (sectionArr[0] === projectData.No) {
+                    projectName = projectData.Name;
+                }
+            });
+        }
+        return projectName;
+    } catch (e) {
+        console.log('getProjectNameBySection', e);
+    }
+};
+// 根据项目的No获取项目名称
+export const getProjectNameByBigTreeListProject = (projectNo, bigTreeList) => {
+    try {
+        let projectName = '';
+        bigTreeList.map((projectData) => {
+            if (projectNo === projectData.No) {
+                projectName = projectData.Name;
+            }
+        });
+        return projectName;
+    } catch (e) {
+        console.log('getProjectNameBySection', e);
+    }
+};

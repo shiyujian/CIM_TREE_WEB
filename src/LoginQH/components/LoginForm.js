@@ -336,6 +336,7 @@ class LoginForm extends Component {
                                 ]
                             })(
                                 <Input
+                                    onPressEnter={this.handleSubmit.bind(this)}
                                     className='login-usernameInput'
                                     ref={(input) => { this.nameInput = input; }}
                                     id='username'
@@ -361,6 +362,7 @@ class LoginForm extends Component {
                             })(
                                 <div>
                                     <Input.Password
+                                        onPressEnter={this.handleSubmit.bind(this)}
                                         className='login-passwordInput'
                                         id='pwdInp'
                                         placeholder='请输入密码'
@@ -404,6 +406,7 @@ class LoginForm extends Component {
                         <a key='登录'
                             title='登录'
                             id='loginButton'
+                            htmlType='submit'
                             className='login-form-button'
                             onClick={this.handleSubmit.bind(this)}
                         >

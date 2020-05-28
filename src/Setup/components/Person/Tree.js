@@ -95,7 +95,6 @@ export default class Tree extends Component {
                 } else {
                     // 如果不在公司下，则至获取他所在的组织机构的数据
                     orgTreeData = await getChildOrgTreeByID({id: orgID});
-                    console.log('orgTreeData', orgTreeData);
                     if (orgTreeData && orgTreeData.ID) {
                         orgTreeData.children = [];
                         orgTreeArrList.push(orgTreeData);
@@ -108,9 +107,7 @@ export default class Tree extends Component {
             }
             // 如果是管理员，获取全部数据
             if (permission) {
-                console.log('aaaaaaa');
                 let rst = await getOrgTree({});
-                console.log('rst', rst);
                 // 对苗圃基地和供应商按照区号进行省份和地区的划分
                 if (rst && rst instanceof Array) {
                     orgTreeArrList = rst;
@@ -131,8 +128,6 @@ export default class Tree extends Component {
                             item.Orgs = await addGroup(item.Orgs, '苗圃基地');
                         }
                     });
-                    console.log('orgTreeArrList', orgTreeArrList);
-
                     this.setState({
                         orgTreeArrList
                     });

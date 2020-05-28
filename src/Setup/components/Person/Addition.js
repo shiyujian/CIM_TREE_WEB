@@ -26,6 +26,8 @@ const RealName = (addition) => {
             if (rst.status === '01') {
                 message.success('实名认证通过');
                 resolve();
+            } else if (rst.msg) {
+                message.warning(rst.msg);
             } else {
                 message.warning('实名认证失败，请确认信息是否正确');
             }
@@ -250,7 +252,6 @@ class Addition extends Component {
             // 密码正则
             let reg = /^(?![\d]+$)(?![a-zA-Z]+$)(?![^\da-zA-Z]+$).{6,16}$/;
             // let reg = /^[a-zA-Z0-9_]{6,16}$/;
-            console.log('reg.test(value)', reg.test(value));
             // isNaN(value);
             if (reg.test(value)) {
                 if (value) {
@@ -269,7 +270,6 @@ class Addition extends Component {
         if (value) {
             // 手机号正则
             let reg = /^[a-zA-Z0-9]{4,16}$/;
-            console.log('reg.test(value)', reg.test(value));
             // isNaN(value);
             if (reg.test(value)) {
                 if (value) {
@@ -302,8 +302,6 @@ class Addition extends Component {
         if (value) {
             // 手机号正则
             let reg = /^[1]([3-9])[0-9]{9}$/;
-            console.log('reg.test(value)', reg.test(value));
-            // isNaN(value);
             if (!isNaN(value) && reg.test(value)) {
                 if (value > 0) {
                     callback();
@@ -354,7 +352,6 @@ class Addition extends Component {
             }
         } = this.props;
         this.props.form.validateFields(async (err, values) => {
-            console.log('values', values);
             if (!err) {
                 if (!/^[\w@\.\+\-_]+$/.test(values.UserName)) {
                     message.warn('请输入英文字符、数字');
@@ -394,7 +391,6 @@ class Addition extends Component {
                 // 先进行实名认证再注册用户
                 await RealName(values);
                 let userData = await postForestUser({}, postUserPostData);
-                console.log('userData', userData);
                 if (userData && userData.code === 1) {
                     const msgs = JSON.parse(userData.msg);
                     if (msgs && msgs.status && msgs.status === 400 && msgs.error &&

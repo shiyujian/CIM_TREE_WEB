@@ -18,7 +18,10 @@ import Addition from './Addition';
 import Edit from './Edit';
 import CheckUserModal from './CheckUserModal';
 import QRCodeRegisterModal from './QRCodeRegisterModal';
-import {getSectionNameBySection} from '_platform/gisAuth';
+import {
+    getSectionNameByBigTreeListSection,
+    getProjectNameByBigTreeListSection
+} from '_platform/gisAuth';
 import { getUser } from '_platform/auth';
 import './index.less';
 const { Option, OptGroup } = Select;
@@ -55,7 +58,6 @@ class Users extends Component {
     columns = [
         {
             title: '序号',
-            key: '0',
             dataIndex: 'index',
             render: (text, record, index) => {
                 return index + 1;
@@ -63,17 +65,14 @@ class Users extends Component {
         },
         {
             title: '姓名',
-            key: '1',
             dataIndex: 'Full_Name'
         },
         {
             title: '用户名',
-            key: '2',
             dataIndex: 'User_Name'
         },
         {
             title: '性别',
-            key: '3',
             dataIndex: 'Sex',
             render: (text, record) => {
                 return record.Sex ? '女' : '男';
@@ -82,7 +81,6 @@ class Users extends Component {
         {
             title: '角色',
             width: '15%',
-            key: '4',
             render: (text, record) => {
                 if (record.Roles && record.Roles instanceof Array && record.Roles.length > 0) {
                     return record.Roles[0].RoleName;
@@ -93,17 +91,14 @@ class Users extends Component {
         },
         {
             title: '职务',
-            key: '5',
             dataIndex: 'Duty'
         },
         {
             title: '手机号码',
-            key: '6',
             dataIndex: 'Phone'
         },
         {
             title: '所属部门',
-            key: '7',
             dataIndex: 'OrgObj',
             render: (text, record) => {
                 if (record.OrgObj && record.OrgObj.OrgName) {
@@ -112,8 +107,7 @@ class Users extends Component {
             }
         },
         {
-            title: '标段',
-            key: '8',
+            title: '项目',
             render: (text, record) => {
                 const {
                     platform: { tree = {} },
@@ -126,7 +120,29 @@ class Users extends Component {
                 } else {
                     let bigTreeList = tree.bigTreeList;
                     if (record && record.Section) {
-                        let name = getSectionNameBySection(record.Section, bigTreeList);
+                        let name = getProjectNameByBigTreeListSection(record.Section, bigTreeList);
+                        return name;
+                    } else {
+                        return '/';
+                    }
+                }
+            }
+        },
+        {
+            title: '标段',
+            render: (text, record) => {
+                const {
+                    platform: { tree = {} },
+                    sidebar: {
+                        node = {}
+                    } = {}
+                } = this.props;
+                if (node.NurseryName) {
+                    return '/';
+                } else {
+                    let bigTreeList = tree.bigTreeList;
+                    if (record && record.Section) {
+                        let name = getSectionNameByBigTreeListSection(record.Section, bigTreeList);
                         return name;
                     } else {
                         return '/';
@@ -136,7 +152,6 @@ class Users extends Component {
         },
         {
             title: '状态',
-            key: '9',
             dataIndex: 'Status',
             render: (text, record) => {
                 if (record.Status) {
@@ -148,7 +163,6 @@ class Users extends Component {
         },
         {
             title: '操作',
-            key: '10',
             render: (text, record) => {
                 const user = getUser();
                 let userRoles = user.roles || '';
@@ -163,7 +177,7 @@ class Users extends Component {
                 if (user && user.username && user.username === 'admin') {
                     if (!record.Status) {
                         arr.push(<a
-                            key={4}
+                            key={'审核'}
                             style={{marginRight: '.5em'}}
                             onClick={this.toAudit.bind(this, record)}
                         >
@@ -173,7 +187,7 @@ class Users extends Component {
                         arr = [];
                     } else if (record.IsForbidden) {
                         arr.push(<a
-                            key={3}
+                            key={'启用'}
                             style={{ marginRight: '.5em', color: 'red' }}
                             onClick={this.handleUserDisabled.bind(this, record)}
                         >
@@ -181,7 +195,7 @@ class Users extends Component {
                         </a>);
                     } else if (!record.IsForbidden) {
                         arr.push(<a
-                            key={3}
+                            key={'禁用'}
                             style={{marginRight: '.5em'}}
                             onClick={this.handleUserDisabled.bind(this, record)}
                         >
@@ -190,7 +204,7 @@ class Users extends Component {
                         arr.push(
                             <a
                                 onClick={this.edit.bind(this, record)}
-                                key={1}
+                                key={'编辑'}
                                 style={{ marginRight: '.5em' }}
                             >
                                 编辑
@@ -200,7 +214,7 @@ class Users extends Component {
                     arr.push(
                         <Popconfirm
                             title='是否要删除用户?'
-                            key={2}
+                            key={'删除'}
                             onConfirm={this.del.bind(this, record)}
                             okText='是'
                             cancelText='否'
@@ -211,7 +225,7 @@ class Users extends Component {
                 } else if (userIsProjectDocument) {
                     if (!record.Status) {
                         arr.push(<a
-                            key={4}
+                            key={'审核'}
                             style={{marginRight: '.5em'}}
                             onClick={this.toAudit.bind(this, record)}
                         >
@@ -221,7 +235,7 @@ class Users extends Component {
                         arr = [];
                     } else if (record.IsForbidden) {
                         arr.push(<a
-                            key={3}
+                            key={'启用'}
                             style={{ marginRight: '.5em', color: 'red' }}
                             onClick={this.handleUserDisabled.bind(this, record)}
                         >
@@ -229,7 +243,7 @@ class Users extends Component {
                         </a>);
                     } else if (!record.IsForbidden) {
                         arr.push(<a
-                            key={3}
+                            key={'禁用'}
                             style={{marginRight: '.5em'}}
                             onClick={this.handleUserDisabled.bind(this, record)}
                         >
@@ -238,7 +252,7 @@ class Users extends Component {
                         arr.push(
                             <a
                                 onClick={this.edit.bind(this, record)}
-                                key={1}
+                                key={'编辑'}
                                 style={{ marginRight: '.5em' }}
                             >
                                 编辑
@@ -302,7 +316,6 @@ class Users extends Component {
                 parentRoleType.push(role);
             }
         });
-        console.log('parentRoleType', parentRoleType);
         parentRoleType.map((type) => {
             systemRoles.push({
                 name: type && type.RoleName,
@@ -370,7 +383,6 @@ class Users extends Component {
         if (node && node.OrgName) {
             let orgName = node.OrgName;
             let QRCodeRegisterValue = orgType + '^' + orgName + '^' + orgID + '^' + 'QRRegister^forest';
-            console.log('QRCodeRegisterValue', QRCodeRegisterValue);
             this.setState({
                 QRCodeRegisterVisible: true,
                 QRCodeRegisterValue
@@ -401,8 +413,6 @@ class Users extends Component {
         const {
             selectedRowKeys = []
         } = this.state;
-        console.log('node', node);
-
         let QRCodeRegisterDisabled = true;
         if (node && node.OrgType && node.OrgType.indexOf('单位') !== -1) {
             QRCodeRegisterDisabled = false;
@@ -747,7 +757,6 @@ class Users extends Component {
                     return;
                 }
             }
-            console.log('postData', postData);
             this.setState({ loading: true });
             let data = await getUsers({}, postData);
             if (data && data.code && data.code === 200) {
@@ -844,13 +853,10 @@ class Users extends Component {
         const {
             sidebar: { node } = {}
         } = this.props;
-        console.log('node', node);
-        console.log('record', record);
 
         if (node && node.Section) {
             if (record && record.Section) {
                 if (record.Section.indexOf(',') !== -1 || record.Section.indexOf('，') !== -1) {
-                    console.log('aaaaaaaa');
                     Notification.info({
                         message: '请编辑人员，选择标段'
                     });
@@ -961,7 +967,6 @@ class Users extends Component {
             this.setState({ loading: true });
             let isActive = true;
             let changeName = '';
-            console.log('user', user);
             if (user.IsForbidden === 1) {
                 isActive = true;
                 changeName = '启用';

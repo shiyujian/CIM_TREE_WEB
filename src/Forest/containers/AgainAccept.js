@@ -229,8 +229,10 @@ export default class AgainAccept extends Component {
             let roleID = '';
             if (roles && roles instanceof Array && roles.length > 0) {
                 roles.map((role) => {
-                    if (role && role.RoleName && role.RoleName === '监理文书') {
-                        roleID = role.ID;
+                    if (role && role.ID && role.ParentID === 0) {
+                        if (role.RoleName.indexOf('监理') !== -1) {
+                            roleID = role.ID;
+                        }
                     }
                 });
                 let postData = {
