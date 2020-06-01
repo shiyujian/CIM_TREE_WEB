@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 import { TREETYPENO, NURSERYPARAM, TREEPARAM } from '_platform/api';
 import { getForestImgUrl } from '_platform/auth';
 import {
@@ -61,7 +62,8 @@ class AddThinClassModal extends Component {
             packageDatas,
             sectionsData,
             actions: {
-                postAddWpunits
+                postAddWpunits,
+                setConstructionPackageAddStatus
             }
         } = this.props;
         const {
@@ -102,7 +104,7 @@ class AddThinClassModal extends Component {
 
         if (!firstSmallClassNum) {
             Notification.warning({
-                message: '请输入小班编号'
+                message: '请输入区段编号'
             });
             return;
         }
@@ -111,7 +113,7 @@ class AddThinClassModal extends Component {
         if (addThinClassType === 'one') {
             if (!firstThinClassNum) {
                 Notification.warning({
-                    message: '请输入细班编号'
+                    message: '请输入组团编号'
                 });
                 return;
             };
@@ -124,10 +126,10 @@ class AddThinClassModal extends Component {
                     UnitProject: sectionName, // 标段
                     UnitProjectNo: sectionNoArr[2], // 标段编码
                     UnitProjectName: sectionName, // 标段名称
-                    SmallClass: this.changeNumToString(firstSmallClassNum), // 小班
-                    ThinClass: this.changeNumToString(firstThinClassNum), // 细班
-                    SmallClassName: this.changeNumToString(firstSmallClassNum) + '号小班', // 小班名称
-                    ThinClassName: this.changeNumToString(firstThinClassNum) + '号细班', // 细班名称
+                    SmallClass: this.changeNumToString(firstSmallClassNum), // 区段
+                    ThinClass: this.changeNumToString(firstThinClassNum), // 组团
+                    SmallClassName: this.changeNumToString(firstSmallClassNum) + '号区段', // 区段名称
+                    ThinClassName: this.changeNumToString(firstThinClassNum) + '号组团', // 组团名称
                     TreeTypeName: '' // 树种名称
                 }
             ];
@@ -138,7 +140,7 @@ class AddThinClassModal extends Component {
                 Notification.success({
                     message: '新增成功'
                 });
-                await this.props.handleAddThinClassCancel();
+                await this.props.handleAddThinClassOK();
             } else {
                 Notification.error({
                     message: '新增失败'
@@ -147,7 +149,7 @@ class AddThinClassModal extends Component {
         } else if (addThinClassType === 'multiple') {
             if (!firstThinClassNum || !secondThinClassNum) {
                 Notification.warning({
-                    message: '请输入细班编号'
+                    message: '请输入组团编号'
                 });
                 return;
             };
@@ -161,10 +163,10 @@ class AddThinClassModal extends Component {
                     UnitProject: sectionName, // 标段
                     UnitProjectNo: sectionNoArr[2], // 标段编码
                     UnitProjectName: sectionName, // 标段名称
-                    SmallClass: this.changeNumToString(firstSmallClassNum), // 小班
-                    ThinClass: this.changeNumToString(i), // 细班
-                    SmallClassName: this.changeNumToString(firstSmallClassNum) + '号小班', // 小班名称
-                    ThinClassName: this.changeNumToString(i) + '号细班', // 细班名称
+                    SmallClass: this.changeNumToString(firstSmallClassNum), // 区段
+                    ThinClass: this.changeNumToString(i), // 组团
+                    SmallClassName: this.changeNumToString(firstSmallClassNum) + '号区段', // 区段名称
+                    ThinClassName: this.changeNumToString(i) + '号组团', // 组团名称
                     TreeTypeName: '' // 树种名称
                 });
             }
@@ -175,7 +177,7 @@ class AddThinClassModal extends Component {
                 Notification.success({
                     message: '新增成功'
                 });
-                await this.props.handleAddThinClassCancel();
+                await this.props.handleAddThinClassOK();
             } else {
                 Notification.error({
                     message: '新增失败'
@@ -213,7 +215,7 @@ class AddThinClassModal extends Component {
         return (
             <div>
                 <Modal
-                    title='新增细班'
+                    title='新增组团'
                     width={600}
                     visible
                     maskClosable={false}
@@ -233,8 +235,8 @@ class AddThinClassModal extends Component {
                                                 <RadioGroup
                                                     value={addThinClassType}
                                                     onChange={this.changeAddThinClassType.bind(this)} >
-                                                    <Radio value={'multiple'} key={'multiple'}>新增多个细班</Radio>
-                                                    <Radio value={'one'} key={'one'}>新增一个细班</Radio>
+                                                    <Radio value={'multiple'} key={'multiple'}>新增多个组团</Radio>
+                                                    <Radio value={'one'} key={'one'}>新增一个组团</Radio>
                                                 </RadioGroup>
                                             </Col>
                                             <Col span={6} />
@@ -243,7 +245,7 @@ class AddThinClassModal extends Component {
                                     <Col span={24} style={{marginTop: 20}}>
                                         <Row>
                                             <Col span={6}>
-                                                <span>小班编码</span>
+                                                <span>区段编码</span>
                                             </Col>
                                             <Col span={7}>
                                                 <InputNumber
