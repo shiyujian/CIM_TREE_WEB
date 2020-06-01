@@ -334,16 +334,26 @@ class ModalSee extends Component {
                                     <FormItem
                                         label='会议二维码'
                                     >
-                                        <a>
-                                            <img
-                                                onClick={this.handleImgView.bind(this, QRCode)}
-                                                src={QRCode}
-                                                alt='二维码加载失败'
-                                                style={{width: 80, height: 80}}
-                                            />
-                                        </a>
+                                        <div>
+                                            <a>
+                                                <img
+                                                    onClick={this.handleImgView.bind(this, QRCode)}
+                                                    src={QRCode}
+                                                    alt='二维码加载失败'
+                                                    style={{width: 80, height: 80}}
+                                                />
+                                            </a>
+                                            <div>
+                                                <span style={{
+                                                    color: '#17bfb1',
+                                                    fontSize: 16
+                                                }}>
+                                                    ↑请点击二维码查看大图
+                                                </span>
+                                            </div>
+                                        </div>
                                     </FormItem>
-                                    <FormItem
+                                    {/* <FormItem
                                         label='小程序'
                                     >
                                         <a>
@@ -354,7 +364,7 @@ class ModalSee extends Component {
                                                 style={{width: 80, height: 80}}
                                             />
                                         </a>
-                                    </FormItem>
+                                    </FormItem> */}
                                     <FormItem
                                         label='会议名称'
                                     >
