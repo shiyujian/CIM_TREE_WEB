@@ -565,6 +565,9 @@ export default class TreePipePage extends Component {
         const {
             actions: {
                 getQueryTreePipe
+            },
+            platform: {
+                tree
             }
         } = this.props;
         const {
@@ -578,6 +581,18 @@ export default class TreePipePage extends Component {
             let contents = [];
             let sqlData = '';
             let layers = '';
+            let sectionData = '';
+            let bigTreeList = (tree && tree.bigTreeList) || [];
+            bigTreeList.map((project, index) => {
+                let orderData = `( Section like '${project.No}%' )`;
+                if (index === 0) {
+                    sectionData = `( ${orderData}`;
+                } else if (index === bigTreeList.length - 1) {
+                    sectionData = `${sectionData} or ${orderData} )`;
+                } else {
+                    sectionData = `${sectionData} or ${orderData}`;
+                }
+            });
             if (treePipe) {
                 layers = 'pipe';
                 if (treePipeCaliberData) {
@@ -586,10 +601,16 @@ export default class TreePipePage extends Component {
                 if (treePipeMaterialData) {
                     sqlData += `and ${treePipeMaterialData}`;
                 }
+                if (sectionData) {
+                    sqlData += `and ${sectionData}`;
+                }
             } else if (treePipeNode) {
                 layers = 'pipenode';
                 if (treePipeNodeTypeData) {
                     sqlData += `and ${treePipeNodeTypeData}`;
+                }
+                if (sectionData) {
+                    sqlData += `and ${sectionData}`;
                 }
             }
             if (sqlData) {
