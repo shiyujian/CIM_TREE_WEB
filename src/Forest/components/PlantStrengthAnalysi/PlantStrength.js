@@ -497,12 +497,12 @@ class PlantStrength extends Component {
             spinningTree: true
         });
         let smallNo = '', thinNo = '';
-        if (smallClassNoTree) {
-            let arr = smallClassNoTree.split('-');
-            smallNo = arr[0] + '-' + arr[1] + '-' + arr[3];
-        } else if (thinClassNoTree) {
+        if (thinClassNoTree) {
             let arr = thinClassNoTree.split('-');
             thinNo = arr[0] + '-' + arr[1] + '-' + arr[3] + '-' + arr[4];
+        } else if (smallClassNoTree) {
+            let arr = smallClassNoTree.split('-');
+            smallNo = arr[0] + '-' + arr[1] + '-' + arr[3];
         }
         getStatByTreetype({}, {
             no: thinNo || smallNo || this.leftkeycode,
