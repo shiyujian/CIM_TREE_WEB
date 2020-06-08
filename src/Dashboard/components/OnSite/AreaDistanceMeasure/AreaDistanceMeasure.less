@@ -5,7 +5,7 @@
     position: absolute;
     right: 120px;
     top: 184px;
-    height: 128px;
+    height: 192px;
     width: 64px;
     transition: all 0.3s;
     z-index: 980;
@@ -72,6 +72,40 @@
     width:400px;
     height:60px;
 
+    .AreaDistanceMeasure-measureNumText {
+        background-image: url("./MeasureImg/pop-ups.png");
+        width: 100%;
+        height: 100%;
+        font-size:16px;
+        font-family:Source Han Sans CN;
+        font-weight:500;
+        color:rgba(255,255,255,1);
+        line-height:60px;
+        display: block;
+        text-align: center;
+        opacity:0.8;
+    }
+}
+.DataDistanceMeasure-measureNumLayout {
+    position: absolute;
+    z-index: 960;
+    top: 45px;
+    left: 120px;
+    width: 620px;
+    height: 60px;
+    .DataDistanceMeasure-btnLayout {
+        display: flex;
+        justify-content: space-between;
+        width: 220px;
+        overflow: hidden;
+        float: left;
+    }
+    .DataDistanceMeasure-spanLayout{
+        width: 380px;
+        height: 60px;
+        float: left;
+        margin-left: 20px;
+    }
     .AreaDistanceMeasure-measureNumText {
         background-image: url("./MeasureImg/pop-ups.png");
         width: 100%;
