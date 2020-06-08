@@ -17,6 +17,7 @@ import {
     getIconType,
     getTaskThinClassName,
     getThinClassName,
+    getThinClassNameByThinClassNo,
     getTaskStatus,
     getCuringTaskCreateTreeData,
     handleAreaLayerData,
@@ -50,6 +51,7 @@ export default class TaskCreateTable extends Component {
             curingLayerChecked: true,
             // 细班树
             areaTreeLoading: false,
+            areaTreeCheckedKeys: [],
             // 养护任务树
             taskTreeData: [], // 养护任务tree数据
             curingTypes: [],
@@ -412,7 +414,8 @@ export default class TaskCreateTable extends Component {
         } = this.props;
         const {
             coordinates,
-            treeCoords
+            treeCoords,
+            areaTreeCheckedKeys
         } = this.state;
 
         // 首先查看有没有关联标段，没有关联的人无法获取人员
@@ -442,7 +445,6 @@ export default class TaskCreateTable extends Component {
                     });
                 }
             });
-            console.log('thinClassCoords', thinClassCoords);
 
             if (thinClassCoords.length === 1) {
                 coords = thinClassCoords[0];
@@ -486,9 +488,15 @@ export default class TaskCreateTable extends Component {
                 wkt = wkt + ')';
             }
             regionArea = regionArea * 0.0015;
-            // 包括的细班号
-            let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
-            let regionData = getThinClassName(regionThinClass, totalThinClass, this.section, bigTreeList);
+            let regionData = '';
+            if (selectMap === '细班选择') {
+                regionData = getThinClassNameByThinClassNo(checkedKeys, totalThinClass, bigTreeList);
+            } else if (selectMap === '手动框选') {
+                // 包括的细班号
+                let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
+                regionData = getThinClassName(regionThinClass, totalThinClass, this.section, bigTreeList);
+            }
+
             // let sectionBool = regionData.sectionBool;
             // if (!sectionBool) {
             //     Notification.error({
@@ -503,11 +511,11 @@ export default class TaskCreateTable extends Component {
             //     return;
             // }
             console.log('regionData', regionData);
-            let regionThinName = regionData.regionThinName;
-            let regionThinNo = regionData.regionThinNo;
-            let regionSectionNo = regionData.regionSectionNo;
-            let regionSectionName = regionData.regionSectionName;
-            let regionSmallThinClassName = regionData.regionSmallThinClassName;
+            let regionThinName = (regionData && regionData.regionThinName) || '';
+            let regionThinNo = (regionData && regionData.regionThinNo) || '';
+            let regionSectionNo = (regionData && regionData.regionSectionNo) || '';
+            let regionSectionName = (regionData && regionData.regionSectionName) || '';
+            let regionSmallThinClassName = (regionData && regionData.regionSmallThinClassName) || '';
             // 区域内树木数量
             // let treeNum = await postTreeLocationNumByRegion({}, {WKT: wkt});
             this.setState({
@@ -520,7 +528,11 @@ export default class TaskCreateTable extends Component {
                 regionThinNo,
                 regionSectionNo,
                 regionSectionName,
-                noLoading: true
+                noLoading: false
+            }, () => {
+                this.setState({
+                    noLoading: true
+                });
             });
         } catch (e) {
             console.log('树木数量', e);
@@ -629,6 +641,9 @@ export default class TaskCreateTable extends Component {
                     createBtnVisible: false
                 });
             }
+            this.setState({
+                areaTreeCheckedKeys: keys
+            });
 
             // 选中节点对key进行处理
             let handleKey = eventKey.split('-');

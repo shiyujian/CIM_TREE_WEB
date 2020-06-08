@@ -7,7 +7,7 @@ import {getUser} from '_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
-
+const { TextArea } = Input;
 class TaskCreateModal extends Component {
     constructor (props) {
         super(props);
@@ -57,10 +57,13 @@ class TaskCreateModal extends Component {
             noLoading
         } = this.props;
         if (noLoading && noLoading !== prevProps.noLoading) {
-            this.setState({
-                loading: false
-            });
+            this.handleCancelLoading();
         }
+    }
+    handleCancelLoading () {
+        this.setState({
+            loading: false
+        });
     }
 
     render () {
@@ -170,7 +173,7 @@ class TaskCreateModal extends Component {
                                         { required: true, message: '请输入标段名称' }
                                     ]
                                 })(
-                                    <Input readOnly />
+                                    <TextArea readOnly />
                                 )}
                             </FormItem>
                         </Row>
@@ -182,7 +185,7 @@ class TaskCreateModal extends Component {
                                         { required: true, message: '请输入细班名称' }
                                     ]
                                 })(
-                                    <Input readOnly />
+                                    <TextArea rows={4} readOnly />
                                 )}
                             </FormItem>
                         </Row>
