@@ -49,7 +49,6 @@ export default class ConstructionPackage extends Component {
             leftkeycode: '',
             resetkey: 0,
             sectionsData: [],
-            smallCalssPackageList: [],
             packageDatas: []
         };
     }
@@ -67,7 +66,7 @@ export default class ConstructionPackage extends Component {
             let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
             let totalThinClass = data.totalThinClass || [];
             let projectList = data.projectList || [];
-            // 获取所有的小班数据，用来计算养护任务的位置
+            // 获取所有的区段数据，用来计算养护任务的位置
             await getTotalThinClass(totalThinClass);
             // 区域地块树
             await getThinClassTree(projectList);
@@ -110,7 +109,7 @@ export default class ConstructionPackage extends Component {
             packageDatas: projectList
         });
     }
-    // 树选择, 重新获取: 标段、小班、细班、树种并置空
+    // 树选择, 重新获取: 标段、区段、组团、树种并置空
     onSelect (keys = [], info) {
         const {
             platform: { tree = {} }
@@ -174,82 +173,6 @@ export default class ConstructionPackage extends Component {
             console.log('e', e);
         }
     }
-    sectionSelect = async (value) => {
-        const {
-            actions: {
-                getThinClassList,
-                setConstructionPackageLoading
-            }
-        } = this.props;
-        await setConstructionPackageLoading(true);
-        let smallCalssPackageList = await getConstructionPackageBySection(value, getThinClassList);
-        console.log('smallCalssPackageList', smallCalssPackageList);
-
-        this.setSmallClassOption(smallCalssPackageList);
-        this.setState({
-            smallCalssPackageList
-        });
-        await setConstructionPackageLoading(false);
-    }
-    // 设置小班选项
-    setSmallClassOption (rst) {
-        if (rst instanceof Array) {
-            let smallclassOptions = [];
-            rst.map(small => {
-                smallclassOptions.push(
-                    <Option key={small.No} value={small.No} title={small.Name}>
-                        {small.Name}
-                    </Option>
-                );
-            });
-            smallclassOptions.unshift(
-                <Option key={-1} value={''} title={'全部'}>
-                        全部
-                </Option>
-            );
-            this.setState({
-                smallclassoption: smallclassOptions
-            });
-        }
-    }
-    // 小班选择, 重新获取: 细班
-    smallClassSelect (value) {
-        const {
-            smallCalssPackageList
-        } = this.state;
-        smallCalssPackageList.map((smallClassData) => {
-            if (value === smallClassData.No) {
-                let thinClassesData = smallClassData.children;
-                this.setState({
-                    thinClassesData
-                });
-                this.setThinClassOption(thinClassesData);
-            }
-        });
-    }
-    // 设置细班选项
-    setThinClassOption (rst) {
-        if (rst instanceof Array) {
-            let thinclassOptions = [];
-            rst.map(thin => {
-                thinclassOptions.push(
-                    <Option key={thin.No} value={thin.No} title={thin.Name}>
-                        {thin.Name}
-                    </Option>
-                );
-            });
-            thinclassOptions.unshift(
-                <Option key={-1} value={''} title={'全部'}>
-                            全部
-                </Option>
-            );
-            this.setState({ thinclassoption: thinclassOptions });
-        }
-    }
-
-    // 细班选择, 重新获取: 树种
-    thinClassSelect (value) {
-    }
     // 重置
     resetinput (leftkeycode) {
         this.setState({
@@ -287,9 +210,6 @@ export default class ConstructionPackage extends Component {
                             {...this.props}
                             {...this.state}
                             resetinput={this.resetinput.bind(this)}
-                            sectionSelect={this.sectionSelect.bind(this)}
-                            smallClassSelect={this.smallClassSelect.bind(this)}
-                            thinClassSelect={this.thinClassSelect.bind(this)}
                         />
                     </Content>
                 </Main>

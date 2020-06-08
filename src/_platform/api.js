@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2020-05-08 16:38:56
+ * @Last Modified time: 2020-05-15 16:51:40
  */
 /**
  *
@@ -102,7 +102,7 @@ export const DB_API = `${DOMAIN}/db`;
 // 二维码分发
 export const QRCODE_API = `${DOMAIN}/qrcode`;
 // 会议服务
-export const MEETING_API = `${SDOMAIN}/meeting`;
+export const MEETING_API = `${DOMAIN}/meeting`;
 // 文件导出服务
 export const DOCEXPORT_API = `${DOMAIN}/DocExport.ashx`;
 // 验证码服务
@@ -479,15 +479,22 @@ export const MODULES = [
                     {
                         id: 'OVERALL.STANDARD',
                         name: '制度标准'
-                    }, {
+                    },
+                    {
                         id: 'OVERALL.ENGINEERING',
                         name: '工程文档'
-                    }, {
+                    },
+                    {
                         id: 'OVERALL.REDIOS',
                         name: '会议记录'
-                    }, {
+                    },
+                    {
                         id: 'OVERALL.INTERIM',
                         name: '过程资料'
+                    },
+                    {
+                        id: 'OVERALL.TRAININGDOCUMENTS',
+                        name: '培训文档'
                     }
                 ]
             }
@@ -578,12 +585,8 @@ export const MODULES = [
                     //     name: '业主抽查信息'
                     // },
                     {
-                        id: 'FOREST.TRANSPLANTINFO',
-                        name: '移植信息'
-                    },
-                    {
-                        id: 'FOREST.VOLUNTEERTREE',
-                        name: '义务植树信息'
+                        id: 'FOREST.QUALITYDEFECTS',
+                        name: '质量缺陷信息'
                     }
                 ]
             },
@@ -602,6 +605,14 @@ export const MODULES = [
                     {
                         id: 'FOREST.DIETREES',
                         name: '苗木死亡信息'
+                    },
+                    {
+                        id: 'FOREST.TRANSPLANTINFO',
+                        name: '移植信息'
+                    },
+                    {
+                        id: 'FOREST.VOLUNTEERTREE',
+                        name: '义务植树信息'
                     }
                 ]
             },

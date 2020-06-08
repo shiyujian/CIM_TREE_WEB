@@ -9,6 +9,7 @@ import standardReducer, {actions as standardActions} from './Datum/standard';
 import engineeringReducer, {actions as engineeringActions} from './Datum/engineering';
 import rediosReducer, {actions as rediosActions} from './Datum/redios';
 import interimReducer, {actions as interimActions} from './Datum/interim';
+import trainingDocumentsReducer, {actions as trainingDocumentsActions} from './Datum/trainingDocuments';
 
 export default handleActions({
     [combineActions(...actionsMap(newsActions))]: (state, action) => {
@@ -37,6 +38,10 @@ export default handleActions({
     [combineActions(...actionsMap(interimActions))]: (state = {}, action) => ({
         ...state,
         interim: interimReducer(state.interim, action)
+    }),
+    [combineActions(...actionsMap(trainingDocumentsActions))]: (state = {}, action) => ({
+        ...state,
+        trainingDocuments: trainingDocumentsReducer(state.trainingDocuments, action)
     })
 
 }, {});

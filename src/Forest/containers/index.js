@@ -24,3 +24,4 @@ export CompletionPlan from './CompletionPlan';
 export TransplantInfo from './TransplantInfo';
 export FactsSurvey from './FactsSurvey';
 export VolunteerTree from './VolunteerTree';
+export QualityDefects from './QualityDefects';

@@ -28,6 +28,8 @@ const RealName = (value) => {
             if (rst.status === '01') {
                 message.success('实名认证通过');
                 resolve();
+            } else if (rst.msg) {
+                message.warning(rst.msg);
             } else {
                 message.warning('实名认证失败，请确认信息是否正确');
             }
@@ -476,7 +478,6 @@ class Edit extends Component {
             blackRemarkValue
         } = this.state;
         const user = getUser();
-        console.log('companyOrgTree', companyOrgTree);
         // 用户是否为文书
         let userIsDocument = getUserIsDocument();
         // let userIsDocument = true;

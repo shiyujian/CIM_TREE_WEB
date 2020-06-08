@@ -47,7 +47,8 @@ export default class Nursmeasureinfo extends Component {
             leftkeycode: '',
             resetkey: 0,
             bigType: '',
-            sectionsData: []
+            sectionsData: [],
+            loading: false
         };
     }
     getbigTypeName (type) {
@@ -93,6 +94,9 @@ export default class Nursmeasureinfo extends Component {
             getTreeList().then(x => this.setTreeTypeOption(x));
         }
         if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
+            this.setState({
+                loading: true
+            });
             let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
             let totalThinClass = data.totalThinClass || [];
             let projectList = data.projectList || [];
@@ -100,6 +104,9 @@ export default class Nursmeasureinfo extends Component {
             await getTotalThinClass(totalThinClass);
             // 区域地块树
             await getThinClassTree(projectList);
+            this.setState({
+                loading: false
+            });
         }
 
         if (!nurseryList) {
@@ -189,6 +196,8 @@ export default class Nursmeasureinfo extends Component {
                     <Sidebar>
                         <PkCodeTree
                             treeData={treeList}
+                            {...this.props}
+                            {...this.state}
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}
                         />
@@ -197,17 +206,9 @@ export default class Nursmeasureinfo extends Component {
                         <NursmeasureTable
                             key={resetkey}
                             {...this.props}
-                            sectionoption={sectionoption}
+                            {...this.state}
                             sectionSelect={this.sectionSelect.bind(this)}
-                            bigType={bigType}
-                            typeoption={typeoption}
-                            mmtypeoption={mmtypeoption}
                             typeselect={this.typeselect.bind(this)}
-                            treetypeoption={treetypeoption}
-                            treetypelist={treetypelist}
-                            leftkeycode={leftkeycode}
-                            statusoption={statusoption}
-                            keycode={keycode}
                             resetinput={this.resetinput.bind(this)}
                         />
                     </Content>

@@ -37,7 +37,8 @@ export default class SeedlingsChange extends Component {
         super(props);
         this.state = {
             leftkeycode: '',
-            resetkey: 0
+            resetkey: 0,
+            loading: false
         };
     }
     componentDidMount = async () => {
@@ -58,6 +59,9 @@ export default class SeedlingsChange extends Component {
             getTreeList();
         }
         if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
+            this.setState({
+                loading: true
+            });
             let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
             let totalThinClass = data.totalThinClass || [];
             let projectList = data.projectList || [];
@@ -65,6 +69,9 @@ export default class SeedlingsChange extends Component {
             await getTotalThinClass(totalThinClass);
             // 区域地块树
             await getThinClassTree(projectList);
+            this.setState({
+                loading: false
+            });
         }
     }
 
@@ -88,6 +95,8 @@ export default class SeedlingsChange extends Component {
                     <Sidebar>
                         <PkCodeTree
                             treeData={treeList}
+                            {...this.props}
+                            {...this.state}
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}
                         />
@@ -96,8 +105,7 @@ export default class SeedlingsChange extends Component {
                         <SeedlingsInfo
                             key={resetkey}
                             {...this.props}
-                            leftkeycode={leftkeycode}
-                            keycode={keycode}
+                            {...this.state}
                             resetinput={this.resetinput.bind(this)}
                         />
                     </Content>

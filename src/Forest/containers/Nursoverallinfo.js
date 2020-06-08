@@ -66,6 +66,7 @@ export default class Nursoverallinfo extends Component {
                         <NursOverallTable
                             key={resetkey}
                             {...this.props}
+                            {...this.state}
                             resetinput={this.resetinput.bind(this)}
                         />
                     </Content>

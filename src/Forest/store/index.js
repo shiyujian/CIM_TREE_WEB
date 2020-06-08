@@ -520,6 +520,13 @@ export const getInvestigationExportSHP = createFetchAction(`${TREEPIPE_API}/Data
  */
 // 查看义务植树信息
 export const getVolunteerTrees = forestFetchAction(`${TREE_API}/volunteertrees`, [], 'GET', []);
+/**
+ * 质量缺陷
+ */
+// 质量缺陷
+export const getQualityDefectsList = forestFetchAction(`${TREE_API}/patrolevents?eventtype=0`, []);
+export const getQualityDefectsType = forestFetchAction(`${SYSTEM_API}/bases?basetype=缺陷类型`, []);
+export const getQualityDefectsDetail = forestFetchAction(`${TREE_API}/patrolevent/{{id}}`, []);
 export const actions = {
     exportEcporttreestatuss,
     getTotalSat,
@@ -652,7 +659,10 @@ export const actions = {
     getInvestigationPolygons,
     getInvestigationExportDXF,
     getInvestigationExportSHP,
-    getVolunteerTrees
+    getVolunteerTrees,
+    getQualityDefectsList,
+    getQualityDefectsType,
+    getQualityDefectsDetail
 };
 export default handleActions({
     [getTreeOK]: (state, {

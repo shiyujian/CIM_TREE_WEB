@@ -34,7 +34,8 @@ export default class EnterStrengthAnalysi extends Component {
             treeList: [], // 树列表
             tabPane: '1', // 该次标签
             sectionList: [], // 标段列表
-            leftkeycode: '' // 项目code
+            leftkeycode: '', // 项目code
+            loading: false
         };
     }
 
@@ -46,7 +47,13 @@ export default class EnterStrengthAnalysi extends Component {
             platform: { tree = {} }
         } = this.props;
         if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
+            this.setState({
+                loading: true
+            });
             await getTreeNodeList();
+            this.setState({
+                loading: false
+            });
         }
         let defaultProject = await getDefaultProject();
         if (defaultProject) {
@@ -70,6 +77,8 @@ export default class EnterStrengthAnalysi extends Component {
                     <Sidebar>
                         <PkCodeTree
                             treeData={treeList}
+                            {...this.props}
+                            {...this.state}
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}
                         />

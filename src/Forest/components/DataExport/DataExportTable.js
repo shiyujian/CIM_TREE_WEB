@@ -491,7 +491,8 @@ export default class LocmeasureTable extends Component {
             if (!rst) return;
             let tblData = rst.content;
             if (tblData instanceof Array) {
-                tblData.forEach((plan, i) => {
+                for (let i = 0; i < tblData.length; i++) {
+                    let plan = tblData[i];
                     plan.order = (page - 1) * size + i + 1;
                     plan.SXM = plan.SXM;
                     plan.H = plan.H;
@@ -509,7 +510,8 @@ export default class LocmeasureTable extends Component {
                     plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
                     let noArr = plan.No.split('-');
                     plan.place = getSmallThinNameByPlaceData(plan.Section, noArr[2], noArr[3], thinClassTree);
-                });
+                }
+
                 const pagination = { ...this.state.pagination };
                 pagination.total = rst.pageinfo.total;
                 pagination.pageSize = size;

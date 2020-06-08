@@ -27,7 +27,8 @@ export default class Overall extends Component {
             Interim,
             DesignChangeManagement,
             NegotiationManagement,
-            VisaManagement
+            VisaManagement,
+            TrainingDocuments
         } = this.state || {};
         return (
             <Body>
@@ -71,6 +72,10 @@ export default class Overall extends Component {
                     {
                         VisaManagement &&
                         <Route path='/overall/visaManagement' component={VisaManagement} />
+                    }
+                    {
+                        TrainingDocuments &&
+                        <Route path='/overall/trainingdocuments' component={TrainingDocuments} />
                     }
                 </Switch>
             </Body>

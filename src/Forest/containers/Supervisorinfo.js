@@ -46,7 +46,8 @@ export default class Supervisorinfo extends Component {
             resetkey: 0,
             treetypeoption: [],
             sectionsData: [],
-            smallClassesData: []
+            smallClassesData: [],
+            loading: false
         };
     }
     componentDidMount = async () => {
@@ -68,6 +69,9 @@ export default class Supervisorinfo extends Component {
             getTreeList();
         }
         if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
+            this.setState({
+                loading: true
+            });
             let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
             let totalThinClass = data.totalThinClass || [];
             let projectList = data.projectList || [];
@@ -75,6 +79,9 @@ export default class Supervisorinfo extends Component {
             await getTotalThinClass(totalThinClass);
             // 区域地块树
             await getThinClassTree(projectList);
+            this.setState({
+                loading: false
+            });
         }
         // 类型
         let typeoption = [
@@ -154,6 +161,8 @@ export default class Supervisorinfo extends Component {
                     <Sidebar>
                         <PkCodeTree
                             treeData={treeList}
+                            {...this.props}
+                            {...this.state}
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}
                         />
@@ -162,19 +171,11 @@ export default class Supervisorinfo extends Component {
                         <SupervisorTable
                             key={resetkey}
                             {...this.props}
-                            sectionoption={sectionoption}
+                            {...this.state}
                             sectionSelect={this.sectionSelect.bind(this)}
-                            smallclassoption={smallclassoption}
                             smallClassSelect={this.smallClassSelect.bind(this)}
-                            thinclassoption={thinclassoption}
                             typeselect={this.typeselect.bind(this)}
-                            bigType={bigType}
-                            typeoption={typeoption}
-                            treetypeoption={treetypeoption}
                             thinClassSelect={this.thinClassSelect.bind(this)}
-                            statusoption={statusoption}
-                            leftkeycode={leftkeycode}
-                            keycode={keycode}
                             resetinput={this.resetinput.bind(this)}
                         />
                     </Content>
@@ -201,10 +202,13 @@ export default class Supervisorinfo extends Component {
         // 树种
         this.typeselect('');
         let sectionsData = [];
+        console.log('keycode', keycode);
+
         if (keycode) {
             treeList.map((treeData) => {
                 if (keycode === treeData.No) {
                     sectionsData = treeData.children;
+                    console.log('sectionsData', sectionsData);
                 }
             });
         }
@@ -217,10 +221,13 @@ export default class Supervisorinfo extends Component {
         let permission = getUserIsManager();
         if (permission) {
             // 是admin或者业主
+            console.log('aaaaaaaaaa');
             this.setSectionOption(sectionsData);
         } else {
             sectionsData.map((sectionData) => {
                 if (section && section === sectionData.No) {
+                    console.log('bbbbbbbb');
+
                     this.setSectionOption(sectionData);
                 }
             });
@@ -228,24 +235,24 @@ export default class Supervisorinfo extends Component {
     }
     // 设置标段选项
     setSectionOption (rst) {
-        let sectionOptions = [];
+        let sectionoption = [];
         try {
             if (rst instanceof Array) {
                 rst.map(sec => {
-                    sectionOptions.push(
+                    sectionoption.push(
                         <Option key={sec.No} value={sec.No} title={sec.Name}>
                             {sec.Name}
                         </Option>
                     );
                 });
-                this.setState({ sectionoption: sectionOptions });
+                this.setState({ sectionoption: sectionoption });
             } else {
-                sectionOptions.push(
+                sectionoption.push(
                     <Option key={rst.No} value={rst.No} title={rst.Name}>
                         {rst.Name}
                     </Option>
                 );
-                this.setState({ sectionoption: sectionOptions });
+                this.setState({ sectionoption: sectionoption });
             }
         } catch (e) {
             console.log('e', e);
