@@ -91,7 +91,10 @@ export const getSmallClass = (smallClassList) => {
     let array = [];
     try {
         smallClassList.map(list => {
-            let noArr = list.No.split('-');
+            let noArr = [];
+            if (list.No) {
+                noArr = list.No.split('-');
+            }
             // 如果小于5 说明没有标段  不符合规则
             if (noArr.length < 5) {
                 return;
@@ -1036,7 +1039,10 @@ export const getSmallClassGarden = (smallClassList) => {
     let array = [];
     try {
         smallClassList.map(list => {
-            let noArr = list.No.split('-');
+            let noArr = [];
+            if (list.No) {
+                noArr = list.No.split('-');
+            }
             // 如果小于5 说明没有标段  不符合规则
             if (noArr.length < 5) {
                 return;

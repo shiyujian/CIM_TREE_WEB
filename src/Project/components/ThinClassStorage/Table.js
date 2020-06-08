@@ -413,10 +413,18 @@ class Tablelevel extends Component {
             // 入库选中的数据
             selectKey.map(row => {
                 if (item.key === row) {
+                    let Section = '';
+                    let ThinClass = '';
+                    if (item.ThinClass) {
+                        Section = item.Section.slice(0, 1).toUpperCase() + item.Section.slice(1);
+                    }
+                    if (item.ThinClass) {
+                        ThinClass = item.ThinClass.slice(0, 1).toUpperCase() + item.ThinClass.slice(1);
+                    }
                     pro.push({
-                        no: item.ThinClass,
+                        no: ThinClass,
                         treetype: item.TreeType,
-                        Section: item.Section,
+                        Section: Section,
                         num: parseInt(item.Num || 0), // 细班计划种植数量
                         area: parseFloat(item.Area || item.area || 0), // 面积
                         Level: item.Spec, // 规格

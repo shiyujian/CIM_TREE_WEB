@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button } from 'antd';
+import { Button, Radio, Modal, Tabs, Table } from 'antd';
 import L from 'leaflet';
 import 'leaflet-editable';
 import './AreaDistanceMeasure.less';
@@ -12,18 +12,21 @@ import {
     handlePolygonLatLngs,
     handlePolylineLatLngs
 } from '_platform/gisAuth';
-
+import CoverageModal from './CoverageModal';
 export default class AreaDistanceMeasure extends Component {
     constructor (props) {
         super(props);
         this.state = {
             // 数据测量
+            radioValue: 1, // 1导入范围 2手动圈画
             totalDistanceMeasure: 0, // 总距离
             areaMeasure: 0, // 圈选区域面积
+            coverageVisible: false, // 图层解析
+            dataMeasureVisible: false, // 统计数据显示
             areaMeasureVisible: false, // 面积数据显示
             distanceMeasureNumList: []
         };
-        this.editPolygon = '';
+        this.editPolygon = ''; // 面积图层
         this.editPolyline = '';
         this.distanceMeasureMarkerList = {};
     }
@@ -153,6 +156,11 @@ export default class AreaDistanceMeasure extends Component {
             } else if (type === 'areaMeasureMenu') {
                 // 重新开始框选图层
                 this.editPolygon = map.editTools.startPolygon();
+            } else if (type === 'dataMeasureMenu') {
+                // 重新开始框选图层
+                this.setState({
+                    dataMeasureVisible: true
+                });
             }
         }
     }
@@ -185,6 +193,49 @@ export default class AreaDistanceMeasure extends Component {
             distanceMeasureNumList: []
         });
     }
+    // 确定
+    handleConfirm () {
+        if (this.editPolygon) {
+            let coordinates = handlePolygonLatLngs(this.editPolygon);
+            console.log('coordinatesshiyujian', coordinates);
+            if (coordinates.length > 2) {
+                this.setState({
+                    coverageVisible: true
+                });
+            }
+        }
+    }
+    // 回退
+    handleRollback () {
+        if (this.editPolygon) {
+            this.editPolygon.editor.pop();
+        }
+    }
+    handleRadio (e) {
+        const {
+            map
+        } = this.props;
+        let value = e.target.value;
+        if (value === 2) {
+            // 手动圈画
+            this.editPolygon = map.editTools.startPolygon();
+        }
+        this.setState({
+            radioValue: value
+        });
+    }
+    // 撤销
+    handleRevocation () {
+        const {
+            map
+        } = this.props;
+        // 去除面积测量图层
+        if (this.editPolygon) {
+            map.removeLayer(this.editPolygon);
+            map.editTools.stopDrawing();
+            this.editPolygon = map.editTools.startPolygon();
+        }
+    }
 
     render () {
         const {
@@ -192,7 +243,9 @@ export default class AreaDistanceMeasure extends Component {
         } = this.props;
         const {
             areaMeasure,
+            dataMeasureVisible,
             areaMeasureVisible,
+            coverageVisible,
             totalDistanceMeasure
         } = this.state;
         return (
@@ -212,22 +265,50 @@ export default class AreaDistanceMeasure extends Component {
                                     title='面积计算'
                                     className='AreaDistanceMeasure-rightDataMeasureMenu-clickImg' />
                             </div>
+                            {/* <div className={areaDistanceMeasureMenu === 'areaMeasureMenu' ? 'AreaDistanceMeasure-rightDataMeasureMenu-back-Select' : 'AreaDistanceMeasure-rightDataMeasureMenu-back-Unselect'}>
+                                <img src={areaDistanceMeasureMenu === 'areaMeasureMenu' ? areaMeasureSelImg : areaMeasureUnSelImg}
+                                    onClick={this.handleSwitchMeasureMenu.bind(this, 'dataMeasureMenu')}
+                                    title='统计数据'
+                                    className='AreaDistanceMeasure-rightDataMeasureMenu-clickImg' />
+                            </div> */}
                         </div>
                     </aside>
                 </div>
-                <div className='AreaDistanceMeasure-measureNumLayout'>
-                    <span className='AreaDistanceMeasure-measureNumText'>
-                        {
-                            areaMeasureVisible
-                                ? `面积：${areaMeasure} 亩`
-                                : (
-                                    totalDistanceMeasure
-                                        ? `总距离：${totalDistanceMeasure} 米`
-                                        : ''
-                                )
-                        }
-                    </span>
-                </div>
+                {
+                    dataMeasureVisible ? <div className='DataDistanceMeasure-measureNumLayout'>
+                        <div className='DataDistanceMeasure-btnLayout'>
+                            <Button type='primary' onClick={this.handleConfirm.bind(this)}>确定</Button>
+                            <Button onClick={this.handleRollback.bind(this)}>上一步</Button>
+                            <Button onClick={this.handleRevocation.bind(this)}>撤销</Button>
+                        </div>
+                        <div className='DataDistanceMeasure-spanLayout'>
+                            <span className='AreaDistanceMeasure-measureNumText'>
+                                <Radio.Group value={this.state.radioValue} onChange={this.handleRadio.bind(this)}>
+                                    <Radio style={{color: '#fff'}} value={1}>导入范围</Radio>
+                                    <Radio style={{color: '#fff'}} value={2}>手动圈画</Radio>
+                                </Radio.Group>
+                            </span>
+                        </div>
+                    </div> : <div className='AreaDistanceMeasure-measureNumLayout'>
+                        <span className='AreaDistanceMeasure-measureNumText'>
+                            {
+                                areaMeasureVisible
+                                    ? `面积：${areaMeasure} 亩`
+                                    : (
+                                        totalDistanceMeasure
+                                            ? `总距离：${totalDistanceMeasure} 米`
+                                            : ''
+                                    )
+                            }
+                        </span>
+                    </div>
+                }
+                {
+                    coverageVisible ? <CoverageModal
+                        {...this.props}
+                        coverageVisible={coverageVisible}
+                    /> : ''
+                }
             </div>
         );
     }

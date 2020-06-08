@@ -530,6 +530,7 @@ class OnSite extends Component {
                                 <AreaDistanceMeasure
                                     {...this.props}
                                     {...this.state}
+                                    treeData={onSiteAreaTreeData || []}
                                     map={this.map}
                                 />
                             ) : ''
