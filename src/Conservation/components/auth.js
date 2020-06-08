@@ -189,6 +189,7 @@ export const getThinClassName = (regionThinClass, totalThinClass, signSection, b
     try {
         regionThinClass.map((thinData, index) => {
             let section = thinData.Section;
+
             // 如果圈选的区域不在登录用户的标段内，则不能下发任务
             // if (signSection !== section) {
             //     sectionBool = false;
@@ -199,6 +200,9 @@ export const getThinClassName = (regionThinClass, totalThinClass, signSection, b
             //     return;
             // }
             let thinNo = thinData.no;
+            if (!(section && thinNo)) {
+                return;
+            }
             let pushState = true;
             // 获取的thinNo可能又会重复的，需要进行处理
             thinNoList.map((data) => {
@@ -214,6 +218,8 @@ export const getThinClassName = (regionThinClass, totalThinClass, signSection, b
                 let sectionNo = sectionData.section;
                 // 首先根据区块找到对应的细班list
                 if (section === sectionNo) {
+                    console.log('thinNo', thinNo);
+
                     let smallClassList = sectionData.smallClassList;
                     smallClassList.map((smallClass) => {
                         // tree结构的数据经过了处理，需要和api获取的数据调整一致
