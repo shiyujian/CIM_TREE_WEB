@@ -12,7 +12,7 @@ import {
     message
 } from 'antd';
 import moment from 'moment';
-import { FOREST_API } from '_platform/api';
+import { FOREST_API, DOCEXPORT_API } from '_platform/api';
 import '../index.less';
 import {
     getSmallThinNameByPlaceData
@@ -84,7 +84,8 @@ export default class LocmeasureTable extends Component {
             smallclassoption,
             thinclassoption,
             typeoption,
-            positionoption
+            positionoption,
+            dxfPermission
         } = this.props;
         const {
             sxm,
@@ -282,7 +283,7 @@ export default class LocmeasureTable extends Component {
                             查询
                         </Button>
                     </Col>
-                    <Col span={18} className='forest-quryrstcnt'>
+                    <Col span={14} className='forest-quryrstcnt'>
                         <span>
                             此次查询共有苗木：
                             {this.state.pagination.total}棵
@@ -296,6 +297,18 @@ export default class LocmeasureTable extends Component {
                             重置
                         </Button>
                     </Col>
+                    <Col span={2} />
+                    {
+                        dxfPermission
+                            ? <Col span={2}>
+                                <Button
+                                    type='primary'
+                                    onClick={this.dwgExport.bind(this)}
+                                >
+                            竣工图导出
+                                </Button>
+                            </Col> : <Col span={2} />
+                    }
                     <Col span={2}>
                         <Button
                             type='primary'
@@ -532,7 +545,7 @@ export default class LocmeasureTable extends Component {
             smallclassData = '',
             thinclassData = ''
         } = this.state;
-        if (thinclass === '') {
+        if (section === '' || smallclass === '' || thinclass === '') {
             message.info('请选择项目，标段，小班及细班信息');
             return;
         }
@@ -573,6 +586,24 @@ export default class LocmeasureTable extends Component {
             }
             this.setState({ loading: false });
         });
+    }
+
+    dwgExport = async () => {
+        const {
+            section = '',
+            thinclass = '',
+            smallclass = '',
+            smallclassData = '',
+            thinclassData = ''
+        } = this.state;
+        if (section === '' || smallclass === '' || thinclass === '') {
+            message.info('请选择项目，标段，区段及组团信息');
+            return;
+        }
+        let sectionArr = section.split('-');
+        let no = sectionArr[0] + '-' + sectionArr[1] + '-' + smallclassData + '-' + thinclassData;
+        let downloadUrl = `${DOCEXPORT_API}?action=treedrawing4label&section=${section}&thinclass=${no}`;
+        await this.createLink(this, downloadUrl);
     }
 
     createLink (name, url) {

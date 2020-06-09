@@ -50,7 +50,8 @@ export default class DataExport extends Component {
             positionoption: [],
             sectionsData: [],
             smallClassesData: [],
-            loading: false
+            loading: false,
+            dxfPermission: false
         };
     }
     getbigTypeName (type) {
@@ -82,7 +83,21 @@ export default class DataExport extends Component {
             treetypes,
             platform: { tree = {} }
         } = this.props;
+        let user = getUser();
+        let dxfPermission = false;
+        let userRoles = user.role;
+        if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('业主') !== -1) {
+            dxfPermission = true;
+        }
+        console.log('user.username', user.username);
 
+        if (user && user.username && user.username === 'admin') {
+            console.log('user.username', user.username);
+            dxfPermission = true;
+        }
+        this.setState({
+            dxfPermission
+        });
         setkeycode('');
         // 避免反复获取森林树种列表，提高效率
         if (!treetypes) {
