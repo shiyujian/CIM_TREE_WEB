@@ -597,7 +597,7 @@ export default class LocmeasureTable extends Component {
             thinclassData = ''
         } = this.state;
         if (section === '' || smallclass === '' || thinclass === '') {
-            message.info('请选择项目，标段，区段及组团信息');
+            message.info('请选择项目，标段，小班及细班信息');
             return;
         }
         let sectionArr = section.split('-');

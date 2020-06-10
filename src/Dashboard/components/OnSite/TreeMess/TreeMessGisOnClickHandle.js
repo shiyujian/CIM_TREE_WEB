@@ -543,12 +543,12 @@ export default class TreeMessGisOnClickHandle extends Component {
             };
 
             let SmallClassName = queryTreeData.SmallClass
-                ? queryTreeData.SmallClass + '号区段'
+                ? queryTreeData.SmallClass + '号小班'
                 : '';
             let ThinClassName = queryTreeData.ThinClass
-                ? queryTreeData.ThinClass + '号组团'
+                ? queryTreeData.ThinClass + '号细班'
                 : '';
-            // 获取区段组团名称
+            // 获取小班细班名称
             if (queryTreeData && queryTreeData.Section && queryTreeData.SmallClass && queryTreeData.ThinClass) {
                 let sections = queryTreeData.Section.split('-');
                 let No =

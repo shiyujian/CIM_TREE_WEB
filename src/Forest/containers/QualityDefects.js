@@ -66,7 +66,7 @@ export default class QualityDefects extends Component {
             let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
             let totalThinClass = data.totalThinClass || [];
             let projectList = data.projectList || [];
-            // 获取所有的区段数据，用来计算养护任务的位置
+            // 获取所有的小班数据，用来计算养护任务的位置
             await getTotalThinClass(totalThinClass);
             // 区域地块树
             await getThinClassTree(projectList);
@@ -195,7 +195,7 @@ export default class QualityDefects extends Component {
             }
         });
     }
-    // 设置区段选项
+    // 设置小班选项
     setSmallClassOption (rst) {
         if (rst instanceof Array) {
             let smallclassOptions = [];
@@ -214,7 +214,7 @@ export default class QualityDefects extends Component {
             this.setState({ smallClassOption: smallclassOptions });
         }
     }
-    // 区段选择, 重新获取: 组团
+    // 小班选择, 重新获取: 细班
     smallClassSelect (value) {
         const {
             smallClassesData
@@ -229,7 +229,7 @@ export default class QualityDefects extends Component {
             }
         });
     }
-    // 设置组团选项
+    // 设置细班选项
     setThinClassOption (rst) {
         if (rst instanceof Array) {
             let thinclassOptions = [];

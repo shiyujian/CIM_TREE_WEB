@@ -79,14 +79,14 @@ export default class QRCodeDistribute extends Component {
             let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
             let totalThinClass = data.totalThinClass || [];
             let projectList = data.projectList || [];
-            // 获取所有的区段数据，用来计算养护任务的位置
+            // 获取所有的小班数据，用来计算养护任务的位置
             await getTotalThinClass(totalThinClass);
             // 区域地块树
             await getThinClassTree(projectList);
             this.setState({
                 projectList: projectList
             });
-        }else{
+        } else {
             this.setState({
                 projectList: tree.thinClassTree
             });

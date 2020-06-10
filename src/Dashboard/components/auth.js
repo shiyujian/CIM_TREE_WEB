@@ -953,8 +953,8 @@ export const handleLocationDeviceData = (datas, thinClassTree) => {
 
 /**
  * 获取园林施工包数据
- * @param {*} getTreeNodeListGarden 
- * @param {*} getThinClassListGarden 
+ * @param {*} getTreeNodeListGarden
+ * @param {*} getThinClassListGarden
  */
 // 获取施工包数据，并将数据进行整理
 export const getAreaDataGarden = async (getTreeNodeListGarden, getThinClassListGarden) => {
@@ -1047,34 +1047,34 @@ export const getSmallClassGarden = (smallClassList) => {
             if (noArr.length < 5) {
                 return;
             }
-            // // 项目 + 区块 + 标段 + 区段 + 组团
+            // // 项目 + 区块 + 标段 + 小班 + 细班
             // let No = noArr[0] + '-' + noArr[1] + '-' + noArr[4] + '-' + noArr[2] + '-' + noArr[3];
-            // 项目 + 区块 + 标段 + 区段
+            // 项目 + 区块 + 标段 + 小班
             let No = noArr[0] + '-' + noArr[1] + '-' + noArr[4] + '-' + noArr[2];
             // 之前没有存入过该小班，则push进数组
             if (list.SmallClass && array.indexOf(No) === -1) {
                 if (list.SmallClassName) {
-                    if (list.SmallClassName.indexOf('区段') !== -1) {
+                    if (list.SmallClassName.indexOf('小班') !== -1) {
                         uniqueSmallClass.push({
                             Name: list.SmallClassName,
                             No: No
                         });
                     } else {
                         uniqueSmallClass.push({
-                            Name: list.SmallClassName + '区段',
+                            Name: list.SmallClassName + '小班',
                             No: No
                         });
                     }
                 } else {
                     uniqueSmallClass.push({
-                        Name: list.SmallClass + '区段',
+                        Name: list.SmallClass + '小班',
                         No: No
                     });
                 }
                 // uniqueSmallClass.push({
                 //     Name: list.SmallClassName
-                //         ? list.SmallClassName + '区段'
-                //         : list.SmallClass + '区段',
+                //         ? list.SmallClassName + '小班'
+                //         : list.SmallClass + '小班',
                 //     No: No
                 // });
                 array.push(No);
@@ -1108,31 +1108,31 @@ export const getThinClassGarden = (smallClass, list) => {
                 noArr[0] === projectNo && noArr[1] === unitProjectNo && noArr[4] === sectionNo &&
                 noArr[2] === smallClassNo
             ) {
-                // 项目 + 区块 + 标段 + 区段 + 组团
+                // 项目 + 区块 + 标段 + 小班 + 细班
                 let No = noArr[0] + '-' + noArr[1] + '-' + noArr[4] + '-' + noArr[2] + '-' + noArr[3];
                 if (codeArray.indexOf(No) === -1) {
                     if (rst.ThinClassName) {
-                        if (rst.ThinClassName.indexOf('组团') !== -1) {
+                        if (rst.ThinClassName.indexOf('细班') !== -1) {
                             thinClassList.push({
                                 Name: rst.ThinClassName,
                                 No: No
                             });
                         } else {
                             thinClassList.push({
-                                Name: rst.ThinClassName + '组团',
+                                Name: rst.ThinClassName + '细班',
                                 No: No
                             });
                         }
                     } else {
                         thinClassList.push({
-                            Name: rst.ThinClass + '组团',
+                            Name: rst.ThinClass + '细班',
                             No: No
                         });
                     }
                     // thinClassList.push({
                     //     Name: rst.ThinClassName
-                    //         ? rst.ThinClassName + '组团'
-                    //         : rst.ThinClass + '组团',
+                    //         ? rst.ThinClassName + '细班'
+                    //         : rst.ThinClass + '细班',
                     //     No: No
                     // });
                     codeArray.push(No);
