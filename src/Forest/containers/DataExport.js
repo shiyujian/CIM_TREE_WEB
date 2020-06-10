@@ -101,10 +101,7 @@ export default class DataExport extends Component {
         if (userRoles && userRoles.ParentID && userRoles.ParentID === owerRoleID) {
             dxfPermission = true;
         }
-        console.log('user.username', user.username);
-
         if (user && user.username && user.username === 'admin') {
-            console.log('user.username', user.username);
             dxfPermission = true;
         }
         this.setState({
