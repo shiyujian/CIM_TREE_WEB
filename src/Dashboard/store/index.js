@@ -149,7 +149,13 @@ export const getTreeNodeListGarden = forestFetchAction(`${TREE_API_GARDEN}/wpuni
 export const getThinClassListGarden = forestFetchAction(`${TREE_API_GARDEN}/wpunit4apps?parent={{no}}`, []); //
 // 将园林施工包数据上传至redux
 export const getTotalThinClassGarden = createAction(`${ID}获取所有的小班数据`);
-
+/**
+ *  辅助管理模块接口
+ */
+// 获取各个树种的实际数量
+export const getStatByTreeType = forestFetchAction(`${TREE_API}/statbytreetype`, []); //
+// 获取各个树种的设计数量
+export const getStatTreePlans = forestFetchAction(`${TREE_API}/treeplans`, []); //
 export const actions = {
     getRisk,
     getRiskContactSheet,
@@ -236,7 +242,11 @@ export const actions = {
     getParentOrgTreeByIDGarden,
     getTreeNodeListGarden,
     getThinClassListGarden,
-    getTotalThinClassGarden
+    getTotalThinClassGarden,
+
+    // 辅助管理模块接口
+    getStatByTreeType,
+    getStatTreePlans
 };
 export default handleActions(
     {

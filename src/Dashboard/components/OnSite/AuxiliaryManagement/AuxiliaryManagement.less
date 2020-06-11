@@ -1,0 +1,284 @@
+@font-face {
+    font-family: Digital-7;
+    src: url('../digital-7.ttf');
+}
+.AuxiliaryManagement-container{
+    display: flex;
+    position: absolute;
+    // width: calc(~'100% - 44px');
+    left: 44px;
+    top: 610px;
+    width:560px;
+    height:265px;
+
+    .AuxiliaryManagement-r-main{
+    flex:1 1 auto;
+    position: relative;
+    overflow: hidden;
+    }
+
+    .AuxiliaryManagement-foldBtn {
+        position: absolute;
+        width: 64px;
+        height: 64px;
+        text-align: center;
+        cursor: pointer;
+        z-index: 500;
+        -webkit-transition: all .3s;
+        -o-transition: all .3s;
+        transition: all .3s;
+        // border:1px solid rgba(97,245,171,1);
+    }
+
+    .AuxiliaryManagement-menuPanel {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 265px;
+        transition: all 0.8s;
+        z-index: 980;
+        // background:rgba(19,34,36,0.8);
+        // background-image: url("./AuxiliaryManagementImg/bottom1.png");
+        // background-repeat: no-repeat;
+  
+        .AuxiliaryManagement-menuBackground {
+            background-image: url("./AuxiliaryManagementImg/bottom1.png");
+            background-repeat: no-repeat;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            bottom: 0;
+            // background: rgba(19,34,36,1);
+            opacity: 0.7;
+        }
+        .AuxiliaryManagement-aside {
+            position: absolute;
+            left: 24px;
+            width: calc(~'100% - 24px');;
+            height: 100%;
+            color: #333;
+            z-index: 999;
+            overflow: auto;
+
+            .AuxiliaryManagement-MenuNameLayout { 
+                display: inline-block;
+                margin-top: 18px;
+                width: 100%;
+            }
+            .AuxiliaryManagement-MenuName {
+                width: 230px;
+                height: 17px;
+                font-size: 16px;
+                font-family: Microsoft YaHei;
+                font-weight: bold;
+                color: #61f5ab;
+                position: absolute;
+                left: 12px;
+                top: 18px;
+            }
+            .AuxiliaryManagement-MenuHideButton {
+                float: right;
+                cursor: pointer;
+                margin-right: 15px;
+            }
+            .AuxiliaryManagement-NumTitle{
+                width:127px;
+                height:19px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:400;
+                color:rgba(161,182,194,1);
+                line-height:19px;
+                margin-left: 210px;
+                vertical-align: middle;
+            }
+            .AuxiliaryManagement-asideTree {
+                margin-top: 10px;
+                // margin-left: 10px;
+            }
+            .AuxiliaryManagement-button {
+                display: block;
+                // width: 220px;
+            }
+            .AuxiliaryManagement-button-layoutSel {
+                width: 122px;
+                height: 74px;
+                border:1px solid rgba(60,248,247,1);
+                border-radius:2px;
+                background-image: url("./AuxiliaryManagementImg/bg1.png");
+                display: inline-block;
+            }
+            .AuxiliaryManagement-button-layout-text {
+                width: 122px;
+                height:14px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:bold;
+                color:rgba(255,255,255,1);
+                line-height: 14px;
+                margin-left: 16px;
+                margin-top: 10px;
+                display: inline-block;
+            }
+            .AuxiliaryManagement-button-layout-numSel {
+                width: 122px;
+                height: 16px;
+                display: inline-block;
+                line-height: 22px;
+                position: absolute;
+                text-align: right;
+                margin-top: 6px;
+
+                .AuxiliaryManagement-button-layout-actualNum {
+                    height: 16px;
+                    font-size: 24px;
+                    font-family: Digital-7;
+                    font-weight: 400;
+                    display: inline-block;
+                    color: #61F5AB;
+                    line-height: 16px;
+                    margin-right: 10px;
+                }
+                .AuxiliaryManagement-button-layout-numDivide {
+                    height: 16px;
+                    font-size: 24px;
+                    font-family: Digital-7;
+                    font-weight: 400;
+                    display: inline-block;
+                    color: rgba(255,255,255,1);
+                    line-height: 16px;
+                    margin-right: 10px;
+                }
+                .AuxiliaryManagement-button-layout-designNum {
+                    height: 16px;
+                    font-size: 24px;
+                    font-family: Digital-7;
+                    font-weight: 400;
+                    display: inline-block;
+                    color: #61F5AB;
+                    line-height: 16px;
+                    margin-right: 10px;
+                }
+            }
+        }
+    }
+}
+.AuxiliaryManagement-result-Container{
+    display: flex;
+    position: absolute;
+    left: 612px;
+    top: 610px;
+    width: 280px;
+    height: 265px;
+
+    .AuxiliaryManagement-result-r-main{
+    flex:1 1 auto;
+    position: relative;
+    overflow: hidden;
+    }
+
+    .AuxiliaryManagement-result-foldBtn {
+        position: absolute;
+        width: 64px;
+        height: 64px;
+        text-align: center;
+        cursor: pointer;
+        z-index: 500;
+        -webkit-transition: all .3s;
+        -o-transition: all .3s;
+        transition: all .3s;
+        // border:1px solid rgba(97,245,171,1);
+    }
+
+    .AuxiliaryManagement-result-menuPanel {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 265px;
+        transition: all 0.8s;
+        z-index: 980;
+        // background:rgba(19,34,36,0.8);
+        // background-image: url("./AuxiliaryManagementImg/bottom1.png");
+        // background-repeat: no-repeat;
+  
+        .AuxiliaryManagement-result-menuBackground {
+            background-image: url("./AuxiliaryManagementImg/bottom1.png");
+            background-repeat: no-repeat;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            bottom: 0;
+            // background: rgba(19,34,36,1);
+            opacity: 0.7;
+        }
+        .AuxiliaryManagement-result-aside {
+            position: absolute;
+            left: 24px;
+            width: calc(~'100% - 40px');;
+            height: 100%;
+            color: #333;
+            z-index: 999;
+            overflow: auto;
+
+            .AuxiliaryManagement-result-MenuNameLayout { 
+                display: inline-block;
+                margin-top: 18px;
+                width: 100%;
+            }
+             .AuxiliaryManagement-result-MenuName {
+                width:32px;
+                height:17px;
+                font-size:16px;
+                font-family:Microsoft YaHei;
+                font-weight:bold;
+                color:rgba(255,255,255,1);
+                position: absolute;
+                left: 12px;
+                top: 18px;
+            }
+            .AuxiliaryManagement-result-asideTree {
+                margin-top: 10px;
+                margin-left: 10px;
+            }
+
+            .AuxiliaryManagement-result-resultlayout {
+                width:232px;
+                height:32px;
+                margin-bottom: 5px;
+                // background:rgba(161,182,194,1);
+                // opacity:0.6;
+            }
+            .AuxiliaryManagement-result-resultBackground {
+                width: 100%;
+                height: 32px;
+                background:rgba(161,182,194,1);
+                position: absolute;
+                opacity: 0.26;
+            }
+            .AuxiliaryManagement-result-type {
+                width:100px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:400;
+                color:rgba(97,245,171,1);
+                line-height:40px;
+                vertical-align: middle;
+                float: left;
+                line-height: 32px;
+                margin-left: 15px;
+            }
+            .AuxiliaryManagement-result-num {
+                width:34px;
+                font-size:18px;
+                font-family:Digital-7;
+                font-weight:400;
+                color:rgba(97,245,171,1);
+                line-height:40px;
+                vertical-align: middle;
+                float: right;
+                line-height: 32px;
+                margin-right: 15px;
+            }
+        }
+    }
+}
