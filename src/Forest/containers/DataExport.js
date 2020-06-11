@@ -90,15 +90,15 @@ export default class DataExport extends Component {
         let userRoles = user.roles;
         // 需要找到是业主角色的人
         let roleData = await getRoles();
-        let owerRoleID = '';
+        let ownerRoleID = '';
         roleData.map((role) => {
             if (role && role.ID && !role.ParentID) {
                 if (role.RoleName === '业主') {
-                    owerRoleID = role.ID;
+                    ownerRoleID = role.ID;
                 }
             }
         });
-        if (userRoles && userRoles.ParentID && userRoles.ParentID === owerRoleID) {
+        if (userRoles && userRoles.ParentID && userRoles.ParentID === ownerRoleID) {
             dxfPermission = true;
         }
         if (user && user.username && user.username === 'admin') {

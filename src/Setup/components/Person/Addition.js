@@ -465,6 +465,10 @@ class Addition extends Component {
         // 用户是否为文书
         let userIsDocument = getUserIsDocument();
         let units = this.getUnits();
+        let sectionRequiredStatus = false;
+        if (node && node.Section && node.Section.length > 0) {
+            sectionRequiredStatus = true;
+        }
         return (
             <div>
                 <Modal
@@ -581,7 +585,7 @@ class Addition extends Component {
                                     {getFieldDecorator('section', {
                                         rules: [
                                             {
-                                                required: false,
+                                                required: sectionRequiredStatus,
                                                 message: '请选择标段'
                                             }
                                         ]

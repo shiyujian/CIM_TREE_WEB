@@ -719,14 +719,14 @@ class PlantStrength extends Component {
             section: plantSection || ''
         }).then(rep => {
             let plantArr = rep.split(',');
-            this.renderPlantCake(plantArr[1], plantArr[0]);
+            this.renderPlantCake(Math.abs(plantArr[1]), Math.abs(plantArr[0]));
         });
         getLocationStat({}, {
             no: thinNo || smallNo || this.leftkeycode,
             section: plantSection
         }).then(rep => {
             let localtionArr = rep.split(',');
-            this.renderLocaltionCake(localtionArr[1], localtionArr[0]);
+            this.renderLocaltionCake(Math.abs(localtionArr[1]), Math.abs(localtionArr[0]));
         });
     }
     renderLocaltionCake (localtionNum, unLocaltionNum) {

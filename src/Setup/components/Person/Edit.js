@@ -471,7 +471,10 @@ class Edit extends Component {
             form: {
                 getFieldDecorator
             },
-            companyOrgTree = {}
+            companyOrgTree = {},
+            sidebar: {
+                node = {}
+            }
         } = this.props;
         const {
             isBlackChecked,
@@ -486,6 +489,10 @@ class Edit extends Component {
         let userIsAdmin = false;
         if (user.username === 'admin') {
             userIsAdmin = true;
+        }
+        let sectionRequiredStatus = false;
+        if (node && node.Section && node.Section.length > 0) {
+            sectionRequiredStatus = true;
         }
         return (
             <div>
@@ -581,7 +588,7 @@ class Edit extends Component {
                                     {getFieldDecorator('section', {
                                         rules: [
                                             {
-                                                required: false,
+                                                required: sectionRequiredStatus,
                                                 message: '请选择标段'
                                             }
                                         ]

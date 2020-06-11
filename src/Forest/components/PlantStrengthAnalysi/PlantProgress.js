@@ -80,7 +80,7 @@ class PositionProgress extends Component {
             thinPlantSmallClassList,
             smallNo
         } = this.state;
-        console.log('startDate', endDate)
+        console.log('startDate', endDate);
         return (
             <div>
                 <Form layout='inline'>
@@ -89,8 +89,8 @@ class PositionProgress extends Component {
                         <RangePicker showTime={{ format: 'HH:mm:ss' }}
                             format={dateFormat}
                             defaultValue={
-                                [moment(startDate, dateFormat), 
-                                moment(endDate, dateFormat)]
+                                [moment(startDate, dateFormat),
+                                    moment(endDate, dateFormat)]
                             }
                             onChange={this.handleDate.bind(this)} />
                     </Form.Item>
@@ -284,7 +284,7 @@ class PositionProgress extends Component {
                 let Sum = 0;
                 rep.map(record => {
                     if (item === record.Time) {
-                        Sum += record.Num;
+                        Sum += Math.abs(record.Num);
                     }
                 });
                 tblDataTotal.push({
@@ -306,7 +306,7 @@ class PositionProgress extends Component {
                     let sum = 0;
                     rep.map(row => {
                         if (record === row.Time && row.Section === item.No) {
-                            sum += row.Num;
+                            sum += Math.abs(row.Num);
                         }
                     });
                     tblDataTotal[ind][item.Name] = sum;
@@ -375,12 +375,12 @@ class PositionProgress extends Component {
                 xAxisData.push(item.Name);
                 rep.map(record => {
                     if (item.No === record.Label) {
-                        completeArr.push(record.Complete);
-                        unCompleteArr.push(record.UnComplete);
+                        completeArr.push(Math.abs(record.Complete));
+                        unCompleteArr.push(Math.abs(record.UnComplete));
                         tblDataSection.push({
                             '标段': item.Name,
-                            '已种植': record.Complete,
-                            '未种植': record.UnComplete
+                            '已种植': Math.abs(record.Complete),
+                            '未种植': Math.abs(record.UnComplete)
                         });
                     }
                 });
@@ -498,13 +498,13 @@ class PositionProgress extends Component {
                     let recordNo = '';
                     recordNo = record.Section + '-' + record.No.split('-')[2];
                     if (recordNo === item.No) {
-                        complete.push(record.Complete);
-                        unComplete.push(record.UnComplete);
+                        complete.push(Math.abs(record.Complete));
+                        unComplete.push(Math.abs(record.UnComplete));
                         xAxisData.push(item.Name);
                         tblDataSmall.push({
-                            '小班': item.Name,
-                            '已种植': record.Complete,
-                            '未种植': record.UnComplete
+                            '区段': item.Name,
+                            '已种植': Math.abs(record.Complete),
+                            '未种植': Math.abs(record.UnComplete)
                         });
                     }
                 });
@@ -623,13 +623,13 @@ class PositionProgress extends Component {
                     let recordArr = record.No.split('-');
                     recordNo = record.Section + '-' + recordArr[2] + '-' + recordArr[3];
                     if (recordNo === item.No) {
-                        complete.push(record.Complete);
-                        unComplete.push(record.UnComplete);
+                        complete.push(Math.abs(record.Complete));
+                        unComplete.push(Math.abs(record.UnComplete));
                         xAxisData.push(item.Name);
                         tblDataThin.push({
-                            '小班': item.Name,
-                            '已种植': record.Complete,
-                            '未种植': record.unComplete
+                            '区段': item.Name,
+                            '已种植': Math.abs(record.Complete),
+                            '未种植': Math.abs(record.unComplete)
                         });
                     }
                 });
