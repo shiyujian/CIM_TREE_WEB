@@ -197,8 +197,6 @@ export default class TreePipePage extends Component {
             await this.getTreePipeNodeLayer();
             let data = Scrollbar.init(document.querySelector('#asideDom'));
             let resultdata = Scrollbar.init(document.querySelector('#resultAsideDom'));
-            console.log('data', data);
-            console.log('resultdata', resultdata);
             await this.handleQueryTreePipe();
         } catch (e) {
             console.log('componentDidMount', e);
@@ -561,22 +559,22 @@ export default class TreePipePage extends Component {
             let sqlData = '';
             let layers = '';
             let sectionData = '';
-            if (selectProject) {
-                let orderData = `( Section like '${selectProject}%' )`;
-                sectionData = `( ${orderData} )`;
-            } else {
-                let bigTreeList = (tree && tree.bigTreeList) || [];
-                bigTreeList.map((project, index) => {
-                    let orderData = `( Section like '${project.No}%' )`;
-                    if (index === 0) {
-                        sectionData = `( ${orderData}`;
-                    } else if (index === bigTreeList.length - 1) {
-                        sectionData = `${sectionData} or ${orderData} )`;
-                    } else {
-                        sectionData = `${sectionData} or ${orderData}`;
-                    }
-                });
-            }
+            // if (selectProject) {
+            //     let orderData = `( Section like '${selectProject}%' )`;
+            //     sectionData = `( ${orderData} )`;
+            // } else {
+            let bigTreeList = (tree && tree.bigTreeList) || [];
+            bigTreeList.map((project, index) => {
+                let orderData = `( Section like '${project.No}%' )`;
+                if (index === 0) {
+                    sectionData = `( ${orderData}`;
+                } else if (index === bigTreeList.length - 1) {
+                    sectionData = `${sectionData} or ${orderData} )`;
+                } else {
+                    sectionData = `${sectionData} or ${orderData}`;
+                }
+            });
+            // }
 
             if (treePipe) {
                 layers = 'pipe';
@@ -702,15 +700,9 @@ export default class TreePipePage extends Component {
                     }
                 }
             }
-            console.log('pipeMaterialList', pipeMaterialList);
-            console.log('pipeMaterialIDList', pipeMaterialIDList);
-            console.log('pipeMaterialIDList', JSON.stringify(pipeMaterialIDList));
-            console.log('pipeRateList', pipeRateList);
-            console.log('pipeRateIDList', pipeRateIDList);
-            console.log('pipeTypeList', pipeTypeList);
-            console.log('pipeTypeIDList', pipeTypeIDList);
-            console.log('pipeNodeTypeList', pipeNodeTypeList);
-            console.log('pipeNodeTypeIDList', pipeNodeTypeIDList);
+            // console.log('pipeMaterialList', pipeMaterialList);
+            // console.log('pipeMaterialIDList', pipeMaterialIDList);
+            // console.log('pipeMaterialIDList', JSON.stringify(pipeMaterialIDList));
 
             this.setState({
                 contents,
@@ -853,7 +845,6 @@ export default class TreePipePage extends Component {
             pipeTypeList = [], // 管线类型
             pipeNodeTypeList = [] // 管点设备类型
         } = this.state;
-        console.log('contents', contents);
 
         let menuName = this.handleGetProjectName();
         return (
