@@ -97,6 +97,7 @@ export const switchAreaDistanceMeasureMenu = createAction(`${ID}切换二维展�
 export const getDeviceTreeLoading = createAction(`${ID}机械设备树加载loading`);
 export const getDeviceTree = createAction(`${ID}机械设备树数据`);
 export const getDeviceTreeDay = createAction(`${ID}机械设备树数据天`);
+export const setSelectProject = createAction(`${ID}设置当前选中的项目节点`);
 
 // 获取今日人员投入
 export const getWorkMansbyday = forestFetchAction(`${GARDEN_API}/workmansbyday`, [], 'GET');
@@ -215,6 +216,7 @@ export const actions = {
     setUserMapPositionName,
     switchAreaDistanceMeasureMenu,
     getDeviceTreeDay,
+    setSelectProject,
     getDeviceTreeLoading,
     getDeviceTree,
 
@@ -470,6 +472,12 @@ export default handleActions(
             return {
                 ...state,
                 deviceTreeDataDay: payload
+            };
+        },
+        [setSelectProject]: (state, { payload }) => {
+            return {
+                ...state,
+                selectProject: payload
             };
         },
         [getTotalThinClassGarden]: (state, { payload }) => {

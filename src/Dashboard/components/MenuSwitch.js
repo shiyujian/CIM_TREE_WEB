@@ -8,6 +8,7 @@ import {
 import {
     trim
 } from '_platform/auth';
+import {DEFAULT_PROJECT} from '_platform/api';
 import irrigationSel from './MenuSwitchImg/irrigation3.gif';
 import irrigation from './MenuSwitchImg/irrigation2.png';
 import distributedSel from './MenuSwitchImg/distributed3.gif';
@@ -116,7 +117,8 @@ export default class MenuSwitch extends Component {
                 switchAreaDistanceMeasureMenu,
                 switchDashboardFocus,
                 switchDashboardTreeMess,
-                switchDashboardRightMenu
+                switchDashboardRightMenu,
+                setSelectProject
             }
         } = this.props;
         // 左侧菜单
@@ -144,6 +146,8 @@ export default class MenuSwitch extends Component {
         // 区域地块
         // 默认不打开区域地块树
         await switchDashboardRightMenu('');
+        // 默认不选择任何项目
+        await setSelectProject(DEFAULT_PROJECT);
         document.addEventListener('fullscreenchange', this.exitHandler);
         document.addEventListener('webkitfullscreenchange', this.exitHandler);
         document.addEventListener('mozfullscreenchange', this.exitHandler);
@@ -774,6 +778,11 @@ export default class MenuSwitch extends Component {
                         key='dataView'
                         title='数据看板'
                         onClick={this.handleDataViewButton.bind(this)} />
+                    {/* <a className={dashboardDataView === 'mapFoucs' ? 'menuSwitch-rightMenuDataViewButtonSelLayout' : 'menuSwitch-rightMenuDataViewButtonUnSelLayout'}
+                        id='mapFoucs'
+                        key='mapFoucs'
+                        title='视图管理'
+                        onClick={this.handleMapFoucsButton.bind(this)} /> */}
                 </div>
             </div>);
     }

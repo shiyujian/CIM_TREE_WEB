@@ -3,9 +3,6 @@ import { Tree, Input, Spin } from 'antd';
 import L from 'leaflet';
 import Scrollbar from 'smooth-scrollbar';
 import {PROJECTPOSITIONCENTER} from '_platform/api';
-import {
-    getDefaultProject
-} from '_platform/auth';
 import './AreaTree.less';
 const TreeNode = Tree.TreeNode;
 export default class AreaTree extends Component {
@@ -46,25 +43,27 @@ export default class AreaTree extends Component {
     componentDidMount = async () => {
         const {
             map,
-            treeData
+            treeData,
+            selectProject
         } = this.props;
         if (document.querySelector('#AreaTreeAsideDom')) {
             let AreaTreeAsideDom = Scrollbar.init(document.querySelector('#AreaTreeAsideDom'));
             console.log('AreaTreeAsideDom', AreaTreeAsideDom);
         }
-        let defaultProject = await getDefaultProject();
-        let treeDataSelect = [];
-        let projectNameSelect = '';
-        treeData.map((child) => {
-            if (child.No === defaultProject) {
-                treeDataSelect = child.children;
-                projectNameSelect = child.Name;
-            }
-        });
-        this.setState({
-            projectNameSelect,
-            treeDataSelect
-        });
+        if (selectProject) {
+            let treeDataSelect = [];
+            let projectNameSelect = '';
+            treeData.map((child) => {
+                if (child.No === selectProject) {
+                    treeDataSelect = child.children;
+                    projectNameSelect = child.Name;
+                }
+            });
+            this.setState({
+                projectNameSelect,
+                treeDataSelect
+            });
+        }
         if (map) {
         }
     }
@@ -77,9 +76,22 @@ export default class AreaTree extends Component {
     handleProjectChange = (project) => {
         const {
             map,
-            treeData
+            treeData,
+            actions: {
+                setSelectProject
+            }
         } = this.props;
+        const {
+            projectNameSelect
+        } = this.state;
         try {
+            // if (projectNameSelect && project.Name === projectNameSelect) {
+            //     setSelectProject('');
+            //     this.setState({
+            //         projectNameSelect: '',
+            //         treeDataSelect: []
+            //     });
+            // } else {
             PROJECTPOSITIONCENTER.map(async (option) => {
                 if (option.Name === project.Name) {
                     await map.panTo(option.center);
@@ -95,10 +107,12 @@ export default class AreaTree extends Component {
                     treeDataSelect = child.children;
                 }
             });
+            setSelectProject(project.No);
             this.setState({
                 projectNameSelect: project.Name,
                 treeDataSelect
             });
+            // }
         } catch (e) {
             console.log('handleProjectChange', e);
         };
@@ -113,6 +127,7 @@ export default class AreaTree extends Component {
             treeDataSelect,
             projectNameSelect
         } = this.state;
+
         return (
             <div className='AreaTreePage-container'>
                 <div className='AreaTreePage-r-main'>
