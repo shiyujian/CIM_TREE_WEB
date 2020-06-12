@@ -559,22 +559,22 @@ export default class TreePipePage extends Component {
             let sqlData = '';
             let layers = '';
             let sectionData = '';
-            // if (selectProject) {
-            //     let orderData = `( Section like '${selectProject}%' )`;
-            //     sectionData = `( ${orderData} )`;
-            // } else {
-            let bigTreeList = (tree && tree.bigTreeList) || [];
-            bigTreeList.map((project, index) => {
-                let orderData = `( Section like '${project.No}%' )`;
-                if (index === 0) {
-                    sectionData = `( ${orderData}`;
-                } else if (index === bigTreeList.length - 1) {
-                    sectionData = `${sectionData} or ${orderData} )`;
-                } else {
-                    sectionData = `${sectionData} or ${orderData}`;
-                }
-            });
-            // }
+            if (selectProject) {
+                let orderData = `( Section like '${selectProject}%' )`;
+                sectionData = `( ${orderData} )`;
+            } else {
+                let bigTreeList = (tree && tree.bigTreeList) || [];
+                bigTreeList.map((project, index) => {
+                    let orderData = `( Section like '${project.No}%' )`;
+                    if (index === 0) {
+                        sectionData = `( ${orderData}`;
+                    } else if (index === bigTreeList.length - 1) {
+                        sectionData = `${sectionData} or ${orderData} )`;
+                    } else {
+                        sectionData = `${sectionData} or ${orderData}`;
+                    }
+                });
+            }
 
             if (treePipe) {
                 layers = 'pipe';
