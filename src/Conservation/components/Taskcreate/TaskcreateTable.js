@@ -720,7 +720,7 @@ export default class TaskCreateTable extends Component {
                 });
             };
         } catch (e) {
-
+            console.log('_addAreaLayer', e);
         }
     }
 

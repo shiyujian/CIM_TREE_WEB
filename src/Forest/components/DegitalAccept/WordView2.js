@@ -220,14 +220,15 @@ export default class WordView1 extends Component {
 
         // 设计密度
         let designNum = (detail && detail.DesignNum) || 0; // 细班设计量
-        let designArea = (detail && detail.DesignArea && (detail.DesignArea * 0.0015).toFixed(2)) || 0; // 细班设计面积
+        let designArea = (detail && detail.DesignArea && (detail.DesignArea * 0.0015)) || 0; // 细班设计面积
         let designDensity = 1;
         if (designArea && designNum && designArea !== 0) {
             designDensity = (designNum / designArea).toFixed(2);
         }
 
         let loftingNum = (detail && detail.LoftingNum) || 0; // 放点数量
-        let sampleTapeArea = (detail && detail.SampleTapeArea && (detail.SampleTapeArea * 0.0015).toFixed(2)) || ''; // 样带面积
+        let sampleTapeArea = (detail && detail.SampleTapeArea && (detail.SampleTapeArea * 0.0015)) || ''; // 样带面积
+
         let truemd = 1; // 实际密度
         if (sampleTapeArea && sampleTapeArea !== 0) {
             truemd = (loftingNum / sampleTapeArea).toFixed(2);

@@ -153,7 +153,9 @@ class Addition extends Component {
                     '普通员工',
                     '施工文书',
                     '测量员',
-                    '施工整改人'
+                    '施工整改人',
+                    // '班组长',
+                    '养护员'
                 ]
             });
             systemRoles.push({
@@ -195,7 +197,9 @@ class Addition extends Component {
                                 '普通员工',
                                 '施工文书',
                                 '测量员',
-                                '施工整改人'
+                                '施工整改人',
+                                // '班组长',
+                                '养护员'
                             ]
                         });
                     }
