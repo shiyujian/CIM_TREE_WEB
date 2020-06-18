@@ -468,6 +468,8 @@ export const postAreaAcceptanceMapImage = forestFetchAction(`${ROUTE_API}/areaac
 export const getAcceptanceThinclasses = forestFetchAction(`${ROUTE_API}/acceptancethinclasses`, [], 'GET', []);
 // 获取第十一项信息
 export const getLastAcceptanceResult = forestFetchAction(`${TREE_API}/lastacceptanceresult`, [], 'GET', []);
+// 获取第九项信息
+export const getAcceptanceBasicStat = forestFetchAction(`${TREE_API}/acceptancebasicstat`, [], 'GET', []);
 
 // 辅助验收模块
 export const getSupervisorUsersOK = createAction(`${ID}获取监理用户列表`);
@@ -643,6 +645,7 @@ export const actions = {
     postAreaAcceptanceMapImage,
     getAcceptanceThinclasses,
     getLastAcceptanceResult,
+    getAcceptanceBasicStat,
     getDieTreesData,
     getExportDieTree,
     getSupervisorUsersOK,
