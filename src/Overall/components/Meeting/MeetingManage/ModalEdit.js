@@ -5,7 +5,8 @@ import {
     Input,
     Modal,
     Form,
-    message
+    message,
+    Select
 } from 'antd';
 import moment from 'moment';
 import L from 'leaflet';
@@ -19,6 +20,7 @@ const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
 const { TextArea } = Input;
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';
+const Option = Select.Option;
 let markerUI;
 class ModalEdit extends Component {
     constructor (props) {
@@ -27,7 +29,8 @@ class ModalEdit extends Component {
             visibleMap: false,
             lat: '',
             lng: '',
-            WKT: 'POINT(0 0)'
+            WKT: 'POINT(0 0)',
+            isOnline: 0
         };
         this.handleCancel = this.handleCancel.bind(this); // 取消创建
         this.handleOk = this.handleOk.bind(this); // 确认修改
@@ -121,12 +124,14 @@ class ModalEdit extends Component {
                 Location: rep.Location,
                 MeetingTheme: rep.MeetingTheme,
                 Contacter: rep.Contacter,
-                Phone: rep.Phone
+                Phone: rep.Phone,
+                IsOnLine: rep.IsOnLine
             });
             this.setState({
                 WKT: `POINT(${rep.X} ${rep.Y})`,
                 lat: rep.Y,
-                lng: rep.X
+                lng: rep.X,
+                isOnline: rep.IsOnLine
             });
         });
     }
@@ -160,9 +165,11 @@ class ModalEdit extends Component {
                     return;
                 }
             }
-            if (lat === '' || lng === '') {
-                message.warning('请务必在地图中选中会议位置');
-                return;
+            if (!values.IsOnLine) {
+                if (lat === '' || lng === '') {
+                    message.warning('请务必在地图中选中会议位置');
+                    return;
+                }
             }
             if (!err) {
                 let StartTime = '', EndTime = '';
@@ -174,6 +181,7 @@ class ModalEdit extends Component {
                     MeetingType: '日常会议',
                     ProjectCode: 'P193',
                     BelongSystem: '雄安森林大数据平台',
+                    IsOnLine: values.IsOnLine,
                     OrgID: permission ? leftKeyCode : parentOrgID,
                     ID: recordID || '',
                     Contacter: values.Contacter, // 联系人
@@ -211,10 +219,20 @@ class ModalEdit extends Component {
             }
         });
     }
+    handleMeetingIsOnline = async (value) => {
+        this.setState({
+            isOnline: value
+        }, () => {
+            this.props.form.validateFields(['Location'], { force: true });
+        });
+    }
     render () {
         const {
             form: { getFieldDecorator }
         } = this.props;
+        const {
+            isOnline
+        } = this.state;
         return (
             <div>
                 <Modal
@@ -244,6 +262,26 @@ class ModalEdit extends Component {
                             }
                         </FormItem>
                         <FormItem
+                            label='会议类型'
+                        >
+                            {
+                                getFieldDecorator('IsOnLine', {
+                                    rules: [
+                                        { required: true, message: '请选择会议类型' }
+                                    ]
+                                })(
+                                    <Select onSelect={this.handleMeetingIsOnline.bind(this)}>
+                                        <Option value={0} key={'线下会议'} title={'线下会议'} >
+                                            线下会议
+                                        </Option>
+                                        <Option value={1} key={'视频会议'} title={'视频会议'} >
+                                            视频会议
+                                        </Option>
+                                    </Select>
+                                )
+                            }
+                        </FormItem>
+                        <FormItem
                             label='会议时间'
                         >
                             {
@@ -266,7 +304,7 @@ class ModalEdit extends Component {
                             {
                                 getFieldDecorator('Location', {
                                     rules: [
-                                        { required: true, message: '请务必填写此项' }
+                                        { required: !isOnline, message: '请务必填写此项' }
                                     ]
                                 })(
                                     <Input

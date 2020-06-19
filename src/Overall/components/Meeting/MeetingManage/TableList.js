@@ -264,6 +264,17 @@ class TableList extends Component {
             dataIndex: 'MeetingName'
         },
         {
+            title: '会议类型',
+            dataIndex: 'IsOnLine',
+            render: (text, record) => {
+                if (text) {
+                    return '视频会议';
+                } else {
+                    return '线下会议';
+                }
+            }
+        },
+        {
             title: '会议地点',
             dataIndex: 'Location'
         },
