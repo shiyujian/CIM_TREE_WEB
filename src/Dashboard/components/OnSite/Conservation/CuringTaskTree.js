@@ -338,7 +338,7 @@ export default class CuringTaskTree extends Component {
             this.handleCuringTaskTypeAddLayer();
         });
     }
-    
+
     // 养护任务选择类型
     handleCuringTaskTypeButton (option) {
         try {
@@ -748,7 +748,7 @@ export default class CuringTaskTree extends Component {
                                     className='CuringTreePage-MenuHideButton' />
                             </div>
                             <div className='CuringTreePage-asideTree'>
-                                <Spin spinning={curingTaskTreeLoading}></Spin>
+                                <Spin spinning={curingTaskTreeLoading}>
                                     <div className='CuringTreePage-StatusButton'>
                                         <a key='未完成'
                                             title='未完成'

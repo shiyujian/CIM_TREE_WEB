@@ -313,11 +313,15 @@ export const getSmallClass = (smallClassList) => {
                 permission = true;
             }
             let userRoles = user.roles || '';
-            if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('业主') !== -1) {
+            if (userRoles && userRoles.ParentID && userRoles.ParentID === 3) {
                 permission = true;
             }
+            let costPermission = false;
+            if (userRoles && userRoles.ParentID && userRoles.ParentID === 107) {
+                costPermission = true;
+            }
             // permission为true说明是管理员或者业主
-            if (permission) {
+            if (permission || costPermission) {
                 // console.log('wwwww', sectionNo);
             } else if (section) {
                 if (sectionNo !== section) {
