@@ -230,16 +230,27 @@ export default class DegitalAcceptTable extends Component {
                             }
                         } else if (record.status === '完成') {
                             if (record.CanReAccpetance === 1) {
-                                return (<div >
-                                    <a onClick={this.viewWord.bind(this, record)} >
-                                        查看
-                                    </a>
-                                    <Divider type='vertical' />
-                                    <a onClick={this.exportFile.bind(this, record)}>导出</a>
-                                    <Divider type='vertical' />
-                                    <a onClick={this.againCheck.bind(this, record)}>重新验收</a>
-                                </div>
-                                );
+                                if (permission) {
+                                    return (<div >
+                                        <a onClick={this.viewWord.bind(this, record)} >
+                                            查看
+                                        </a>
+                                        <Divider type='vertical' />
+                                        <a onClick={this.exportFile.bind(this, record)}>导出</a>
+                                        <Divider type='vertical' />
+                                        <a onClick={this.againCheck.bind(this, record)}>重新验收</a>
+                                    </div>
+                                    );
+                                } else {
+                                    return (<div >
+                                        <a onClick={this.viewWord.bind(this, record)} >
+                                            查看
+                                        </a>
+                                        <Divider type='vertical' />
+                                        <a onClick={this.exportFile.bind(this, record)}>导出</a>
+                                    </div>
+                                    );
+                                }
                             } else {
                                 return (<div >
                                     <a onClick={this.viewWord.bind(this, record)} >
