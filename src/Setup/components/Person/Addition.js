@@ -153,7 +153,9 @@ class Addition extends Component {
                     '普通员工',
                     '施工文书',
                     '测量员',
-                    '施工整改人'
+                    '施工整改人',
+                    // '班组长',
+                    '养护员'
                 ]
             });
             systemRoles.push({
@@ -195,7 +197,9 @@ class Addition extends Component {
                                 '普通员工',
                                 '施工文书',
                                 '测量员',
-                                '施工整改人'
+                                '施工整改人',
+                                // '班组长',
+                                '养护员'
                             ]
                         });
                     }
@@ -465,6 +469,10 @@ class Addition extends Component {
         // 用户是否为文书
         let userIsDocument = getUserIsDocument();
         let units = this.getUnits();
+        let sectionRequiredStatus = false;
+        if (node && node.Section && node.Section.length > 0) {
+            sectionRequiredStatus = true;
+        }
         return (
             <div>
                 <Modal
@@ -581,7 +589,7 @@ class Addition extends Component {
                                     {getFieldDecorator('section', {
                                         rules: [
                                             {
-                                                required: false,
+                                                required: sectionRequiredStatus,
                                                 message: '请选择标段'
                                             }
                                         ]

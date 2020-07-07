@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2020-04-28 14:23:34
+ * @Last Modified time: 2020-06-11 16:51:34
  */
 import React, { Component } from 'react';
 import {
@@ -24,6 +24,7 @@ import RiskTree from './Risk/RiskTree';
 import TrackTree from './Track/TrackTree';
 import TreeTypeTree from './TreeType/TreeTypeTree';
 import TreeMessGisOnClickHandle from './TreeMess/TreeMessGisOnClickHandle';
+import AuxiliaryManagement from './AuxiliaryManagement/AuxiliaryManagement';
 import CuringTaskTree from './Conservation/CuringTaskTree';
 import SurvivalRateTree from './SurvivalRate/SurvivalRateTree';
 import TreeAdoptTree from './Adopt/TreeAdoptTree';
@@ -58,8 +59,7 @@ class OnSite extends Component {
             areaEventKey: '', // 区域地块选中节点的key
             areaEventTitle: '', // 区域地块选中节点的name
             // 图层数据List
-            areaLayerList: {}, // 区域地块图层list
-            realThinClassLayerList: {} // 实际细班种植图层
+            areaLayerList: {} // 区域地块图层list
         };
         this.tileLayer = null; // 最底部基础图层
         this.tileTreeLayerBasic = null; // 树木区域图层
@@ -145,15 +145,11 @@ class OnSite extends Component {
         // 在各个菜单之间切换时需要处理的图层
         if (dashboardCompomentMenu && dashboardCompomentMenu !== prevProps.dashboardCompomentMenu) {
             // 去除各个模块切换的图层，其他模块的图层在退出模块时自动去除，辅助管理的图层在主文件中
-            if (dashboardCompomentMenu &&
-                dashboardCompomentMenu !== 'geojsonFeature_auxiliaryManagement'
-            ) {
-                await this.handleRemoveRealThinClassLayer();
-            }
             // 选择苗木结缘  成活率  灌溉管网时 需要将基本树木图层去除
             if (dashboardCompomentMenu === 'geojsonFeature_treeAdopt' ||
                 dashboardCompomentMenu === 'geojsonFeature_survivalRate' ||
-                dashboardCompomentMenu === 'geojsonFeature_treePipe'
+                dashboardCompomentMenu === 'geojsonFeature_treePipe' ||
+                dashboardCompomentMenu === 'geojsonFeature_auxiliaryManagement'
             ) {
                 await this.removeTileTreeLayerBasic();
             } else {
@@ -256,20 +252,10 @@ class OnSite extends Component {
             }
         }
     }
-    // 去除细班实际区域的图层
-    handleRemoveRealThinClassLayer = () => {
-        const {
-            realThinClassLayerList
-        } = this.state;
-        for (let i in realThinClassLayerList) {
-            this.map.removeLayer(realThinClassLayerList[i]);
-        }
-    }
     // 细班选择处理
     _handleAreaSelect = async (keys, info) => {
         const {
-            areaLayerList,
-            realThinClassLayerList
+            areaLayerList
         } = this.state;
         const {
             dashboardCompomentMenu
@@ -301,33 +287,6 @@ class OnSite extends Component {
                     } else {
                         // 如果不是添加过，需要请求数据
                         await this._addAreaLayer(eventKey);
-                    }
-                }
-                if (dashboardCompomentMenu === 'geojsonFeature_auxiliaryManagement') {
-                    let selectNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
-                    let selectSectionNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
-                    if (this.tileTreeLayerBasic) {
-                        this.map.removeLayer(this.tileTreeLayerBasic);
-                    }
-                    this.handleRemoveRealThinClassLayer();
-                    if (realThinClassLayerList[eventKey]) {
-                        realThinClassLayerList[eventKey].addTo(this.map);
-                    } else {
-                        var url = FOREST_GIS_API +
-                            `/geoserver/xatree/wms?cql_filter=No+LIKE+%27%25${selectNo}%25%27%20and%20Section+LIKE+%27%25${selectSectionNo}%25%27`;
-                        let thinClassLayer = L.tileLayer.wms(url,
-                            {
-                                layers: 'xatree:treelocation',
-                                crs: L.CRS.EPSG4326,
-                                format: 'image/png',
-                                maxZoom: 22,
-                                transparent: true
-                            }
-                        ).addTo(this.map);
-                        realThinClassLayerList[eventKey] = thinClassLayer;
-                        this.setState({
-                            realThinClassLayerList
-                        });
                     }
                 }
             }
@@ -573,6 +532,16 @@ class OnSite extends Component {
                                     {...this.props}
                                     {...this.state}
 
+                                />
+                            ) : ''
+                    }
+                    {// 辅助管理
+                        dashboardCompomentMenu === 'geojsonFeature_auxiliaryManagement'
+                            ? (
+                                <AuxiliaryManagement
+                                    map={this.map}
+                                    {...this.props}
+                                    {...this.state}
                                 />
                             ) : ''
                     }

@@ -1,5 +1,5 @@
-// 根据标段，区段，组团的数据获取区段组团的Name
-// 此处的区段数据为 001  组团数据为001 类型   不为具体的区段组团No
+// 根据标段，小班，细班的数据获取小班细班的Name
+// 此处的小班数据为 001  细班数据为001 类型   不为具体的小班细班No
 export const getSmallThinNameByPlaceData = (section, smallClass, thinClass, thinClassTree) => {
     let smallClassName = '';
     let thinClassName = '';

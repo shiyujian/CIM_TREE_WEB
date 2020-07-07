@@ -44,7 +44,7 @@ export default class ConstructionPackageTable extends Component {
                 }
             },
             {
-                title: '区段号',
+                title: '小班号',
                 dataIndex: 'smallCalss',
                 render: (text, record) => {
                     const {
@@ -64,7 +64,7 @@ export default class ConstructionPackageTable extends Component {
                 }
             },
             {
-                title: '组团号',
+                title: '细班号',
                 dataIndex: 'No',
                 render: (text, record) => {
                     let thinClassNo = '/';
@@ -137,7 +137,7 @@ export default class ConstructionPackageTable extends Component {
         });
         await setConstructionPackageLoading(false);
     }
-    // 设置区段选项
+    // 设置小班选项
     setSmallClassOption (rst) {
         if (rst instanceof Array) {
             let smallclassOptions = [];
@@ -189,7 +189,7 @@ export default class ConstructionPackageTable extends Component {
             console.log('onSmallClassChange', e);
         }
     }
-    // 设置组团选项
+    // 设置细班选项
     setThinClassOption (rst) {
         if (rst instanceof Array) {
             let thinclassOptions = [];
@@ -237,7 +237,7 @@ export default class ConstructionPackageTable extends Component {
         console.log('query', smallclass);
 
         if (!smallclass) {
-            message.info('请选择项目，标段，区段');
+            message.info('请选择项目，标段，小班');
         }
         smallCalssPackageList.map((smallClassData) => {
             if (smallclass === smallClassData.No) {
@@ -290,7 +290,7 @@ export default class ConstructionPackageTable extends Component {
     handleDeleteConstructionCancel = () => {
 
     }
-    // 删除组团
+    // 删除细班
     handleDeleteConstruction = async (record) => {
         console.log('record', record);
         const {
@@ -313,8 +313,8 @@ export default class ConstructionPackageTable extends Component {
                 'LandNo': LandNo, // 地块编码
                 'RegionNo': RegionNo, // 区块编码
                 'UnitProjectNo': UnitProjectNo, // 标段编码
-                'SmallClass': SmallClass, // 区段
-                'ThinClass': ThinClass // 组团
+                'SmallClass': SmallClass, // 小班
+                'ThinClass': ThinClass // 细班
             };
             let data = await deleteWpunit({}, postData);
             console.log('data', data);
@@ -337,7 +337,7 @@ export default class ConstructionPackageTable extends Component {
             }
         } else {
             Notification.error({
-                message: '当前组团编号错误，请重新查找'
+                message: '当前细班编号错误，请重新查找'
             });
         }
     }
@@ -382,7 +382,7 @@ export default class ConstructionPackageTable extends Component {
                                         </Select>
                                     </div>
                                     <div className='ConstructionPackageTable-mrg10'>
-                                        <span className='ConstructionPackageTable-search-span'>区段：</span>
+                                        <span className='ConstructionPackageTable-search-span'>小班：</span>
                                         <Select
                                             allowClear
                                             showSearch
@@ -400,7 +400,7 @@ export default class ConstructionPackageTable extends Component {
                                         </Select>
                                     </div>
                                     <div className='ConstructionPackageTable-mrg10'>
-                                        <span className='ConstructionPackageTable-search-span'>组团：</span>
+                                        <span className='ConstructionPackageTable-search-span'>细班：</span>
                                         <Select
                                             allowClear
                                             showSearch
@@ -424,14 +424,14 @@ export default class ConstructionPackageTable extends Component {
                                             type='primary'
                                             disabled={!section}
                                             onClick={this.handleAddThinClass.bind(this)}
-                                            className='ConstructionPackageTable-search-button'>新增组团</Button>
+                                            className='ConstructionPackageTable-search-button'>新增细班</Button>
                                     </div>
                                     {/* <div className='ConstructionPackageTable-mrg10-button'>
                                         <Button
                                             type='primary'
                                             style={{marginRight: 30}}
                                             onClick={this.handleAddSmallClassOK.bind(this)}
-                                            className='ConstructionPackageTable-search-button'>新增区段</Button>
+                                            className='ConstructionPackageTable-search-button'>新增小班</Button>
                                     </div> */}
                                     <div className='ConstructionPackageTable-mrg10-button'>
                                         <Button

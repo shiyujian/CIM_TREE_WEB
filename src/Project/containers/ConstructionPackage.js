@@ -66,7 +66,7 @@ export default class ConstructionPackage extends Component {
             let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
             let totalThinClass = data.totalThinClass || [];
             let projectList = data.projectList || [];
-            // 获取所有的区段数据，用来计算养护任务的位置
+            // 获取所有的小班数据，用来计算养护任务的位置
             await getTotalThinClass(totalThinClass);
             // 区域地块树
             await getThinClassTree(projectList);
@@ -109,7 +109,7 @@ export default class ConstructionPackage extends Component {
             packageDatas: projectList
         });
     }
-    // 树选择, 重新获取: 标段、区段、组团、树种并置空
+    // 树选择, 重新获取: 标段、小班、细班、树种并置空
     onSelect (keys = [], info) {
         const {
             platform: { tree = {} }

@@ -2,7 +2,7 @@
     font-family: Digital-7;
     src: url('../digital-7.ttf');
 }
-.TreePipePage-container{
+.AuxiliaryManagement-container{
     display: flex;
     position: absolute;
     // width: calc(~'100% - 44px');
@@ -11,13 +11,13 @@
     width:560px;
     height:265px;
 
-    .TreePipePage-r-main{
+    .AuxiliaryManagement-r-main{
     flex:1 1 auto;
     position: relative;
     overflow: hidden;
     }
 
-    .TreePipePage-foldBtn {
+    .AuxiliaryManagement-foldBtn {
         position: absolute;
         width: 64px;
         height: 64px;
@@ -30,7 +30,7 @@
         // border:1px solid rgba(97,245,171,1);
     }
 
-    .TreePipePage-menuPanel {
+    .AuxiliaryManagement-menuPanel {
         position: absolute;
         bottom: 0;
         width: 100%;
@@ -38,11 +38,11 @@
         transition: all 0.8s;
         z-index: 980;
         // background:rgba(19,34,36,0.8);
-        // background-image: url("./TreePipeImg/bottom1.png");
+        // background-image: url("./AuxiliaryManagementImg/bottom1.png");
         // background-repeat: no-repeat;
   
-        .TreePipePage-menuBackground {
-            background-image: url("./TreePipeImg/bottom1.png");
+        .AuxiliaryManagement-menuBackground {
+            background-image: url("./AuxiliaryManagementImg/bottom1.png");
             background-repeat: no-repeat;
             width: 100%;
             height: 100%;
@@ -51,7 +51,7 @@
             // background: rgba(19,34,36,1);
             opacity: 0.7;
         }
-        .TreePipePage-aside {
+        .AuxiliaryManagement-aside {
             position: absolute;
             left: 24px;
             width: calc(~'100% - 24px');;
@@ -60,13 +60,13 @@
             z-index: 999;
             overflow: auto;
 
-            .TreePipePage-MenuNameLayout { 
+            .AuxiliaryManagement-MenuNameLayout { 
                 display: inline-block;
                 margin-top: 18px;
                 width: 100%;
             }
-             .TreePipePage-MenuName {
-                width: 450px;
+            .AuxiliaryManagement-MenuName {
+                width: 230px;
                 height: 17px;
                 font-size: 16px;
                 font-family: Microsoft YaHei;
@@ -76,77 +76,94 @@
                 left: 12px;
                 top: 18px;
             }
-            .TreePipePage-MenuHideButton {
+            .AuxiliaryManagement-MenuHideButton {
                 float: right;
                 cursor: pointer;
                 margin-right: 15px;
             }
-            .TreePipePage-asideTree {
+            .AuxiliaryManagement-NumTitle{
+                width:127px;
+                height:19px;
+                font-size:14px;
+                font-family:Microsoft YaHei;
+                font-weight:400;
+                color:rgba(161,182,194,1);
+                line-height:19px;
+                margin-left: 210px;
+                vertical-align: middle;
+            }
+            .AuxiliaryManagement-asideTree {
                 margin-top: 10px;
                 // margin-left: 10px;
             }
-            .TreePipePage-button {
+            .AuxiliaryManagement-button {
                 display: block;
                 // width: 220px;
             }
-            .TreePipePage-button-layout {
-                width:96px;
-                height:64px;
-                // border:1px solid rgba(60,248,247,1);
-                border-radius:2px;
-                background-image: url("./TreePipeImg/1levitate.png");
-                display: inline-block;
-            }
-            .TreePipePage-button-layoutSel {
-                width:96px;
-                height:64px;
+            .AuxiliaryManagement-button-layoutSel {
+                width: 122px;
+                height: 74px;
                 border:1px solid rgba(60,248,247,1);
                 border-radius:2px;
-                background-image: url("./TreePipeImg/1selection.png");
+                background-image: url("./AuxiliaryManagementImg/bg1.png");
                 display: inline-block;
             }
-            .TreePipePage-button-layout-text {
-                width:28px;
+            .AuxiliaryManagement-button-layout-text {
+                width: 122px;
                 height:14px;
                 font-size:14px;
                 font-family:Microsoft YaHei;
                 font-weight:bold;
                 color:rgba(255,255,255,1);
-                line-height: 60px;
-                margin-left: 10px;
-            }
-            .TreePipePage-button-layout-numSel {
-                width: 40px;
-                height: 15px;
-                font-size: 32px;
-                font-family: Digital-7;
-                font-weight: 400;
+                line-height: 14px;
+                margin-left: 16px;
+                margin-top: 10px;
                 display: inline-block;
-                color: #66ffb3;
-                line-height: 15px;
-                position: absolute;
-                background: #50c250;
-                margin-top: 35px;
-                text-align: center;
-                margin-left: 10px;
             }
-            .TreePipePage-button-layout-num {
-                width: 105px;
-                height: 22px;
-                font-size: 32px;
-                font-family: Digital-7;
-                font-weight: 400;
+            .AuxiliaryManagement-button-layout-numSel {
+                width: 122px;
+                height: 16px;
                 display: inline-block;
-                color: #66ffb3;
-                line-height: 40px;
+                line-height: 22px;
                 position: absolute;
                 text-align: right;
-                opacity:0.02;
+                margin-top: 6px;
+
+                .AuxiliaryManagement-button-layout-actualNum {
+                    height: 16px;
+                    font-size: 24px;
+                    font-family: Digital-7;
+                    font-weight: 400;
+                    display: inline-block;
+                    color: #61F5AB;
+                    line-height: 16px;
+                    margin-right: 10px;
+                }
+                .AuxiliaryManagement-button-layout-numDivide {
+                    height: 16px;
+                    font-size: 24px;
+                    font-family: Digital-7;
+                    font-weight: 400;
+                    display: inline-block;
+                    color: rgba(255,255,255,1);
+                    line-height: 16px;
+                    margin-right: 10px;
+                }
+                .AuxiliaryManagement-button-layout-designNum {
+                    height: 16px;
+                    font-size: 24px;
+                    font-family: Digital-7;
+                    font-weight: 400;
+                    display: inline-block;
+                    color: #61F5AB;
+                    line-height: 16px;
+                    margin-right: 10px;
+                }
             }
         }
     }
 }
-.TreePipePage-result-Container{
+.AuxiliaryManagement-result-Container{
     display: flex;
     position: absolute;
     left: 612px;
@@ -154,13 +171,13 @@
     width: 280px;
     height: 265px;
 
-    .TreePipePage-result-r-main{
+    .AuxiliaryManagement-result-r-main{
     flex:1 1 auto;
     position: relative;
     overflow: hidden;
     }
 
-    .TreePipePage-result-foldBtn {
+    .AuxiliaryManagement-result-foldBtn {
         position: absolute;
         width: 64px;
         height: 64px;
@@ -173,7 +190,7 @@
         // border:1px solid rgba(97,245,171,1);
     }
 
-    .TreePipePage-result-menuPanel {
+    .AuxiliaryManagement-result-menuPanel {
         position: absolute;
         bottom: 0;
         width: 100%;
@@ -181,11 +198,11 @@
         transition: all 0.8s;
         z-index: 980;
         // background:rgba(19,34,36,0.8);
-        // background-image: url("./TreePipeImg/bottom1.png");
+        // background-image: url("./AuxiliaryManagementImg/bottom1.png");
         // background-repeat: no-repeat;
   
-        .TreePipePage-result-menuBackground {
-            background-image: url("./TreePipeImg/bottom1.png");
+        .AuxiliaryManagement-result-menuBackground {
+            background-image: url("./AuxiliaryManagementImg/bottom1.png");
             background-repeat: no-repeat;
             width: 100%;
             height: 100%;
@@ -194,7 +211,7 @@
             // background: rgba(19,34,36,1);
             opacity: 0.7;
         }
-        .TreePipePage-result-aside {
+        .AuxiliaryManagement-result-aside {
             position: absolute;
             left: 24px;
             width: calc(~'100% - 40px');;
@@ -203,12 +220,12 @@
             z-index: 999;
             overflow: auto;
 
-            .TreePipePage-result-MenuNameLayout { 
+            .AuxiliaryManagement-result-MenuNameLayout { 
                 display: inline-block;
                 margin-top: 18px;
                 width: 100%;
             }
-             .TreePipePage-result-MenuName {
+             .AuxiliaryManagement-result-MenuName {
                 width:32px;
                 height:17px;
                 font-size:16px;
@@ -219,50 +236,26 @@
                 left: 12px;
                 top: 18px;
             }
-            .TreePipePage-result-asideTree {
+            .AuxiliaryManagement-result-asideTree {
                 margin-top: 10px;
                 margin-left: 10px;
             }
-            
-            .TreePipePage-result-titlelayout {
-                width:232px;
-                height:32px;
-                margin-bottom: 5px;
-            }
-            .TreePipePage-result-titleBackground {
-                width: 100%;
-                height: 32px;
-                // background:rgba(161,182,194,1);
-                position: absolute;
-                // opacity: 0.26;
-            }
-            .TreePipePage-result-title {
-                width:100px;
-                font-size:14px;
-                font-family:Microsoft YaHei;
-                font-weight:400;
-                color:rgba(255,255,255,1);
-                line-height:40px;
-                vertical-align: middle;
-                float: left;
-                line-height: 32px;
-                margin-left: 15px;
-            }
-            .TreePipePage-result-resultlayout {
+
+            .AuxiliaryManagement-result-resultlayout {
                 width:232px;
                 height:32px;
                 margin-bottom: 5px;
                 // background:rgba(161,182,194,1);
                 // opacity:0.6;
             }
-            .TreePipePage-result-resultBackground {
+            .AuxiliaryManagement-result-resultBackground {
                 width: 100%;
                 height: 32px;
                 background:rgba(161,182,194,1);
                 position: absolute;
                 opacity: 0.26;
             }
-            .TreePipePage-result-type {
+            .AuxiliaryManagement-result-type {
                 width:100px;
                 font-size:14px;
                 font-family:Microsoft YaHei;
@@ -274,7 +267,7 @@
                 line-height: 32px;
                 margin-left: 15px;
             }
-            .TreePipePage-result-num {
+            .AuxiliaryManagement-result-num {
                 width:34px;
                 font-size:18px;
                 font-family:Digital-7;

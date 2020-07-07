@@ -189,6 +189,7 @@ export const getThinClassName = (regionThinClass, totalThinClass, signSection, b
     try {
         regionThinClass.map((thinData, index) => {
             let section = thinData.Section;
+
             // 如果圈选的区域不在登录用户的标段内，则不能下发任务
             // if (signSection !== section) {
             //     sectionBool = false;
@@ -199,6 +200,9 @@ export const getThinClassName = (regionThinClass, totalThinClass, signSection, b
             //     return;
             // }
             let thinNo = thinData.no;
+            if (!(section && thinNo)) {
+                return;
+            }
             let pushState = true;
             // 获取的thinNo可能又会重复的，需要进行处理
             thinNoList.map((data) => {
@@ -214,6 +218,8 @@ export const getThinClassName = (regionThinClass, totalThinClass, signSection, b
                 let sectionNo = sectionData.section;
                 // 首先根据区块找到对应的细班list
                 if (section === sectionNo) {
+                    console.log('thinNo', thinNo);
+
                     let smallClassList = sectionData.smallClassList;
                     smallClassList.map((smallClass) => {
                         // tree结构的数据经过了处理，需要和api获取的数据调整一致
@@ -263,6 +269,113 @@ export const getThinClassName = (regionThinClass, totalThinClass, signSection, b
                     });
                 }
             });
+        });
+    } catch (e) {
+        console.log('细班名称', e);
+    }
+    let regionData = {
+        regionThinName: regionThinName,
+        regionThinNo: regionThinNo,
+        regionSectionNo: regionSectionNo,
+        regionSectionName: regionSectionName,
+        sectionBool: sectionBool,
+        regionSmallName: regionSmallName,
+        regionSmallNo: regionSmallNo,
+        regionSmallThinClassName: regionSmallThinClassName
+    };
+    return regionData;
+};
+// 查找区域内的细班的名称
+export const getThinClassNameByThinClassNo = (checkedKeys, totalThinClass, bigTreeList) => {
+    // 经过筛选后的细班No
+    let regionThinNo = '';
+    // 经过筛选后的细班Name
+    let regionThinName = '';
+    // 经过筛选后的小班
+    let regionSmallNo = '';
+    let regionSmallName = '';
+    // 经过筛选后的标段No
+    let regionSectionNo = '';
+    // 经过筛选后的标段Name
+    let regionSectionName = '';
+    // 标段是否是登陆用户所在标段
+    let sectionBool = true;
+    // 小班细班名称
+    let regionSmallThinClassName = '';
+
+    // 细班数组，查看细班是否重复，重复不再查询
+    let thinNoList = [];
+    let smallNoList = [];
+    try {
+        checkedKeys.map((checkKey, index) => {
+            let checkKeyArr = checkKey.split('-');
+            if (checkKeyArr instanceof Array && checkKeyArr.length === 5) {
+                let section = checkKeyArr[0] + '-' + checkKeyArr[1] + '-' + checkKeyArr[2];
+                let thinNo = checkKeyArr[0] + '-' + checkKeyArr[1] + '-' + checkKeyArr[3] + '-' + checkKeyArr[4];
+                let pushState = true;
+                // 获取的thinNo可能又会重复的，需要进行处理
+                if (thinNoList.indexOf(thinNo) !== -1) {
+                    pushState = false;
+                }
+                if (!pushState) {
+                    return;
+                }
+                thinNoList.push(thinNo);
+                totalThinClass.map((sectionData) => {
+                    let sectionNo = sectionData.section;
+                    // 首先根据区块找到对应的细班list
+                    if (section === sectionNo) {
+                        console.log('thinNo', thinNo);
+
+                        let smallClassList = sectionData.smallClassList;
+                        smallClassList.map((smallClass) => {
+                            let smallClassHandleKey = smallClass.No.split('-');
+                            let smallClassNo = smallClassHandleKey[0] + '-' + smallClassHandleKey[1] + '-' + smallClassHandleKey[3];
+                            let childSection = smallClassHandleKey[0] + '-' + smallClassHandleKey[1] + '-' + smallClassHandleKey[2];
+                            if (thinNo.indexOf(smallClassNo) !== -1) {
+                                // 找到符合条件的数据的name
+                                let thinClassList = smallClass.children;
+                                thinClassList.map((thinClass) => {
+                                    let thinClassHandleKey = thinClass.No.split('-');
+                                    let thinClassNo = thinClassHandleKey[0] + '-' + thinClassHandleKey[1] + '-' + thinClassHandleKey[3] + '-' + thinClassHandleKey[4];
+                                    if (thinNo.indexOf(thinClassNo) !== -1) {
+                                        // 是否小班重复
+                                        let isUniqueSmall = true;
+                                        smallNoList.map((smallData) => {
+                                            if (smallData === smallClassNo) {
+                                                isUniqueSmall = false;
+                                            }
+                                        });
+                                        if (isUniqueSmall) {
+                                            if (!regionSmallNo) {
+                                                regionSmallNo = smallClassNo;
+                                                regionSmallName = smallClass.Name;
+                                            } else {
+                                                regionSmallNo = regionSmallNo + ' ,' + smallClassNo;
+                                                regionSmallName = regionSmallName + ' ,' + smallClass.Name;
+                                            }
+                                            smallNoList.push(smallClassNo);
+                                        }
+                                        let thinClassName = thinClass.Name;
+                                        let sectionName = getSectionName(section, bigTreeList);
+                                        regionSectionNo = section;
+                                        regionSectionName = sectionName;
+                                        if (index === 0) {
+                                            regionThinName = regionThinName + thinClassName;
+                                            regionThinNo = regionThinNo + thinNo;
+                                            regionSmallThinClassName = regionSmallThinClassName + smallClass.Name + thinClassName;
+                                        } else {
+                                            regionThinName = regionThinName + ' ,' + thinClassName;
+                                            regionThinNo = regionThinNo + ' ,' + thinNo;
+                                            regionSmallThinClassName = regionSmallThinClassName + ' ,' + smallClass.Name + thinClassName;
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
         });
     } catch (e) {
         console.log('细班名称', e);

@@ -7,7 +7,8 @@ import {
     Notification,
     Input,
     Modal,
-    Form
+    Form,
+    Select
 } from 'antd';
 import moment from 'moment';
 import XLSX from 'xlsx';
@@ -22,6 +23,7 @@ import zhiguanban from './zhiguanban.png';
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
 const { TextArea } = Input;
+const Option = Select.Option;
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';
 let markerUI;
 
@@ -37,7 +39,8 @@ class ModalSee extends Component {
             dataList: [],
             imgViewSrc: '',
             imgViewModalVisible: false,
-            meetingRecord: ''
+            meetingRecord: '',
+            isOnline: 0
         };
         this.handleCancel = this.handleCancel.bind(this); // 取消创建
         this.handleOk = this.handleOk.bind(this); // 确认查看
@@ -91,7 +94,8 @@ class ModalSee extends Component {
                     Location: rep.Location,
                     MeetingTheme: rep.MeetingTheme,
                     Contacter: rep.Contacter,
-                    Phone: rep.Phone
+                    Phone: rep.Phone,
+                    IsOnLine: rep.IsOnLine
                 });
                 let dataList = [];
                 if (rep.Users && rep.Users instanceof Array) {
@@ -111,7 +115,8 @@ class ModalSee extends Component {
                     lng: rep.X,
                     QRCode: rep.QRCode,
                     dataList: dataList,
-                    meetingRecord: rep
+                    meetingRecord: rep,
+                    isOnline: rep.IsOnLine
                 });
             }
         });
@@ -377,6 +382,26 @@ class ModalSee extends Component {
                                                     style={{width: 350}}
                                                     placeholder='请输入'
                                                 />
+                                            )
+                                        }
+                                    </FormItem>
+                                    <FormItem
+                                        label='会议类型'
+                                    >
+                                        {
+                                            getFieldDecorator('IsOnLine', {
+                                                rules: [
+                                                    { required: false, message: '请选择会议类型' }
+                                                ]
+                                            })(
+                                                <Select disabled>
+                                                    <Option value={0} key={'线下会议'} title={'线下会议'} >
+                                                        线下会议
+                                                    </Option>
+                                                    <Option value={1} key={'视频会议'} title={'视频会议'} >
+                                                        视频会议
+                                                    </Option>
+                                                </Select>
                                             )
                                         }
                                     </FormItem>

@@ -141,7 +141,17 @@ export default class CuringTaskTree extends Component {
             console.log('componentDidMount', e);
         }
     }
-
+    componentDidUpdate = async (prevProps, prevState) => {
+        const {
+            selectProject
+        } = this.props;
+        const {
+            timeType
+        } = this.state;
+        if (selectProject !== prevProps.selectProject) {
+            this.handleTimeChange(timeType);
+        }
+    }
     componentWillUnmount = async () => {
         await this.handleRemoveAllCuringTaskLayer();
     }
@@ -175,7 +185,8 @@ export default class CuringTaskTree extends Component {
             curingTaskComplete
         } = this.state;
         const {
-            curingTaskTree
+            curingTaskTree,
+            selectProject = ''
         } = this.props;
         try {
             this.setState({
@@ -195,7 +206,11 @@ export default class CuringTaskTree extends Component {
                         if (curingTaskComplete) {
                             this.query();
                         } else {
-                            this.handleCuringTaskSearchData(curingTaskTree);
+                            if (!selectProject) {
+                                this.handleCuringTaskSearchData(curingTaskTree);
+                            } else {
+                                this.query();
+                            }
                         }
                     } else {
                         this.query();
@@ -241,7 +256,8 @@ export default class CuringTaskTree extends Component {
                 getCuringTaskTreeLoading
             },
             curingTypes,
-            curingTaskTree
+            curingTaskTree,
+            selectProject = ''
         } = this.props;
         const {
             stime,
@@ -251,7 +267,7 @@ export default class CuringTaskTree extends Component {
             curingTaskComplete
         } = this.state;
         try {
-            if (!stime && !etime && curingTaskUnComplete && curingTaskTree) {
+            if (!stime && !etime && curingTaskUnComplete && !selectProject) {
                 await this.handleCuringTaskSearchData(curingTaskTree);
                 return;
             }
@@ -271,14 +287,16 @@ export default class CuringTaskTree extends Component {
                     let postdata1 = {
                         stime: stime ? moment(stime).format('YYYY-MM-DD 00:00:01') : '',
                         etime: etime ? moment(etime).format('YYYY-MM-DD 23:59:59') : '',
-                        status: 0
+                        status: 0,
+                        section: selectProject
                     };
                     let data1 = await getCuring({}, postdata1);
                     // 状态为退回
                     let postdata2 = {
                         stime: stime ? moment(stime).format('YYYY-MM-DD 00:00:01') : '',
                         etime: etime ? moment(etime).format('YYYY-MM-DD 23:59:59') : '',
-                        status: 1
+                        status: 1,
+                        section: selectProject
                     };
                     let data2 = await getCuring({}, postdata2);
                     if (data1 && data1.content) {
@@ -298,7 +316,8 @@ export default class CuringTaskTree extends Component {
                     let postdata = {
                         stime: stime ? moment(stime).format('YYYY-MM-DD 00:00:01') : '',
                         etime: etime ? moment(etime).format('YYYY-MM-DD 23:59:59') : '',
-                        status: 2
+                        status: 2,
+                        section: selectProject
                     };
                     let curingTaskData = await getCuring({}, postdata);
                     let curingTasks = curingTaskData.content;

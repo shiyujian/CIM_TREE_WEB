@@ -200,14 +200,12 @@ export const getAreaTreeData = async (getTreeNodeList, getThinClassList) => {
         permission = true;
     }
     let userRoles = user.roles || '';
-    if (userRoles && userRoles.RoleName) {
-        if (userRoles.RoleName.indexOf('业主') !== -1) {
-            permission = true;
-        } else if (userRoles.RoleName.indexOf('项目技术负责人') !== -1) {
-            permission = true;
-        } else if (userRoles.RoleName.indexOf('项目经理') !== -1) {
-            permission = true;
-        }
+    if (userRoles && userRoles.ParentID && userRoles.ParentID === 3) {
+        permission = true;
+    }
+    let multipleSectionPermission = false;
+    if (userRoles && userRoles.ParentID && userRoles.ParentID === 107) {
+        multipleSectionPermission = true;
     }
 
     if (rst instanceof Array && rst.length > 0) {
@@ -227,6 +225,21 @@ export const getAreaTreeData = async (getTreeNodeList, getThinClassList) => {
                             Parent: noArr[0]
                         });
                     }
+                }
+            } else if (multipleSectionPermission) {
+                let sectionArr = section.split('-');
+                let projectKey = sectionArr[0];
+                if (node.Type === '项目工程' && node.No.indexOf(projectKey) !== -1) {
+                    projectList.push({
+                        Name: node.Name,
+                        No: node.No
+                    });
+                } else if (node.Type === '单位工程' && node.No.indexOf(projectKey) !== -1) {
+                    sectionList.push({
+                        Name: node.Name,
+                        No: node.No,
+                        Parent: projectKey
+                    });
                 }
             } else if (section) {
                 let sectionArr = section.split('-');
@@ -300,11 +313,15 @@ export const getSmallClass = (smallClassList) => {
                 permission = true;
             }
             let userRoles = user.roles || '';
-            if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('业主') !== -1) {
+            if (userRoles && userRoles.ParentID && userRoles.ParentID === 3) {
                 permission = true;
             }
+            let multipleSectionPermission = false;
+            if (userRoles && userRoles.ParentID && userRoles.ParentID === 107) {
+                multipleSectionPermission = true;
+            }
             // permission为true说明是管理员或者业主
-            if (permission) {
+            if (permission || multipleSectionPermission) {
                 // console.log('wwwww', sectionNo);
             } else if (section) {
                 if (sectionNo !== section) {
@@ -472,7 +489,10 @@ export const getUserIsManager = () => {
             permission = true;
         }
         let userRoles = user.roles || '';
-        if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('业主') !== -1) {
+        if (userRoles && userRoles.ParentID && userRoles.ParentID === 3) {
+            permission = true;
+        }
+        if (userRoles && userRoles.ParentID && userRoles.ParentID === 107) {
             permission = true;
         }
         return permission;
@@ -484,7 +504,15 @@ export const getUserIsManager = () => {
 // 判断用户应该选择的标段
 export const getDefaultProject = async () => {
     try {
-        let permission = await getUserIsManager();
+        const user = getUser();
+        let permission = false;
+        if (user.username === 'admin') {
+            permission = true;
+        }
+        let userRoles = user.roles || '';
+        if (userRoles && userRoles.ParentID && userRoles.ParentID === 3) {
+            permission = true;
+        }
         if (permission) {
             return DEFAULT_PROJECT;
         } else {

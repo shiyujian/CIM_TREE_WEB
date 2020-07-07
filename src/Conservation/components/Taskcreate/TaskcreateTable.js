@@ -17,6 +17,7 @@ import {
     getIconType,
     getTaskThinClassName,
     getThinClassName,
+    getThinClassNameByThinClassNo,
     getTaskStatus,
     getCuringTaskCreateTreeData,
     handleAreaLayerData,
@@ -150,7 +151,7 @@ export default class TaskCreateTable extends Component {
             await changeCheckedKeys([]);
             await changeSelectMap('细班选择');
             // 初始化地图
-            await this._initMap();
+            await this.initMap();
             // 获取地块树数据
             if (tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0) {
                 this.setState({
@@ -165,8 +166,35 @@ export default class TaskCreateTable extends Component {
             console.log('componentDidMount', e);
         }
     }
+    componentDidUpdate (prevProps, prevState) {
+        const {
+            selectMap,
+            actions: {
+                changeCheckedKeys
+            }
+        } = this.props;
+        const {
+            polygonData,
+            areaLayerList
+        } = this.state;
+        if (selectMap && selectMap !== prevProps.selectMap) {
+            if (selectMap === '细班选择') {
+                if (polygonData) {
+                    this.map.removeLayer(polygonData);
+                }
+            } else {
+                changeCheckedKeys([]);
+                for (let i in areaLayerList) {
+                    areaLayerList[i].map((layer) => {
+                        this.map.removeLayer(layer);
+                    });
+                }
+            }
+            this.resetButState();
+        }
+    }
     /* 初始化地图 */
-    _initMap () {
+    initMap () {
         let me = this;
         let mapInitialization = INITLEAFLET_API;
         mapInitialization.crs = L.CRS.EPSG4326;
@@ -190,39 +218,6 @@ export default class TaskCreateTable extends Component {
         }).addTo(this.map);
         // 加载树图层
         this.getTileLayer2();
-        // // 地图点击事件
-        // this.map.on('mousemove', function (e) {
-        //     const {
-        //         coordinates,
-        //         createBtnVisible
-        //     } = me.state;
-        //     const {
-        //         selectMap
-        //     } = me.props;
-        //     if (selectMap === '细班选择') {
-        //         return;
-        //     }
-        //     // 对点击点的坐标进行保存
-        //     coordinates.push([e.latlng.lat, e.latlng.lng]);
-        //     if (coordinates.length > 2 && !createBtnVisible) {
-        //         me.setState({
-        //             createBtnVisible: true
-        //         });
-        //     }
-        //     // 去除原来的图层，只保留最新的图层
-        //     if (me.state.polygonData) {
-        //         me.map.removeLayer(me.state.polygonData);
-        //     }
-        //     let polygonData = L.polygon(coordinates, {
-        //         color: 'white',
-        //         fillColor: 'red',
-        //         fillOpacity: 0.5
-        //     }).addTo(me.map);
-        //     me.setState({
-        //         coordinates,
-        //         polygonData: polygonData
-        //     });
-        // });
         // 地图点击事件
         this.map.on('click', function (e) {
             const {
@@ -442,7 +437,6 @@ export default class TaskCreateTable extends Component {
                     });
                 }
             });
-            console.log('thinClassCoords', thinClassCoords);
 
             if (thinClassCoords.length === 1) {
                 coords = thinClassCoords[0];
@@ -481,14 +475,19 @@ export default class TaskCreateTable extends Component {
             } else {
                 let num = computeSignedArea(coords, 1);
                 regionArea = regionArea + num;
-                wkt = 'POLYGON(';
+                wkt = 'POLYGON';
                 wkt = wkt + getWktData(coords);
-                wkt = wkt + ')';
             }
             regionArea = regionArea * 0.0015;
-            // 包括的细班号
-            let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
-            let regionData = getThinClassName(regionThinClass, totalThinClass, this.section, bigTreeList);
+            let regionData = '';
+            if (selectMap === '细班选择') {
+                regionData = getThinClassNameByThinClassNo(checkedKeys, totalThinClass, bigTreeList);
+            } else if (selectMap === '手动框选') {
+                // 包括的细班号
+                let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
+                regionData = getThinClassName(regionThinClass, totalThinClass, this.section, bigTreeList);
+            }
+
             // let sectionBool = regionData.sectionBool;
             // if (!sectionBool) {
             //     Notification.error({
@@ -503,11 +502,11 @@ export default class TaskCreateTable extends Component {
             //     return;
             // }
             console.log('regionData', regionData);
-            let regionThinName = regionData.regionThinName;
-            let regionThinNo = regionData.regionThinNo;
-            let regionSectionNo = regionData.regionSectionNo;
-            let regionSectionName = regionData.regionSectionName;
-            let regionSmallThinClassName = regionData.regionSmallThinClassName;
+            let regionThinName = (regionData && regionData.regionThinName) || '';
+            let regionThinNo = (regionData && regionData.regionThinNo) || '';
+            let regionSectionNo = (regionData && regionData.regionSectionNo) || '';
+            let regionSectionName = (regionData && regionData.regionSectionName) || '';
+            let regionSmallThinClassName = (regionData && regionData.regionSmallThinClassName) || '';
             // 区域内树木数量
             // let treeNum = await postTreeLocationNumByRegion({}, {WKT: wkt});
             this.setState({
@@ -520,7 +519,11 @@ export default class TaskCreateTable extends Component {
                 regionThinNo,
                 regionSectionNo,
                 regionSectionName,
-                noLoading: true
+                noLoading: false
+            }, () => {
+                this.setState({
+                    noLoading: true
+                });
             });
         } catch (e) {
             console.log('树木数量', e);
@@ -717,7 +720,7 @@ export default class TaskCreateTable extends Component {
                 });
             };
         } catch (e) {
-
+            console.log('_addAreaLayer', e);
         }
     }
 
@@ -967,33 +970,7 @@ export default class TaskCreateTable extends Component {
             return layer;
         }
     }
-    componentDidUpdate (prevProps, prevState) {
-        const {
-            selectMap,
-            actions: {
-                changeCheckedKeys
-            }
-        } = this.props;
-        const {
-            polygonData,
-            areaLayerList
-        } = this.state;
-        if (selectMap && selectMap !== prevProps.selectMap) {
-            if (selectMap === '细班选择') {
-                if (polygonData) {
-                    this.map.removeLayer(polygonData);
-                }
-            } else {
-                changeCheckedKeys([]);
-                for (let i in areaLayerList) {
-                    areaLayerList[i].map((layer) => {
-                        this.map.removeLayer(layer);
-                    });
-                }
-            }
-            this.resetButState();
-        }
-    }
+
     /* 菜单展开收起 */
     _extendAndFold () {
         this.setState({ menuIsExtend: !this.state.menuIsExtend });

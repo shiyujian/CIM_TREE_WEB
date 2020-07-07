@@ -50,7 +50,8 @@ export default class DataExport extends Component {
             positionoption: [],
             sectionsData: [],
             smallClassesData: [],
-            loading: false
+            loading: false,
+            dxfPermission: false
         };
     }
     getbigTypeName (type) {
@@ -77,12 +78,35 @@ export default class DataExport extends Component {
                 setkeycode,
                 getThinClassList,
                 getTotalThinClass,
-                getThinClassTree
+                getThinClassTree,
+                getRoles
             },
             treetypes,
             platform: { tree = {} }
         } = this.props;
-
+        // 竣工图导出权限
+        let user = getUser();
+        let dxfPermission = false;
+        let userRoles = user.roles;
+        // 需要找到是业主角色的人
+        let roleData = await getRoles();
+        let ownerRoleID = '';
+        roleData.map((role) => {
+            if (role && role.ID && !role.ParentID) {
+                if (role.RoleName === '业主') {
+                    ownerRoleID = role.ID;
+                }
+            }
+        });
+        if (userRoles && userRoles.ParentID && userRoles.ParentID === ownerRoleID) {
+            dxfPermission = true;
+        }
+        if (user && user.username && user.username === 'admin') {
+            dxfPermission = true;
+        }
+        this.setState({
+            dxfPermission
+        });
         setkeycode('');
         // 避免反复获取森林树种列表，提高效率
         if (!treetypes) {
