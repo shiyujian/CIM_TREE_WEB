@@ -203,9 +203,9 @@ export const getAreaTreeData = async (getTreeNodeList, getThinClassList) => {
     if (userRoles && userRoles.ParentID && userRoles.ParentID === 3) {
         permission = true;
     }
-    let costPermission = false;
+    let multipleSectionPermission = false;
     if (userRoles && userRoles.ParentID && userRoles.ParentID === 107) {
-        costPermission = true;
+        multipleSectionPermission = true;
     }
 
     if (rst instanceof Array && rst.length > 0) {
@@ -226,7 +226,7 @@ export const getAreaTreeData = async (getTreeNodeList, getThinClassList) => {
                         });
                     }
                 }
-            } else if (costPermission) {
+            } else if (multipleSectionPermission) {
                 let sectionArr = section.split('-');
                 let projectKey = sectionArr[0];
                 if (node.Type === '项目工程' && node.No.indexOf(projectKey) !== -1) {
@@ -316,12 +316,12 @@ export const getSmallClass = (smallClassList) => {
             if (userRoles && userRoles.ParentID && userRoles.ParentID === 3) {
                 permission = true;
             }
-            let costPermission = false;
+            let multipleSectionPermission = false;
             if (userRoles && userRoles.ParentID && userRoles.ParentID === 107) {
-                costPermission = true;
+                multipleSectionPermission = true;
             }
             // permission为true说明是管理员或者业主
-            if (permission || costPermission) {
+            if (permission || multipleSectionPermission) {
                 // console.log('wwwww', sectionNo);
             } else if (section) {
                 if (sectionNo !== section) {

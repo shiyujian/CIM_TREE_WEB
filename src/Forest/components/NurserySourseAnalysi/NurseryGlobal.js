@@ -152,14 +152,14 @@ export default class NurseryGlobal extends Component {
                     </div>
                 </div>
                 <div style={{marginTop: 15}}>
-                    <h2>进场率排行榜</h2>
+                    <h2>进场量排行榜</h2>
                 </div>
                 <div>
                     <div>
                         <Row gutter={16}>
                             <Col span={12}>
                                 <Spin spinning={this.state.loading1} >
-                                    <Card title='苗圃进场率（前五名）'
+                                    <Card title='苗圃进场量（前五名）'
                                         extra={
                                             <span>
                                             截至日期：
@@ -177,7 +177,7 @@ export default class NurseryGlobal extends Component {
                             </Col>
                             <Col span={12}>
                                 <Spin spinning={this.state.loading2} >
-                                    <Card title='供应商进场率（前五名）'
+                                    <Card title='供应商进场量（前五名）'
                                         extra={
                                             <span>
                                             截至日期：
@@ -197,14 +197,14 @@ export default class NurseryGlobal extends Component {
                     </div>
                 </div>
                 <div style={{marginTop: 15}}>
-                    <h2>退苗率排行榜</h2>
+                    <h2>退苗量排行榜</h2>
                 </div>
                 <div>
                     <div>
                         <Row gutter={16}>
                             <Col span={12}>
                                 <Spin spinning={this.state.loading3} >
-                                    <Card title='苗圃退苗率（前五名）'
+                                    <Card title='苗圃退苗量（前五名）'
                                         extra={
                                             <span>
                                             截至日期：
@@ -222,7 +222,7 @@ export default class NurseryGlobal extends Component {
                             </Col>
                             <Col span={12}>
                                 <Spin spinning={this.state.loading4} >
-                                    <Card title='供应商退苗率（前五名）'
+                                    <Card title='供应商退苗量（前五名）'
                                         extra={
                                             <span>
                                             截至日期：
@@ -303,23 +303,22 @@ export default class NurseryGlobal extends Component {
                         // rotate: 40,
                         fontSize: 12,
                         formatter: (value) => {
-                            var ret = "";//拼接加\n返回的类目项
-                            var maxLength = 4;//每项显示文字个数
-                            var valLength = value.length;//X轴类目项的文字个数
-                            var rowN = Math.ceil(valLength / maxLength); //类目项需要换行的行数
-                            if (rowN > 1)//如果类目项的文字大于3,
+                            var ret = '';// 拼接加\n返回的类目项
+                            var maxLength = 4;// 每项显示文字个数
+                            var valLength = value.length;// X轴类目项的文字个数
+                            var rowN = Math.ceil(valLength / maxLength); // 类目项需要换行的行数
+                            if (rowN > 1)// 如果类目项的文字大于3,
                             {
                                 for (var i = 0; i < rowN; i++) {
-                                    var temp = "";//每次截取的字符串
-                                    var start = i * maxLength;//开始截取的位置
-                                    var end = start + maxLength;//结束截取的位置
-                                    //这里也可以加一个是否是最后一行的判断，但是不加也没有影响，那就不加吧
-                                    temp = value.substring(start, end) + "\n";
-                                    ret += temp; //凭借最终的字符串
+                                    var temp = '';// 每次截取的字符串
+                                    var start = i * maxLength;// 开始截取的位置
+                                    var end = start + maxLength;// 结束截取的位置
+                                    // 这里也可以加一个是否是最后一行的判断，但是不加也没有影响，那就不加吧
+                                    temp = value.substring(start, end) + '\n';
+                                    ret += temp; // 凭借最终的字符串
                                 }
                                 return ret;
-                            }
-                            else {
+                            } else {
                                 return value;
                             }
                         }
@@ -331,7 +330,7 @@ export default class NurseryGlobal extends Component {
                 series: [{
                     data: yGrandData,
                     type: 'bar',
-                    name: '苗圃进场率'
+                    name: '苗圃进场量'
                 }]
             };
             myChart.setOption(option);
@@ -403,23 +402,22 @@ export default class NurseryGlobal extends Component {
                         // rotate: 40,
                         fontSize: 12,
                         formatter: (value) => {
-                            var ret = "";//拼接加\n返回的类目项
-                            var maxLength = 4;//每项显示文字个数
-                            var valLength = value.length;//X轴类目项的文字个数
-                            var rowN = Math.ceil(valLength / maxLength); //类目项需要换行的行数
-                            if (rowN > 1)//如果类目项的文字大于3,
+                            var ret = '';// 拼接加\n返回的类目项
+                            var maxLength = 4;// 每项显示文字个数
+                            var valLength = value.length;// X轴类目项的文字个数
+                            var rowN = Math.ceil(valLength / maxLength); // 类目项需要换行的行数
+                            if (rowN > 1)// 如果类目项的文字大于3,
                             {
                                 for (var i = 0; i < rowN; i++) {
-                                    var temp = "";//每次截取的字符串
-                                    var start = i * maxLength;//开始截取的位置
-                                    var end = start + maxLength;//结束截取的位置
-                                    //这里也可以加一个是否是最后一行的判断，但是不加也没有影响，那就不加吧
-                                    temp = value.substring(start, end) + "\n";
-                                    ret += temp; //凭借最终的字符串
+                                    var temp = '';// 每次截取的字符串
+                                    var start = i * maxLength;// 开始截取的位置
+                                    var end = start + maxLength;// 结束截取的位置
+                                    // 这里也可以加一个是否是最后一行的判断，但是不加也没有影响，那就不加吧
+                                    temp = value.substring(start, end) + '\n';
+                                    ret += temp; // 凭借最终的字符串
                                 }
                                 return ret;
-                            }
-                            else {
+                            } else {
                                 return value;
                             }
                         }
@@ -431,7 +429,7 @@ export default class NurseryGlobal extends Component {
                 series: [{
                     data: yGrandData,
                     type: 'bar',
-                    name: '供应商进场率'
+                    name: '供应商进场量'
                 }]
             };
             myChart.setOption(option);
@@ -504,23 +502,22 @@ export default class NurseryGlobal extends Component {
                         // rotate: 40,
                         fontSize: 12,
                         formatter: (value) => {
-                            var ret = "";//拼接加\n返回的类目项
-                            var maxLength = 4;//每项显示文字个数
-                            var valLength = value.length;//X轴类目项的文字个数
-                            var rowN = Math.ceil(valLength / maxLength); //类目项需要换行的行数
-                            if (rowN > 1)//如果类目项的文字大于3,
+                            var ret = '';// 拼接加\n返回的类目项
+                            var maxLength = 4;// 每项显示文字个数
+                            var valLength = value.length;// X轴类目项的文字个数
+                            var rowN = Math.ceil(valLength / maxLength); // 类目项需要换行的行数
+                            if (rowN > 1)// 如果类目项的文字大于3,
                             {
                                 for (var i = 0; i < rowN; i++) {
-                                    var temp = "";//每次截取的字符串
-                                    var start = i * maxLength;//开始截取的位置
-                                    var end = start + maxLength;//结束截取的位置
-                                    //这里也可以加一个是否是最后一行的判断，但是不加也没有影响，那就不加吧
-                                    temp = value.substring(start, end) + "\n";
-                                    ret += temp; //凭借最终的字符串
+                                    var temp = '';// 每次截取的字符串
+                                    var start = i * maxLength;// 开始截取的位置
+                                    var end = start + maxLength;// 结束截取的位置
+                                    // 这里也可以加一个是否是最后一行的判断，但是不加也没有影响，那就不加吧
+                                    temp = value.substring(start, end) + '\n';
+                                    ret += temp; // 凭借最终的字符串
                                 }
                                 return ret;
-                            }
-                            else {
+                            } else {
                                 return value;
                             }
                         }
@@ -532,7 +529,7 @@ export default class NurseryGlobal extends Component {
                 series: [{
                     data: yGrandData,
                     type: 'bar',
-                    name: '苗圃退苗率'
+                    name: '苗圃退苗量'
                 }]
             };
             myChart.setOption(option);
@@ -604,23 +601,22 @@ export default class NurseryGlobal extends Component {
                         // rotate: 40,
                         fontSize: 12,
                         formatter: (value) => {
-                            var ret = "";//拼接加\n返回的类目项
-                            var maxLength = 4;//每项显示文字个数
-                            var valLength = value.length;//X轴类目项的文字个数
-                            var rowN = Math.ceil(valLength / maxLength); //类目项需要换行的行数
-                            if (rowN > 1)//如果类目项的文字大于3,
+                            var ret = '';// 拼接加\n返回的类目项
+                            var maxLength = 4;// 每项显示文字个数
+                            var valLength = value.length;// X轴类目项的文字个数
+                            var rowN = Math.ceil(valLength / maxLength); // 类目项需要换行的行数
+                            if (rowN > 1)// 如果类目项的文字大于3,
                             {
                                 for (var i = 0; i < rowN; i++) {
-                                    var temp = "";//每次截取的字符串
-                                    var start = i * maxLength;//开始截取的位置
-                                    var end = start + maxLength;//结束截取的位置
-                                    //这里也可以加一个是否是最后一行的判断，但是不加也没有影响，那就不加吧
-                                    temp = value.substring(start, end) + "\n";
-                                    ret += temp; //凭借最终的字符串
+                                    var temp = '';// 每次截取的字符串
+                                    var start = i * maxLength;// 开始截取的位置
+                                    var end = start + maxLength;// 结束截取的位置
+                                    // 这里也可以加一个是否是最后一行的判断，但是不加也没有影响，那就不加吧
+                                    temp = value.substring(start, end) + '\n';
+                                    ret += temp; // 凭借最终的字符串
                                 }
                                 return ret;
-                            }
-                            else {
+                            } else {
                                 return value;
                             }
                         }
@@ -632,7 +628,7 @@ export default class NurseryGlobal extends Component {
                 series: [{
                     data: yGrandData,
                     type: 'bar',
-                    name: '供应商退苗率'
+                    name: '供应商退苗量'
                 }]
             };
             myChart.setOption(option);
