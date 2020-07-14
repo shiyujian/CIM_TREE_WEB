@@ -16,7 +16,8 @@ import {
     DOCEXPORT_API,
     TREEPIPEEXPORTSECTIONS,
     TREEPIPEEXPORTPERSONS,
-    TREEPIPE_API
+    TREEPIPE_API,
+    FOREST_IMG
 } from '_platform/api';
 import {
     handleAreaLayerData,
@@ -451,6 +452,12 @@ export default class CompletionPlanTable extends Component {
     handleExportPipeCoordinateOk = async () => {
         try {
             const {
+                actions: {
+                    getExportPipeNodeCoordinate,
+                    getExportPipeCoordinate
+                }
+            } = this.props;
+            const {
                 section,
                 isSuperAdmin
             } = this.state;
@@ -472,18 +479,49 @@ export default class CompletionPlanTable extends Component {
                 let userData = getUser();
                 let userID = userData.ID;
                 if (isSuperAdmin) {
-                    let pipenodeDownloadUrl = `${TREEPIPE_API}/pipe/exportpipenode?bbox=${wkt}&inputer=${userID}`;
-                    await this.createLink(this, pipenodeDownloadUrl);
-                    let downloadUrl = `${TREEPIPE_API}/pipe/exportpipe?bbox=${wkt}&inputer=${userID}`;
+                    let pipenodePostData = {
+                        bbox: wkt
+                    };
+                    let pipenodeDownloadUrl = await getExportPipeNodeCoordinate({}, pipenodePostData);
+                    if (pipenodeDownloadUrl) {
+                        console.log('pipenodeDownloadUrl', pipenodeDownloadUrl);
+                        console.log('this.getPipeDownLoadUrl(pipenodeDownloadUrl)', this.getPipeDownLoadUrl(pipenodeDownloadUrl));
+                        await this.createLink(this, this.getPipeDownLoadUrl(pipenodeDownloadUrl));
+                    }
+                    let pipePostData = {
+                        bbox: wkt
+                    };
+                    let downloadUrl = await getExportPipeCoordinate({}, pipePostData);
+                    if (downloadUrl) {
+                        console.log('downloadUrl', downloadUrl);
+                        console.log('this.getPipeDownLoadUrl(downloadUrl)', this.getPipeDownLoadUrl(downloadUrl));
+                        await this.createLink(this, this.getPipeDownLoadUrl(downloadUrl));
+                    }
                     await this.createLink(this, downloadUrl);
                     this.setState({
                         loading: false
                     });
                 } else {
-                    let pipenodeDownloadUrl = `${TREEPIPE_API}/pipe/exportpipenode?bbox=${wkt}&section=${section}&inputer=${userID}`;
-                    await this.createLink(this, pipenodeDownloadUrl);
-                    let downloadUrl = `${TREEPIPE_API}/pipe/exportpipe?bbox=${wkt}&section=${section}&inputer=${userID}`;
-                    await this.createLink(this, downloadUrl);
+                    let pipenodePostData = {
+                        bbox: wkt,
+                        section: section
+                    };
+                    let pipenodeDownloadUrl = await getExportPipeNodeCoordinate({}, pipenodePostData);
+                    if (pipenodeDownloadUrl) {
+                        console.log('pipenodeDownloadUrl', pipenodeDownloadUrl);
+                        console.log('this.getPipeDownLoadUrl(pipenodeDownloadUrl)', this.getPipeDownLoadUrl(pipenodeDownloadUrl));
+                        await this.createLink(this, this.getPipeDownLoadUrl(pipenodeDownloadUrl));
+                    }
+                    let pipePostData = {
+                        bbox: wkt,
+                        section: section
+                    };
+                    let downloadUrl = await getExportPipeCoordinate({}, pipePostData);
+                    if (downloadUrl) {
+                        console.log('downloadUrl', downloadUrl);
+                        console.log('this.getPipeDownLoadUrl(downloadUrl)', this.getPipeDownLoadUrl(downloadUrl));
+                        await this.createLink(this, this.getPipeDownLoadUrl(downloadUrl));
+                    }
                     this.setState({
                         loading: false
                     });
@@ -497,6 +535,20 @@ export default class CompletionPlanTable extends Component {
             console.log('handleExportPipeCoordinateOk', e);
         }
     }
+
+    getPipeDownLoadUrl = (data) => {
+        try {
+            let imgUrl = '';
+            if (data.indexOf(FOREST_IMG) !== -1) {
+                imgUrl = data;
+            } else {
+                imgUrl = TREEPIPE_API + '/' + data.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+            }
+            return imgUrl;
+        } catch (e) {
+            console.log('getForestImgUrl', e);
+        }
+    };
 
     handleCreateTaskCancel = async () => {
         if (this.editPolygon) {
