@@ -287,7 +287,7 @@ export default class DegitalAcceptTable extends Component {
                                 </div>
                                 );
                             } else {
-                                if (record.CanReAccpetance === 1) {
+                                if (record.CanReAccpetance === 1 && permission) {
                                     return (<div >
                                         <a onClick={this.viewWord.bind(this, record)} >
                                             查看
@@ -313,7 +313,7 @@ export default class DegitalAcceptTable extends Component {
                             return '/';
                         }
                     } else { // 验收类型除10，11
-                        if (record.CanReAccpetance === 1) {
+                        if (record.CanReAccpetance === 1 && permission) {
                             if (record.status === '未申请') {
                                 return (<div >
                                     <a style={{color: '#ccc'}} >
@@ -588,6 +588,7 @@ export default class DegitalAcceptTable extends Component {
         let shigongRole = '';
         let jianliRole = '';
         let yezhuRole = '';
+        console.log('用户身份', rolesData);
         rolesData.map((role) => {
             if (role && role.ID && !role.ParentID) {
                 if (role.RoleName === '施工') {

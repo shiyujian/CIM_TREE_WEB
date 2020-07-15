@@ -256,6 +256,7 @@ export default class EntranceLeft extends Component {
                 });
             }
         });
+        console.log('导出表格', tblData);
         let _headers = ['标段', '进场数'];
         let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
             .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});

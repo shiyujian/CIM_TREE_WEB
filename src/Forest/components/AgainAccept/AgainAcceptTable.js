@@ -1023,7 +1023,7 @@ export default class AgainAcceptTable extends Component {
                 </Col>
                 <Col span={2}>
                     {
-                        roleName === '施工文书' ? <Button type='primary' onClick={this.onAgainCheck.bind(this)} >
+                        roleName === '施工整改人' ? <Button type='primary' onClick={this.onAgainCheck.bind(this)} >
                             重新验收
                         </Button> : ''
                     }

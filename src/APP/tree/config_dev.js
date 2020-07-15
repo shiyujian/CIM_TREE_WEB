@@ -24,6 +24,7 @@ window.config = {
     /** *********************公共资源服务**************************/
     // 基础服务域名
     DOMAIN: 'https://www.xaqnxl.com',
+    DOMAIN809: 'https://www.xaqnxl.com:810',
     // 园林接口地址
     SDOMAIN: 'https://www.xazhyl.com',
     // 二维展示根据坐标获取树木顺序码端口

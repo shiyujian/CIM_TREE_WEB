@@ -9,11 +9,19 @@ import {
     CURING_API,
     GARDEN_API,
     FOREST_API,
+    BIGTREE_API,
+    Pipe_API,
     TREE_API_GARDEN,
     CURING_API_GARDEN,
     SYSTEM_API_GARDEN
 } from '_platform/api';
 const ID = 'dashboard';
+// 获取既有数据管点
+export const getPipenodeStatByRegion = createFetchAction(`${Pipe_API}/pipenodestatbyregion`, [], 'GET');
+// 获取既有数据管线
+export const getPipeStatByRegion = createFetchAction(`${Pipe_API}/pipestatbyregion`, [], 'GET');
+// 获取既有数据苗木
+export const getLocationsTatByRegion = createFetchAction(`${BIGTREE_API}/locationstatbyregion`, [], 'GET');
 // 获取隐患列表
 export const getRisk = forestFetchAction(`${TREE_API}/patrolevents`, []);
 // 获取隐患详情
@@ -158,6 +166,9 @@ export const getStatByTreeType = forestFetchAction(`${TREE_API}/statbytreetype`,
 // 获取各个树种的设计数量
 export const getStatTreePlans = forestFetchAction(`${TREE_API}/treeplans`, []); //
 export const actions = {
+    getPipenodeStatByRegion,
+    getPipeStatByRegion,
+    getLocationsTatByRegion,
     getRisk,
     getRiskContactSheet,
     getInspectRouter,

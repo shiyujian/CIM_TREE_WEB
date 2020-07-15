@@ -13,11 +13,14 @@ import {
     handlePolylineLatLngs
 } from '_platform/gisAuth';
 import CoverageModal from './CoverageModal';
+import ImportModal from './ImportModal';
 export default class AreaDistanceMeasure extends Component {
     constructor (props) {
         super(props);
         this.state = {
             // 数据测量
+            visibleImport: false, // 导入
+            polygonEncircle: [], // 面坐标
             radioValue: 1, // 1导入范围 2手动圈画
             totalDistanceMeasure: 0, // 总距离
             areaMeasure: 0, // 圈选区域面积
@@ -195,13 +198,29 @@ export default class AreaDistanceMeasure extends Component {
     }
     // 确定
     handleConfirm () {
-        if (this.editPolygon) {
-            let coordinates = handlePolygonLatLngs(this.editPolygon);
-            console.log('coordinatesshiyujian', coordinates);
-            if (coordinates.length > 2) {
-                this.setState({
-                    coverageVisible: true
+        const { radioValue } = this.state;
+        if (radioValue === 1) {
+            this.setState({
+                visibleImport: true
+            });
+        } else if (radioValue === 2) {
+            if (this.editPolygon) {
+                let coordinates = handlePolygonLatLngs(this.editPolygon);
+                console.log('coordinatesshiyujian', coordinates);
+                console.log('this.editPolygon', this.editPolygon);
+                let WKT = 'POLYGON((';
+                coordinates.map(item => {
+                    let coord = item[1] + ' ' + item[0];
+                    WKT += coord + ',';
                 });
+                let polygonEncircleWKT = WKT + coordinates[0][1] + ' ' + coordinates[0][0] + '))';
+                if (coordinates.length > 2) {
+                    this.setState({
+                        polygonEncircleWKT: polygonEncircleWKT,
+                        polygonEncircle: coordinates,
+                        coverageVisible: true
+                    });
+                }
             }
         }
     }
@@ -219,6 +238,7 @@ export default class AreaDistanceMeasure extends Component {
         if (value === 2) {
             // 手动圈画
             this.editPolygon = map.editTools.startPolygon();
+            console.log(this.editPolygon);
         }
         this.setState({
             radioValue: value
@@ -236,13 +256,26 @@ export default class AreaDistanceMeasure extends Component {
             this.editPolygon = map.editTools.startPolygon();
         }
     }
+    handleCancelCoverage () {
+        this.setState({
+            coverageVisible: false
+        });
+    }
+    handleCancelImport () {
+        this.setState({
+            visibleImport: false
+        });
+    }
 
     render () {
         const {
             areaDistanceMeasureMenu
         } = this.props;
         const {
+            visibleImport,
             areaMeasure,
+            polygonEncircleWKT,
+            polygonEncircle,
             dataMeasureVisible,
             areaMeasureVisible,
             coverageVisible,
@@ -265,12 +298,12 @@ export default class AreaDistanceMeasure extends Component {
                                     title='面积计算'
                                     className='AreaDistanceMeasure-rightDataMeasureMenu-clickImg' />
                             </div>
-                            {/* <div className={areaDistanceMeasureMenu === 'areaMeasureMenu' ? 'AreaDistanceMeasure-rightDataMeasureMenu-back-Select' : 'AreaDistanceMeasure-rightDataMeasureMenu-back-Unselect'}>
+                            <div className={areaDistanceMeasureMenu === 'areaMeasureMenu' ? 'AreaDistanceMeasure-rightDataMeasureMenu-back-Select' : 'AreaDistanceMeasure-rightDataMeasureMenu-back-Unselect'}>
                                 <img src={areaDistanceMeasureMenu === 'areaMeasureMenu' ? areaMeasureSelImg : areaMeasureUnSelImg}
                                     onClick={this.handleSwitchMeasureMenu.bind(this, 'dataMeasureMenu')}
                                     title='统计数据'
                                     className='AreaDistanceMeasure-rightDataMeasureMenu-clickImg' />
-                            </div> */}
+                            </div>
                         </div>
                     </aside>
                 </div>
@@ -306,7 +339,17 @@ export default class AreaDistanceMeasure extends Component {
                 {
                     coverageVisible ? <CoverageModal
                         {...this.props}
+                        handleCancel={this.handleCancelCoverage.bind(this)}
+                        polygonEncircleWKT={polygonEncircleWKT}
+                        polygonEncircle={polygonEncircle}
                         coverageVisible={coverageVisible}
+                    /> : ''
+                }
+                {
+                    visibleImport ? <ImportModal
+                        {...this.props}
+                        handleCancel={this.handleCancelImport.bind(this)}
+                        visibleImport={visibleImport}
                     /> : ''
                 }
             </div>

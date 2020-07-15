@@ -559,6 +559,7 @@ class NurseryFrom extends Component {
                 tblData.push(obj);
             }
         });
+        console.log('来源地分析', tblData);
         let _headers = ['省份', '种植数'];
         let headers = _headers.map((v, i) => Object.assign({}, {
             v: v,

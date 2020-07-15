@@ -47,9 +47,10 @@ import 'whatwg-fetch';
 require('es6-promise').polyfill();
 
 window.config = window.config || {};
-let DOMAIN, SDOMAIN;
+let DOMAIN, SDOMAIN, DOMAIN809;
 
 DOMAIN = window.config.DOMAIN;
+DOMAIN809 = window.config.DOMAIN809;
 SDOMAIN = window.config.SDOMAIN;
 
 /** *********************公共资源服务**************************/
@@ -89,6 +90,10 @@ export const DOC_API = `${DOMAIN}/doc`;
 export const TREE_API = `${DOMAIN}/tree`;
 //
 export const TREES_API = `${DOMAIN}/trees`;
+// 既有数据苗木服务
+export const BIGTREE_API = `${DOMAIN}/bigdata`;
+// 既有数据管网服务
+export const Pipe_API = `${DOMAIN809}/pipe`;
 // 养护服务
 export const CURING_API = `${DOMAIN}/curing`;
 // 路线服务
