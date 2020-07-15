@@ -213,6 +213,14 @@ class Edit extends Component {
                 name: '供应商职务',
                 children: ['供应商', '供应商文书']
             });
+            systemRoles.push({
+                name: '设计职务',
+                children: ['普通设计']
+            });
+            systemRoles.push({
+                name: '造价职务',
+                children: ['普通造价']
+            });
         } else {
             const rolea = userRoles.ParentID;
             switch (rolea) {
@@ -270,7 +278,23 @@ class Edit extends Component {
                         children: ['供应商', '供应商文书']
                     });
                     break;
+                case 106:
+                    systemRoles.push({
+                        name: '设计职务',
+                        children: ['普通设计']
+                    });
+                    break;
+                case 107:
+                    systemRoles.push({
+                        name: '造价职务',
+                        children: ['普通造价']
+                    });
+                    break;
                 default:
+                    systemRoles.push({
+                        name: '施工职务',
+                        children: ['普通员工']
+                    });
                     break;
             }
         }

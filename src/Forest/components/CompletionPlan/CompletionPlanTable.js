@@ -15,7 +15,9 @@ import {
     INITLEAFLET_API,
     DOCEXPORT_API,
     TREEPIPEEXPORTSECTIONS,
-    TREEPIPEEXPORTPERSONS
+    TREEPIPEEXPORTPERSONS,
+    TREEPIPE_API,
+    FOREST_IMG
 } from '_platform/api';
 import {
     handleAreaLayerData,
@@ -448,174 +450,105 @@ export default class CompletionPlanTable extends Component {
     };
 
     handleExportPipeCoordinateOk = async () => {
-        const {
-            actions: {
-                postPipeCoordinate
-            }
-        } = this.props;
-        const {
-            section,
-            isSuperAdmin
-        } = this.state;
-        if (this.editPolygon && section) {
-            this.setState({
-                loading: true
-            });
-            let coordinates = handlePolygonLatLngs(this.editPolygon);
-            console.log('coordinates', coordinates);
-            let wkt = 'POLYGON(';
-            // 获取手动框选坐标wkt
-            wkt = wkt + getHandleWktData(coordinates);
-            wkt = wkt + ')';
-            console.log('wkt', wkt);
-            let postData = {
-                Sql: ` and  Section = "${section}"`,
-                Bbox: wkt
-            };
-            let data = await postPipeCoordinate({}, postData);
-            console.log('data', data);
-            if (data && data.Pipes && data.PipeNodes) {
-                let pipeNodes = data.PipeNodes;
-                let pipes = data.Pipes;
-                let PipeNodesName = [`管点`];
-                let PipeNodesNameData = PipeNodesName.map((data, i) =>
-                    Object.assign(
-                        {},
-                        {
-                            v: data, position: String.fromCharCode(65 + i) + 1
-                        })).reduce((prev, next) =>
-                    Object.assign(
-                        {}, prev, {
-                            [next.position]: { v: next.v }
-                        }), {});
-                let _pipeNodesHeader = ['名称', '类型', '创建时间', '标段', '坐标'];
-                let pipeNodesHeader = _pipeNodesHeader.map((data, i) =>
-                    Object.assign(
-                        {},
-                        {
-                            v: data, position: String.fromCharCode(65 + i) + 2
-                        })).reduce((prev, next) =>
-                    Object.assign(
-                        {}, prev, {
-                            [next.position]: { v: next.v }
-                        }), {});
-                let pipeNodesData = [];
-                let pipeNodesTableData = [];
-                if (pipeNodes instanceof Array && pipeNodes.length > 0) {
-                    pipeNodes.map(item => {
-                        let obj = {};
-                        obj['名称'] = item.Name;
-                        obj['类型'] = item.PipeType;
-                        obj['创建时间'] = item.CreateTime;
-                        obj['标段'] = item.Section;
-                        obj['坐标'] = item.Geom;
-                        pipeNodesData.push(obj);
-                    });
-                    pipeNodesTableData = pipeNodesData.map((data, i) =>
-                        _pipeNodesHeader.map((k, j) =>
-                            Object.assign(
-                                {},
-                                {
-                                    v: data[k],
-                                    position: String.fromCharCode(65 + j) + (i + 3)
-                                }))).reduce((prev, next) =>
-                        prev.concat(next)).reduce((prev, next) =>
-                        Object.assign(
-                            {}, prev, {
-                                [next.position]: { v: next.v }
-                            }),
-                    {});
+        try {
+            const {
+                actions: {
+                    getExportPipeNodeCoordinate,
+                    getExportPipeCoordinate
                 }
-
-                let length = pipeNodes.length;
-                let pipesName = [`管线`];
-                let pipesNameData = pipesName.map((data, i) =>
-                    Object.assign(
-                        {},
-                        {
-                            v: data, position: String.fromCharCode(65 + i) + (length + 5)
-                        })).reduce((prev, next) =>
-                    Object.assign(
-                        {}, prev, {
-                            [next.position]: { v: next.v }
-                        }), {});
-                let _pipesHeader = ['材质', '创建时间', '长度', '标段', '坐标'];
-                let pipesHeader = _pipesHeader.map((data, i) =>
-                    Object.assign(
-                        {},
-                        {
-                            v: data, position: String.fromCharCode(65 + i) + (length + 6)
-                        })).reduce((prev, next) =>
-                    Object.assign(
-                        {}, prev, {
-                            [next.position]: { v: next.v }
-                        }), {});
-                let pipesData = [];
-                let pipesTableData = [];
-                if (pipes instanceof Array && pipes.length > 0) {
-                    pipes.map(item => {
-                        let obj = {};
-                        obj['材质'] = item.Material;
-                        obj['创建时间'] = item.CreateTime;
-                        obj['长度'] = item.Length;
-                        obj['标段'] = item.Section;
-                        obj['坐标'] = item.Geom;
-                        pipesData.push(obj);
-                    });
-                    pipesTableData = pipesData.map((data, i) =>
-                        _pipesHeader.map((k, j) =>
-                            Object.assign(
-                                {},
-                                {
-                                    v: data[k],
-                                    position: String.fromCharCode(65 + j) + (i + length + 7)
-                                }))).reduce((prev, next) =>
-                        prev.concat(next)).reduce((prev, next) =>
-                        Object.assign(
-                            {}, prev, {
-                                [next.position]: { v: next.v }
-                            }),
-                    {});
-                }
-
-                let output = Object.assign(
-                    {},
-                    PipeNodesNameData,
-                    pipeNodesHeader,
-                    pipeNodesTableData,
-                    pipesNameData,
-                    pipesHeader,
-                    pipesTableData
-                );
-                // 获取所有单元格的位置
-                let outputPos = Object.keys(output);
-                // 计算出范围
-                let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
-                // 构建 workbook 对象
-                let wb = {
-                    SheetNames: ['mySheet'],
-                    Sheets: {
-                        'mySheet': Object.assign({}, output, { '!ref': ref })
-                    }
-                };
-                XLSX.writeFile(wb, `灌溉坐标表.xlsx`);
+            } = this.props;
+            const {
+                section,
+                isSuperAdmin
+            } = this.state;
+            if (this.editPolygon && (section || isSuperAdmin)) {
                 this.setState({
-                    loading: false
+                    loading: true
                 });
+                let coordinates = handlePolygonLatLngs(this.editPolygon);
+                console.log('coordinates', coordinates);
+                let wkt = 'POLYGON(';
+                // 获取手动框选坐标wkt
+                wkt = wkt + getHandleWktData(coordinates);
+                wkt = wkt + ')';
+                console.log('wkt', wkt);
+                // let postData = {
+                //     bbox: wkt
+                // };
+                // await getExportPipeDrawing({}, postData);
+                let userData = getUser();
+                let userID = userData.ID;
+                if (isSuperAdmin) {
+                    let pipenodePostData = {
+                        bbox: wkt
+                    };
+                    let pipenodeDownloadUrl = await getExportPipeNodeCoordinate({}, pipenodePostData);
+                    if (pipenodeDownloadUrl) {
+                        console.log('pipenodeDownloadUrl', pipenodeDownloadUrl);
+                        console.log('this.getPipeDownLoadUrl(pipenodeDownloadUrl)', this.getPipeDownLoadUrl(pipenodeDownloadUrl));
+                        await this.createLink(this, this.getPipeDownLoadUrl(pipenodeDownloadUrl));
+                    }
+                    let pipePostData = {
+                        bbox: wkt
+                    };
+                    let downloadUrl = await getExportPipeCoordinate({}, pipePostData);
+                    if (downloadUrl) {
+                        console.log('downloadUrl', downloadUrl);
+                        console.log('this.getPipeDownLoadUrl(downloadUrl)', this.getPipeDownLoadUrl(downloadUrl));
+                        await this.createLink(this, this.getPipeDownLoadUrl(downloadUrl));
+                    }
+                    await this.createLink(this, downloadUrl);
+                    this.setState({
+                        loading: false
+                    });
+                } else {
+                    let pipenodePostData = {
+                        bbox: wkt,
+                        section: section
+                    };
+                    let pipenodeDownloadUrl = await getExportPipeNodeCoordinate({}, pipenodePostData);
+                    if (pipenodeDownloadUrl) {
+                        console.log('pipenodeDownloadUrl', pipenodeDownloadUrl);
+                        console.log('this.getPipeDownLoadUrl(pipenodeDownloadUrl)', this.getPipeDownLoadUrl(pipenodeDownloadUrl));
+                        await this.createLink(this, this.getPipeDownLoadUrl(pipenodeDownloadUrl));
+                    }
+                    let pipePostData = {
+                        bbox: wkt,
+                        section: section
+                    };
+                    let downloadUrl = await getExportPipeCoordinate({}, pipePostData);
+                    if (downloadUrl) {
+                        console.log('downloadUrl', downloadUrl);
+                        console.log('this.getPipeDownLoadUrl(downloadUrl)', this.getPipeDownLoadUrl(downloadUrl));
+                        await this.createLink(this, this.getPipeDownLoadUrl(downloadUrl));
+                    }
+                    this.setState({
+                        loading: false
+                    });
+                }
             } else {
                 Notification.error({
-                    message: '获取数据为空，请重新框选范围'
-                });
-                this.setState({
-                    loading: false
+                    message: '当前用户未关联标段，请重新切换用户'
                 });
             }
-        } else {
-            Notification.error({
-                message: '当前用户未关联标段，请重新切换用户'
-            });
+        } catch (e) {
+            console.log('handleExportPipeCoordinateOk', e);
         }
     }
+
+    getPipeDownLoadUrl = (data) => {
+        try {
+            let imgUrl = '';
+            if (data.indexOf(FOREST_IMG) !== -1) {
+                imgUrl = data;
+            } else {
+                imgUrl = TREEPIPE_API + '/' + data.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+            }
+            return imgUrl;
+        } catch (e) {
+            console.log('getForestImgUrl', e);
+        }
+    };
 
     handleCreateTaskCancel = async () => {
         if (this.editPolygon) {

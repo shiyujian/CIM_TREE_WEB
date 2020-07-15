@@ -490,11 +490,16 @@ export const getExportDieTree = forestFetchAction(
 );
 // 车辆包新增
 export const postAddCarPack = forestFetchAction(`${TREE_API}/carpack`, [], 'POST', []);
-
+/**
+ * 灌溉竣工图
+ */
 // 竣工图导出
 export const getExportPipeDrawing = forestFetchAction(`${DOCEXPORT_API}/?action=pipedrawing`, []);
 // 竣工图坐标数据查看
 export const postPipeCoordinate = createFetchAction(`${TREEPIPE_API}/pipe/query`, [], 'POST', []);
+// 竣工图坐标数据导出
+export const getExportPipeNodeCoordinate = createFetchAction(`${TREEPIPE_API}/pipe/exportpipenode`, [], 'GET', []);
+export const getExportPipeCoordinate = createFetchAction(`${TREEPIPE_API}/pipe/exportpipe`, [], 'GET', []);
 // 上传附件
 export const uploadFileHandler = myFetch(`${base}/OSSUploadHandler.ashx?filetype=news`, [], 'POST');
 // 获取树木列表
@@ -654,6 +659,8 @@ export const actions = {
     postAddCarPack,
     getExportPipeDrawing,
     postPipeCoordinate,
+    getExportPipeNodeCoordinate,
+    getExportPipeCoordinate,
     getTreesInfo,
     getTransplantTransMess,
     getInvestigationTypes,
