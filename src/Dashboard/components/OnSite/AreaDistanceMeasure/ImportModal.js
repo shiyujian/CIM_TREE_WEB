@@ -16,13 +16,32 @@ export default class AreaDistanceMeasure extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            fileList: []
         };
     }
     handleCancel () {
         this.props.handleCancel();
     }
     handleOk () {
-
+        const { fileList } = this.state;
+        const {
+            actions: { shapeUploadHandler }
+        } = this.props;
+        const formdata = new FormData();
+        formdata.append('file', fileList[0]);
+        shapeUploadHandler({
+            name: fileList[0].name.split('.')[0]
+        }, formdata).then(rep => {
+            console.log('成功', rep);
+            // 清除不规范字符
+            rep = rep.replace(/\\/g, ' ');
+            rep = typeof rep === 'string' ? JSON.parse(rep) : rep;
+            if (rep && rep.features) {
+                console.log('关闭导入');
+                this.props.handleCancel();
+                this.props.handlePolygon(rep.features[0].Geom);
+            }
+        });
     }
     render () {
         const {
@@ -33,36 +52,13 @@ export default class AreaDistanceMeasure extends Component {
             action: '',
             beforeUpload: (file, fileList) => {
                 this.setState({
-                    progress: 0,
-                    loading: true
-                });
-                let { fileListNew } = this.state;
-                const { uploadFileHandler } = this.props.actions;
-                const formdata = new FormData();
-                formdata.append('file', fileList[0]);
-                uploadFileHandler({}, formdata).then(rep => {
-                    file.url = rep;
-                    fileListNew.push(file);
-                    this.setState({
-                        fileUrl: rep,
-                        progress: 1,
-                        loading: false,
-                        fileListNew
-                    });
+                    fileList
                 });
                 return false;
             },
             onRemove: (file) => {
-                let { fileListNew } = this.state;
-                let fileList = [];
-                fileListNew.map(item => {
-                    if (item.uid !== file.uid) {
-                        fileList.push(item);
-                    }
-                });
                 this.setState({
-                    fileUrl: '',
-                    fileListNew: fileList
+                    fileList: []
                 });
             }
         };

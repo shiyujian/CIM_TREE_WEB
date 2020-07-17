@@ -1,6 +1,7 @@
 import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from 'fetch-action';
 import {forestFetchAction} from '_platform/store/fetchAction';
+import {createFetchActionWithHeaders as myFetch} from './myfetchAction';
 import {
     ADOPT_API,
     TREEPIPE_API,
@@ -13,9 +14,24 @@ import {
     Pipe_API,
     TREE_API_GARDEN,
     CURING_API_GARDEN,
-    SYSTEM_API_GARDEN
+    SYSTEM_API_GARDEN,
+    SHAPEUPLOAD_API
 } from '_platform/api';
 const ID = 'dashboard';
+// 导出范围内管线详情
+export const exportPipe = createFetchAction(`${Pipe_API}/exportpipe`, [], 'GET');
+// 导出范围内管点详情
+export const exportPipenode = createFetchAction(`${Pipe_API}/exportpipenode`, [], 'GET');
+// 获取范围内管点详情
+export const getPipenodequery = createFetchAction(`${Pipe_API}/pipenodequery`, [], 'POST');
+// 获取范围内管线详情
+export const getPipequery = createFetchAction(`${Pipe_API}/pipequery`, [], 'POST');
+// 导出范围内苗木详情
+export const exportTreeLocations = createFetchAction(`${TREE_API}/exporttreelocations`, [], 'GET');
+// 获取范围内苗木详情
+export const getTreeLocations = createFetchAction(`${TREE_API}/treelocations`, [], 'GET');
+// 导入细班/地块数据
+export const shapeUploadHandler = myFetch(`${SHAPEUPLOAD_API}?layername={{name}}`, [], 'POST');
 // 获取既有数据管点
 export const getPipenodeStatByRegion = createFetchAction(`${Pipe_API}/pipenodestatbyregion`, [], 'GET');
 // 获取既有数据管线
@@ -166,6 +182,13 @@ export const getStatByTreeType = forestFetchAction(`${TREE_API}/statbytreetype`,
 // 获取各个树种的设计数量
 export const getStatTreePlans = forestFetchAction(`${TREE_API}/treeplans`, []); //
 export const actions = {
+    exportPipe,
+    exportPipenode,
+    getPipenodequery,
+    getPipequery,
+    getTreeLocations,
+    exportTreeLocations,
+    shapeUploadHandler,
     getPipenodeStatByRegion,
     getPipeStatByRegion,
     getLocationsTatByRegion,

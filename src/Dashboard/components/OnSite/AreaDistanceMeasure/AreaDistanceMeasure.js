@@ -224,6 +224,13 @@ export default class AreaDistanceMeasure extends Component {
             }
         }
     }
+    handlePolygon (Geom) {
+        console.log('handlePolygon', Geom);
+        this.setState({
+            polygonEncircleWKT: Geom,
+            coverageVisible: true
+        });
+    }
     // 回退
     handleRollback () {
         if (this.editPolygon) {
@@ -349,6 +356,7 @@ export default class AreaDistanceMeasure extends Component {
                     visibleImport ? <ImportModal
                         {...this.props}
                         handleCancel={this.handleCancelImport.bind(this)}
+                        handlePolygon={this.handlePolygon.bind(this)}
                         visibleImport={visibleImport}
                     /> : ''
                 }

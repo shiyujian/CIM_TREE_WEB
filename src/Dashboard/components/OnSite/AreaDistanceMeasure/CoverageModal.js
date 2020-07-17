@@ -3,6 +3,7 @@ import { Button, Radio, Modal, Tabs, Table, Form, Select, Tree, Spin, Row, Col }
 import echarts from 'echarts';
 import XLSX from 'xlsx';
 import './CoverageModal.less';
+import { FOREST_API } from '_platform/api';
 const TreeNode = Tree.TreeNode;
 const { TabPane } = Tabs;
 const formItemLayout = {
@@ -24,6 +25,8 @@ export default class AreaDistanceMeasure extends Component {
             selectSection: '', // 选中的标段
 
             dataListDetails: [], // 详情信息
+            dataListDetailsPoint: [], // 管点详细信息
+            dataListDetailsLine: [], // 管线详细信息
             overallSectionLineList: [], // 所有标段管线数据
             overallSectionLineTotal: [], // 所有标段管线总长度
 
@@ -1284,8 +1287,53 @@ export default class AreaDistanceMeasure extends Component {
         }
     }
     onExport (type) {
-        const { node, sectionTreeList, treeTypeList, sectionLineList, overallDiameterList, overallMaterialList, sectionPointList, overallPipeTypeList } = this.state;
+        const { coverageType, PipeType, node, selectSection, sectionTreeList, treeTypeList, sectionLineList, overallDiameterList, overallMaterialList, sectionPointList, overallPipeTypeList } = this.state;
         console.log('导出', node, sectionTreeList, treeTypeList);
+        const {
+            polygonEncircleWKT,
+            actions: { exportPipe, exportPipenode, exportTreeLocations } 
+        } = this.props;
+        if (type === 'details') {
+            if (coverageType === 'tree') {
+                exportTreeLocations({}, {
+                    sxm: '',
+                    no: '',
+                    section: selectSection,
+                    treetype: '',
+                    bigtype: '',
+                    crs: '',
+                    stime: '',
+                    etime: '',
+                    bbox: polygonEncircleWKT,
+                    page: '',
+                    size: ''
+                }).then(rep => {
+                    window.open(FOREST_API + '/' + rep, '_blank');
+                });
+            } else {
+                if (PipeType === 'line') {
+                    exportPipe({}, {
+                        section: selectSection,
+                        thinclass: '',
+                        pipetype: '',
+                        bbox: polygonEncircleWKT,
+                        inputer: ''
+                    }).then(rep => {
+                        window.open(FOREST_API + '/' + rep, '_blank');
+                    });
+                } else {
+                    exportPipenode({}, {
+                        section: selectSection,
+                        thisclass: '',
+                        pipenodetype: '',
+                        bbox: polygonEncircleWKT,
+                        inputer: ''
+                    }).then(rep => {
+                        window.open(FOREST_API + '/' + rep, '_blank');
+                    });
+                }
+            }
+        }
         if (type === 'sectionTree') {
             let tblData = [];
             sectionTreeList.map(item => {
@@ -1565,21 +1613,67 @@ export default class AreaDistanceMeasure extends Component {
     }
     changeTabs (key) {
         const {
+            treeData,
             polygonEncircleWKT,
-            actions: { getLocationsTatByRegion }
+            actions: { getTreeLocations }
         } = this.props;
         const { coverageType } = this.state;
         console.log(key, coverageType);
         if (key === 'detailsInfo') {
             if (coverageType === 'tree') {
-                getLocationsTatByRegion({}, {
-                    stattype: 'section',
+                this.setState({
+                    loading: true
+                });
+                getTreeLocations({}, {
+                    sxm: '',
                     no: '',
                     section: '',
-                    wkt: polygonEncircleWKT,
+                    treetype: '',
+                    bigtype: '',
+                    crs: '',
                     stime: '',
-                    etime: ''
+                    etime: '',
+                    bbox: polygonEncircleWKT,
+                    page: '',
+                    size: ''
                 }).then(rep => {
+                    if (rep && rep.code === 200) {
+                        let dataListDetails = [];
+                        rep.content.map((item, index) => {
+                            let ProjectName = '', SectionName = '';
+                            treeData.map(record => {
+                                record.children.map(row => {
+                                    if (row.No === item.Section) {
+                                        SectionName = row.Name;
+                                        ProjectName = record.Name;
+                                    }
+                                });
+                            });
+                            let NoArr = item.No.split('-');
+                            let NoStr = NoArr[2] + '号小班' + NoArr[3] + '号细班';
+                            let locationStr = '未定位';
+                            if (item.X && item.Y) {
+                                locationStr = '已定位';
+                            }
+                            dataListDetails.push({
+                                key: index,
+                                ProjectName,
+                                SectionName,
+                                NoStr,
+                                Section: item.Section,
+                                SXM: item.SXM,
+                                TreeType: item.TreeType,
+                                TreeTypeName: item.TreeTypeObj && item.TreeTypeObj.TreeTypeName,
+                                locationStr,
+                                CreateTime: item.CreateTime,
+                            });
+                        });
+                        console.log('dataListDetails', dataListDetails);
+                        this.setState({
+                            dataListDetails,
+                            loading: false
+                        });
+                    }
                     console.log(rep);
                 });
             }
@@ -1661,13 +1755,156 @@ export default class AreaDistanceMeasure extends Component {
         }
     }
     onSearch (type) {
-        const { selectProject, selectSection } = this.state;
+        const { selectProject, selectSection, PipeType, coverageType } = this.state;
         const {
+            polygonEncircleWKT,
             treeData,
-            actions: { getLocationsTatByRegion, getPipeStatByRegion, getPipenodeStatByRegion }
+            actions: { getPipenodequery, getPipequery, getTreeLocations, getLocationsTatByRegion, getPipeStatByRegion, getPipenodeStatByRegion }
         } = this.props;
         console.log(selectProject, selectSection);
-        if (type === 'pipeType') {
+        if (type === 'details') {
+            if (coverageType === 'tree') {
+                this.setState({
+                    loading: true
+                });
+                getTreeLocations({}, {
+                    sxm: '',
+                    no: '',
+                    section: selectSection,
+                    treetype: '',
+                    bigtype: '',
+                    crs: '',
+                    stime: '',
+                    etime: '',
+                    bbox: polygonEncircleWKT,
+                    page: '',
+                    size: ''
+                }).then(rep => {
+                    if (rep && rep.code === 200) {
+                        let dataListDetails = [];
+                        rep.content.map((item, index) => {
+                            let ProjectName = '', SectionName = '';
+                            treeData.map(record => {
+                                record.children.map(row => {
+                                    if (row.No === item.Section) {
+                                        SectionName = row.Name;
+                                        ProjectName = record.Name;
+                                    }
+                                });
+                            });
+                            let NoArr = item.No.split('-');
+                            let NoStr = NoArr[2] + '号小班' + NoArr[3] + '号细班';
+                            let locationStr = '未定位';
+                            if (item.X && item.Y) {
+                                locationStr = '已定位';
+                            }
+                            dataListDetails.push({
+                                key: index,
+                                ProjectName,
+                                SectionName,
+                                NoStr,
+                                Section: item.Section,
+                                SXM: item.SXM,
+                                TreeType: item.TreeType,
+                                TreeTypeName: item.TreeTypeObj && item.TreeTypeObj.TreeTypeName,
+                                locationStr,
+                                CreateTime: item.CreateTime,
+                            })
+                        });
+                        console.log('dataListDetails', dataListDetails);
+                        this.setState({
+                            dataListDetails,
+                            loading: false
+                        })
+                    }
+                });
+            } else {
+                if (PipeType === 'line') {
+                    this.setState({
+                        loading: true
+                    });
+                    getPipequery({}, {
+                        Materail: '',
+                        DN: '',
+                        Section: selectSection,
+                        Bbox: polygonEncircleWKT,
+                        Inputer: '',
+                        ThinClass: ''
+                    }).then(rep => {
+                        if (rep) {
+                            let dataListDetailsLine = [];
+                            rep.map((item, index) => {
+                                let ProjectName = '', SectionName = '';
+                                treeData.map(record => {
+                                    record.children.map(row => {
+                                        if (row.No === item.Section) {
+                                            SectionName = row.Name;
+                                            ProjectName = record.Name;
+                                        }
+                                    });
+                                });
+                                dataListDetailsLine.push({
+                                    key: index,
+                                    ProjectName,
+                                    SectionName,
+                                    Section: item.Section,
+                                    DN: item.DN,
+                                    Material: item.Material,
+                                    Altitude: item.Altitude,
+                                    Depth: item.Depth,
+                                    Length: item.Length,
+                                })
+                            });
+                            this.setState({
+                                dataListDetailsLine,
+                                loading: false
+                            });
+                        }
+                    });
+                } else {
+                    this.setState({
+                        loading: true
+                    });
+                    getPipenodequery({}, {
+                        PipeType: '',
+                        Section: selectSection,
+                        ThinClass: '',
+                        Bbox: polygonEncircleWKT,
+                        Inputer: ''
+                    }).then(rep => {
+                        if (rep) {
+                            let dataListDetailsPoint = [];
+                            rep.map((item, index) => {
+                                let ProjectName = '', SectionName = '';
+                                treeData.map(record => {
+                                    record.children.map(row => {
+                                        if (row.No === item.Section) {
+                                            SectionName = row.Name;
+                                            ProjectName = record.Name;
+                                        }
+                                    });
+                                });
+                                dataListDetailsPoint.push({
+                                    key: index,
+                                    ProjectName,
+                                    SectionName,
+                                    Section: item.Section,
+                                    PipeTypeID: item.PipeTypeID,
+                                    PipeType: item.PipeType,
+                                    Depth: item.Depth,
+                                    Depth: item.Depth,
+                                    Length: item.Length,
+                                })
+                            });
+                            this.setState({
+                                dataListDetailsPoint,
+                                loading: false
+                            });
+                        }
+                    })
+                }
+            }
+        } else if (type === 'pipeType') {
             getPipenodeStatByRegion({}, {
                 stattype: 'pipetype',
                 section: selectSection,
@@ -1850,6 +2087,8 @@ export default class AreaDistanceMeasure extends Component {
             overallDiameterList,
             overallMaterialList,
             overallPipeTypeList,
+            dataListDetailsLine,
+            dataListDetailsPoint,
             dataListDetails,
             SectionList,
             selectProject,
@@ -2418,6 +2657,14 @@ export default class AreaDistanceMeasure extends Component {
                         }
                     </TabPane>
                     <TabPane tab='详细信息' key='detailsInfo'>
+                        {
+                            coverageType !== 'tree' ? <div>
+                                <Radio.Group onChange={this.onChangePipeType.bind(this)} value={PipeType} style={{marginBottom: '10px'}}>
+                                    <Radio value='line'>管线统计</Radio>
+                                    <Radio value='point'>管点统计</Radio>
+                                </Radio.Group>
+                            </div> : ''
+                        }
                         <Form {...formItemLayout} layout='inline'>
                             <Row>
                                 <Col span={8}>
@@ -2464,17 +2711,34 @@ export default class AreaDistanceMeasure extends Component {
                                 <Col span={3}>
                                     <Form.Item
                                     >
-                                        <Button onClick={this.onExport.bind(this)}>导出</Button>
+                                        <Button onClick={this.onExport.bind(this, 'details')}>导出</Button>
                                     </Form.Item>
                                 </Col>
                             </Row>
                         </Form>
-                        <Table
-                            bordered
-                            columns={this.columns2}
-                            rowKey='order'
-                            dataSource={dataListDetails}
-                        />
+                        <Spin spinning={loading}>
+                            {
+                                coverageType === 'tree' ? <Table
+                                    bordered
+                                    columns={this.columnsDetails}
+                                    rowKey='key'
+                                    dataSource={dataListDetails}
+                                /> : ''
+                            }
+                            {
+                                coverageType !== 'tree' && PipeType === 'line' ? <Table
+                                    bordered
+                                    columns={this.columnsDetailsLine}
+                                    rowKey='key'
+                                    dataSource={dataListDetailsLine}
+                                /> : <Table
+                                    bordered
+                                    columns={this.columnsDetailsPoint}
+                                    rowKey='key'
+                                    dataSource={dataListDetailsPoint}
+                                />
+                            }
+                        </Spin>
                     </TabPane>
                 </Tabs>
             </Modal>
@@ -2534,19 +2798,95 @@ export default class AreaDistanceMeasure extends Component {
             dataIndex: 'Num'
         }
     ]
-    columns2 = [
+    columnsDetailsPoint = [
         {
             title: '序号',
-            dataIndex: 'order'
+            dataIndex: 'key'
         },
         {
             title: '项目',
-            dataIndex: 'project'
+            dataIndex: 'ProjectName'
         },
         {
             title: '标段',
-            dataIndex: 'section'
+            dataIndex: 'SectionName'
+        },
+        {
+            title: '类型',
+            dataIndex: 'PipeType'
+        },
+        {
+            title: '埋深',
+            dataIndex: 'Depth'
+        },
+    ]
+    columnsDetails = [
+        {
+            title: '序号',
+            dataIndex: 'key'
+        },
+        {
+            title: '顺序码',
+            dataIndex: 'SXM'
+        },
+        {
+            title: '项目',
+            dataIndex: 'ProjectName'
+        },
+        {
+            title: '标段',
+            dataIndex: 'SectionName'
+        },
+        {
+            title: '位置',
+            dataIndex: 'NoStr'
+        },
+        {
+            title: '树种',
+            dataIndex: 'TreeTypeName'
+        },
+        {
+            title: '定位',
+            dataIndex: 'locationStr'
+        },
+        {
+            title: '定位时间',
+            dataIndex: 'CreateTime'
         }
+    ]
+    columnsDetailsLine = [
+        {
+            title: '序号',
+            dataIndex: 'key'
+        },
+        {
+            title: '项目',
+            dataIndex: 'ProjectName'
+        },
+        {
+            title: '标段',
+            dataIndex: 'SectionName'
+        },
+        {
+            title: '管径',
+            dataIndex: 'DN'
+        },
+        {
+            title: '材质',
+            dataIndex: 'Material'
+        },
+        {
+            title: '埋深',
+            dataIndex: 'Depth'
+        },
+        {
+            title: '高程',
+            dataIndex: 'Altitude'
+        },
+        {
+            title: '长度',
+            dataIndex: 'Length'
+        },
     ]
     columnsTreeType = [
         {

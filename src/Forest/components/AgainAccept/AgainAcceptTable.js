@@ -250,6 +250,7 @@ export default class AgainAcceptTable extends Component {
             Status: param.checkStatus, // 0未通过 1通过
             User: user.ID // 审核用户
         };
+        console.log('业主审核', JSON.stringify(pro));
         let checkInfoRep = await postCheckWfreAcceptance({}, pro);
         if (checkInfoRep && checkInfoRep.code === 1) {
             this.setState({
