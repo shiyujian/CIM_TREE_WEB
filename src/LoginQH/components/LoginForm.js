@@ -9,7 +9,8 @@ import {
 import {
     clearUser,
     setPermissions,
-    removePermissions
+    removePermissions,
+    getCompanyDataByOrgCode
 } from '_platform/auth';
 import './Login.less';
 const FormItem = Form.Item;
@@ -127,7 +128,8 @@ class LoginForm extends Component {
             actions: {
                 loginForest,
                 getRolePermission,
-                getUsers
+                getUsers,
+                getParentOrgTreeByID
             },
             history,
             history: { replace },
@@ -201,6 +203,38 @@ class LoginForm extends Component {
             } else {
                 await setPermissions([]);
             }
+            // 获取用户公司所在信息
+            let parentOrgID = '';
+            let parentOrgData = '';
+            if (forestLoginUserData.User_Name !== 'admin') {
+                // 获取登录用户的公司的信息
+                let orgID = forestLoginUserData.Org;
+                // 根据登录用户的部门code获取所在公司的code，这里没有对苗圃和供应商做对应处理
+                parentOrgData = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
+                console.log('parentOrgData', parentOrgData);
+
+                // 如果在公司下，则获取公司所有的信息
+                if (parentOrgData && parentOrgData.ID) {
+                    console.log('parentOrgID', parentOrgID);
+
+                    parentOrgID = parentOrgData.ID;
+                    window.localStorage.setItem(
+                        'LOGIN_USER_PARENTORGDATA',
+                        JSON.stringify(parentOrgData)
+                    );
+                    window.localStorage.setItem(
+                        'LOGIN_USER_PARENTORGID',
+                        JSON.stringify(parentOrgID)
+                    );
+                } else {
+                    Notification.warning({
+                        message: '当前用户不在公司下，请重新登录',
+                        duration: 3
+                    });
+                    this.clearSystemUser();
+                    return;
+                }
+            }
 
             Notification.open({
                 message: loginType
@@ -226,15 +260,17 @@ class LoginForm extends Component {
                     );
                 }
             }
+
+            let that = this;
             setTimeout(() => {
                 window.localStorage.clear();
                 let href = window.location.href;
                 if (href.indexOf('www.xaqnxl.com' !== -1)) {
-                    history.replace('/login');
                     Notification.warning({
                         message: '验证已过期，请重新登录',
                         duration: 3
                     });
+                    that.clearSystemUser();
                 }
             }, 21600000);
             setTimeout(() => {
@@ -280,6 +316,27 @@ class LoginForm extends Component {
                 });
             }
         }
+    }
+    clearSystemUser = () => {
+        const {
+            history,
+            actions: { clearTab }
+        } = this.props;
+        clearUser();
+        clearTab();
+        removePermissions();
+        window.localStorage.removeItem('LOGIN_USER_DATA');
+        let remember = window.localStorage.getItem('QH_LOGIN_REMEMBER');
+        if (!remember) {
+            window.localStorage.removeItem('LOGIN_USER_PASSDATA');
+        }
+        window.localStorage.removeItem('RegionCodeList');
+        window.localStorage.removeItem('LOGIN_USER_PARENTORGDATA');
+        window.localStorage.removeItem('LOGIN_USER_PARENTORGID');
+        window.localStorage.clear();
+        setTimeout(() => {
+            history.replace('/login');
+        }, 500);
     }
     // 点击下载APP
     handleAppDownload = () => {

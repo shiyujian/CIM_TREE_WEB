@@ -14,7 +14,8 @@ import {
 import {
     getUser,
     getUserIsManager,
-    getAreaTreeData
+    getAreaTreeData,
+    getCompanyDataByOrgCode
 } from '_platform/auth';
 import {
     getConstructionPackageBySection
@@ -49,7 +50,12 @@ export default class ConstructionPackage extends Component {
             leftkeycode: '',
             resetkey: 0,
             sectionsData: [],
-            packageDatas: []
+            packageDatas: [],
+            // 获取公司信息
+            parentOrgData: '',
+            parentOrgID: '',
+            selectOrgData: '',
+            isOwner: false
         };
     }
     componentDidMount = async () => {
@@ -58,7 +64,8 @@ export default class ConstructionPackage extends Component {
                 getTreeNodeList,
                 getThinClassList,
                 getTotalThinClass,
-                getThinClassTree
+                getThinClassTree,
+                getParentOrgTreeByID
             },
             platform: { tree = {} }
         } = this.props;
@@ -108,12 +115,52 @@ export default class ConstructionPackage extends Component {
         this.setState({
             packageDatas: projectList
         });
+
+        let userInfo = await getUser();
+        // 获取用户的公司信息
+        let currentUserSection = userInfo.section || '';
+        let isOwner = false;
+        if ((userInfo.roles && userInfo.roles.RoleName.indexOf('设计') !== -1) || userInfo.username === 'admin') {
+            isOwner = true;
+        }
+        this.setState({
+            isOwner,
+            currentUserSection
+        });
+
+        let parentOrgID = '';
+        let parentOrgData = '';
+        if (userInfo.username !== 'admin') {
+            // 获取登录用户的公司的信息
+            let orgID = userInfo.org;
+            // 根据登录用户的部门code获取所在公司的code，这里没有对苗圃和供应商做对应处理
+            parentOrgData = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
+            console.log('parentOrgData', parentOrgData);
+
+            // 如果在公司下，则获取公司所有的信息
+            if (parentOrgData && parentOrgData.ID) {
+                parentOrgID = parentOrgData.ID;
+                this.setState({
+                    parentOrgData,
+                    parentOrgID
+                });
+            } else {
+                Notification.warning({
+                    message: '当前用户不在公司下，请重新登录',
+                    duration: 3
+                });
+            }
+        }
     }
     // 树选择, 重新获取: 标段、小班、细班、树种并置空
     onSelect (keys = [], info) {
         const {
             platform: { tree = {} }
         } = this.props;
+        const {
+            parentOrgData,
+            isOwner
+        } = this.state;
         let treeList = tree.thinClassTree;
 
         let keycode = keys[0] || '';
@@ -135,11 +182,32 @@ export default class ConstructionPackage extends Component {
 
         // 标段
         let user = getUser();
+        console.log('user', user);
         let section = user.section;
+        let newSectionList = [];
+        if (isOwner) {
+            // 根据公司所关联的标段展示施工包树
+            let companySection = (parentOrgData && parentOrgData.Section) || '';
+            if (companySection) {
+                let sectionList = companySection.split(',');
+                console.log('sectionList', sectionList);
+
+                if (sectionList && sectionList instanceof Array && sectionList.length > 0) {
+                    sectionsData.map((item) => {
+                        if (sectionList.indexOf(item.No) !== -1) {
+                            newSectionList.push(item);
+                        }
+                    });
+                };
+            }
+        }
         let permission = getUserIsManager();
         if (permission) {
             // 是admin或者业主
             this.setSectionOption(sectionsData);
+        } else if (isOwner) {
+            console.log('newSectionList', newSectionList);
+            this.setSectionOption(newSectionList);
         } else {
             sectionsData.map((sectionData) => {
                 if (section && section === sectionData.No) {

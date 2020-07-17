@@ -14,9 +14,10 @@ import {
 } from 'antd';
 import moment from 'moment';
 import { FOREST_API } from '_platform/api';
-import { getForestImgUrl } from '_platform/auth';
+import { getForestImgUrl, getUser } from '_platform/auth';
 import '../index.less';
 import { getSmallThinNameByPlaceData } from '../auth';
+
 import {
     getSectionNameBySection,
     getProjectNameBySection
@@ -608,9 +609,12 @@ export default class CheckerTable extends Component {
             smallclassData = '',
             thinclassData = ''
         } = this.state;
+        let user = getUser();
         if (thinclass === '' && sxm === '') {
-            message.info('请选择项目，标段，小班及细班信息或输入顺序码');
-            return;
+            if (user.username !== 'admin') {
+                message.info('请选择项目，标段，小班及细班信息或输入顺序码');
+                return;
+            }
         }
         const {
             actions: {

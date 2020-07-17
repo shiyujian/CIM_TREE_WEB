@@ -359,9 +359,12 @@ export default class SupervisorTable extends Component {
             status = ''
         } = this.state;
 
+        let user = getUser();
         if (thinclass === '' && sxm === '') {
-            message.info('请选择项目，标段，小班及细班信息或输入顺序码');
-            return;
+            if (user.username !== 'admin') {
+                message.info('请选择项目，标段，小班及细班信息或输入顺序码');
+                return;
+            }
         }
         /**
          * 全部
@@ -373,7 +376,7 @@ export default class SupervisorTable extends Component {
                             status   0,2
                             section
             业主抽查合格    checkstatus   0  业主不合格
-            业主抽查不合格  checkstatus  1业主合格
+            业主抽查不合格  checkstatus  1   业主合格
          */
 
         /**

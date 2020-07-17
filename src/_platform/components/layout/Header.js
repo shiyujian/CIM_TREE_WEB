@@ -84,10 +84,8 @@ export default class Header extends Component {
     clearSystemUser = () => {
         const {
             history,
-            actions: { clearTab },
-            location: { pathname = '' } = {}
+            actions: { clearTab }
         } = this.props;
-        console.log('pathname', pathname);
         clearUser();
         clearTab();
         removePermissions();
@@ -97,6 +95,8 @@ export default class Header extends Component {
             window.localStorage.removeItem('LOGIN_USER_PASSDATA');
         }
         window.localStorage.removeItem('RegionCodeList');
+        window.localStorage.removeItem('LOGIN_USER_PARENTORGDATA');
+        window.localStorage.removeItem('LOGIN_USER_PARENTORGID');
         window.localStorage.clear();
         setTimeout(() => {
             history.replace('/login');

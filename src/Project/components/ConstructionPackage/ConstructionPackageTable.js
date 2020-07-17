@@ -105,7 +105,11 @@ export default class ConstructionPackageTable extends Component {
             smallclass: '',
             thinclass: '',
             smallclassData: '',
-            thinclassData: ''
+            thinclassData: '',
+            smallclassoption: [],
+            thinclassoption: [],
+            tblData: []
+
         }, () => {
             if (value) {
                 this.handleQuerySmallCalssPackageList();
