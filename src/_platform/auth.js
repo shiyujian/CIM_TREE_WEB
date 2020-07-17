@@ -16,6 +16,20 @@ export const trim = (str) => {
 export const getUser = () => {
     try {
         let user = window.localStorage.getItem('LOGIN_USER_DATA');
+        let parentOrgID = window.localStorage.getItem('LOGIN_USER_PARENTORGID') || '';
+        let parentOrgData = window.localStorage.getItem('LOGIN_USER_PARENTORGDATA') || '';
+        if (parentOrgID) {
+            parentOrgID = JSON.parse(parentOrgID);
+        }
+        let companySection = '';
+        let companySectionList = '';
+        if (parentOrgData) {
+            parentOrgData = JSON.parse(parentOrgData);
+            companySection = (parentOrgData && parentOrgData.Section) || '';
+            if (companySection) {
+                companySectionList = companySection.split(',');
+            }
+        }
         if (!user) {
             return {
                 username: '',
@@ -69,7 +83,11 @@ export const getUser = () => {
             status: Status,
             token: Token,
             tasks: cookie.get('tasks'),
-            password: cookie.get('password')
+            password: cookie.get('password'),
+            parentOrgID: parentOrgID,
+            parentOrgData: parentOrgData,
+            companySection: companySection,
+            companySectionList: companySectionList
         };
     } catch (e) {
         console.log('getUser', e);
@@ -199,13 +217,22 @@ export const getAreaTreeData = async (getTreeNodeList, getThinClassList) => {
     if (user.username === 'admin') {
         permission = true;
     }
+    // 业主角色
     let userRoles = user.roles || '';
     if (userRoles && userRoles.ParentID && userRoles.ParentID === 3) {
         permission = true;
     }
+    // 针对设计  造价等多个标段的账户
     let multipleSectionPermission = false;
-    if (userRoles && userRoles.ParentID && userRoles.ParentID === 107) {
-        multipleSectionPermission = true;
+    if (userRoles && userRoles.ParentID) {
+        // 造价角色
+        if (userRoles.ParentID === 107) {
+            multipleSectionPermission = true;
+        }
+        // 设计角色
+        if (userRoles.ParentID === 106) {
+            multipleSectionPermission = true;
+        }
     }
 
     if (rst instanceof Array && rst.length > 0) {

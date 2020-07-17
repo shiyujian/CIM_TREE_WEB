@@ -14,7 +14,7 @@ import {
     Card
 } from 'antd';
 import moment from 'moment';
-import { getForestImgUrl } from '_platform/auth';
+import { getForestImgUrl, getUser } from '_platform/auth';
 import '../index.less';
 import {
     getSmallThinNameByPlaceData

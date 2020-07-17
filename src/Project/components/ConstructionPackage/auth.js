@@ -10,8 +10,6 @@ export const getConstructionPackageBySection = async (sectionNo, getThinClassLis
         let thinClassList = getThinClassBySection(smallClass, list);
         smallClass.children = thinClassList;
     });
-    console.log('smallCalssPackageList', smallCalssPackageList);
-
     return smallCalssPackageList;
 };
 // 获取项目的小班
@@ -43,8 +41,13 @@ export const getSmallClassBySection = (smallClassList) => {
             if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('业主') !== -1) {
                 permission = true;
             }
+            // 设计角色
+            let multipleSectionPermission = false;
+            if (userRoles && userRoles.ParentID && userRoles.ParentID === 106) {
+                multipleSectionPermission = true;
+            }
             // permission为true说明是管理员或者业主
-            if (permission) {
+            if (permission || multipleSectionPermission) {
                 // console.log('wwwww', sectionNo);
             } else if (section) {
                 if (sectionNo !== section) {

@@ -21,6 +21,7 @@ import {
     getSectionNameBySection,
     getProjectNameBySection
 } from '_platform/gisAuth';
+import { getUser } from '_platform/auth';
 const InputGroup = Input.Group;
 const { RangePicker } = DatePicker;
 
@@ -449,6 +450,11 @@ export default class LocmeasureTable extends Component {
 
     query (page) {
         const {
+            actions: { getTreeLocations },
+            platform: { tree = {} },
+            leftkeycode = ''
+        } = this.props;
+        const {
             sxm = '',
             section = '',
             treetype = '',
@@ -461,15 +467,16 @@ export default class LocmeasureTable extends Component {
             smallclassData = '',
             thinclassData = '',
             bigType = ''
+
         } = this.state;
+        let user = getUser();
         if (thinclass === '' && sxm === '') {
-            message.info('请选择项目，标段，小班及细班信息或输入顺序码');
-            return;
+            if (user.username !== 'admin') {
+                message.info('请选择项目，标段，小班及细班信息或输入顺序码');
+                return;
+            }
         }
-        const {
-            actions: { getTreeLocations },
-            platform: { tree = {} }
-        } = this.props;
+
         let thinClassTree = tree.thinClassTree;
         let postdata = {
             sxm,
@@ -491,7 +498,7 @@ export default class LocmeasureTable extends Component {
         }
         let sectionArr = section.split('-');
         if (smallclass === '') {
-            postdata.no = '';
+            postdata.no = leftkeycode;
         } else if (thinclass === '') {
             postdata.no = sectionArr[0] + '-' + sectionArr[1] + '-' + smallclassData;
         } else {

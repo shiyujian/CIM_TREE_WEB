@@ -152,20 +152,19 @@ export default class AuxiliaryManagement extends Component {
             let realStatData = await getStatByTreeType({}, realStatPostData);
             let planStatData = await getStatTreePlans({}, planStatPostData);
             let uniqueTreeTypeIDList = [];
-
             realStatData.map((realData) => {
                 if (realData && realData.TreeTypeNo) {
                     let typeID = '';
                     let typeName = '';
                     treeTypeList.map((treeType) => {
-                        if (treeType.TreeTypeNo === realData.TreeTypeNo) {
-                            typeID = treeType.ID;
+                        if (Number(treeType.TreeTypeNo) === Number(realData.TreeTypeNo)) {
+                            typeID = Number(treeType.ID);
                             typeName = treeType.TreeTypeName;
                         }
                     });
                     if (uniqueTreeTypeIDList.indexOf(typeID) === -1) {
                         uniqueTreeTypeIDList.push(typeID);
-                        let designData = planStatData.find((design) => design.TreeType === typeID);
+                        let designData = planStatData.find((design) => Number(design.TreeType) === Number(typeID));
                         if (designData && designData.No) {
                             treeTypeRealDesignList.push({
                                 realNum: Math.abs(realData.Num),
@@ -189,8 +188,8 @@ export default class AuxiliaryManagement extends Component {
                     let typeID = '';
                     let typeName = '';
                     treeTypeList.map((treeType) => {
-                        if (treeType.ID === planData.TreeType) {
-                            typeID = treeType.ID;
+                        if (Number(treeType.ID) === Number(planData.TreeType)) {
+                            typeID = Number(treeType.ID);
                             typeName = treeType.TreeTypeName;
                         }
                     });
