@@ -112,8 +112,8 @@ export default class DegitalAcceptTable extends Component {
             reDrawAreaVisible: false,
             againCheckModalVisible: false, // 重新验收
             thinClassDesignData: [],
-            filterList: [], // 筛选数据
-            userOperatePermission: false
+            filterList: [] // 筛选数据
+
         };
         this.columns = [
             {
@@ -168,9 +168,11 @@ export default class DegitalAcceptTable extends Component {
                 render: (text, record) => {
                     console.log('状态', record);
                     const {
-                        curingTreeData,
-                        filterList,
                         userOperatePermission
+                    } = this.props;
+                    const {
+                        curingTreeData,
+                        filterList
                     } = this.state;
                     const user = getUser();
                     let duty = user.duty || '';
@@ -526,24 +528,13 @@ export default class DegitalAcceptTable extends Component {
                 getUnitMessageBySection
             }
         } = this.props;
-        // 雄县2019秋季造林关闭查看和导出权限
-        let userOperatePermission = true;
-        let user = getUser();
-        let userSection = user.section;
-        if (userSection) {
-            DEGITALACCEPTCANTEXPORTSECTIONS.map((sectionMess) => {
-                if (userSection === sectionMess.section) {
-                    userOperatePermission = false;
-                }
-            });
-        }
+
         let unitMessage = await getUnitMessageBySection();
         // 获取监理和业主
         await this.getOwnerInfo();
         // 获取所有重新验收记录
         this.setState({
-            unitMessage,
-            userOperatePermission
+            unitMessage
         });
     }
     // 重新验收

@@ -10,8 +10,12 @@ import {
     getUser,
     getAreaTreeData,
     getDefaultProject,
-    getUserIsManager
+    getUserIsManager,
+    getCompanyDataByOrgCode
 } from '_platform/auth';
+import {
+    DEGITALACCEPTCANTEXPORTSECTIONS
+} from '_platform/api';
 import {
     Main,
     Body,
@@ -44,7 +48,10 @@ export default class DegitalAccept extends Component {
             resetkey: 0,
             sectionsData: [],
             smallClassesData: [],
-            loading: false
+            loading: false,
+            parentOrgData: '',
+            parentOrgID: '',
+            userOperatePermission: false
         };
     }
     componentDidMount = async () => {
@@ -53,7 +60,8 @@ export default class DegitalAccept extends Component {
                 getTreeNodeList,
                 getThinClassList,
                 getTotalThinClass,
-                getThinClassTree
+                getThinClassTree,
+                getParentOrgTreeByID
             },
             platform: { tree = {} },
             supervisorUsersList
@@ -162,6 +170,54 @@ export default class DegitalAccept extends Component {
             </Option>
         ];
         this.setState({ typeoption, zttypeoption, ystypeoption });
+
+        // 雄县2019秋季造林关闭查看和导出权限
+        let userOperatePermission = true;
+        let user = getUser();
+        let userSection = user.section;
+        if (userSection) {
+            DEGITALACCEPTCANTEXPORTSECTIONS.map((sectionMess) => {
+                if (userSection === sectionMess.section) {
+                    userOperatePermission = false;
+                }
+            });
+        }
+        let userInfo = await getUser();
+        let parentOrgID = '';
+        let parentOrgData = '';
+        if (userInfo.username !== 'admin') {
+            // 获取登录用户的公司的信息
+            let orgID = userInfo.org;
+            // 根据登录用户的部门code获取所在公司的code，这里没有对苗圃和供应商做对应处理
+            parentOrgData = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
+            console.log('parentOrgData', parentOrgData);
+
+            // 如果在公司下，则获取公司所有的信息
+            if (parentOrgData && parentOrgData.ID) {
+                parentOrgID = parentOrgData.ID;
+                this.setState({
+                    parentOrgData,
+                    parentOrgID
+                });
+            } else {
+                Notification.warning({
+                    message: '当前用户不在公司下，请重新登录',
+                    duration: 3
+                });
+            }
+        }
+        if (!parentOrgID) {
+            userOperatePermission = false;
+        } else if (parentOrgID && parentOrgID === '69f5ea14-dd9d-443a-8c1d-56623c328883') {
+            console.log('aaaaaaa');
+            userOperatePermission = false;
+        } else if (parentOrgData && parentOrgData.OrgName && parentOrgData.OrgName === '雄县自然资源局') {
+            console.log('bbbbbb');
+            userOperatePermission = false;
+        }
+        this.setState({
+            userOperatePermission
+        });
     }
 
     // 获取监理列表
