@@ -16,6 +16,7 @@ export const trim = (str) => {
 export const getUser = () => {
     try {
         let user = window.localStorage.getItem('LOGIN_USER_DATA');
+
         let parentOrgID = window.localStorage.getItem('LOGIN_USER_PARENTORGID') || '';
         let parentOrgData = window.localStorage.getItem('LOGIN_USER_PARENTORGDATA') || '';
         if (parentOrgID) {
@@ -49,6 +50,7 @@ export const getUser = () => {
             };
         }
         user = JSON.parse(user);
+        console.log('localStorage', user);
         const {
             User_Name = '',
             ID = '',
@@ -62,7 +64,9 @@ export const getUser = () => {
             Roles = '',
             Section = '',
             Status = 1,
-            Token = ''
+            Token = '',
+            Sex = 1,
+            EMail = ''
         } = user;
         let roles = '';
         if (Roles && Roles instanceof Array && Roles.length > 0) {
@@ -82,6 +86,8 @@ export const getUser = () => {
             section: Section,
             status: Status,
             token: Token,
+            sex: Sex,
+            email: EMail,
             tasks: cookie.get('tasks'),
             password: cookie.get('password'),
             parentOrgID: parentOrgID,
