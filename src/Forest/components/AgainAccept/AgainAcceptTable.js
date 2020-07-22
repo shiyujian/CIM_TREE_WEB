@@ -197,19 +197,6 @@ export default class AgainAcceptTable extends Component {
     }
     // 获取各个标段对应的公司和项目经理
     componentDidMount = async () => {
-        const {
-            sectionSelect
-        } = this.props;
-        let user = getUser();
-        if (user.section) {
-            sectionSelect(user.section);
-            this.setState({
-                section: user.section
-            }, async () => {
-                // 获取所有重新验收记录
-                await this.query(1);
-            });
-        }
         // 获取监理和业主
         await this.getOwnerInfo();
     }

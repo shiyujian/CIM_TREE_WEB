@@ -314,6 +314,7 @@ export default class AgainAccept extends Component {
                 }
             });
         }
+        console.log('所有标段选项', sectionsData);
         this.setState({
             sectionsData
         });
@@ -374,6 +375,7 @@ export default class AgainAccept extends Component {
         const {
             sectionsData
         } = this.state;
+        console.log('设置小班', value, sectionsData);
         if (value) {
             sectionsData.map((sectionData) => {
                 if (value === sectionData.No) {
