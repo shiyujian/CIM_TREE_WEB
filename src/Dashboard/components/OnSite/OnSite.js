@@ -396,7 +396,8 @@ class OnSite extends Component {
                     className={
                         areaDistanceMeasureMenu === 'areaMeasureMenu'
                             ? 'dashboard-map-area r-main'
-                            : 'dashboard-map r-main'
+                            : (areaDistanceMeasureMenu === 'dataMeasureMenu' ?
+                            'dashboard-map-data r-main': 'dashboard-map r-main')
                     }
                     id='onSiteDom'
                 >

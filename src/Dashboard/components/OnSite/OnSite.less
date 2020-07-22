@@ -45,6 +45,7 @@
     }
 }
 // 为测量面积和距离显示不同的样式，新增‘dashboard-map-area’，修改leaflet-interactive的数据
+
 .dashboard-map {
     position: relative;
 
@@ -650,6 +651,19 @@
                 cursor: pointer;
             }
         }
+    }
+}
+.dashboard-map-data {
+    position: relative;
+    .leaflet-interactive {
+        stroke: rgb(241, 94, 35);
+        stroke-opacity: 1;
+        stroke-width: 3;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        fill: rgba(241, 94, 35, 1);
+        fill-opacity: 0.3;
+        fill-rule: evenodd;
     }
 }
 // 为测量面积和距离显示不同的样式，修改leaflet-interactive的数据

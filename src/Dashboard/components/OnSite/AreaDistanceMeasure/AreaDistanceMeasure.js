@@ -21,7 +21,7 @@ export default class AreaDistanceMeasure extends Component {
             // 数据测量
             visibleImport: false, // 导入
             polygonEncircle: [], // 面坐标
-            radioValue: 1, // 1导入范围 2手动圈画
+            radioValue: 2, // 1导入范围 2手动圈画
             totalDistanceMeasure: 0, // 总距离
             areaMeasure: 0, // 圈选区域面积
             coverageVisible: false, // 图层解析
@@ -30,6 +30,7 @@ export default class AreaDistanceMeasure extends Component {
             distanceMeasureNumList: []
         };
         this.editPolygon = ''; // 面积图层
+        this.editPolygonData = ''; // 统计图层
         this.editPolyline = '';
         this.distanceMeasureMarkerList = {};
     }
@@ -160,6 +161,7 @@ export default class AreaDistanceMeasure extends Component {
                 // 重新开始框选图层
                 this.editPolygon = map.editTools.startPolygon();
             } else if (type === 'dataMeasureMenu') {
+                this.editPolygonData = map.editTools.startPolygon();
                 // 重新开始框选图层
                 this.setState({
                     dataMeasureVisible: true
@@ -168,7 +170,7 @@ export default class AreaDistanceMeasure extends Component {
         }
     }
 
-    // 撤销测量面积或者距离的图层
+    // 撤销测量面积/距离/统计的图层
     handleCloseMeasureMenu = async () => {
         const {
             map
@@ -185,12 +187,19 @@ export default class AreaDistanceMeasure extends Component {
             map.editTools.stopDrawing();
         }
         this.editPolygon = '';
+        // 去除统计测量图层
+        if (this.editPolygonData) {
+            map.removeLayer(this.editPolygonData);
+            map.editTools.stopDrawing();
+        }
+        this.editPolygonData = '';
         // 去除距离测量的显示的距离图层
         for (let i in this.distanceMeasureMarkerList) {
             map.removeLayer(this.distanceMeasureMarkerList[i]);
         }
         this.setState({
             areaMeasure: 0,
+            dataMeasureVisible: false,
             areaMeasureVisible: false,
             totalDistanceMeasure: 0,
             distanceMeasureNumList: []
@@ -198,43 +207,44 @@ export default class AreaDistanceMeasure extends Component {
     }
     // 确定
     handleConfirm () {
-        const { radioValue } = this.state;
-        if (radioValue === 1) {
-            this.setState({
-                visibleImport: true
+        if (this.editPolygonData) {
+            let coordinates = handlePolygonLatLngs(this.editPolygonData);
+            let WKT = 'POLYGON((';
+            coordinates.map(item => {
+                let coord = item[1] + ' ' + item[0];
+                WKT += coord + ',';
             });
-        } else if (radioValue === 2) {
-            if (this.editPolygon) {
-                let coordinates = handlePolygonLatLngs(this.editPolygon);
-                console.log('coordinatesshiyujian', coordinates);
-                console.log('this.editPolygon', this.editPolygon);
-                let WKT = 'POLYGON((';
-                coordinates.map(item => {
-                    let coord = item[1] + ' ' + item[0];
-                    WKT += coord + ',';
+            let polygonEncircleWKT = WKT + coordinates[0][1] + ' ' + coordinates[0][0] + '))';
+            if (coordinates.length > 2) {
+                this.setState({
+                    polygonEncircleWKT: polygonEncircleWKT,
+                    polygonEncircle: coordinates,
+                    coverageVisible: true
                 });
-                let polygonEncircleWKT = WKT + coordinates[0][1] + ' ' + coordinates[0][0] + '))';
-                if (coordinates.length > 2) {
-                    this.setState({
-                        polygonEncircleWKT: polygonEncircleWKT,
-                        polygonEncircle: coordinates,
-                        coverageVisible: true
-                    });
-                }
             }
         }
     }
     handlePolygon (Geom) {
-        console.log('handlePolygon', Geom);
+        const {
+            map
+        } = this.props;
+        let coordArr = Geom.slice(10, -2).split(',');
+        let coordArrNew = [];
+        coordArr.map(item => {
+            let arr = item.split(' ');
+            coordArrNew.push([arr[1], arr[0]])
+        });
+        coordArrNew.pop();
+        this.editPolygonData = L.polygon(coordArrNew).addTo(map);
+        map.fitBounds(this.editPolygonData.getBounds());
         this.setState({
-            polygonEncircleWKT: Geom,
-            coverageVisible: true
+            polygonEncircleWKT: Geom
         });
     }
     // 回退
     handleRollback () {
-        if (this.editPolygon) {
-            this.editPolygon.editor.pop();
+        if (this.editPolygonData) {
+            this.editPolygonData.editor.pop();
         }
     }
     handleRadio (e) {
@@ -244,12 +254,18 @@ export default class AreaDistanceMeasure extends Component {
         let value = e.target.value;
         if (value === 2) {
             // 手动圈画
-            this.editPolygon = map.editTools.startPolygon();
-            console.log(this.editPolygon);
+            map.removeLayer(this.editPolygonData);
+            this.editPolygonData = map.editTools.startPolygon();
+            this.setState({
+                radioValue: value
+            });
+        } else {
+            map.removeLayer(this.editPolygonData);
+            this.setState({
+                radioValue: value,
+                visibleImport: true
+            });
         }
-        this.setState({
-            radioValue: value
-        });
     }
     // 撤销
     handleRevocation () {
@@ -257,10 +273,10 @@ export default class AreaDistanceMeasure extends Component {
             map
         } = this.props;
         // 去除面积测量图层
-        if (this.editPolygon) {
-            map.removeLayer(this.editPolygon);
+        if (this.editPolygonData) {
+            map.removeLayer(this.editPolygonData);
             map.editTools.stopDrawing();
-            this.editPolygon = map.editTools.startPolygon();
+            this.editPolygonData = map.editTools.startPolygon();
         }
     }
     handleCancelCoverage () {
@@ -324,8 +340,8 @@ export default class AreaDistanceMeasure extends Component {
                         <div className='DataDistanceMeasure-spanLayout'>
                             <span className='AreaDistanceMeasure-measureNumText'>
                                 <Radio.Group value={this.state.radioValue} onChange={this.handleRadio.bind(this)}>
-                                    <Radio style={{color: '#fff'}} value={1}>导入范围</Radio>
                                     <Radio style={{color: '#fff'}} value={2}>手动圈画</Radio>
+                                    <Radio style={{color: '#fff'}} value={1}>导入范围</Radio>
                                 </Radio.Group>
                             </span>
                         </div>
