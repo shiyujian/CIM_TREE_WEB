@@ -20,7 +20,8 @@ import {
     getUser,
     clearUser,
     getPermissions,
-    removePermissions
+    removePermissions,
+    getAreaTreeData
 } from '../../auth';
 import {
     getProjectNameByBigTreeListSection,
@@ -232,9 +233,14 @@ class Header extends Component {
         const {
             actions: {
                 putForestUser,
-                getUsers
+                getUsers,
+                getTreeNodeList,
+                getThinClassList,
+                getTotalThinClass,
+                getThinClassTree
             },
-            history
+            history,
+            location: { pathname = '' } = {}
         } = this.props;
         this.props.form.validateFields(async (err, values) => {
             if (!err) {
@@ -283,12 +289,29 @@ class Header extends Component {
                             let loginUserNewData = userNewData.content[0];
                             console.log('loginUserNewData', loginUserNewData);
                             loginUserNewData.Token = token;
-                            setTimeout(() => {
+                            setTimeout(async () => {
                                 window.localStorage.setItem(
                                     'LOGIN_USER_DATA',
                                     JSON.stringify(loginUserNewData)
                                 );
+                                // 用户可以切换标段，切换标段之后，需要重新获取数据，因此需要更新数据
+                                let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
+                                let totalThinClass = data.totalThinClass || [];
+                                let projectList = data.projectList || [];
+                                // 获取所有的小班数据，用来计算养护任务的位置
+                                await getTotalThinClass(totalThinClass);
+                                // 区域地块树
+                                await getThinClassTree(projectList);
                                 history.replace('/');
+
+                                // let href = window.location.href;
+                                // let reg = new RegExp(/(\w+):\/\/([^/:]+)(:\d*)?/);
+                                // let result = href.match(reg);
+                                // console.log('href', href);
+                                // console.log('result', result);
+                                // console.log('history', history);
+                                // console.log('pathname', pathname);
+                                // history.replace(pathname);
                                 Notification.success({
                                     message: '修改标段成功'
                                 });
@@ -355,7 +378,7 @@ class Header extends Component {
         }
         let sectionChangeMenu = '';
         let bigTreeList = (tree && tree.bigTreeList) || [];
-        if (section) {
+        if (section && section.indexOf('P009') !== -1) {
             let sectionName = getSectionNameByBigTreeListSection(section, bigTreeList);
             let projectName = getProjectNameByBigTreeListSection(section, bigTreeList);
             sectionChangeMenu = (
@@ -579,7 +602,11 @@ class Header extends Component {
                             {/* <a onClick={this.onClickDot.bind(this)}> */}
                             <img
                                 src={roleIcon}
-                                style={{ verticalAlign: 'middle' }}
+                                style={{
+                                    verticalAlign: 'middle',
+                                    width: 25,
+                                    height: 25
+                                }}
                             />
                             {/* </a> */}
                             {/* </Link> */}
@@ -617,6 +644,7 @@ class Header extends Component {
                     title='切换标段'
                     visible={changeSectionModalVisible}
                     footer={null}
+                    maskClosable={false}
                     onOk={this.handleChangeSectionOk.bind(this)}
                     onCancel={this.handleChangeSectionCancel.bind(this)}
                 >

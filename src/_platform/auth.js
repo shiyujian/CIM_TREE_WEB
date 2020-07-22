@@ -50,7 +50,6 @@ export const getUser = () => {
             };
         }
         user = JSON.parse(user);
-        console.log('localStorage', user);
         const {
             User_Name = '',
             ID = '',
