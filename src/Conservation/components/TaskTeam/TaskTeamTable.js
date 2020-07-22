@@ -94,6 +94,7 @@ export default class TaskTeamTable extends Component {
         const {
             selectState
         } = this.props;
+        // 只有获取数据  并且  已经进行点击  才能进行展示
         let disabled = true;
         if (selectState && !relateDisabled) {
             disabled = false;

@@ -68,7 +68,7 @@ import signOut from './layoutImages/退出1.png';
 // 角色
 import roleIcon from './layoutImages/role.png';
 const FormItem = Form.Item;
-const { Option, OptGroup } = Select;
+const { Option } = Select;
 @connect(
     state => {
         const { platform = {} } = state;
@@ -105,9 +105,6 @@ class Header extends Component {
         const {
             actions: {
                 getTreeNodeList
-            },
-            form: {
-                setFieldsValue
             },
             tree = {}
         } = this.props;
@@ -222,9 +219,6 @@ class Header extends Component {
         });
     }
     handleChangeSectionCancel = () => {
-        const {
-            changeSectionLoading
-        } = this.state;
         this.setState({
             changeSectionModalVisible: false
         });
@@ -645,6 +639,7 @@ class Header extends Component {
                     visible={changeSectionModalVisible}
                     footer={null}
                     maskClosable={false}
+                    closable={false}
                     onOk={this.handleChangeSectionOk.bind(this)}
                     onCancel={this.handleChangeSectionCancel.bind(this)}
                 >
