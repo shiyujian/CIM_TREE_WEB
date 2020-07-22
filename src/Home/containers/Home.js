@@ -81,17 +81,16 @@ export default class Home extends Component {
             },
             platform: { tree = {} }
         } = this.props;
+        console.log('aaaaaaa');
+        // 用户可以切换标段，切换标段之后，需要重新获取数据，因此需要更新数据
+        let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
+        let totalThinClass = data.totalThinClass || [];
+        let projectList = data.projectList || [];
+        // 获取所有的小班数据，用来计算养护任务的位置
+        await getTotalThinClass(totalThinClass);
+        // 区域地块树
+        await getThinClassTree(projectList);
 
-        // 避免反复获取施工包数据
-        if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
-            let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
-            let totalThinClass = data.totalThinClass || [];
-            let projectList = data.projectList || [];
-            // 获取所有的小班数据，用来计算养护任务的位置
-            await getTotalThinClass(totalThinClass);
-            // 区域地块树
-            await getThinClassTree(projectList);
-        }
         let defaultProject = await getDefaultProject();
         this.getStatworkmans(defaultProject);
         this.getGardentotalstat(defaultProject);

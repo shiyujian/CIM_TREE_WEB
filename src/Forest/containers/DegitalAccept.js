@@ -170,11 +170,10 @@ export default class DegitalAccept extends Component {
             </Option>
         ];
         this.setState({ typeoption, zttypeoption, ystypeoption });
-
+        let userInfo = await getUser();
         // 雄县2019秋季造林关闭查看和导出权限
         let userOperatePermission = true;
-        let user = getUser();
-        let userSection = user.section;
+        let userSection = userInfo.section;
         if (userSection) {
             DEGITALACCEPTCANTEXPORTSECTIONS.map((sectionMess) => {
                 if (userSection === sectionMess.section) {
@@ -182,7 +181,7 @@ export default class DegitalAccept extends Component {
                 }
             });
         }
-        let userInfo = await getUser();
+        // 雄县自然资源局的账户无法进行查看和导出
         let parentOrgID = '';
         let parentOrgData = '';
         if (userInfo.username !== 'admin') {
@@ -190,8 +189,6 @@ export default class DegitalAccept extends Component {
             let orgID = userInfo.org;
             // 根据登录用户的部门code获取所在公司的code，这里没有对苗圃和供应商做对应处理
             parentOrgData = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
-            console.log('parentOrgData', parentOrgData);
-
             // 如果在公司下，则获取公司所有的信息
             if (parentOrgData && parentOrgData.ID) {
                 parentOrgID = parentOrgData.ID;
@@ -206,13 +203,13 @@ export default class DegitalAccept extends Component {
                 });
             }
         }
-        if (!parentOrgID) {
+        if (userInfo.username === 'admin') {
+            userOperatePermission = true;
+        } else if (!parentOrgID) {
             userOperatePermission = false;
         } else if (parentOrgID && parentOrgID === '69f5ea14-dd9d-443a-8c1d-56623c328883') {
-            console.log('aaaaaaa');
             userOperatePermission = false;
         } else if (parentOrgData && parentOrgData.OrgName && parentOrgData.OrgName === '雄县自然资源局') {
-            console.log('bbbbbb');
             userOperatePermission = false;
         }
         this.setState({

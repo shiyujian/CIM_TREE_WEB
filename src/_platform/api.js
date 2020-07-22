@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2020-07-20 13:46:49
+ * @Last Modified time: 2020-07-22 09:51:09
  */
 /**
  *
@@ -459,12 +459,12 @@ export const DEGITALACCEPTCANTEXPORTSECTIONS = [
         section: 'P194-02-07',
         sectionName: '7标段',
         unit: '红谷滩园林建设集团有限公司、中铁北京工程局集团有限公司'
-    },
-    {
-        section: 'P194-02-08',
-        sectionName: '8标段',
-        unit: '江西景观建设集团有限公司、保定市绿叶园林绿化有限公司'
     }
+    // {
+    //     section: 'P194-02-08',
+    //     sectionName: '8标段',
+    //     unit: '江西景观建设集团有限公司、保定市绿叶园林绿化有限公司'
+    // }
 ];
 
 export const MODULES = [
