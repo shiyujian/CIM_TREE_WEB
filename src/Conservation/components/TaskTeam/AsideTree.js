@@ -69,7 +69,8 @@ class AsideTree extends Component {
         const {
             actions: {
                 getTreeNodeList,
-                changeSelectMemTeam
+                changeSelectMemTeam,
+                changeSelectState
             },
             platform: { tree = {} }
         } = this.props;
@@ -77,6 +78,7 @@ class AsideTree extends Component {
             this.user = getUser();
             let section = this.user.section;
             await changeSelectMemTeam('');
+            changeSelectState(false);
             // 首先查看是否为管理员，是的话，获取全部信息
             if (this.user.username === 'admin') {
                 if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
