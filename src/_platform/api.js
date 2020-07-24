@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2020-07-22 09:51:09
+ * @Last Modified time: 2020-07-24 11:16:13
  */
 /**
  *
@@ -454,12 +454,12 @@ export const DEGITALACCEPTCANTEXPORTSECTIONS = [
         section: 'P194-02-05',
         sectionName: '5标段',
         unit: '中国建筑第五工程局有限公司，北京北发生态建设有限公司'
-    },
-    {
-        section: 'P194-02-07',
-        sectionName: '7标段',
-        unit: '红谷滩园林建设集团有限公司、中铁北京工程局集团有限公司'
     }
+    // {
+    //     section: 'P194-02-07',
+    //     sectionName: '7标段',
+    //     unit: '红谷滩园林建设集团有限公司、中铁北京工程局集团有限公司'
+    // },
     // {
     //     section: 'P194-02-08',
     //     sectionName: '8标段',

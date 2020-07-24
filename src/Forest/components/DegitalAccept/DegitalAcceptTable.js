@@ -166,7 +166,6 @@ export default class DegitalAcceptTable extends Component {
             {
                 title: '操作',
                 render: (text, record) => {
-                    console.log('状态', record);
                     const {
                         userOperatePermission
                     } = this.props;
@@ -180,7 +179,6 @@ export default class DegitalAcceptTable extends Component {
                     if ((duty && duty === '施工整改人') || user.username === 'admin') {
                         permission = true;
                     }
-                    console.log('filterList', filterList);
                     if (record.CheckType && record.CheckType === 10) {
                         // 验收类型：造林面积
                         let status = true;

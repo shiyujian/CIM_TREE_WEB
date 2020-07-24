@@ -169,12 +169,14 @@ class Addition extends Component {
             companyVisible,
             regionCode
         } = this.state;
-        const sections = addition.sections ? addition.sections.join() : [];
+
         this.props.form.validateFields(async (err, values) => {
             if (!err) {
                 this.setState({
                     loading: true
                 });
+                const editSections = values.sections ? values.sections.join() : [];
+
                 let postData = {
                     ID: addition.ID,
                     OrgCode: addition.OrgCode,
@@ -183,8 +185,10 @@ class Addition extends Component {
                     ParentID: addition.ParentID,
                     ProjectID: addition.ProjectID,
                     RegionCode: regionCode,
-                    Section: sections
+                    Section: editSections
                 };
+                console.log('postData', postData);
+
                 let rst = await putChangeOrg({}, postData);
                 console.log('rst', rst);
                 if (rst && rst.code && rst.code === 1) {
