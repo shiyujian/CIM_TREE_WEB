@@ -338,7 +338,7 @@ class Tablelevel extends Component {
         // 业主和管理员
         let permissionOperate = false;
         console.log('用户标段', userData);
-        this.userSection = userData.companySection;
+        this.userSection = userData.section;
         if (userData.username === 'admin' || this.userSection.indexOf(',') > -1) {
             permissionOperate = true;
             this.setState({
