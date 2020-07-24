@@ -98,6 +98,7 @@ class Tablelevel extends Component {
             title: '操作',
             dataIndex: 'action',
             render: (text, record, index) => {
+                console.log(this.userSection);
                 if (this.userSection === record.Section || this.state.isSuperAdmin) {
                     return <a onClick={this.onEdit.bind(this, record)}>编辑</a>;
                 } else {
@@ -238,6 +239,7 @@ class Tablelevel extends Component {
                 title: '操作',
                 key: '4',
                 render: (text, record, index) => {
+                    console.log('用户标段', this.userSection, this.state.isSuperAdmin);
                     if (this.userSection === record.Section || this.state.isSuperAdmin) {
                         // 可编辑
                         if (index === 0) {
@@ -335,7 +337,8 @@ class Tablelevel extends Component {
         let userData = getUser();
         // 业主和管理员
         let permissionOperate = false;
-        this.userSection = userData.section;
+        console.log('用户标段', userData);
+        this.userSection = userData.companySection;
         if (userData.username === 'admin' || this.userSection.indexOf(',') > -1) {
             permissionOperate = true;
             this.setState({
