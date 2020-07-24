@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Radio, Modal, Tabs, Table } from 'antd';
+import { Button, Radio, Modal, Tabs, Table, notification } from 'antd';
 import L from 'leaflet';
 import 'leaflet-editable';
 import './AreaDistanceMeasure.less';
@@ -7,6 +7,8 @@ import distanceMeasureUnSelImg from './MeasureImg/距离测量2.png';
 import distanceMeasureSelImg from './MeasureImg/距离测量3.png';
 import areaMeasureUnSelImg from './MeasureImg/面积测量2.png';
 import areaMeasureSelImg from './MeasureImg/面积测量3.png';
+import dataMeasureUnSelImg from './MeasureImg/统计数据2.png';
+import dataMeasureSelImg from './MeasureImg/统计数据3.png';
 import {
     computeSignedArea,
     handlePolygonLatLngs,
@@ -243,8 +245,18 @@ export default class AreaDistanceMeasure extends Component {
     }
     // 回退
     handleRollback () {
+        console.log('回退', this.editPolygonData);
         if (this.editPolygonData) {
-            this.editPolygonData.editor.pop();
+            if (this.editPolygonData._latlngs[0].length > 1) {
+                this.editPolygonData.editor.pop();
+                notification.success({
+                    message: '已退至上一步圈画，继续点击可再次回退'
+                })
+            } else {
+                notification.error({
+                    message: '已退至最初状态，不可继续回退'
+                })
+            }
         }
     }
     handleRadio (e) {
@@ -285,8 +297,14 @@ export default class AreaDistanceMeasure extends Component {
         });
     }
     handleCancelImport () {
+        const {
+            map
+        } = this.props;
         this.setState({
-            visibleImport: false
+            visibleImport: false,
+            radioValue: 2
+        }, () => {
+            this.editPolygonData = map.editTools.startPolygon();
         });
     }
 
@@ -321,8 +339,8 @@ export default class AreaDistanceMeasure extends Component {
                                     title='面积计算'
                                     className='AreaDistanceMeasure-rightDataMeasureMenu-clickImg' />
                             </div>
-                            <div className={areaDistanceMeasureMenu === 'areaMeasureMenu' ? 'AreaDistanceMeasure-rightDataMeasureMenu-back-Select' : 'AreaDistanceMeasure-rightDataMeasureMenu-back-Unselect'}>
-                                <img src={areaDistanceMeasureMenu === 'areaMeasureMenu' ? areaMeasureSelImg : areaMeasureUnSelImg}
+                            <div className={areaDistanceMeasureMenu === 'dataMeasureMenu' ? 'AreaDistanceMeasure-rightDataMeasureMenu-back-Select' : 'AreaDistanceMeasure-rightDataMeasureMenu-back-Unselect'}>
+                                <img src={areaDistanceMeasureMenu === 'dataMeasureMenu' ? dataMeasureSelImg : dataMeasureUnSelImg}
                                     onClick={this.handleSwitchMeasureMenu.bind(this, 'dataMeasureMenu')}
                                     title='统计数据'
                                     className='AreaDistanceMeasure-rightDataMeasureMenu-clickImg' />

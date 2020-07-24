@@ -213,7 +213,7 @@ export default class DegitalAcceptTable extends Component {
                                                 重新申请
                                             </a>
                                             <Divider type='vertical' />
-                                            <a onClick={this.againCheck.bind(this, record)}>重新验收</a>
+                                            <a onClick={this.againCheck.bind(this, 'app')}>重新验收</a>
                                         </div>);
                                     } else {
                                         return (<div >
@@ -281,7 +281,7 @@ export default class DegitalAcceptTable extends Component {
                                                 重新申请
                                             </a>
                                             <Divider type='vertical' />
-                                            <a onClick={this.againCheck.bind(this, record)}>重新验收</a>
+                                            <a onClick={this.againCheck.bind(this, 'app')}>重新验收</a>
                                         </div>);
                                     } else {
                                         return (<div >
@@ -335,7 +335,7 @@ export default class DegitalAcceptTable extends Component {
                                         <a style={{color: '#ccc', cursor: 'auto'}} >重新验收</a>
                                     </div>
                                     );
-                                } else {
+                                } else if (record.status === '完成') {
                                     if (permission) {
                                         if (record.CanReAccpetance === 1) {
                                             return (<div >
@@ -346,6 +346,40 @@ export default class DegitalAcceptTable extends Component {
                                                 <a onClick={this.exportFile.bind(this, record)}>导出</a>
                                                 <Divider type='vertical' />
                                                 <a onClick={this.againCheck.bind(this, record)}>重新验收</a>
+                                            </div>);
+                                        } else {
+                                            return (<div >
+                                                <a onClick={this.viewWord.bind(this, record)} >
+                                                    查看
+                                                </a>
+                                                <Divider type='vertical' />
+                                                <a onClick={this.exportFile.bind(this, record)}>导出</a>
+                                                <Divider type='vertical' />
+                                                <a onClick={this.againCheck.bind(this, 'CanReAccpetance')}>重新验收</a>
+                                            </div>);
+                                        }
+                                    } else {
+                                        return (<div >
+                                            <a onClick={this.viewWord.bind(this, record)} >
+                                                查看
+                                            </a>
+                                            <Divider type='vertical' />
+                                            <a onClick={this.exportFile.bind(this, record)}>导出</a>
+                                            <Divider type='vertical' />
+                                            <a onClick={this.againCheck.bind(this, 'permission')}>重新验收</a>
+                                        </div>);
+                                    }
+                                } else {
+                                    if (permission) {
+                                        if (record.CanReAccpetance === 1) {
+                                            return (<div >
+                                                <a onClick={this.viewWord.bind(this, record)} >
+                                                    查看
+                                                </a>
+                                                <Divider type='vertical' />
+                                                <a onClick={this.exportFile.bind(this, record)}>导出</a>
+                                                <Divider type='vertical' />
+                                                <a onClick={this.againCheck.bind(this, 'app')}>重新验收</a>
                                             </div>);
                                         } else {
                                             return (<div >
@@ -380,11 +414,27 @@ export default class DegitalAcceptTable extends Component {
                                         <a style={{color: '#ccc', cursor: 'auto'}} >重新验收</a>
                                     </div>
                                     );
-                                } else {
+                                } else if (record.status === '完成') {
                                     if (permission) {
                                         if (record.CanReAccpetance === 1) {
                                             return (<div >
                                                 <a onClick={this.againCheck.bind(this, record)}>重新验收</a>
+                                            </div>);
+                                        } else {
+                                            return (<div >
+                                                <a onClick={this.againCheck.bind(this, 'CanReAccpetance')}>重新验收</a>
+                                            </div>);
+                                        }
+                                    } else {
+                                        return (<div >
+                                            <a onClick={this.againCheck.bind(this, 'permission')}>重新验收</a>
+                                        </div>);
+                                    }
+                                } else {
+                                    if (permission) {
+                                        if (record.CanReAccpetance === 1) {
+                                            return (<div >
+                                                <a onClick={this.againCheck.bind(this, 'app')}>重新验收</a>
                                             </div>);
                                         } else {
                                             return (<div >
@@ -415,7 +465,7 @@ export default class DegitalAcceptTable extends Component {
                                 if (permission) {
                                     if (record.CanReAccpetance === 1) {
                                         return (<div >
-                                            <a onClick={this.againCheck.bind(this, record)}>
+                                            <a onClick={this.againCheck.bind(this, 'app')}>
                                                 重新验收
                                             </a>
                                         </div>);
@@ -467,7 +517,7 @@ export default class DegitalAcceptTable extends Component {
                                         <a onClick={this.againCheck.bind(this, 'permission')}>重新验收</a>
                                     </div>);
                                 }
-                            } else{
+                            } else {
                                 if (permission) {
                                     if (record.CanReAccpetance === 1) {
                                         return (<div >
@@ -475,7 +525,7 @@ export default class DegitalAcceptTable extends Component {
                                                 查看
                                             </a>
                                             <Divider type='vertical' />
-                                            <a onClick={this.againCheck.bind(this, record)}>重新验收</a>
+                                            <a onClick={this.againCheck.bind(this, 'app')}>重新验收</a>
                                         </div>);
                                     } else {
                                         return (<div >
@@ -503,7 +553,29 @@ export default class DegitalAcceptTable extends Component {
                                         重新验收
                                     </a>
                                 </div>);
-                            } else if (record.status === '待验收' || record.status === '完成') {
+                            } else if (record.status === '待验收') {
+                                if (permission) {
+                                    if (record.CanReAccpetance === 1) {
+                                        return (<div >
+                                            <a onClick={this.againCheck.bind(this, 'app')}>
+                                                重新验收
+                                            </a>
+                                        </div>);
+                                    } else {
+                                        return (<div >
+                                            <a onClick={this.againCheck.bind(this, 'CanReAccpetance')}>
+                                                重新验收
+                                            </a>
+                                        </div>);
+                                    }
+                                } else {
+                                    return (<div >
+                                        <a onClick={this.againCheck.bind(this, 'permission')}>
+                                            重新验收
+                                        </a>
+                                    </div>);
+                                }
+                            } else if (record.status === '完成') {
                                 if (permission) {
                                     if (record.CanReAccpetance === 1) {
                                         return (<div >
@@ -529,7 +601,7 @@ export default class DegitalAcceptTable extends Component {
                                 if (permission) {
                                     if (record.CanReAccpetance === 1) {
                                         return (<div >
-                                            <a onClick={this.againCheck.bind(this, record)}>
+                                            <a onClick={this.againCheck.bind(this, 'app')}>
                                                 重新验收
                                             </a>
                                         </div>);
@@ -581,6 +653,11 @@ export default class DegitalAcceptTable extends Component {
             Notification.error({
                 message: '提示',
                 description: '非施工整改人，没有发起重新验收申请的权限'
+            });
+        } else if (record === 'app') {
+            Notification.error({
+                message: '提示',
+                description: '不能发起重新验收，去移动端处理'
             });
         } else {
             this.setState({

@@ -79,6 +79,7 @@ export default class AreaDistanceMeasure extends Component {
                 title='导入范围'
                 className='import_modal'
                 style={{ top: 200 }}
+                maskClosable={false}
                 onCancel={this.handleCancel.bind(this)}
                 onOk={this.handleOk.bind(this)}
             >
