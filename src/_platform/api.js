@@ -439,22 +439,22 @@ export const DEGITALACCEPTCANTEXPORTSECTIONS = [
         section: 'P194-01-01',
         sectionName: '1标段',
         unit: '江苏兴业环境集团有限公司'
-    },
-    {
-        section: 'P194-01-02',
-        sectionName: '2标段',
-        unit: '中铁十一局集团有限公司、天津市宏路园林绿化工程有限公司'
-    },
-    {
-        section: 'P194-01-04',
-        sectionName: '4标段',
-        unit: '中铁一局集团有限公司、江苏星美环境建设有限公司'
-    },
-    {
-        section: 'P194-02-05',
-        sectionName: '5标段',
-        unit: '中国建筑第五工程局有限公司，北京北发生态建设有限公司'
     }
+    // {
+    //     section: 'P194-01-02',
+    //     sectionName: '2标段',
+    //     unit: '中铁十一局集团有限公司、天津市宏路园林绿化工程有限公司'
+    // },
+    // {
+    //     section: 'P194-01-04',
+    //     sectionName: '4标段',
+    //     unit: '中铁一局集团有限公司、江苏星美环境建设有限公司'
+    // },
+    // {
+    //     section: 'P194-02-05',
+    //     sectionName: '5标段',
+    //     unit: '中国建筑第五工程局有限公司，北京北发生态建设有限公司'
+    // }
     // {
     //     section: 'P194-02-07',
     //     sectionName: '7标段',
