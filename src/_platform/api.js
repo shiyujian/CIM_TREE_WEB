@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2020-07-24 11:16:13
+ * @Last Modified time: 2020-07-28 14:17:42
  */
 /**
  *
@@ -435,11 +435,11 @@ export const TREEPIPEEXPORTPERSONS = [
 ];
 // 数字化验收不可查看和导出单位
 export const DEGITALACCEPTCANTEXPORTSECTIONS = [
-    {
-        section: 'P194-01-01',
-        sectionName: '1标段',
-        unit: '江苏兴业环境集团有限公司'
-    }
+    // {
+    //     section: 'P194-01-01',
+    //     sectionName: '1标段',
+    //     unit: '江苏兴业环境集团有限公司'
+    // }
     // {
     //     section: 'P194-01-02',
     //     sectionName: '2标段',
