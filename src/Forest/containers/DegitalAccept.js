@@ -207,11 +207,12 @@ export default class DegitalAccept extends Component {
             userOperatePermission = true;
         } else if (!parentOrgID) {
             userOperatePermission = false;
-        } else if (parentOrgID && parentOrgID === '69f5ea14-dd9d-443a-8c1d-56623c328883') {
-            userOperatePermission = false;
-        } else if (parentOrgData && parentOrgData.OrgName && parentOrgData.OrgName === '雄县自然资源局') {
-            userOperatePermission = false;
         }
+        // else if (parentOrgID && parentOrgID === '69f5ea14-dd9d-443a-8c1d-56623c328883') {
+        //     userOperatePermission = false;
+        // } else if (parentOrgData && parentOrgData.OrgName && parentOrgData.OrgName === '雄县自然资源局') {
+        //     userOperatePermission = false;
+        // }
         this.setState({
             userOperatePermission
         });
