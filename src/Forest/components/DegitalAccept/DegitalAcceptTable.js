@@ -682,14 +682,23 @@ export default class DegitalAcceptTable extends Component {
                 const { record } = this.state;
                 let user = getUser();
                 let Details = [];
-                param.treeType.map(item => {
+                if (param.treeType.length > 0) {
+                    param.treeType.map(item => {
+                        Details.push({
+                            CheckType: record.CheckType,
+                            Section: record.Section,
+                            ThinClass: record.ThinClass,
+                            TreeType: item
+                        });
+                    });
+                } else {
                     Details.push({
                         CheckType: record.CheckType,
                         Section: record.Section,
                         ThinClass: record.ThinClass,
-                        TreeType: item
+                        TreeType: 0
                     });
-                });
+                }
                 let pro = {
                     Applier: user.ID, // 申请人
                     CheckType: record.ystype, // 验收类型名称，多个逗号隔开
